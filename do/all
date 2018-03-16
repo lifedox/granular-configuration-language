@@ -1,0 +1,16 @@
+#!/bin/bash -e
+
+source do/setup
+python --version
+./do/clean
+./do/test
+
+source do/teardown
+source do/setup3
+python --version
+./do/clean
+./do/test
+if [ "${SKIP_BUILD,,}" != "true" ]; then
+  ./do/build
+fi
+source do/teardown

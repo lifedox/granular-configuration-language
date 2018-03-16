@@ -1,0 +1,5 @@
+b: from g/h.txt
+h: from g/h.txt
+
+map:
+  h: from g/h.txt

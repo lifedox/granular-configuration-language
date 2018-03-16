@@ -1,0 +1,6 @@
+#!/bin/bash -e
+
+if [ ! -z "${VIRTUAL_ENV}" ]; then
+  deactivate
+  rm -rf venv
+fi

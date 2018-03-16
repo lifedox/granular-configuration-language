@@ -1,0 +1,10 @@
+a: from a/b/t2.txt
+c: from a/b/t2.txt
+h: from a/b/t2.txt
+
+map:
+  a: from a/b/t2.txt
+
+deep_test:
+  a:
+    b: 10
