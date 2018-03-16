@@ -65,7 +65,7 @@ def _get_files_from_locations(filenames=None, directories=None, files=None):
         ).keys()
 
 
-class ConfigurationLocations():
+class ConfigurationLocations(object):
     def __init__(self, filenames=None, directories=None, files=None):
         if files and (filenames or directories):
             raise ValueError("files cannot be defined with filenames and directories.")

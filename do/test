@@ -5,4 +5,4 @@ if [ -z "${VIRTUAL_ENV}" ]; then
     exit 1
 fi
 python setup.py test
-bandit -r granular_event_sourcing_consumer_client -ll
+bandit -r granular_configuration -ll
