@@ -89,12 +89,12 @@ def _get_all_unique_locations(locations):
     ).keys()
 
 class LazyLoadConfiguration(object):
-    def __init__(self, *locations, **kwargs):
+    def __init__(self, *load_order_location, **kwargs):
         base_path = kwargs.get("base_path")
         self._base_path = base_path if base_path else []
         self._config = None
-        self._locations = locations
-        if not any(map(lambda loc: isinstance(loc, ConfigurationLocations), locations)):
+        self._locations = load_order_location
+        if not any(map(lambda loc: isinstance(loc, ConfigurationLocations), load_order_location)):
             raise ValueError("locations be of type ConfigurationLocations.")
 
     def get(self, *args, **kwargs):
