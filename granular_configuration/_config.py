@@ -66,6 +66,14 @@ class Configuration(MutableMapping):
     def __repr__(self):
         return repr(self.__data)
 
+    @property
+    def __class__(self):
+        return _ConDict
+
+
+class _ConDict(dict, Configuration):
+    pass
+
 
 def _load_file(filename):
     try:

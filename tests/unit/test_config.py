@@ -76,6 +76,11 @@ class TestConfig(unittest.TestCase):
         assert config.popitem() == ("a", reduce, )
 
 
+    def test_Configuration_is_dict(self):
+        value = Configuration()
+
+        assert isinstance(value, dict)
+
 
     def test__get_files_from_locations(self):
         base_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), "../assets/config_location_test"))
