@@ -105,3 +105,27 @@ CONFIG = LazyLoadConfiguration(
 ```python
 assert CONFIG.Key1.Key2.Key3 == "Set by the priority file"
 ```
+
+&nbsp;
+
+## Tags
+
+* `!Env`
+  - **Usage:** `!Env '{{ENVIRONMENT_VARIABLE_THAT_EXISTS}} {{ENVIRONMENT_VARIABLE_THAT_DOES_NOT_EXIST:default value}}'`
+  - **Argument:** *String*. Returns a string produced by the string format, replacing `{{VARIABLE_NAME}}` with the Environment Variable specified. Optionally, a default value can be specified should the Environment Variable not exist.
+* `!Func`
+  - **Usage:** `!Func 'path.to.function'`
+  - **Argument:** *String*. Returns a pointer to the function specified. Acts as an import of `path.to`, returning `getattr(path.to, function)`. The current working directory is added prior to attempt the import. Returned object must be callable.
+* `!Class`
+  - **Usage:** `!Class 'path.to.function'`
+  - Acts the same as `!Func` except that the returned object must subclass `object`
+* `!Placeholder`
+  - **Usage:** `!Placeholder 'message'`
+  - **Argument:** *String*. Returns a `Placeholder` containing the message. If a Placeholder is not overridden, a `PlaceholderConfigurationError` exception will be thrown if accessed.
+
+&nbsp;
+
+## Changelog
+### 1.1
+ * Adds `!Placeholder` Tag
+ * Makes tags evaluate lazily (i.e. at first usage)

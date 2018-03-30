@@ -12,6 +12,22 @@ consume = partial(deque, maxlen=0)
 
 ENV_PATTERN = re.compile(r'(\{\{\s*(?P<env_name>[A-Za-z0-9-_]+)\s*(?:\:(?P<default>.*?))?\}\})')
 
+class Placeholder(object):
+    def __init__(self, message):
+        self.message = message
+
+    def __str__(self):
+        return str(self.message)
+
+class LazyEval(object):
+    def __init__(self, value):
+        assert callable(value)
+        self.value = value
+
+    def run(self):
+        return self.value()
+
+
 def load_env(env_name, default=None):
     if default is None:
         return os.environ[env_name]
@@ -36,9 +52,18 @@ def handle_env(loader, node):
 
     if isinstance(node, ScalarNode):
         value = loader.construct_scalar(node)
-        return ENV_PATTERN.sub(lambda x: load_env(**x.groupdict()), value)
+        return LazyEval(lambda: ENV_PATTERN.sub(lambda x: load_env(**x.groupdict()), value))
     else:
         raise ValueError("Only strings are supported by !Env")
+
+def handle_placeholder(loader, node):
+    assert isinstance(loader, SafeLoader)
+
+    if isinstance(node, ScalarNode):
+        value = loader.construct_scalar(node)
+        return Placeholder(value)
+    else:
+        raise ValueError("Only strings are supported by !Placeholder")
 
 def handle_class(value):
     class_type = get_func(value)
@@ -84,5 +109,6 @@ def loads(yaml_str, obj_pairs_hook=None):
     ExtendSafeLoader.add_constructor("!Env", handle_env)
     ExtendSafeLoader.add_constructor("!Func", partial(string_check, handle_func))
     ExtendSafeLoader.add_constructor("!Class", partial(string_check, handle_class))
+    ExtendSafeLoader.add_constructor("!Placeholder", handle_placeholder)
 
     return yaml.load(yaml_str, Loader=ExtendSafeLoader)  # nosec  # ExtendSafeLoader is a subclass of SafeLoader

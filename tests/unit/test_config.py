@@ -3,23 +3,23 @@ from mock import patch, call
 import os
 from functools import reduce, partial
 
-from granular_configuration.yaml_handler import loads
+from granular_configuration.yaml_handler import loads, Placeholder, LazyEval
 from granular_configuration._config import (
     _get_files_from_locations, LazyLoadConfiguration, _build_configuration, Configuration, ConfigurationLocations, _get_all_unique_locations)
-
+from granular_configuration.exceptions import PlaceholderConfigurationError
 
 class TestConfig(unittest.TestCase):
     def test_yaml_env(self):
         with patch.dict(os.environ, values={"unreal_env_variable": "test me"}):
-            assert loads("!Env '{{unreal_env_variable}}'") == "test me"
-            assert loads("!Env '{{unreal_env_variable:special}}'") == "test me"
-            assert loads("!Env '{{unreal_env_vari:special case }}'") == "special case "
+            assert loads("!Env '{{unreal_env_variable}}'").run() == "test me"
+            assert loads("!Env '{{unreal_env_variable:special}}'").run() == "test me"
+            assert loads("!Env '{{unreal_env_vari:special case }}'").run() == "special case "
 
             with self.assertRaises(KeyError):
-                loads("!Env '{{unreal_env_vari}}'")
+                loads("!Env '{{unreal_env_vari}}'").run()
 
             with self.assertRaises(ValueError):
-                loads("!Env [a]")
+                loads("!Env [a]").run()
 
 
     def test_yaml_func(self):
@@ -47,6 +47,15 @@ class TestConfig(unittest.TestCase):
 
         with self.assertRaises(ValueError):
             loads("!Class [a]")
+
+    def test_yaml_placeholder(self):
+        placeholder = loads("!Placeholder value")
+
+        assert isinstance(placeholder, Placeholder)
+        assert str(placeholder) == "value"
+
+        with self.assertRaises(ValueError):
+            loads("!Placeholder []")
 
 
     def test__get_files_from_locations(self):
@@ -117,9 +126,24 @@ class TestConfig(unittest.TestCase):
                                      "c": "from c/t.txt"
                                     }
         assert configuration.deep_test.a.b == 10
+        assert configuration.placeholder_test.overridden == 'This should be overridden'
+        assert configuration.env_test.default == "This should be seen"
 
-        with self.assertRaises(AttributeError):
+        with self.assertRaises(AttributeError, message='Configuration value "doesnotexist" does not exist') as cm:
             configuration.doesnotexist
+
+        assert str(cm.exception) == 'Configuration value "doesnotexist" does not exist'
+
+        with self.assertRaises(AttributeError) as cm:
+            configuration.deep_test.a.doesnotexist
+
+        assert str(cm.exception) == 'Configuration value "deep_test.a.doesnotexist" does not exist'
+
+        with self.assertRaises(PlaceholderConfigurationError) as cm:
+            configuration.placeholder_test.not_overridden
+
+        assert str(cm.exception) == 'Configuration expects "placeholder_test.not_overridden" to be overwritten. Message: "This should not be overridden"'
+
 
     def test__ConfigurationLocations(self):
         base_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), "../assets/config_location_test"))

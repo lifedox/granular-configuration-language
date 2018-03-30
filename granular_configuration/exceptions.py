@@ -1,0 +1,4 @@
+
+class PlaceholderConfigurationError(Exception):
+    pass
+

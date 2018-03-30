@@ -3,3 +3,6 @@ h: from g/h.txt
 
 map:
   h: from g/h.txt
+
+placeholder_test:
+  overridden: 'This should be overridden'
