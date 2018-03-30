@@ -2,6 +2,7 @@ import unittest
 from mock import patch, call
 import os
 from functools import reduce, partial
+from six import iteritems, itervalues
 
 from granular_configuration.yaml_handler import loads, Placeholder, LazyEval
 from granular_configuration._config import (
@@ -23,30 +24,30 @@ class TestConfig(unittest.TestCase):
 
 
     def test_yaml_func(self):
-        assert loads("!Func functools.reduce") is reduce
-        assert loads("!Func granular_configuration._config.ConfigurationLocations") is ConfigurationLocations
+        assert loads("!Func functools.reduce").run() is reduce
+        assert loads("!Func granular_configuration._config.ConfigurationLocations").run() is ConfigurationLocations
 
         with self.assertRaises(ValueError):
-            loads("!Func unreal.garbage.func")
+            loads("!Func unreal.garbage.func").run()
 
         with self.assertRaises(ValueError):
-            loads("!Func sys.stdout")
+            loads("!Func sys.stdout").run()
 
         with self.assertRaises(ValueError):
-            loads("!Func [a]")
+            loads("!Func [a]").run()
 
     def test_yaml_class(self):
-        assert loads("!Class granular_configuration._config.ConfigurationLocations") is ConfigurationLocations
+        assert loads("!Class granular_configuration._config.ConfigurationLocations").run() is ConfigurationLocations
 
         with self.assertRaises(ValueError):
-            loads("!Class functools.reduce")
+            loads("!Class functools.reduce").run()
 
         with self.assertRaises(ValueError):
-            loads("!Class unreal.garbage.func")
+            loads("!Class unreal.garbage.func").run()
 
 
         with self.assertRaises(ValueError):
-            loads("!Class [a]")
+            loads("!Class [a]").run()
 
     def test_yaml_placeholder(self):
         placeholder = loads("!Placeholder value")
@@ -56,6 +57,24 @@ class TestConfig(unittest.TestCase):
 
         with self.assertRaises(ValueError):
             loads("!Placeholder []")
+
+    def test_converting_Configuration_to_dict(self):
+        config = loads("a: !Func functools.reduce", Configuration)
+        assert isinstance(config, Configuration)
+        assert tuple(iteritems(config)) == (("a", reduce),)
+
+        config = loads("a: !Func functools.reduce", Configuration)
+        assert tuple(itervalues(config)) == (reduce, )
+
+        config = loads("a: !Func functools.reduce", Configuration)
+        assert dict(config) == {"a": reduce}
+
+        config = loads("a: !Func functools.reduce", Configuration)
+        assert config.pop("a") == reduce
+
+        config = loads("a: !Func functools.reduce", Configuration)
+        assert config.popitem() == ("a", reduce, )
+
 
 
     def test__get_files_from_locations(self):

@@ -1,5 +1,5 @@
 from __future__ import print_function, absolute_import
-from collections import Mapping, deque, OrderedDict
+from collections import Mapping, deque, OrderedDict, UserDict
 import os
 from itertools import product, groupby, chain, starmap, islice
 from six import iteritems
@@ -10,7 +10,7 @@ from granular_configuration.exceptions import PlaceholderConfigurationError
 
 consume = partial(deque, maxlen=0)
 
-class Configuration(dict):
+class Configuration(UserDict):
     def __init__(self, *arg, **kwargs):
         super(Configuration, self).__init__()
         consume(starmap(self.__setitem__, iteritems(dict(*arg, **kwargs))))
@@ -37,11 +37,8 @@ class Configuration(dict):
 
         return super(Configuration, self).__setitem__(key, value)
 
-    def __getattr__(self, name):
-        if name not in self:
-            raise AttributeError('Configuration value "{}" does not exist'.format(self.__get_name(name)))
-
-        value = self[name]
+    def __getitem__(self, name):
+        value = super(Configuration, self).__getitem__(name)
         if isinstance(value, Placeholder):
             raise PlaceholderConfigurationError(
                 'Configuration expects "{}" to be overwritten. Message: "{}"'.format(self.__get_name(name), value))
@@ -52,6 +49,11 @@ class Configuration(dict):
         else:
             return value
 
+    def __getattr__(self, name):
+        if name not in self:
+            raise AttributeError('Configuration value "{}" does not exist'.format(self.__get_name(name)))
+
+        return self[name]
 
 
 def _load_file(filename):
@@ -67,7 +69,7 @@ def _build_configuration(locations):
         assert isinstance(from_dict, Mapping)
 
         for key, value in iteritems(from_dict):
-            if isinstance(value, dict) and (key in base_dict) and isinstance(base_dict[key], dict):
+            if isinstance(value, Configuration) and (key in base_dict) and isinstance(base_dict[key], Configuration):
                 new_dict = base_dict[key]
                 _recursive_build_config(new_dict, value)
                 value = new_dict
@@ -75,7 +77,7 @@ def _build_configuration(locations):
             base_dict[key] = value
 
     available_configs = map(_load_file, locations)
-    valid_configs = filter(lambda config: isinstance(config, dict), available_configs)
+    valid_configs = filter(lambda config: isinstance(config, Configuration), available_configs)
 
     base_conf = Configuration()
     consume(map(partial(_recursive_build_config, base_conf), valid_configs))
