@@ -85,7 +85,7 @@ def handle_func(value):
 def string_check(func, loader, node):
     assert isinstance(loader, SafeLoader)
     if isinstance(node, ScalarNode):
-        return func(loader.construct_scalar(node))
+        return LazyEval(lambda: func(loader.construct_scalar(node)))
     else:
         raise ValueError("Only strings are supported by !{}".format(node.tag))
 
