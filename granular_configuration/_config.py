@@ -5,18 +5,54 @@ from itertools import product, groupby, chain, starmap, islice
 from six import iteritems
 from six.moves import map, filter, zip_longest
 from functools import partial, reduce
-from granular_configuration.yaml_handler import loads
+from granular_configuration.yaml_handler import loads, Placeholder, LazyEval
+from granular_configuration.exceptions import PlaceholderConfigurationError
 
 consume = partial(deque, maxlen=0)
 
 class Configuration(dict):
     def __init__(self, *arg, **kwargs):
-        super(Configuration, self).__init__(*arg, **kwargs)
-        self.__dict__.update(self)
+        super(Configuration, self).__init__()
+        consume(starmap(self.__setitem__, iteritems(dict(*arg, **kwargs))))
+
+        self.__parent = None
+        self.__name = None
+
+    def __generate_name(self, attribute=None):
+        if self.__parent:
+            for name in self.__parent._Configuration__generate_name():
+                yield name
+        if self.__name:
+            yield self.__name
+        if attribute:
+            yield attribute
+
+    def __get_name(self, attribute=None):
+        return ".".join(self.__generate_name(attribute))
 
     def __setitem__(self, key, value):
-        setattr(self, key, value)
+        if isinstance(value, Configuration):
+            value._Configuration__name = key
+            value._Configuration__parent = self
+
         return super(Configuration, self).__setitem__(key, value)
+
+    def __getattr__(self, name):
+        if name not in self:
+            raise AttributeError('Configuration value "{}" does not exist'.format(self.__get_name(name)))
+
+        value = self[name]
+        if isinstance(value, Placeholder):
+            raise PlaceholderConfigurationError(
+                'Configuration expects "{}" to be overwritten. Message: "{}"'.format(self.__get_name(name), value))
+        elif isinstance(value, LazyEval):
+            new_value = value.run()
+            self[name] = new_value
+            return new_value
+        else:
+            return value
+
+
 
 def _load_file(filename):
     try:
@@ -80,6 +116,18 @@ class ConfigurationLocations(object):
         return _get_files_from_locations(filenames=self.filenames,
                                          directories=self.directories,
                                          files=self.files)
+
+class ConfigurationFiles(ConfigurationLocations):
+    def __init__(self, files):
+        super(ConfigurationFiles, self).__init__(filenames=None,
+                                                 directories=None,
+                                                 files=files)
+
+class ConfigurationMultiNamedFiles(ConfigurationLocations):
+    def __init__(self, filenames, directories):
+        super(ConfigurationMultiNamedFiles, self).__init__(filenames=filenames,
+                                                           directories=directories,
+                                                           files=None)
 
 def _get_all_unique_locations(locations):
     return OrderedDict(

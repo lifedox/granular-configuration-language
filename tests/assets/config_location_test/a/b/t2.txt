@@ -8,3 +8,11 @@ map:
 deep_test:
   a:
     b: 10
+
+
+placeholder_test:
+  not_overridden: !Placeholder 'This should not be overridden'
+  overridden: !Placeholder 'This should be overridden'
+
+env_test:
+  default: !Env '{{UNREAL_ENV_VAR:This should be seen}}'

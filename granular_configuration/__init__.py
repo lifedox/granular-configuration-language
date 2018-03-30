@@ -1,1 +1,3 @@
-from granular_configuration._config import LazyLoadConfiguration, Configuration, ConfigurationLocations
+from granular_configuration._config import (
+    LazyLoadConfiguration, Configuration,
+    ConfigurationLocations, ConfigurationFiles, ConfigurationMultiNamedFiles)
