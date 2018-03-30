@@ -1,5 +1,5 @@
 from __future__ import print_function, absolute_import
-from collections import Mapping, deque, OrderedDict, UserDict
+from collections import Mapping, deque, OrderedDict, MutableMapping
 import os
 from itertools import product, groupby, chain, starmap, islice
 from six import iteritems
@@ -10,13 +10,22 @@ from granular_configuration.exceptions import PlaceholderConfigurationError
 
 consume = partial(deque, maxlen=0)
 
-class Configuration(UserDict):
+class Configuration(MutableMapping):
     def __init__(self, *arg, **kwargs):
-        super(Configuration, self).__init__()
+        self.__data = dict()
         consume(starmap(self.__setitem__, iteritems(dict(*arg, **kwargs))))
 
         self.__parent = None
         self.__name = None
+
+    def __iter__(self):
+        return iter(self.__data)
+
+    def __len__(self):
+        return len(self.__data)
+
+    def __delitem__(self, key):
+        return self.__data.__delitem__(key)
 
     def __generate_name(self, attribute=None):
         if self.__parent:
@@ -32,13 +41,12 @@ class Configuration(UserDict):
 
     def __setitem__(self, key, value):
         if isinstance(value, Configuration):
-            value._Configuration__name = key
-            value._Configuration__parent = self
-
-        return super(Configuration, self).__setitem__(key, value)
+            value.__name = key
+            value.__parent = self
+        self.__data[key] = value
 
     def __getitem__(self, name):
-        value = super(Configuration, self).__getitem__(name)
+        value = self.__data[name]
         if isinstance(value, Placeholder):
             raise PlaceholderConfigurationError(
                 'Configuration expects "{}" to be overwritten. Message: "{}"'.format(self.__get_name(name), value))
@@ -55,6 +63,9 @@ class Configuration(UserDict):
 
         return self[name]
 
+    def __repr__(self):
+        return repr(self.__data)
+
 
 def _load_file(filename):
     try:
@@ -66,7 +77,7 @@ def _load_file(filename):
 def _build_configuration(locations):
     def _recursive_build_config(base_dict, from_dict):
         assert isinstance(base_dict, Configuration)
-        assert isinstance(from_dict, Mapping)
+        assert isinstance(from_dict, Configuration)
 
         for key, value in iteritems(from_dict):
             if isinstance(value, Configuration) and (key in base_dict) and isinstance(base_dict[key], Configuration):
