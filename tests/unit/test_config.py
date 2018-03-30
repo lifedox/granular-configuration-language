@@ -129,7 +129,7 @@ class TestConfig(unittest.TestCase):
         assert configuration.placeholder_test.overridden == 'This should be overridden'
         assert configuration.env_test.default == "This should be seen"
 
-        with self.assertRaises(AttributeError, message='Configuration value "doesnotexist" does not exist') as cm:
+        with self.assertRaises(AttributeError) as cm:
             configuration.doesnotexist
 
         assert str(cm.exception) == 'Configuration value "doesnotexist" does not exist'
