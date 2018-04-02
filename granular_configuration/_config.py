@@ -67,6 +67,15 @@ class Configuration(MutableMapping):
     def __repr__(self):
         return repr(self.__data)
 
+    def __contains__(self, key):
+        return key in self.__data
+
+    def __hasattr__(Self, key):
+        return key in self.__data
+
+    def exists(self, key):
+        return (key in self.__data) and not isinstance(self.__data[key], Placeholder)
+
     def as_dict(self):
         return dict(starmap(lambda key, value: (key, value.as_dict() if isinstance(value, Configuration) else value),
                             iteritems(self)))

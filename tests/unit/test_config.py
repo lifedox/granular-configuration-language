@@ -91,6 +91,19 @@ class TestConfig(unittest.TestCase):
 
         assert new == value
 
+
+    def test_Configuration_exists(self):
+        config = Configuration(a=1, b=Placeholder("tests"))
+
+        assert config.exists("a") is True
+        assert config.exists("b") is False
+        assert config.exists("c") is False
+
+        assert ("a" in config) is True
+        assert ("b" in config) is True
+        assert ("c" in config) is False
+
+
     def test_Configuration_as_dict(self):
         input = Configuration(a="b", b=Configuration(a=Configuration(a=1)))
         expected = dict(a="b", b=dict(a=dict(a=1)))
