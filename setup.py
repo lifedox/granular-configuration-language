@@ -21,7 +21,7 @@ setup(
     url='https://gitlab.encirca.auto.pioneer.com/granular-lite/granular-configuration',
     packages=find_packages(exclude=['tests*']),
     package_data={},
-    install_requires=install_requires#,
-    #setup_requires=['pytest-runner'],
-    #tests_require=tests_requires
+    install_requires=install_requires,
+    setup_requires=['pytest-runner'],
+    tests_require=tests_requires
 )
