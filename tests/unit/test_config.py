@@ -103,6 +103,10 @@ class TestConfig(unittest.TestCase):
         assert ("b" in config) is True
         assert ("c" in config) is False
 
+        assert config.get("a") == 1
+        assert config.get("b") is None
+        assert config.get("c") is None
+
 
     def test_Configuration_as_dict(self):
         input = Configuration(a="b", b=Configuration(a=Configuration(a=1)))

@@ -1,5 +1,5 @@
 from __future__ import print_function, absolute_import
-from collections import Mapping, deque, OrderedDict, MutableMapping
+from collections import deque, OrderedDict, MutableMapping
 import os
 import copy
 from itertools import product, groupby, chain, starmap, islice
@@ -29,8 +29,8 @@ class Configuration(MutableMapping):
         return self.__data.__delitem__(key)
 
     def __generate_name(self, attribute=None):
-        if self.__parent_generate_name:
-            for name in self.__parent_generate_name():
+        if callable(self.__parent_generate_name):
+            for name in self.__parent_generate_name(): # pylint: disable=not-callable
                 yield name
         if self.__name:
             yield self.__name
@@ -58,6 +58,9 @@ class Configuration(MutableMapping):
         else:
             return value
 
+    def get(self, key, default=None):
+        return self[key] if self.exists(key) else default
+
     def __getattr__(self, name):
         if name not in self:
             raise AttributeError('Configuration value "{}" does not exist'.format(self.__get_name(name)))
@@ -68,9 +71,6 @@ class Configuration(MutableMapping):
         return repr(self.__data)
 
     def __contains__(self, key):
-        return key in self.__data
-
-    def __hasattr__(Self, key):
         return key in self.__data
 
     def exists(self, key):
@@ -101,7 +101,7 @@ class Configuration(MutableMapping):
         return _ConDict
 
 
-class _ConDict(dict, Configuration):
+class _ConDict(dict, Configuration): # pylint: disable=too-many-ancestors
     pass
 
 
