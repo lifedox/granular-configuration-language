@@ -77,9 +77,27 @@ class TestConfig(unittest.TestCase):
 
 
     def test_Configuration_is_dict(self):
-        value = Configuration()
+        base_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), "../assets/config_location_test"))
+        dir_func = partial(os.path.join, base_dir)
 
+        files = list(map(dir_func, ["g/h.txt", "c/t.txt"]))
+
+        value = _build_configuration(files)
         assert isinstance(value, dict)
+
+        from copy import deepcopy
+
+        new = deepcopy(value)
+
+        assert new == value
+
+    def test_Configuration_as_dict(self):
+        input = Configuration(a="b", b=Configuration(a=Configuration(a=1)))
+        expected = dict(a="b", b=dict(a=dict(a=1)))
+        assert input.as_dict() == expected
+
+
+
 
 
     def test__get_files_from_locations(self):
