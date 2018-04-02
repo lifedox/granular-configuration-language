@@ -91,6 +91,9 @@ class TestConfig(unittest.TestCase):
 
         assert new == value
 
+        assert value.exists("a") is False
+        assert new.exists("a") is False
+
 
     def test_Configuration_exists(self):
         config = Configuration(a=1, b=Placeholder("tests"))

@@ -81,7 +81,7 @@ class Configuration(MutableMapping):
                             iteritems(self)))
 
     def __deepcopy__(self, memo):
-        other = self.__class__()
+        other = Configuration()
         memo[id(self)] = other
         for key, value in iteritems(self.__data):
             other[copy.deepcopy(key, memo)] = copy.deepcopy(value, memo)
