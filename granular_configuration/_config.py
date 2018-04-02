@@ -1,6 +1,7 @@
 from __future__ import print_function, absolute_import
 from collections import Mapping, deque, OrderedDict, MutableMapping
 import os
+import copy
 from itertools import product, groupby, chain, starmap, islice
 from six import iteritems
 from six.moves import map, filter, zip_longest
@@ -15,7 +16,7 @@ class Configuration(MutableMapping):
         self.__data = dict()
         consume(starmap(self.__setitem__, iteritems(dict(*arg, **kwargs))))
 
-        self.__parent = None
+        self.__parent_generate_name = None
         self.__name = None
 
     def __iter__(self):
@@ -28,8 +29,8 @@ class Configuration(MutableMapping):
         return self.__data.__delitem__(key)
 
     def __generate_name(self, attribute=None):
-        if self.__parent:
-            for name in self.__parent._Configuration__generate_name():
+        if self.__parent_generate_name:
+            for name in self.__parent_generate_name():
                 yield name
         if self.__name:
             yield self.__name
@@ -42,7 +43,7 @@ class Configuration(MutableMapping):
     def __setitem__(self, key, value):
         if isinstance(value, Configuration):
             value.__name = key
-            value.__parent = self
+            value.__parent_generate_name = self.__generate_name
         self.__data[key] = value
 
     def __getitem__(self, name):
@@ -65,6 +66,26 @@ class Configuration(MutableMapping):
 
     def __repr__(self):
         return repr(self.__data)
+
+    def as_dict(self):
+        return dict(starmap(lambda key, value: (key, value.as_dict() if isinstance(value, Configuration) else value),
+                            iteritems(self)))
+
+    def __deepcopy__(self, memo):
+        other = self.__class__()
+        memo[id(self)] = other
+        for key, value in iteritems(self.__data):
+            other[copy.deepcopy(key, memo)] = copy.deepcopy(value, memo)
+        return other
+
+    def __getnewargs__(self):
+        return tuple(self.items())
+
+    def __getstate__(self):
+        return self
+
+    def __setstate__(self, state):
+        self.update(state)
 
     @property
     def __class__(self):
