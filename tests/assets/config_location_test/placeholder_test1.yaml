@@ -1,0 +1,3 @@
+a: !Placeholder This should not error
+b: !Placeholder This will not be seen
+c: Thus will been hidden

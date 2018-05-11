@@ -1,0 +1,5 @@
+a:
+  key1: value1
+  key2: value2
+b: !Placeholder Placeholder over a placeholder
+c: !Placeholder Placeholder over a value

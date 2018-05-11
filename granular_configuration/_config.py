@@ -87,6 +87,9 @@ class Configuration(MutableMapping):
             other[copy.deepcopy(key, memo)] = copy.deepcopy(value, memo)
         return other
 
+    def _raw_items(self):
+        return iteritems(self.__data)
+
     def __getnewargs__(self):
         return tuple(self.items())
 
@@ -117,8 +120,13 @@ def _build_configuration(locations):
         assert isinstance(base_dict, Configuration)
         assert isinstance(from_dict, Configuration)
 
-        for key, value in iteritems(from_dict):
-            if isinstance(value, Configuration) and (key in base_dict) and isinstance(base_dict[key], Configuration):
+        for key, value in from_dict._raw_items():
+            if isinstance(value, Configuration) and (key in base_dict):
+                if not base_dict.exists(key):
+                    base_dict[key] = Configuration()
+                elif not isinstance(base_dict[key], Configuration):
+                    continue
+
                 new_dict = base_dict[key]
                 _recursive_build_config(new_dict, value)
                 value = new_dict
