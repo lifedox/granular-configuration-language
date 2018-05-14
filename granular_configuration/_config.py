@@ -107,6 +107,8 @@ class Configuration(MutableMapping):
 class _ConDict(dict, Configuration): # pylint: disable=too-many-ancestors
     pass
 
+def _unique_ordered_iterable(iter):
+    return OrderedDict(zip_longest(iter, [])).keys()
 
 def _load_file(filename):
     try:
@@ -146,18 +148,17 @@ def _get_files_from_locations(filenames=None, directories=None, files=None):
         filenames = []
         directories = []
 
-    files = set(files) if files else set()
+    files = _unique_ordered_iterable(files) if files else []
 
-    return OrderedDict(
-        zip_longest(chain(
-                chain.from_iterable(map(
-                    lambda a: islice(filter(os.path.isfile,
-                                    starmap(os.path.join, a[1])),
-                                     1),
-                    groupby(product(directories, filenames), key=lambda a: a[0]))),
-                filter(os.path.isfile, files)),
-            [])
-        ).keys()
+    return _unique_ordered_iterable(
+        chain(
+            chain.from_iterable(map(
+                lambda a: islice(filter(os.path.isfile,
+                                        starmap(os.path.join, a[1])),
+                                 1),
+                groupby(product(directories, filenames), key=lambda a: a[0]))),
+            filter(os.path.isfile, files)
+        ))
 
 
 class ConfigurationLocations(object):
@@ -189,12 +190,7 @@ class ConfigurationMultiNamedFiles(ConfigurationLocations):
                                                            files=None)
 
 def _get_all_unique_locations(locations):
-    return OrderedDict(
-        zip_longest(
-            chain.from_iterable(map(ConfigurationLocations.get_locations, locations)),
-            [])
-    ).keys()
-
+    return _unique_ordered_iterable(chain.from_iterable(map(ConfigurationLocations.get_locations, locations)))
 class LazyLoadConfiguration(object):
     def __init__(self, *load_order_location, **kwargs):
         base_path = kwargs.get("base_path")
@@ -203,9 +199,6 @@ class LazyLoadConfiguration(object):
         self._locations = load_order_location
         if not any(map(lambda loc: isinstance(loc, ConfigurationLocations), load_order_location)):
             raise ValueError("locations be of type ConfigurationLocations.")
-
-    def get(self, *args, **kwargs):
-        return self._config.get(*args, **kwargs)
 
     def __getattr__(self, name):
         if self._config is None:
