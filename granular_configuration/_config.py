@@ -6,7 +6,8 @@ from itertools import product, groupby, chain, starmap, islice
 from six import iteritems
 from six.moves import map, filter, zip_longest
 from functools import partial, reduce
-from granular_configuration.yaml_handler import loads, Placeholder, LazyEval
+from granular_configuration.yaml_handler import Placeholder, LazyEval
+from granular_configuration._load import load_file
 from granular_configuration.exceptions import PlaceholderConfigurationError
 
 consume = partial(deque, maxlen=0)
@@ -110,12 +111,7 @@ class _ConDict(dict, Configuration): # pylint: disable=too-many-ancestors
 def _unique_ordered_iterable(iter):
     return OrderedDict(zip_longest(iter, [])).keys()
 
-def _load_file(filename):
-    try:
-        with open(filename, "r") as f:
-            return loads(f.read(), obj_pairs_hook=Configuration)
-    except Exception as e:
-        raise ValueError('Problem in file "{}": {}'.format(filename, e))
+_load_file = partial(load_file, obj_pairs_hook=Configuration)
 
 def _build_configuration(locations):
     def _recursive_build_config(base_dict, from_dict):
