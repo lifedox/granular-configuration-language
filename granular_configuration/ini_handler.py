@@ -3,16 +3,18 @@ from configparser import RawConfigParser
 from io import StringIO
 from collections import OrderedDict, MutableMapping, deque
 from six.moves import map, filterfalse
+from six import text_type
 from functools import partial
 from itertools import starmap, islice
+import operator as op
 
 from granular_configuration.yaml_handler import loads as yaml_loads
 from granular_configuration.exceptions import IniKeyExistAsANonMapping, IniTryToReplaceExistingKey
 
-consume = partial(deque)
+consume = partial(deque, maxlen=0)
 
 class IniLoader(object):
-    def __init__(self, parser: RawConfigParser, obj_pairs_hook=None):
+    def __init__(self, parser, obj_pairs_hook=None):
         if obj_pairs_hook and issubclass(obj_pairs_hook, MutableMapping):
             self.obj_pairs_hook = obj_pairs_hook
         else:
@@ -30,7 +32,7 @@ class IniLoader(object):
         consume(starmap(partial(self._set_item, mapping), items))
 
     def _get_sections(self):
-        return filterfalse("ROOT".__eq__, self.parser.sections())
+        return filterfalse(op.methodcaller("__eq__", "ROOT"), self.parser.sections())
 
     def _get_root(self):
         if self.parser.has_section("ROOT"):
@@ -86,7 +88,7 @@ class IniLoader(object):
 def loads(ini_str, obj_pairs_hook=None):
     parser = RawConfigParser()
     parser.optionxform = str
-    parser.readfp(StringIO(ini_str))
+    parser.readfp(StringIO(text_type(ini_str)))
 
     return IniLoader(parser, obj_pairs_hook).read()
 
