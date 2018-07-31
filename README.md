@@ -11,12 +11,12 @@ This library allows a library or application to interact with typed settings tha
 
 
 #### Quick Links
-- [YAML Tags](#YAML-Tags)
-- [Configuration Locations](#Configuration-Locations)
-- [Interface Objects](#Interface-Objects)
-- [Base Path](#Base-Path)
-- [Changelog](#Changelog)
-- [Ini Configuration File Support](#Ini-Configuration-File-Support)
+- [YAML Tags](#yaml-tags)
+- [Configuration Locations](#configuration-locations)
+- [Interface Objects](#interface-objects)
+- [Base Path](#base-path)
+- [Changelog](#changelog)
+- [Ini Configuration File Support](#ini-configuration-file-support)
 
 
 ## Examples
