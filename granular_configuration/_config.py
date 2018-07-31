@@ -63,6 +63,10 @@ class Configuration(MutableMapping):
         return self[key] if self.exists(key) else default
 
     def __getattr__(self, name):
+        """
+        Provides potentially cleaner path as an alternative to __getitem__.
+        Throws AttributeError instead of KeyError, as compared to __getitem__ when an attribute is not present.
+        """
         if name not in self:
             raise AttributeError('Configuration value "{}" does not exist'.format(self.__get_name(name)))
 
@@ -75,9 +79,17 @@ class Configuration(MutableMapping):
         return key in self.__data
 
     def exists(self, key):
+        """
+        Checks that a key exists and is not a Placeholder
+        """
         return (key in self.__data) and not isinstance(self.__data[key], Placeholder)
 
     def as_dict(self):
+        """
+        Returns the Configuration settings as standard Python dict.
+        Nested Configartion object will also be converted.
+        This will evaluated all lazy tag functions and throw an exception on Placeholders.
+        """
         return dict(starmap(lambda key, value: (key, value.as_dict() if isinstance(value, Configuration) else value),
                             iteritems(self)))
 
@@ -178,6 +190,9 @@ class ConfigurationFiles(ConfigurationLocations):
         super(ConfigurationFiles, self).__init__(filenames=None,
                                                  directories=None,
                                                  files=files)
+    @classmethod
+    def from_args(cls, *files):
+        return cls(files)
 
 class ConfigurationMultiNamedFiles(ConfigurationLocations):
     def __init__(self, filenames, directories):
@@ -187,26 +202,45 @@ class ConfigurationMultiNamedFiles(ConfigurationLocations):
 
 def _get_all_unique_locations(locations):
     return _unique_ordered_iterable(chain.from_iterable(map(ConfigurationLocations.get_locations, locations)))
+
 class LazyLoadConfiguration(object):
+    """
+    Provides a lazy interface for loading Configuration from ConfigurationLocations definitions on first access.
+    """
+
     def __init__(self, *load_order_location, **kwargs):
         base_path = kwargs.get("base_path")
-        self._base_path = base_path if base_path else []
+        self.__base_path = base_path if base_path else []
         self._config = None
-        self._locations = load_order_location
+        self.__locations = load_order_location
         if not any(map(lambda loc: isinstance(loc, ConfigurationLocations), load_order_location)):
             raise ValueError("locations be of type ConfigurationLocations.")
 
     def __getattr__(self, name):
-        if self._config is None:
-            self.load_configure()
-
-        return getattr(self._config, name)
+        """
+        Loads (if not loaded) and fetches from the underlying Configuration object.
+        This also exposes the methods of Configuration.
+        """
+        return getattr(self.config, name)
 
     def load_configure(self):
+        """
+        Force load the configuration.
+        """
         if self._config is None:
             self._config = reduce(lambda dic, key: dic[key],
-                                  self._base_path,
-                                  _build_configuration(_get_all_unique_locations(self._locations)))
-            self._locations = None
-            self._base_path = None
+                                  self.__base_path,
+                                  _build_configuration(_get_all_unique_locations(self.__locations)))
+            self.__locations = None
+            self.__base_path = None
+
+    @property
+    def config(self):
+        """
+        Loads and fetches the underlying Configuration object
+        """
+        if self._config is None:
+            self.load_configure()
+        return self._config
+
 

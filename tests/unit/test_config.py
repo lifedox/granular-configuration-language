@@ -280,6 +280,16 @@ class TestConfig(unittest.TestCase):
         assert list(ConfigurationFiles(files).get_locations()) == files
 
 
+
+    def test__ConfigurationFiles_from_args(self):
+        base_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), "../assets/config_location_test"))
+        dir_func = partial(os.path.join, base_dir)
+
+        files = list(map(dir_func, ["placeholder_test1.yaml", "placeholder_test2.yaml"]))
+
+        assert list(ConfigurationFiles.from_args(*files).get_locations()) == files
+
+
     def test__ConfigurationMultiNamedFiles(self):
         base_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), "../assets/config_location_test"))
         dir_func = partial(os.path.join, base_dir)
