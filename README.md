@@ -360,9 +360,9 @@ Configuration files will be loaded as a YAML file unless they have a file extens
 #### General Notes
 - Use of the `[DEFAULT]` is highly discouraged.
 - Use of `[ROOT]`, while added for completeness, is also discouraged, as Base Paths are highly encouraged.
-- Support of only INI configuration is highly discouraged, as well.
+- Support of only INI configuration is discouraged, as yaml is more flexible
 - List values should be define using JSON syntax (e.g `key=['a', 'b', 'c']`), not delimited text that is parse by the user-codebase
-- YAML will always be recommended over INI, as INI features are nonstandard and basically a wrapper over a subset of YAML features.
+- Note: YAML is still preferred over INI due to superior featureset and hierarchical nature
 
 #### Loading
 
