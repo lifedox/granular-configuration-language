@@ -1,5 +1,4 @@
 from __future__ import print_function
-from configparser import RawConfigParser
 from io import StringIO
 from collections import OrderedDict, MutableMapping, deque
 from six.moves import map, filterfalse
@@ -10,6 +9,11 @@ import operator as op
 
 from granular_configuration.yaml_handler import loads as yaml_loads
 from granular_configuration.exceptions import IniKeyExistAsANonMapping, IniTryToReplaceExistingKey
+
+try:
+    from configparser import RawConfigParser
+except ImportError:
+    from ConfigParser import RawConfigParser
 
 consume = partial(deque, maxlen=0)
 
