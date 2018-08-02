@@ -226,6 +226,24 @@ class TestConfig(unittest.TestCase):
         assert isinstance(raw_value["c"], Placeholder) and (raw_value["c"].message == "Placeholder over a value")
 
 
+    def test__build_configuration_mixconfig(self):
+        base_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), "../assets/config_location_test"))
+        dir_func = partial(os.path.join, base_dir)
+
+        files = list(map(dir_func, ["mix_config.yaml", "mix_config.ini"]))
+
+        configuration = _build_configuration(files)
+
+        assert isinstance(configuration, Configuration)
+
+        assert configuration.A.key1 == "value1"
+        assert configuration.A.key2.deep_key == "Overwritten value"
+        assert configuration.A.key3 == "new value"
+        assert configuration.B == {None: 1}
+        assert configuration.D == {None: 1}
+
+
+
 
     def test__ConfigurationLocations(self):
         base_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), "../assets/config_location_test"))
@@ -260,6 +278,16 @@ class TestConfig(unittest.TestCase):
         files = list(map(dir_func, ["placeholder_test1.yaml", "placeholder_test2.yaml"]))
 
         assert list(ConfigurationFiles(files).get_locations()) == files
+
+
+
+    def test__ConfigurationFiles_from_args(self):
+        base_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), "../assets/config_location_test"))
+        dir_func = partial(os.path.join, base_dir)
+
+        files = list(map(dir_func, ["placeholder_test1.yaml", "placeholder_test2.yaml"]))
+
+        assert list(ConfigurationFiles.from_args(*files).get_locations()) == files
 
 
     def test__ConfigurationMultiNamedFiles(self):
