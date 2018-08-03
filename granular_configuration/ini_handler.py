@@ -1,7 +1,7 @@
 from __future__ import print_function
 from io import StringIO
 from collections import OrderedDict, MutableMapping, deque
-from six.moves import map, filterfalse
+from six.moves import map, filterfalse, configparser
 from six import text_type
 from functools import partial
 from itertools import starmap, islice
@@ -9,11 +9,6 @@ import operator as op
 
 from granular_configuration.yaml_handler import loads as yaml_loads
 from granular_configuration.exceptions import IniKeyExistAsANonMapping, IniTryToReplaceExistingKey
-
-try:
-    from configparser import RawConfigParser
-except ImportError:
-    from ConfigParser import RawConfigParser
 
 consume = partial(deque, maxlen=0)
 
@@ -90,7 +85,7 @@ class IniLoader(object):
 
 
 def loads(ini_str, obj_pairs_hook=None):
-    parser = RawConfigParser()
+    parser = configparser.RawConfigParser()
     parser.optionxform = str
     parser.readfp(StringIO(text_type(ini_str)))
 
