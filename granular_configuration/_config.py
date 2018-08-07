@@ -2,8 +2,9 @@ from __future__ import print_function, absolute_import
 from collections import deque, OrderedDict, MutableMapping
 import os
 import copy
+import operator as op
 from itertools import product, groupby, chain, starmap, islice
-from six import iteritems
+from six import iteritems, string_types
 from six.moves import map, filter, zip_longest
 from functools import partial, reduce
 from granular_configuration.yaml_handler import Placeholder, LazyEval
@@ -11,6 +12,7 @@ from granular_configuration._load import load_file
 from granular_configuration.exceptions import PlaceholderConfigurationError
 
 consume = partial(deque, maxlen=0)
+
 
 class Configuration(MutableMapping):
     def __init__(self, *arg, **kwargs):
@@ -31,7 +33,7 @@ class Configuration(MutableMapping):
 
     def __generate_name(self, attribute=None):
         if callable(self.__parent_generate_name):
-            for name in self.__parent_generate_name(): # pylint: disable=not-callable
+            for name in self.__parent_generate_name():  # pylint: disable=not-callable
                 yield name
         if self.__name:
             yield self.__name
@@ -51,7 +53,8 @@ class Configuration(MutableMapping):
         value = self.__data[name]
         if isinstance(value, Placeholder):
             raise PlaceholderConfigurationError(
-                'Configuration expects "{}" to be overwritten. Message: "{}"'.format(self.__get_name(name), value))
+                'Configuration expects "{}" to be overwritten. Message: "{}"'.format(self.__get_name(name), value)
+            )
         elif isinstance(value, LazyEval):
             new_value = value.run()
             self[name] = new_value
@@ -90,8 +93,12 @@ class Configuration(MutableMapping):
         Nested Configartion object will also be converted.
         This will evaluated all lazy tag functions and throw an exception on Placeholders.
         """
-        return dict(starmap(lambda key, value: (key, value.as_dict() if isinstance(value, Configuration) else value),
-                            iteritems(self)))
+        return dict(
+            starmap(
+                lambda key, value: (key, value.as_dict() if isinstance(value, Configuration) else value),
+                iteritems(self),
+            )
+        )
 
     def __deepcopy__(self, memo):
         other = Configuration()
@@ -117,13 +124,16 @@ class Configuration(MutableMapping):
         return _ConDict
 
 
-class _ConDict(dict, Configuration): # pylint: disable=too-many-ancestors
+class _ConDict(dict, Configuration):  # pylint: disable=too-many-ancestors
     pass
+
 
 def _unique_ordered_iterable(iter):
     return OrderedDict(zip_longest(iter, [])).keys()
 
+
 _load_file = partial(load_file, obj_pairs_hook=Configuration)
+
 
 def _build_configuration(locations):
     def _recursive_build_config(base_dict, from_dict):
@@ -151,6 +161,7 @@ def _build_configuration(locations):
 
     return base_conf
 
+
 def _get_files_from_locations(filenames=None, directories=None, files=None):
     if not filenames or not directories:
         filenames = []
@@ -160,13 +171,15 @@ def _get_files_from_locations(filenames=None, directories=None, files=None):
 
     return _unique_ordered_iterable(
         chain(
-            chain.from_iterable(map(
-                lambda a: islice(filter(os.path.isfile,
-                                        starmap(os.path.join, a[1])),
-                                 1),
-                groupby(product(directories, filenames), key=lambda a: a[0]))),
-            filter(os.path.isfile, files)
-        ))
+            chain.from_iterable(
+                map(
+                    lambda a: islice(filter(os.path.isfile, starmap(os.path.join, a[1])), 1),
+                    groupby(product(directories, filenames), key=lambda a: a[0]),
+                )
+            ),
+            filter(os.path.isfile, files),
+        )
+    )
 
 
 class ConfigurationLocations(object):
@@ -181,27 +194,52 @@ class ConfigurationLocations(object):
         self.files = files
 
     def get_locations(self):
-        return _get_files_from_locations(filenames=self.filenames,
-                                         directories=self.directories,
-                                         files=self.files)
+        return _get_files_from_locations(filenames=self.filenames, directories=self.directories, files=self.files)
+
 
 class ConfigurationFiles(ConfigurationLocations):
     def __init__(self, files):
-        super(ConfigurationFiles, self).__init__(filenames=None,
-                                                 directories=None,
-                                                 files=files)
+        super(ConfigurationFiles, self).__init__(filenames=None, directories=None, files=files)
+
     @classmethod
     def from_args(cls, *files):
         return cls(files)
 
+
 class ConfigurationMultiNamedFiles(ConfigurationLocations):
     def __init__(self, filenames, directories):
-        super(ConfigurationMultiNamedFiles, self).__init__(filenames=filenames,
-                                                           directories=directories,
-                                                           files=None)
+        super(ConfigurationMultiNamedFiles, self).__init__(filenames=filenames, directories=directories, files=None)
+
 
 def _get_all_unique_locations(locations):
-    return _unique_ordered_iterable(chain.from_iterable(map(ConfigurationLocations.get_locations, locations)))
+    return _unique_ordered_iterable(chain.from_iterable(map(op.methodcaller("get_locations"), locations)))
+
+
+def _parse_location(location):
+    if isinstance(location, ConfigurationLocations):
+        return location
+    elif isinstance(location, string_types):
+        location = os.path.abspath(os.path.expanduser(location))
+        dirname = os.path.dirname(location)
+        basename, ext = os.path.splitext(os.path.basename(location))
+        if ext in (".*", ".ini"):
+            return ConfigurationMultiNamedFiles(
+                filenames=(basename + ".yaml", basename + ".yml", basename + ".ini"), directories=(dirname,)
+            )
+        elif ext in (".y*", ".yml"):
+            return ConfigurationMultiNamedFiles(
+                filenames=(basename + ".yaml", basename + ".yml"), directories=(dirname,)
+            )
+        else:
+            return ConfigurationFiles(files=(location,))
+    else:
+        raise TypeError(
+            "Expected ConfigurationFiles, ConfigurationMultiNamedFiles, ConfigurationMultiNamedFiles, or a str, \
+not ({})".format(
+                type(location).__name__
+            )
+        )
+
 
 class LazyLoadConfiguration(object):
     """
@@ -212,9 +250,7 @@ class LazyLoadConfiguration(object):
         base_path = kwargs.get("base_path")
         self.__base_path = base_path if base_path else []
         self._config = None
-        self.__locations = load_order_location
-        if not any(map(lambda loc: isinstance(loc, ConfigurationLocations), load_order_location)):
-            raise ValueError("locations be of type ConfigurationLocations.")
+        self.__locations = tuple(map(_parse_location, load_order_location))
 
     def __getattr__(self, name):
         """
@@ -228,9 +264,11 @@ class LazyLoadConfiguration(object):
         Force load the configuration.
         """
         if self._config is None:
-            self._config = reduce(lambda dic, key: dic[key],
-                                  self.__base_path,
-                                  _build_configuration(_get_all_unique_locations(self.__locations)))
+            self._config = reduce(
+                lambda dic, key: dic[key],
+                self.__base_path,
+                _build_configuration(_get_all_unique_locations(self.__locations)),
+            )
             self.__locations = None
             self.__base_path = None
 
@@ -242,5 +280,3 @@ class LazyLoadConfiguration(object):
         if self._config is None:
             self.load_configure()
         return self._config
-
-

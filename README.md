@@ -4,7 +4,7 @@ This library allows a library or application to interact with typed settings tha
 
 
 #### Common Names
-- **Embedded Config**: A configuration file the exists as package data within a library or application. Generally, a single file (referenced via path to a `__file__`) loaded via `ConfigurationFiles`
+- **Embedded Config**/**Package Config**: A configuration file the exists as package data within a library or application. Generally, a single file (referenced via path to a `__file__`) loaded via `ConfigurationFiles`
 - **User Config**: A configuration file that exists in `~/.granular`.
 - **Local Config**: A configuration file that exists in the current working directory.
 - **Global Config**: The set of files called `global_config.yaml` or `global_config.yml` in the current working directory and/or `~/.granular`. See [Global Configuration](#Global-Configuration)
@@ -57,18 +57,10 @@ BasePath:
 **Setup:**
 <br>Note: This library does not pre-defined any configuration or file locations
 ```python
-from granular_configuration import LazyLoadConfiguration, ConfigurationFiles, ConfigurationMultiNamedFiles
+from granular_configuration import LazyLoadConfiguration
 
 CONFIG = LazyLoadConfiguration(
-    ConfigurationFiles(files=['path1\to\configuration1.yaml']),
-    ConfigurationMultiNamedFiles(
-        filenames=["configuration2.yaml", "configuration2.yml"],
-        directories=["path2\to"]
-    ),
-    ConfigurationMultiNamedFiles(
-        filenames=("configuration3.yaml", "configuration3.yml"),
-        directories=["path3\to"]
-    ),
+    'path1\to\configuration1.yaml', "path2\to\configuration2.y*", "path3\to\configuration3.y*",
     base_path=["BasePath"])
 ```
 
@@ -87,6 +79,9 @@ assert CONFIG.CombinedExample == {
 &nbsp;
 
 ### Precedents-Ordered File Example
+
+* `.y*` defines a precedence order of `.yaml`, `.yml`.
+* `.*` defines a precedence order of `.yaml`, `.yml`, `.ini`. 
 
 **Example Config File:**
 
@@ -113,10 +108,7 @@ BasePath1:
 from granular_configuration import LazyLoadConfiguration, ConfigurationLocations
 
 CONFIG = LazyLoadConfiguration(
-    ConfigurationLocations(
-        filenames=["configuration.yaml", "configuration.yml"],
-        directories=["path2\to"]
-    ),
+    "path2\to\configuration.y*",
     base_path=["BasePath1"])
 ```
 
@@ -127,63 +119,6 @@ assert CONFIG.Key1.Key2.Key3 == "Set by the priority file"
 
 &nbsp;
 
-## Configuration Locations
-
-Order for loading your is highly important, as each successive configuration file can provide overrides to values to the previous. `LazyLoadConfiguration` takes in a list (as `*args`) of ConfigurationLocations objects that each provides as list of configuration files to load. By intermixing provided objects, you should be able to clearly and tightly define the load order of your configuration and what happens when files do not exist.
-
-Note: Duplicate file definitions are ignored and used in the first order found.
-
-&nbsp;
-
-### `ConfigurationFiles`
-
-This is the simplest definition. Takes in a list of files and outputs all the files that exists.
-
-*Interface Definition:*
-```python
-import typing as typ
-
-class ConfigurationFiles(ConfigurationLocations):
-    def __init__(self, files: typ.Sequence[str]) -> None:
-        ...
-
-    @classmethod
-    def from_args(cls, *files: typ.Sequence[str]) -> "ConfigurationFiles":
-        ...
-```
-
-&nbsp;
-
-### `ConfigurationMultiNamedFiles`
-
-Takes in a list of possibles filenames and directories, using only the first filename that exists per directory.
-
-Example:
-Note: The order of the directories in this example is not an absolute pattern, there are valid cases from the user config taking precedence over the current working directory.
-
-```python
-locations = ConfigurationMultiNamedFiles(
-    filenames=['config.yaml', 'config.yml'],
-    directories=(os.path.expanduser("~/.granular/"), os.getcwd())
-).get_locations()
-```
-
-Cases:
-- If only `./config.yaml` exists, then `locations` will be `['./config.yaml']`
-- If `./config.yaml` and `./config.yml` exists, then `locations` will be `['./config.yaml']`
-- If `./config.yml` and `~/.granular/config.yml` exists, then `locations` will be `['~/.granular/config.yml', './config.yaml']`
-
-
-*Interface Definition:*
-```python
-import typing as typ
-
-class ConfigurationMultiNamedFiles(ConfigurationLocations):
-    def __init__(self, filenames: typ.Sequence[str], directories: typ.Sequence[str]) -> None:
-        ...
-```
-
-&nbsp;
 
 ## Interface Objects
 
@@ -249,16 +184,12 @@ from granular_configuration import ConfigurationFiles, ConfigurationMultiNamedFi
 
 
 CONFIG = LazyLoadConfiguration(
-    ConfigurationFiles([os.path.join(os.path.dirname(__file__), "<embedded>_config.yaml")]),
-    ConfigurationMultiNamedFiles(filenames=("<special>_config.yaml", "<special>_config.yml"),
-                                 directories=(os.path.expanduser("~/.granular/"),
-                                              os.getcwd())),
-    ConfigurationMultiNamedFiles(filenames=("global_config.yaml", "global_config.yml"),
-                                 directories=(os.path.expanduser("~/.granular/"),
-                                              os.getcwd())),
+    os.path.join(os.path.dirname(__file__), "<embedded>_config.yaml"),
+    "~/.granular/<special>_config.*",
+    "./<special>_config.*",
+    "~/.granular/global_config.*",
+    "./global_config.*",
     base_path=["<UniqueBasePath>"])
-
-
 ```
 
 *Interface Definition:*
@@ -269,6 +200,13 @@ class LazyLoadConfiguration(object):
     """
     Provides a lazy interface for loading Configuration from ConfigurationLocations definitions on first access.
     """
+    def __init__(
+        self,
+        *load_order_location: typ.Sequence[typ.Union[str, ConfigurationLocations]],
+        base_path: typ.Optional[typ.Sequence[str]] -> None
+    ) -> None:
+        ...
+
 
     def __getattr__(self, name: str) -> typ.Any:
         """
@@ -292,6 +230,69 @@ class LazyLoadConfiguration(object):
 ```
 
 Note: This class does not inherit from `Configuration`, `MutableMapping`, or `dict`. It provides access to the methods of `Configuration`, but checks against type (e.g. such as `json.dumps`) should done against `LazyLoadConfiguration.config`.
+
+&nbsp;
+
+
+## Configuration Locations
+
+**For clarity it is recommend to use string paths with `.*` or `.yaml`, as argument for `LazyLoadConfiguration`**
+
+Order for loading your is highly important, as each successive configuration file can provide overrides to values to the previous. `LazyLoadConfiguration` takes in a list (as `*args`) of ConfigurationLocations objects or strings that each provides as list of configuration files to load. By intermixing provided objects, you should be able to clearly and tightly define the load order of your configuration and what happens when files do not exist.
+
+When providing only strings to `LazyLoadConfiguration` they will automatically be converted in `ConfigurationFiles`, `ConfigurationMultiNamedFiles`. Paths with the files extensions `.*` and `.ini` will be converted in `ConfigurationMultiNamedFiles(directories=(dirname), filenames=(basename.yaml, basename.yml, basename.ini)` Paths with the files extensions `.y*` and `.yml` will be converted in `ConfigurationMultiNamedFiles(directories=(dirname), filenames=(basename.yaml, basename.yml)`
+
+Note: Duplicate file definitions are ignored and used in the first order found.
+
+&nbsp;
+
+### `ConfigurationFiles`
+
+This is the simplest definition. Takes in a list of files and outputs all the files that exists.
+
+*Interface Definition:*
+```python
+import typing as typ
+
+class ConfigurationFiles(ConfigurationLocations):
+    def __init__(self, files: typ.Sequence[str]) -> None:
+        ...
+
+    @classmethod
+    def from_args(cls, *files: typ.Sequence[str]) -> "ConfigurationFiles":
+        ...
+```
+
+&nbsp;
+
+### `ConfigurationMultiNamedFiles`
+
+Takes in a list of possibles filenames and directories, using only the first filename that exists per directory.
+
+Example:
+Note: The order of the directories in this example is not an absolute pattern, there are valid cases from the user config taking precedence over the current working directory.
+
+```python
+locations = ConfigurationMultiNamedFiles(
+    filenames=['config.yaml', 'config.yml'],
+    directories=(os.path.expanduser("~/.granular/"), os.getcwd())
+).get_locations()
+```
+
+Cases:
+- If only `./config.yaml` exists, then `locations` will be `['./config.yaml']`
+- If `./config.yaml` and `./config.yml` exists, then `locations` will be `['./config.yaml']`
+- If `./config.yml` and `~/.granular/config.yml` exists, then `locations` will be `['~/.granular/config.yml', './config.yaml']`
+
+
+*Interface Definition:*
+```python
+import typing as typ
+
+class ConfigurationMultiNamedFiles(ConfigurationLocations):
+    def __init__(self, filenames: typ.Sequence[str], directories: typ.Sequence[str]) -> None:
+        ...
+```
 
 &nbsp;
 
@@ -342,12 +343,14 @@ assert LazyLoadConfiguration(..., base_path=["Level1", "Level2", "Level3"]).as_d
 The global configuration is defined to be `global_config.yaml` available in the current working directory or the `~/.granular/` directory. The global provides allows developers and deployed applications to have a single configuration file to many libraries and applications, using Base Path to partition and isolate a single codebase's configuration.
 
 
-Add this `ConfigurationMultiNamedFiles` to your `LazyLoadConfiguration` to support the Global Config:
+Add these path strings to your `LazyLoadConfiguration` to support the Global Config:
 
 ```python
-    ConfigurationMultiNamedFiles(filenames=("global_config.yaml", "global_config.yml"),
-                                 directories=(os.path.expanduser("~/.granular/"),
-                                              os.getcwd())),
+LazyLoadConfiguration(
+   ...,
+   "./global_config.*", "~/.granular/global_config.*",
+   ...,
+)
 ```
 
 
@@ -374,13 +377,10 @@ This example always, an INI file at `./<special>_config.ini` or `~/.granular/<sp
 from granular_configuration import ConfigurationFiles, ConfigurationMultiNamedFiles, LazyLoadConfiguration
 
 CONFIG = LazyLoadConfiguration(
-    ConfigurationFiles([os.path.join(os.path.dirname(__file__), "<embedded>_config.yaml")]),
-    ConfigurationMultiNamedFiles(filenames=("<special>_config.yaml", "<special>_config.yml", , "<special>_config.ini"),
-                                 directories=(os.path.expanduser("~/.granular/"),
-                                              os.getcwd())),
-    ConfigurationMultiNamedFiles(filenames=("global_config.yaml", "global_config.yml"),
-                                 directories=(os.path.expanduser("~/.granular/"),
-                                              os.getcwd())),
+    os.path.join(os.path.dirname(__file__), "<embedded>_config.yaml"),
+    "~/.granular/<special>_config.*",
+    "./<special>_config.*",
+     "./global_config.*", "~/.granular/global_config.*",
     base_path=["<UniqueBasePath>"])
 ```
 
@@ -504,6 +504,10 @@ BasePath:
 &nbsp;
 
 ## Changelog
+
+### 1.3
+ * Adding string path support to `LazyLoadConfiguration`
+ * 
 
 ### 1.2
  * Adding ini support
