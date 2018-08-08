@@ -7,9 +7,17 @@ from six import iteritems, itervalues
 
 from granular_configuration.yaml_handler import loads, Placeholder
 from granular_configuration._config import (
-    _get_files_from_locations, LazyLoadConfiguration, _build_configuration, Configuration, _get_all_unique_locations,
-    ConfigurationLocations, ConfigurationFiles, ConfigurationMultiNamedFiles)
+    _get_files_from_locations,
+    LazyLoadConfiguration,
+    _build_configuration,
+    Configuration,
+    _get_all_unique_locations,
+    ConfigurationLocations,
+    ConfigurationFiles,
+    ConfigurationMultiNamedFiles,
+)
 from granular_configuration.exceptions import PlaceholderConfigurationError
+
 
 class TestYamlHandler(unittest.TestCase):
     def test_yaml_env(self):
@@ -23,7 +31,6 @@ class TestYamlHandler(unittest.TestCase):
 
             with self.assertRaises(ValueError):
                 loads("!Env [a]").run()
-
 
     def test_yaml_func(self):
         assert loads("!Func functools.reduce").run() is reduce
@@ -47,7 +54,6 @@ class TestYamlHandler(unittest.TestCase):
         with self.assertRaises(ValueError):
             loads("!Class unreal.garbage.func").run()
 
-
         with self.assertRaises(ValueError):
             loads("!Class [a]").run()
 
@@ -61,7 +67,5 @@ class TestYamlHandler(unittest.TestCase):
             loads("!Placeholder []")
 
 
-
-
-if __name__ == '__main__':
+if __name__ == "__main__":
     unittest.main()

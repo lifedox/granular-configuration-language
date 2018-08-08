@@ -8,3 +8,7 @@ class IniKeyExistAsANonMapping(Exception):
 
 class IniTryToReplaceExistingKey(Exception):
     pass
+
+
+class GetConfigReadBeforeSetException(Exception):
+    pass

@@ -4,18 +4,17 @@ from functools import reduce, partial
 from six import iteritems, itervalues
 
 from granular_configuration.yaml_handler import loads, Placeholder
-from granular_configuration._config import (
-    _build_configuration, Configuration)
+from granular_configuration._config import _build_configuration, Configuration
+
 
 class TestConfiguration(unittest.TestCase):
-
     def test_converting_Configuration_to_dict(self):
         config = loads("a: !Func functools.reduce", Configuration)
         assert isinstance(config, Configuration)
         assert tuple(iteritems(config)) == (("a", reduce),)
 
         config = loads("a: !Func functools.reduce", Configuration)
-        assert tuple(itervalues(config)) == (reduce, )
+        assert tuple(itervalues(config)) == (reduce,)
 
         config = loads("a: !Func functools.reduce", Configuration)
         assert dict(config) == {"a": reduce}
@@ -24,8 +23,7 @@ class TestConfiguration(unittest.TestCase):
         assert config.pop("a") == reduce
 
         config = loads("a: !Func functools.reduce", Configuration)
-        assert config.popitem() == ("a", reduce, )
-
+        assert config.popitem() == ("a", reduce)
 
     def test_Configuration_is_dict(self):
         base_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), "../assets/config_location_test"))
@@ -45,7 +43,6 @@ class TestConfiguration(unittest.TestCase):
         assert value.exists("a") is False
         assert new.exists("a") is False
 
-
     def test_Configuration_exists(self):
         config = Configuration(a=1, b=Placeholder("tests"))
 
@@ -61,14 +58,11 @@ class TestConfiguration(unittest.TestCase):
         assert config.get("b") is None
         assert config.get("c") is None
 
-
     def test_Configuration_as_dict(self):
         input = Configuration(a="b", b=Configuration(a=Configuration(a=1)))
         expected = dict(a="b", b=dict(a=dict(a=1)))
         assert input.as_dict() == expected
 
 
-
-
-if __name__ == '__main__':
+if __name__ == "__main__":
     unittest.main()

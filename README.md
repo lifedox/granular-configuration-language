@@ -4,7 +4,7 @@ This library allows a library or application to interact with typed settings tha
 
 
 #### Common Names
-- **Embedded Config**/**Package Config**: A configuration file the exists as package data within a library or application. Generally, a single file (referenced via path to a `__file__`) loaded via `ConfigurationFiles`
+- **Embedded Config**/**Package Config**: A configuration file the exists as package data within a library or application. Generally, a single file referenced via path to a `__file__`. This config should always exist in a library to defines defaults and form.
 - **User Config**: A configuration file that exists in `~/.granular`.
 - **Local Config**: A configuration file that exists in the current working directory.
 - **Global Config**: The set of files called `global_config.yaml` or `global_config.yml` in the current working directory and/or `~/.granular`. See [Global Configuration](#Global-Configuration)
@@ -119,6 +119,174 @@ assert CONFIG.Key1.Key2.Key3 == "Set by the priority file"
 
 &nbsp;
 
+## Usage Patterns:
+
+### Library Explicit
+
+The library sets and owns where all of its configuration files can live.
+
+#### Interface
+
+```python
+class LazyLoadConfiguration(object):
+    """
+    Provides a lazy interface for loading Configuration from ConfigurationLocations definitions on first access.
+    """
+    def __init__(
+        self,
+        *load_order_location: typ.Sequence[typ.Union[str, ConfigurationLocations]],
+        base_path: typ.Optional[typ.Sequence[str]] -> None
+    ) -> None:
+        ...
+```
+
+#### Example
+
+Inside Library
+```python
+from granular_configuration import LazyLoadConfiguration
+import os
+
+CONFIG = LazyLoadConfiguration(
+    os.path.join(__file__, "embedded_config.yaml"), # Required, since you should be using !Placeholder to represent the form, if there are no defaults
+    "~/<lib_specific>_config.*", # Optional
+    "./<lib_specific>_config.*", # Optional
+    "global_config.*",
+    base_path=["lib-base-path"]
+)
+
+```
+
+Usage:
+```python
+from ... import ... CONFIG
+
+CONFIG.setting
+```
+
+&nbsp;
+
+### Set-Config
+
+**Note: Import order matters!**
+
+The library sets and owns where some of its configuration files can live, and delegates some configuration files to the app. A failure of the app to provide delegated configuration files (including a empty list) is a failure to use the library.
+
+#### Interface
+
+```python
+def set_config(*load_order_location typ.Sequence[typ.Union[str, ConfigurationLocations]]) -> None:
+    ...
+
+
+def get_config(
+    *load_order_location: typ.Sequence[typ.Union[str, ConfigurationLocations]],
+    base_path: typ.Optional[typ.Sequence[str]] = None
+    requires_set: bool = True
+) -> LazyLoadConfiguration:
+    ...
+```
+
+#### Behavior
+The following are functionality equivalent:
+
+```python
+set_config(*set_args)
+CONFIG = get_config(*get_args, **get_kwargs)
+```
+
+```python
+CONFIG = LazyLoadConfiguration(*get_args, *set_args, **get_kwargs)
+```
+
+
+#### Example
+
+**Inside Application**
+```python
+from granular_configuration import set_config
+import os
+
+set_config(
+    "global_config.*"
+    "~/<app_specific>_config.*",
+    "./<app_specific>_config.*",
+)
+
+```
+
+**Inside Library**
+Note: The application must call `set_config` before import, else `get_config` will throw a `GetConfigReadBeforeSetException` exception.
+
+```python
+from granular_configuration import get_config
+import os
+
+CONFIG = get_config(
+    os.path.join(__file__, "embedded_config.yaml"), # Required, since you should be using !Placeholder to represent the form, if there are no defaults
+    "~/<lib_specific>_config.*", # Optional
+    "./<lib_specific>_config.*", # Optional,
+    base_path=["lib-base-path"]
+)
+
+```
+
+Usage:
+```python
+from ... import ... CONFIG
+
+CONFIG.setting
+```
+
+&nbsp;
+
+### Middle Road
+
+**Note: Import order matters!**
+
+The library sets and owns where some of its configuration files can live, and delegates some configuration files to the app. If an app wants to set configuration files, `set_config` must be called before import.
+
+#### Example
+
+**Inside Application**
+This is now optional behavior.
+```python
+from granular_configuration import set_config
+import os
+
+set_config(
+    "global_config.*"
+    "~/<app_specific>_config.*",
+    "./<app_specific>_config.*",
+)
+
+```
+
+**Inside Library**
+Note: The application must call `set_config` before import, from app-specify configs to be used, but this will not throw an exception
+
+```python
+from granular_configuration import get_config
+import os
+
+CONFIG = get_config(
+    os.path.join(__file__, "embedded_config.yaml"), # Required, since you should be using !Placeholder to represent the form, if there are no defaults
+    "~/<lib_specific>_config.*", # Optional
+    "./<lib_specific>_config.*", # Optional,
+    base_path=["lib-base-path"],
+    requires_set=False
+)
+
+```
+
+Usage:
+```python
+from ... import ... CONFIG
+
+CONFIG.setting
+```
+
+&nbsp;
 
 ## Interface Objects
 
@@ -196,14 +364,14 @@ CONFIG = LazyLoadConfiguration(
 ```python
 import typing as typ
 
-class LazyLoadConfiguration(object):
+class LazyLoadConfiguration(object): # __getattr__ implies implementing Configuration
     """
     Provides a lazy interface for loading Configuration from ConfigurationLocations definitions on first access.
     """
     def __init__(
         self,
         *load_order_location: typ.Sequence[typ.Union[str, ConfigurationLocations]],
-        base_path: typ.Optional[typ.Sequence[str]] -> None
+        base_path: typ.Optional[typ.Sequence[str]] = None
     ) -> None:
         ...
 

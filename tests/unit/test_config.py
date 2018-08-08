@@ -6,18 +6,24 @@ from six import iteritems, itervalues
 
 from granular_configuration.yaml_handler import loads, Placeholder
 from granular_configuration._config import (
-    _get_files_from_locations, LazyLoadConfiguration, _build_configuration, Configuration, _get_all_unique_locations,
-    ConfigurationLocations, ConfigurationFiles, ConfigurationMultiNamedFiles)
+    _get_files_from_locations,
+    LazyLoadConfiguration,
+    _build_configuration,
+    Configuration,
+    _get_all_unique_locations,
+    ConfigurationLocations,
+    ConfigurationFiles,
+    ConfigurationMultiNamedFiles,
+)
 from granular_configuration.exceptions import PlaceholderConfigurationError
 
-class TestConfig(unittest.TestCase):
 
+class TestConfig(unittest.TestCase):
     def test__build_configuration(self):
         base_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), "../assets/config_location_test"))
         dir_func = partial(os.path.join, base_dir)
 
         files = list(map(dir_func, ["a/b/t2.txt", "g/h.txt", "c/t.txt"]))
-
 
         configuration = _build_configuration(files)
 
@@ -28,12 +34,9 @@ class TestConfig(unittest.TestCase):
         assert configuration.b == "from c/t.txt"
         assert configuration.h == "from g/h.txt"
         assert configuration.a == "from a/b/t2.txt"
-        assert configuration.map == {"a": "from a/b/t2.txt",
-                                     "h": "from g/h.txt",
-                                     "c": "from c/t.txt"
-                                    }
+        assert configuration.map == {"a": "from a/b/t2.txt", "h": "from g/h.txt", "c": "from c/t.txt"}
         assert configuration.deep_test.a.b == 10
-        assert configuration.placeholder_test.overridden == 'This should be overridden'
+        assert configuration.placeholder_test.overridden == "This should be overridden"
         assert configuration.env_test.default == "This should be seen"
 
         with self.assertRaises(AttributeError) as cm:
@@ -49,8 +52,10 @@ class TestConfig(unittest.TestCase):
         with self.assertRaises(PlaceholderConfigurationError) as cm:
             configuration.placeholder_test.not_overridden
 
-        assert str(cm.exception) == 'Configuration expects "placeholder_test.not_overridden" to be overwritten. Message: "This should not be overridden"'
-
+        assert (
+            str(cm.exception)
+            == 'Configuration expects "placeholder_test.not_overridden" to be overwritten. Message: "This should not be overridden"'
+        )
 
     def test__build_configuration_placeholder_root(self):
         base_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), "../assets/config_location_test"))
@@ -69,7 +74,6 @@ class TestConfig(unittest.TestCase):
         assert isinstance(raw_value["b"], Placeholder) and (raw_value["b"].message == "Placeholder over a placeholder")
         assert isinstance(raw_value["c"], Placeholder) and (raw_value["c"].message == "Placeholder over a value")
 
-
     def test__build_configuration_mixconfig(self):
         base_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), "../assets/config_location_test"))
         dir_func = partial(os.path.join, base_dir)
@@ -87,9 +91,5 @@ class TestConfig(unittest.TestCase):
         assert configuration.D == {None: 1}
 
 
-
-
-
-
-if __name__ == '__main__':
+if __name__ == "__main__":
     unittest.main()
