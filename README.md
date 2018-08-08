@@ -168,7 +168,7 @@ CONFIG.setting
 
 ### Set-Config
 
-**Note: Import order matters!**
+**Note: Import order matters! Call `set_config` once in application. Call `get_config` once in a library.**
 
 The library sets and owns where some of its configuration files can live, and delegates some configuration files to the app. A failure of the app to provide delegated configuration files (including a empty list) is a failure to use the library.
 
@@ -242,7 +242,7 @@ CONFIG.setting
 
 ### Middle Road
 
-**Note: Import order matters!**
+**Note: Import order matters! Call `set_config` once in application. Call `get_config` once in a library.**
 
 The library sets and owns where some of its configuration files can live, and delegates some configuration files to the app. If an app wants to set configuration files, `set_config` must be called before import.
 
