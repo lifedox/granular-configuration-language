@@ -1,17 +1,58 @@
 from __future__ import print_function, absolute_import
-from collections import deque, OrderedDict, MutableMapping
+from collections import deque, MutableMapping, Mapping
 import os
 import copy
 import operator as op
 from itertools import product, groupby, chain, starmap, islice
 from six import iteritems, string_types
-from six.moves import map, filter, zip_longest
+from six.moves import map, filter, filterfalse
 from functools import partial, reduce
+from contextlib import contextmanager
+
 from granular_configuration.yaml_handler import Placeholder, LazyEval
 from granular_configuration._load import load_file
 from granular_configuration.exceptions import PlaceholderConfigurationError
+from granular_configuration.utils import OrderedSet
 
 consume = partial(deque, maxlen=0)
+
+
+class Patch(Mapping):
+    def __init__(self, patch_map, parent=None):
+        if not isinstance(patch_map, Mapping):
+            raise TypeError("Patch expected a Mapping as input")
+
+        self._patch = {
+            key: Configuration(value) if isinstance(value, Mapping) and not isinstance(value, Configuration) else value
+            for key, value in iteritems(patch_map)
+        }
+        self._alive = True
+        self._parent = parent
+
+    def __getitem__(self, name):
+        return self._patch[name]
+
+    def __iter__(self):
+        return iter(self._patch)
+
+    def __len__(self):
+        return len(self._patch)
+
+    def __hash__(self):
+        return id(self)
+
+    @property
+    def alive(self):
+        if self._parent is not None:
+            return self._parent.alive
+        else:
+            return self._alive
+
+    def kill(self):
+        return self._alive
+
+    def make_child(self, name):
+        return self.__class__(self._patch[name], parent=self)
 
 
 class Configuration(MutableMapping):
@@ -22,11 +63,19 @@ class Configuration(MutableMapping):
         self.__parent_generate_name = None
         self.__name = None
 
+        self.__patches = OrderedSet()
+
     def __iter__(self):
-        return iter(self.__data)
+        if self.__has_patches():
+            return iter(OrderedSet(chain(self.__data, chain.from_iterable(self.__iter_patches()))))
+        else:
+            return iter(self.__data)
 
     def __len__(self):
-        return len(self.__data)
+        if self.__has_patches():
+            return len(OrderedSet(chain(self.__data, chain.from_iterable(self.__iter_patches()))))
+        else:
+            return len(self.__data)
 
     def __delitem__(self, key):
         return self.__data.__delitem__(key)
@@ -49,8 +98,25 @@ class Configuration(MutableMapping):
             value.__parent_generate_name = self.__generate_name
         self.__data[key] = value
 
+    def __get_from_patches(self, name):
+        for patch in self.__iter_patches():
+            if name in patch:
+                return patch[name]
+        return self.__data[name]
+
+    def __get_item(self, name):
+        if self.__has_patches():
+            value = self.__get_from_patches(name)
+
+            if isinstance(value, Configuration):
+                consume(map(value.__add_patch, self.__get_child_patches(name)))
+
+        else:
+            value = self.__data[name]
+        return value
+
     def __getitem__(self, name):
-        value = self.__data[name]
+        value = self.__get_item(name)
         if isinstance(value, Placeholder):
             raise PlaceholderConfigurationError(
                 'Configuration expects "{}" to be overwritten. Message: "{}"'.format(self.__get_name(name), value)
@@ -76,16 +142,21 @@ class Configuration(MutableMapping):
         return self[name]
 
     def __repr__(self):
-        return repr(self.__data)
+        if self.__has_patches():
+            return repr(self.as_dict())
+        else:
+            return repr(self.__data)
 
     def __contains__(self, key):
-        return key in self.__data
+        return key in self.__data or (
+            self.__has_patches() and any(map(op.methodcaller("__contains__", key), self.__iter_patches()))
+        )
 
     def exists(self, key):
         """
         Checks that a key exists and is not a Placeholder
         """
-        return (key in self.__data) and not isinstance(self.__data[key], Placeholder)
+        return (key in self) and not isinstance(self.__get_item(key), Placeholder)
 
     def as_dict(self):
         """
@@ -107,8 +178,13 @@ class Configuration(MutableMapping):
             other[copy.deepcopy(key, memo)] = copy.deepcopy(value, memo)
         return other
 
+    def __copy__(self):
+        return copy.deepcopy(self)
+
+    copy = __copy__
+
     def _raw_items(self):
-        return iteritems(self.__data)
+        return map(lambda key: (key, self.__get_item(key)), self)
 
     def __getnewargs__(self):
         return tuple(self.items())
@@ -123,13 +199,31 @@ class Configuration(MutableMapping):
     def __class__(self):
         return _ConDict
 
+    def __add_patch(self, patch):
+        self.__patches.add(patch)
+
+    def __has_patches(self):
+        for killed in tuple(filterfalse(op.attrgetter("alive"), self.__patches)):
+            self.__patches.remove(killed)
+        return bool(self.__patches)
+
+    def __iter_patches(self):
+        return reversed(self.__patches)
+
+    @contextmanager
+    def patch(self, patch_map):
+        patch = Patch(patch_map)
+        self.__add_patch(patch)
+        yield
+        patch.kill()
+        self.__patches.remove(patch)
+
+    def __get_child_patches(self, name):
+        return map(op.methodcaller("make_child", name), filter(op.methodcaller("__contains__", name), self.__patches))
+
 
 class _ConDict(dict, Configuration):  # pylint: disable=too-many-ancestors
     pass
-
-
-def _unique_ordered_iterable(iter):
-    return OrderedDict(zip_longest(iter, [])).keys()
 
 
 _load_file = partial(load_file, obj_pairs_hook=Configuration)
@@ -167,9 +261,9 @@ def _get_files_from_locations(filenames=None, directories=None, files=None):
         filenames = []
         directories = []
 
-    files = _unique_ordered_iterable(files) if files else []
+    files = OrderedSet(files) if files else []
 
-    return _unique_ordered_iterable(
+    return OrderedSet(
         chain(
             chain.from_iterable(
                 map(
@@ -212,7 +306,7 @@ class ConfigurationMultiNamedFiles(ConfigurationLocations):
 
 
 def _get_all_unique_locations(locations):
-    return _unique_ordered_iterable(chain.from_iterable(map(op.methodcaller("get_locations"), locations)))
+    return OrderedSet(chain.from_iterable(map(op.methodcaller("get_locations"), locations)))
 
 
 def _parse_location(location):

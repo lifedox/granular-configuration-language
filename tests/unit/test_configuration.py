@@ -34,12 +34,20 @@ class TestConfiguration(unittest.TestCase):
         value = _build_configuration(files)
         assert isinstance(value, dict)
 
-        from copy import deepcopy
+        import copy
 
-        new = deepcopy(value)
-
+        new = copy.deepcopy(value)
         assert new == value
+        assert value.exists("a") is False
+        assert new.exists("a") is False
 
+        new = copy.copy(value)
+        assert new == value
+        assert value.exists("a") is False
+        assert new.exists("a") is False
+
+        new = value.copy()
+        assert new == value
         assert value.exists("a") is False
         assert new.exists("a") is False
 
@@ -62,6 +70,95 @@ class TestConfiguration(unittest.TestCase):
         input = Configuration(a="b", b=Configuration(a=Configuration(a=1)))
         expected = dict(a="b", b=dict(a=dict(a=1)))
         assert input.as_dict() == expected
+
+
+    def test_simple_patch(self):
+        input = Configuration(a="b")
+        with input.patch(dict(a="c")):
+            self.assertDictEqual(input.as_dict(), dict(a="c"))
+            self.assertSequenceEqual(tuple(input._raw_items()), tuple(dict(a="c").items()))
+
+        self.assertDictEqual(input.as_dict(), dict(a="b"))
+
+    def test_patch_new(self):
+        input = Configuration(a="b")
+        with input.patch(dict(b="c")):
+            self.assertDictEqual(input.as_dict(), dict(a="b", b="c"))
+            self.assertSequenceEqual(tuple(input._raw_items()), tuple(dict(a="b", b="c").items()))
+            self.assertIn("b", input)
+            self.assertEqual(len(input), 2)
+
+        self.assertNotIn("b", input)
+        self.assertDictEqual(input.as_dict(), dict(a="b"))
+        self.assertEqual(len(input), 1)
+
+    def test_patch_new_dict(self):
+        input = Configuration(a="b")
+        with input.patch(dict(b="c", e=dict(a=1))):
+            self.assertDictEqual(input.as_dict(), dict(a="b", b="c", e=dict(a=1)))
+            self.assertSequenceEqual(tuple(input._raw_items()), tuple(dict(a="b", b="c", e=dict(a=1)).items()))
+            self.assertIn("b", input)
+            self.assertIn("e", input)
+            self.assertIn("a", input.e)
+
+        self.assertDictEqual(input.as_dict(), dict(a="b"))
+
+    def test_patch_nest_dict_deeper(self):
+        input = Configuration(a="b")
+        with input.patch({"b": {"a": {"a": 2}}}):
+            self.assertDictEqual(input.as_dict(), {"a": "b", "b": {"a": {"a": 2}}})
+            self.assertSequenceEqual(tuple(input._raw_items()), tuple({"a": "b", "b": {"a": {"a": 2}}}.items()))
+
+        self.assertDictEqual(input.as_dict(), dict(a="b"))
+
+    def test_patch_nest_dict(self):
+        input = Configuration(a="b", b=Configuration(a=Configuration(a=1)))
+        with input.patch({"b": {"a": {"a": 2}}}):
+            self.assertDictEqual(input.as_dict(), {"a": "b", "b": {"a": {"a": 2}}})
+            self.assertSequenceEqual(tuple(input._raw_items()), tuple({"a": "b", "b": {"a": {"a": 2}}}.items()))
+
+            self.assertDictEqual(input.b.as_dict(), {"a": {"a": 2}})
+
+
+        self.assertDictEqual(input.as_dict(), {"a": "b", "b": {"a": {"a": 1}}})
+        self.assertDictEqual(input.b.as_dict(), {"a": {"a": 1}})
+
+    def test_patch_deep_nest_dict(self):
+        input = Configuration(a="b", b=Configuration(a=Configuration(a=1)))
+        with input.b.patch({"a": {"a": 2}}):
+            self.assertDictEqual(input.as_dict(), {"a": "b", "b": {"a": {"a": 2}}})
+            self.assertSequenceEqual(tuple(input._raw_items()), tuple({"a": "b", "b": {"a": {"a": 2}}}.items()))
+
+        self.assertDictEqual(input.as_dict(), {"a": "b", "b": {"a": {"a": 1}}})
+
+
+    def test_nested_patch(self):
+        input = Configuration(a="b")
+        with input.patch({"a": "c", "b": "b", "c": "c"}):
+            self.assertDictEqual(input.as_dict(), {"a": "c", "b": "b", "c": "c"})
+
+            with input.patch({"c": "c1", "d": "c1"}):
+                self.assertDictEqual(input.as_dict(), {"a": "c", "b": "b", "c": "c1", "d": "c1"})
+
+        self.assertDictEqual(input.as_dict(), {"a": "b"})
+
+
+    def test_patch_copy(self):
+        input = Configuration(a="b")
+        with input.patch({"a": "c", "b": "b", "c": "c"}):
+            self.assertDictEqual(input.as_dict(), {"a": "c", "b": "b", "c": "c"})
+
+            with input.patch({"c": "c1", "d": "c1"}):
+                self.assertDictEqual(input.as_dict(), {"a": "c", "b": "b", "c": "c1", "d": "c1"})
+
+                import copy
+                input_copy = copy.copy(input)
+                input_deepcopy = copy.deepcopy(input)
+
+                self.assertDictEqual(input_copy.as_dict(), {"a": "b"})
+                self.assertDictEqual(input_deepcopy.as_dict(), {"a": "b"})
+
+        self.assertDictEqual(input.as_dict(), {"a": "b"})
 
 
 if __name__ == "__main__":
