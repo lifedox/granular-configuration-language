@@ -18,7 +18,7 @@ consume = partial(deque, maxlen=0)
 
 
 class Patch(Mapping):
-    def __init__(self, patch_map, parent=None):
+    def __init__(self, patch_map, parent=None, allow_new_keys=False):
         if not isinstance(patch_map, Mapping):
             raise TypeError("Patch expected a Mapping as input")
 
@@ -28,6 +28,7 @@ class Patch(Mapping):
         }
         self._alive = True
         self._parent = parent
+        self._allow_new_keys = allow_new_keys
 
     def __getitem__(self, name):
         return self._patch[name]
@@ -39,7 +40,13 @@ class Patch(Mapping):
         return len(self._patch)
 
     def __hash__(self):
-        return id(self)
+        if self._parent is not None:
+            return hash(self._parent)
+        else:
+            return id(self)
+
+    def __eq__(self, rhs):
+        return hash(self) == hash(rhs)
 
     @property
     def alive(self):
@@ -49,10 +56,14 @@ class Patch(Mapping):
             return self._alive
 
     def kill(self):
-        return self._alive
+        self._alive = False
 
-    def make_child(self, name):
-        return self.__class__(self._patch[name], parent=self)
+    @property
+    def allows_new_keys(self):
+        return self._allow_new_keys
+
+    def make_child(self, name, for_patch):
+        return self.__class__(self._patch[name], parent=self, allow_new_keys=self._allow_new_keys or for_patch)
 
 
 class Configuration(MutableMapping):
@@ -98,19 +109,34 @@ class Configuration(MutableMapping):
             value.__parent_generate_name = self.__generate_name
         self.__data[key] = value
 
-    def __get_from_patches(self, name):
+    def __get_from_patches(self, name, default):
         for patch in self.__iter_patches():
             if name in patch:
                 return patch[name]
-        return self.__data[name]
+        return default
 
     def __get_item(self, name):
         if self.__has_patches():
-            value = self.__get_from_patches(name)
+            check = object()
+            patched_value = self.__get_from_patches(name, check)
 
-            if isinstance(value, Configuration):
-                consume(map(value.__add_patch, self.__get_child_patches(name)))
+            if isinstance(patched_value, Configuration):
+                consume(map(patched_value.__add_patch, self.__get_child_patches(name, for_patch=True)))
 
+            if name in self.__data:
+                my_value = self.__data[name]
+
+                if isinstance(my_value, Configuration):
+                    consume(map(my_value.__add_patch, self.__get_child_patches(name, for_patch=False)))
+
+                if isinstance(my_value, Configuration) or (patched_value is check):
+                    value = my_value
+                else:
+                    value = patched_value
+            elif (patched_value is not check) and all(map(op.attrgetter("allows_new_keys"), self.__iter_patches())):
+                value = patched_value
+            else:
+                self.__data[name] # raise KeyError
         else:
             value = self.__data[name]
         return value
@@ -211,15 +237,19 @@ class Configuration(MutableMapping):
         return reversed(self.__patches)
 
     @contextmanager
-    def patch(self, patch_map):
-        patch = Patch(patch_map)
+    def patch(self, patch_map, allow_new_keys=False):
+        """
+        Provides a Context Manger, during whose context's values returned by this Configuration are
+        replaced with the provided patch values.
+        """
+        patch = Patch(patch_map, allow_new_keys=allow_new_keys)
         self.__add_patch(patch)
         yield
         patch.kill()
         self.__patches.remove(patch)
 
-    def __get_child_patches(self, name):
-        return map(op.methodcaller("make_child", name), filter(op.methodcaller("__contains__", name), self.__patches))
+    def __get_child_patches(self, name, for_patch):
+        return map(op.methodcaller("make_child", name, for_patch), filter(op.methodcaller("__contains__", name), self.__patches))
 
 
 class _ConDict(dict, Configuration):  # pylint: disable=too-many-ancestors

@@ -12,9 +12,10 @@ This library allows a library or application to interact with typed settings tha
 
 #### Quick Links
 - [YAML Tags](#yaml-tags)
-- [Configuration Locations](#configuration-locations)
-- [Interface Objects](#interface-objects)
 - [Base Path](#base-path)
+- [Interface Objects](#interface-objects)
+- [Patch Support](#patch-support)
+- [Configuration Locations](#configuration-locations)
 - [Changelog](#changelog)
 - [Ini Configuration File Support](#ini-configuration-file-support)
 
@@ -172,6 +173,8 @@ CONFIG.setting
 
 The library sets and owns where some of its configuration files can live, and delegates some configuration files to the app. A failure of the app to provide delegated configuration files (including a empty list) is a failure to use the library.
 
+This is not a singleton factory.
+
 #### Interface
 
 ```python
@@ -322,7 +325,18 @@ class Configuration(typ.MutableMapping[typ.Any, typ.Any]):
         """
         ...
 
+    def patch(self,
+        patch_map: typ.Mapping[typ.Any, typ.Any],
+        allow_new_keys: bool = False
+    ) -> typ.ContextManager:
+        """
+        Provides a Context Manger, during whose context's values returned by this Configuration are
+        replaced with the provided patch values.
+        """
+
+
 ```
+See [Patch Support](#patch-support) for details of `patch`
 
 Note: The reason for keys being `typing.Any` is that the YAML allows keys to be more than strings (i.e. integer, float, boolean, null), and this library does not restrict this (as there a valid reasons to want to have an integer-to-string map and so on). Just note that you cannot used the `__getattr___` with keys that do not meet the Python attribute naming restrictions, you would have to look those up via `__getitem__` (i.e. `CONFIG[1]`).
 
@@ -364,7 +378,7 @@ CONFIG = LazyLoadConfiguration(
 ```python
 import typing as typ
 
-class LazyLoadConfiguration(object): # __getattr__ implies implementing Configuration
+class LazyLoadConfiguration(object): # __getattr__ implies implementing Configuration's protocol
     """
     Provides a lazy interface for loading Configuration from ConfigurationLocations definitions on first access.
     """
@@ -398,6 +412,170 @@ class LazyLoadConfiguration(object): # __getattr__ implies implementing Configur
 ```
 
 Note: This class does not inherit from `Configuration`, `MutableMapping`, or `dict`. It provides access to the methods of `Configuration`, but checks against type (e.g. such as `json.dumps`) should done against `LazyLoadConfiguration.config`.
+
+
+&nbsp;
+
+
+## Patch Support
+
+*Interface Definition:*
+```python
+import typing as typ
+
+class Configuration(typ.MutableMapping[typ.Any, typ.Any]):
+    def patch(self,
+        patch_map: typ.Mapping[typ.Any, typ.Any],
+        allow_new_keys: bool = False
+    ) -> typ.ContextManager:
+        """
+        Provides a Context Manger, during whose context's values returned by this Configuration are
+        replaced with the provided patch values.
+        """
+```
+<br>
+
+`patch` provides an ability to temporary changes settings on a `Configuration` object. It exists primarily for testing.
+
+By default, patch will not allow new setting keys to be added, this can be altered by passing `allow_new_keys=True`, but all nested patches must called with this argument.
+
+Patches are <u>not</u> type-check against current values.
+
+### Examples
+
+
+#### Simple Setting
+```python
+from attrdict import AttrDict
+from granular_configuration import Configuration
+
+CONFIG = Configuration(
+    key1="value1",
+    key2="value2",
+    nested=Configuration(
+        nest_key1="nested_value1",
+        nest_key2="nested_value2"
+    )
+)
+
+patch1 = AttrDict()
+patch1.key1 = "new value"
+
+with CONFIG.patch(patch1):
+    print(CONFIG)
+    assert CONFIG.key1 == "new value"
+
+```
+Output:
+```python
+{
+    'key1': 'new value',
+    'key2': 'value2',
+    'nested': {
+        'nest_key1': 'nested_value1',
+        'nest_key2': 'nested_value2'
+    }
+}
+```
+
+#### Nested Settings
+```python
+from attrdict import AttrDefault
+from granular_configuration import Configuration
+
+CONFIG = Configuration(
+    key1="value1",
+    key2="value2",
+    nested=Configuration(
+        nest_key1="nested_value1",
+        nest_key2="nested_value2"
+    )
+)
+
+patch1 = AttrDefault(AttrDefault)
+patch1.key1 = "new value"
+patch1.nested.nest_key2 = "new value"
+
+with CONFIG.patch(patch1):
+    print(CONFIG)
+    assert CONFIG.key1 == "new value"
+```
+Output:
+```python
+{
+    'key1': 'new value',
+    'key2': 'value2',
+    'nested': {
+        'nest_key1': 'nested_value1',
+        'nest_key2': 'new value'
+    }
+}
+```
+
+#### Adding Settings
+```python
+from attrdict import AttrDefault
+from granular_configuration import Configuration
+
+CONFIG = Configuration(
+)
+
+patch1 = AttrDefault(AttrDefault)
+patch1.key1 = "new value"
+patch1.nested.nest_key2 = "new value"
+
+with CONFIG.patch(patch1, allow_new_keys=True):
+    print(CONFIG)
+    assert CONFIG.key1 == "new value"
+```
+Output:
+```python
+{
+    'key1': 'new value',
+    'nested': {
+        'nest_key2': 'new value'
+    }
+}
+```
+
+#### Nested Patches Settings
+```python
+from attrdict import AttrDefault
+from granular_configuration import Configuration
+
+CONFIG = Configuration(
+    key1="value1",
+    key2="value2",
+    nested=Configuration(
+        nest_key1="nested_value1",
+        nest_key2="nested_value2",
+    )
+)
+
+patch1 = AttrDefault(AttrDefault)
+patch1.key1 = "new value"
+patch1.nested.nest_key2 = "new value"
+
+patch2 = AttrDefault(AttrDefault)
+patch2.key2 = "new value2"
+patch2.nested.nest_key1 = "new value2"
+
+
+with CONFIG.patch(patch1):
+    with CONFIG.patch(patch2):
+        print(CONFIG)
+```
+Output:
+```python
+{
+    'key1': 'new value',
+    'key2': 'new value2',
+    'nested': {
+        'nest_key1': 'new value2',
+        'nest_key2': 'new value'
+    }
+}
+```
 
 &nbsp;
 
@@ -674,12 +852,13 @@ BasePath:
 ## Changelog
 
 ### 1.3
- * Adding string path support to `LazyLoadConfiguration`
- * 
+ * Adds string path support to `LazyLoadConfiguration`
+ * Adds get-config pattern
+ * Adds Configuration.patch
 
 ### 1.2
  * Adding ini support
 
 ### 1.1
  * Adds `!Placeholder` Tag
- * Makes tags evaluate lazily (i.e. at first usage)
+ * Makes tags evaluate lazily (i.e. at first use)

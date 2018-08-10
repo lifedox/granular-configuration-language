@@ -80,9 +80,16 @@ class TestConfiguration(unittest.TestCase):
 
         self.assertDictEqual(input.as_dict(), dict(a="b"))
 
+    def test_patch_new_not_allowed(self):
+        input = Configuration(a="b")
+
+        with self.assertRaises(KeyError):
+            with input.patch(dict(b="c")):
+                self.assertDictEqual(input.as_dict(), dict(a="b", b="c"))
+
     def test_patch_new(self):
         input = Configuration(a="b")
-        with input.patch(dict(b="c")):
+        with input.patch(dict(b="c"), allow_new_keys=True):
             self.assertDictEqual(input.as_dict(), dict(a="b", b="c"))
             self.assertSequenceEqual(tuple(input._raw_items()), tuple(dict(a="b", b="c").items()))
             self.assertIn("b", input)
@@ -94,7 +101,7 @@ class TestConfiguration(unittest.TestCase):
 
     def test_patch_new_dict(self):
         input = Configuration(a="b")
-        with input.patch(dict(b="c", e=dict(a=1))):
+        with input.patch(dict(b="c", e=dict(a=1)), allow_new_keys=True):
             self.assertDictEqual(input.as_dict(), dict(a="b", b="c", e=dict(a=1)))
             self.assertSequenceEqual(tuple(input._raw_items()), tuple(dict(a="b", b="c", e=dict(a=1)).items()))
             self.assertIn("b", input)
@@ -105,7 +112,7 @@ class TestConfiguration(unittest.TestCase):
 
     def test_patch_nest_dict_deeper(self):
         input = Configuration(a="b")
-        with input.patch({"b": {"a": {"a": 2}}}):
+        with input.patch({"b": {"a": {"a": 2}}}, allow_new_keys=True):
             self.assertDictEqual(input.as_dict(), {"a": "b", "b": {"a": {"a": 2}}})
             self.assertSequenceEqual(tuple(input._raw_items()), tuple({"a": "b", "b": {"a": {"a": 2}}}.items()))
 
@@ -134,10 +141,10 @@ class TestConfiguration(unittest.TestCase):
 
     def test_nested_patch(self):
         input = Configuration(a="b")
-        with input.patch({"a": "c", "b": "b", "c": "c"}):
+        with input.patch({"a": "c", "b": "b", "c": "c"}, allow_new_keys=True):
             self.assertDictEqual(input.as_dict(), {"a": "c", "b": "b", "c": "c"})
 
-            with input.patch({"c": "c1", "d": "c1"}):
+            with input.patch({"c": "c1", "d": "c1"}, allow_new_keys=True):
                 self.assertDictEqual(input.as_dict(), {"a": "c", "b": "b", "c": "c1", "d": "c1"})
 
         self.assertDictEqual(input.as_dict(), {"a": "b"})
@@ -145,10 +152,10 @@ class TestConfiguration(unittest.TestCase):
 
     def test_patch_copy(self):
         input = Configuration(a="b")
-        with input.patch({"a": "c", "b": "b", "c": "c"}):
+        with input.patch({"a": "c", "b": "b", "c": "c"}, allow_new_keys=True):
             self.assertDictEqual(input.as_dict(), {"a": "c", "b": "b", "c": "c"})
 
-            with input.patch({"c": "c1", "d": "c1"}):
+            with input.patch({"c": "c1", "d": "c1"}, allow_new_keys=True):
                 self.assertDictEqual(input.as_dict(), {"a": "c", "b": "b", "c": "c1", "d": "c1"})
 
                 import copy
@@ -159,6 +166,64 @@ class TestConfiguration(unittest.TestCase):
                 self.assertDictEqual(input_deepcopy.as_dict(), {"a": "b"})
 
         self.assertDictEqual(input.as_dict(), {"a": "b"})
+
+    def test_patch_nested_sibling(self):
+        CONFIG = Configuration(
+            key1="value1",
+            key2="value2",
+            nested=Configuration(
+                nest_key1="nested_value1",
+                nest_key2="nested_value2"
+            )
+        )
+        patch = dict(
+            key1="new_value",
+            nested=dict(
+                nest_key2="new_value"
+            )
+        )
+        expected = dict(
+            key1="new_value",
+            key2="value2",
+            nested=dict(
+                nest_key1="nested_value1",
+                nest_key2="new_value"
+            )
+        )
+
+        with CONFIG.patch(patch):
+            self.assertDictEqual(CONFIG.as_dict(), expected)
+
+    def test_nested_patch_full_override(self):
+        CONFIG = Configuration(
+            key1="value1",
+            key2="value2",
+            nested=Configuration(
+                nest_key1="nested_value1",
+                nest_key2="nested_value2"
+            )
+        )
+        patch1 = dict(
+            key1="new value",
+            nested=dict(
+                nest_key2="new value"
+            )
+        )
+        patch2 = dict(
+            key2="new value2",
+            nested=dict(
+                nest_key1="new value2"
+            )
+        )
+        expected = {'key1': 'new value', 'key2': 'new value2', 'nested': {'nest_key1': 'new value2', 'nest_key2': 'new value'}}
+
+        with CONFIG.patch(patch1):
+            with CONFIG.patch(patch2):
+                self.assertDictEqual(CONFIG.as_dict(), expected)
+
+        with CONFIG.patch(patch2):
+            with CONFIG.patch(patch1):
+                self.assertDictEqual(CONFIG.as_dict(), expected)
 
 
 if __name__ == "__main__":
