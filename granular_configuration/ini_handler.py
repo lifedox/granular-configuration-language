@@ -12,6 +12,7 @@ from granular_configuration.exceptions import IniKeyExistAsANonMapping, IniTryTo
 
 consume = partial(deque, maxlen=0)
 
+
 class IniLoader(object):
     def __init__(self, parser, obj_pairs_hook=None):
         if obj_pairs_hook and issubclass(obj_pairs_hook, MutableMapping):
@@ -90,4 +91,3 @@ def loads(ini_str, obj_pairs_hook=None):
     parser.readfp(StringIO(text_type(ini_str)))
 
     return IniLoader(parser, obj_pairs_hook).read()
-

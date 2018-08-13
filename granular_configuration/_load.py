@@ -3,6 +3,7 @@ import os
 from granular_configuration.yaml_handler import loads as yaml_loads
 from granular_configuration.ini_handler import loads as ini_loads
 
+
 def load_file(filename, obj_pairs_hook=None):
     try:
         ext = os.path.splitext(filename)[1]

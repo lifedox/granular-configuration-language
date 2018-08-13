@@ -52,7 +52,15 @@ null= test
 True= "boolean"
 false= "not"
 """
-        assert loads(test, Configuration).as_dict() == {"1": "str", 1: "integer", 1.123: "float", "1.123": "str", None: "test", True: "boolean", False: "not"}
+        assert loads(test, Configuration).as_dict() == {
+            "1": "str",
+            1: "integer",
+            1.123: "float",
+            "1.123": "str",
+            None: "test",
+            True: "boolean",
+            False: "not",
+        }
 
     def test_yaml_key_types(self):
         test = """\
@@ -64,7 +72,15 @@ null: test
 True: "boolean"
 false: "not"
 """
-        assert yaml_loads(test, Configuration).as_dict() == {"1": "str", 1: "integer", 1.123: "float", "1.123": "str", None: "test", True: "boolean", False: "not"}
+        assert yaml_loads(test, Configuration).as_dict() == {
+            "1": "str",
+            1: "integer",
+            1.123: "float",
+            "1.123": "str",
+            None: "test",
+            True: "boolean",
+            False: "not",
+        }
 
     def test_empty_dicts(self):
         test = """\
@@ -73,8 +89,7 @@ false: "not"
 [F.G]
 
 """
-        assert loads(test, Configuration).as_dict() == {"A": {}, "F":{"G": {}}}
-
+        assert loads(test, Configuration).as_dict() == {"A": {}, "F": {"G": {}}}
 
     def test_nested_types(self):
         test = """\
@@ -92,8 +107,10 @@ a=b
 [A.D.E]
 
 """
-        assert loads(test, Configuration).as_dict() == {"A": {"a":"b", "B":{"a":"b", "C":{"a":"b"}}, "D":{"E":{}}}, "F":{"G": {}}}
-
+        assert loads(test, Configuration).as_dict() == {
+            "A": {"a": "b", "B": {"a": "b", "C": {"a": "b"}}, "D": {"E": {}}},
+            "F": {"G": {}},
+        }
 
     def test_tags(self):
         test = """\
@@ -101,8 +118,7 @@ a=b
 a=!Env 'no sub'
 b=!Func functools.reduce
 """
-        assert loads(test, Configuration).as_dict() == {"A": {"a":"no sub", "b": reduce}}
-
+        assert loads(test, Configuration).as_dict() == {"A": {"a": "no sub", "b": reduce}}
 
     def test_bad_replace(self):
 
@@ -116,7 +132,6 @@ a='str'
 """
             print(loads(test, Configuration).as_dict())
 
-
     def test_bad_replace_in_chain(self):
 
         with self.assertRaises(IniKeyExistAsANonMapping):
@@ -128,7 +143,6 @@ a='str'
 
 """
             print(loads(test, Configuration).as_dict())
-
 
     def test_bad_replace_at_root(self):
 
@@ -143,8 +157,6 @@ B='str'
 """
             print(loads(test, Configuration).as_dict())
 
-
-
     def test_out_of_order(self):
 
         with self.assertRaises(IniTryToReplaceExistingKey):
@@ -157,8 +169,6 @@ B='str'
 """
             print(loads(test, Configuration).as_dict())
 
-
-
     def test_bad_yaml(self):
 
         with self.assertRaises(ParserError):
@@ -168,4 +178,3 @@ a={
 
 """
             print(loads(test, Configuration).as_dict())
-
