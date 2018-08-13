@@ -586,7 +586,7 @@ Output:
 
 Order for loading your is highly important, as each successive configuration file can provide overrides to values to the previous. `LazyLoadConfiguration` takes in a list (as `*args`) of ConfigurationLocations objects or strings that each provides as list of configuration files to load. By intermixing provided objects, you should be able to clearly and tightly define the load order of your configuration and what happens when files do not exist.
 
-When providing only strings to `LazyLoadConfiguration` they will automatically be converted in `ConfigurationFiles`, `ConfigurationMultiNamedFiles`. Paths with the files extensions `.*` and `.ini` will be converted in `ConfigurationMultiNamedFiles(directories=(dirname), filenames=(basename.yaml, basename.yml, basename.ini)` Paths with the files extensions `.y*` and `.yml` will be converted in `ConfigurationMultiNamedFiles(directories=(dirname), filenames=(basename.yaml, basename.yml)`
+When providing only strings to `LazyLoadConfiguration` they will automatically be converted in `ConfigurationFiles`, `ConfigurationMultiNamedFiles`. Paths with the file extension `.*` will be converted in `ConfigurationMultiNamedFiles(directories=(dirname), filenames=(basename.yaml, basename.yml, basename.ini)` Paths with the files extensions `.y*` and `.yml` will be converted in `ConfigurationMultiNamedFiles(directories=(dirname), filenames=(basename.yaml, basename.yml)` Paths with the file extension `.ini` will be converted in `ConfigurationMultiNamedFiles(directories=(dirname), filenames=(basename.ini, basename.yaml, basename.yml)` 
 
 Note: Duplicate file definitions are ignored and used in the first order found.
 

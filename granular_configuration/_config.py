@@ -346,13 +346,17 @@ def _parse_location(location):
         location = os.path.abspath(os.path.expanduser(location))
         dirname = os.path.dirname(location)
         basename, ext = os.path.splitext(os.path.basename(location))
-        if ext in (".*", ".ini"):
+        if ext == ".*":
             return ConfigurationMultiNamedFiles(
                 filenames=(basename + ".yaml", basename + ".yml", basename + ".ini"), directories=(dirname,)
             )
         elif ext in (".y*", ".yml"):
             return ConfigurationMultiNamedFiles(
                 filenames=(basename + ".yaml", basename + ".yml"), directories=(dirname,)
+            )
+        elif ext == ".ini":
+            return ConfigurationMultiNamedFiles(
+                filenames=(basename + ".ini", basename + ".yaml", basename + ".yml"), directories=(dirname,)
             )
         else:
             return ConfigurationFiles(files=(location,))

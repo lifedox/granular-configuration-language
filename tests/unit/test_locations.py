@@ -145,7 +145,7 @@ class TestLocations(unittest.TestCase):
 
         con_loc = _parse_location("/a/b/a.ini")
         self.assertSequenceEqual(con_loc.directories, ["/a/b"])
-        self.assertSequenceEqual(con_loc.filenames, ["a.yaml", "a.yml", "a.ini"])
+        self.assertSequenceEqual(con_loc.filenames, ["a.ini", "a.yaml", "a.yml"])
         self.assertIsNone(con_loc.files)
 
     def test__parse_location_ystar(self):
