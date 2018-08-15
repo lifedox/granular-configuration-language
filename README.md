@@ -855,6 +855,9 @@ BasePath:
 
 ## Changelog
 
+### 1.3.1
+ * Adds clear_config
+
 ### 1.3
  * Adds string path support to `LazyLoadConfiguration`
  * Adds get-config pattern
