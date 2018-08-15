@@ -66,6 +66,14 @@ class TestSetConfig(unittest.TestCase):
 
         self.assertIsNone(_set_config._SET_CONFIG_META)
 
+    def test_clear_config(self):
+        _set_config.set_config("a", "b")
+        _set_config.get_config()
+        _set_config.clear_config()
+
+        with self.assertRaises(GetConfigReadBeforeSetException):
+            _set_config.get_config()
+
 
 if __name__ == "__main__":
     unittest.main()

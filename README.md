@@ -289,6 +289,10 @@ from ... import ... CONFIG
 CONFIG.setting
 ```
 
+### Testing set configuration
+
+When testing configuration that is set via `set_config` you may need to clear the state of your configuration to ensure a clean test setup. To do this, simply call `clear_config`.
+
 &nbsp;
 
 ## Interface Objects
