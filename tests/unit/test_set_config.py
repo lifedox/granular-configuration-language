@@ -5,7 +5,7 @@ from mock import patch
 from granular_configuration._config import LazyLoadConfiguration
 from granular_configuration.exceptions import GetConfigReadBeforeSetException
 
-from granular_configuration import _set_config
+from granular_configuration import _set_config, testing
 
 
 class TestSetConfig(unittest.TestCase):
@@ -69,7 +69,7 @@ class TestSetConfig(unittest.TestCase):
     def test_clear_config(self):
         _set_config.set_config("a", "b")
         _set_config.get_config()
-        _set_config.clear_config()
+        testing.clear_config()
 
         with self.assertRaises(GetConfigReadBeforeSetException):
             _set_config.get_config()

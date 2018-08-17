@@ -289,9 +289,25 @@ from ... import ... CONFIG
 CONFIG.setting
 ```
 
+&nbsp;
+
 ### Testing set configuration
 
-When testing configuration that is set via `set_config` you may need to clear the state of your configuration to ensure a clean test setup. To do this, simply call `clear_config`.
+When testing configuration that is set via `set_config`, you can call `set_config` many times and it last call always overrides the previous set-config state. But you may desire to clear the state of set-config, so that calls to `get_config` produce an error again.
+
+Example:
+```python
+from granular_configuration import set_config, get_config
+from granular_configuration.testing import clear_config
+
+set_config() # No additional configuration paths are being provided.
+
+CONFIG = get_config("special_config.*") # Does not error, because set_config was called
+
+clear_config() # Unset set-config
+
+get_config("special_config.*") # Raises granular_configuration.exceptions.GetConfigReadBeforeSetException
+```
 
 &nbsp;
 
