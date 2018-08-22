@@ -149,7 +149,7 @@ from granular_configuration import LazyLoadConfiguration
 import os
 
 CONFIG = LazyLoadConfiguration(
-    os.path.join(__file__, "embedded_config.yaml"), # Required, since you should be using !Placeholder to represent the form, if there are no defaults
+    os.path.join(os.path.dirname(__file__), "embedded_config.yaml"), # Required, since you should be using !Placeholder to represent the form, if there are no defaults
     "~/<lib_specific>_config.*", # Optional
     "./<lib_specific>_config.*", # Optional
     "global_config.*",
@@ -226,7 +226,7 @@ from granular_configuration import get_config
 import os
 
 CONFIG = get_config(
-    os.path.join(__file__, "embedded_config.yaml"), # Required, since you should be using !Placeholder to represent the form, if there are no defaults
+    os.path.join(os.path.dirname(__file__), "embedded_config.yaml"), # Required, since you should be using !Placeholder to represent the form, if there are no defaults
     "~/<lib_specific>_config.*", # Optional
     "./<lib_specific>_config.*", # Optional,
     base_path=["lib-base-path"]
@@ -273,7 +273,7 @@ from granular_configuration import get_config
 import os
 
 CONFIG = get_config(
-    os.path.join(__file__, "embedded_config.yaml"), # Required, since you should be using !Placeholder to represent the form, if there are no defaults
+    os.path.join(os.path.dirname(__file__), "embedded_config.yaml"), # Required, since you should be using !Placeholder to represent the form, if there are no defaults
     "~/<lib_specific>_config.*", # Optional
     "./<lib_specific>_config.*", # Optional,
     base_path=["lib-base-path"],
