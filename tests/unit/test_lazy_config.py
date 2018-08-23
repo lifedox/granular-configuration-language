@@ -5,6 +5,7 @@ from functools import partial
 
 
 from granular_configuration._config import LazyLoadConfiguration, Configuration, ConfigurationLocations
+from granular_configuration.exceptions import InvalidBasePathException
 
 
 class TestLazyLoadConfiguration(unittest.TestCase):
@@ -97,6 +98,46 @@ class TestLazyLoadConfiguration(unittest.TestCase):
             assert config.get("abc") == "test"
             assert config.get("name") == "me"
 
+
+    def test__LazyLoadConfiguration_bad_base_path(self):
+
+        config_dict = Configuration({"abc": "test", "name": "me"})
+
+        with patch("granular_configuration._config._build_configuration", return_value=config_dict) as bc_mock:
+            config = LazyLoadConfiguration(base_path="base")
+
+            with self.assertRaises(InvalidBasePathException):
+                config.load_configure()
+
+
+    def test__LazyLoadConfiguration_string_base_path(self):
+        config_dict = Configuration({"abc": "test", "name": "me"})
+
+        with patch("granular_configuration._config._build_configuration", return_value=config_dict) as bc_mock:
+            config = LazyLoadConfiguration(base_path="base")
+
+            self.assertEquals(config._LazyLoadConfiguration__base_path, ["base"])
+            bc_mock.assert_not_called()
+
+
+    def test__LazyLoadConfiguration_list_base_path(self):
+        config_dict = Configuration({"abc": "test", "name": "me"})
+
+        with patch("granular_configuration._config._build_configuration", return_value=config_dict) as bc_mock:
+            config = LazyLoadConfiguration(base_path=["base", "path"])
+
+            self.assertEquals(config._LazyLoadConfiguration__base_path, ["base", "path"])
+            bc_mock.assert_not_called()
+
+
+    def test__LazyLoadConfiguration_no_base_path(self):
+        config_dict = Configuration({"abc": "test", "name": "me"})
+
+        with patch("granular_configuration._config._build_configuration", return_value=config_dict) as bc_mock:
+            config = LazyLoadConfiguration()
+
+            self.assertEquals(config._LazyLoadConfiguration__base_path, [])
+            bc_mock.assert_not_called()
 
 if __name__ == "__main__":
     unittest.main()

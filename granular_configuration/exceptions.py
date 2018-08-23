@@ -12,3 +12,7 @@ class IniTryToReplaceExistingKey(Exception):
 
 class GetConfigReadBeforeSetException(Exception):
     pass
+
+
+class InvalidBasePathException(KeyError):
+    pass

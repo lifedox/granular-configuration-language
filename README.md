@@ -184,7 +184,7 @@ def set_config(*load_order_location typ.Sequence[typ.Union[str, ConfigurationLoc
 
 def get_config(
     *load_order_location: typ.Sequence[typ.Union[str, ConfigurationLocations]],
-    base_path: typ.Optional[typ.Sequence[str]] = None
+    base_path: typ.Optional[typ.Union[str, typ.Sequence[str]]] = None
     requires_set: bool = True
 ) -> LazyLoadConfiguration:
     ...
@@ -405,7 +405,7 @@ class LazyLoadConfiguration(object): # __getattr__ implies implementing Configur
     def __init__(
         self,
         *load_order_location: typ.Sequence[typ.Union[str, ConfigurationLocations]],
-        base_path: typ.Optional[typ.Sequence[str]] = None
+        base_path: typ.Optional[typ.Union[str, typ.Sequence[str]]] = None
     ) -> None:
         ...
 

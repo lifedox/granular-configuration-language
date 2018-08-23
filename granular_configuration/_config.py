@@ -11,7 +11,7 @@ from contextlib import contextmanager
 
 from granular_configuration.yaml_handler import Placeholder, LazyEval
 from granular_configuration._load import load_file
-from granular_configuration.exceptions import PlaceholderConfigurationError
+from granular_configuration.exceptions import PlaceholderConfigurationError, InvalidBasePathException
 from granular_configuration.utils import OrderedSet
 
 consume = partial(deque, maxlen=0)
@@ -136,7 +136,7 @@ class Configuration(MutableMapping):
             elif (patched_value is not check) and all(map(op.attrgetter("allows_new_keys"), self.__iter_patches())):
                 value = patched_value
             else:
-                self.__data[name] # raise KeyError
+                self.__data[name]  # raise KeyError
         else:
             value = self.__data[name]
         return value
@@ -249,7 +249,10 @@ class Configuration(MutableMapping):
         self.__patches.remove(patch)
 
     def __get_child_patches(self, name, for_patch):
-        return map(op.methodcaller("make_child", name, for_patch), filter(op.methodcaller("__contains__", name), self.__patches))
+        return map(
+            op.methodcaller("make_child", name, for_patch),
+            filter(op.methodcaller("__contains__", name), self.__patches),
+        )
 
 
 class _ConDict(dict, Configuration):  # pylint: disable=too-many-ancestors
@@ -376,7 +379,13 @@ class LazyLoadConfiguration(object):
 
     def __init__(self, *load_order_location, **kwargs):
         base_path = kwargs.get("base_path")
-        self.__base_path = base_path if base_path else []
+        if isinstance(base_path, string_types):
+            self.__base_path = [base_path]
+        elif base_path:
+            self.__base_path = base_path
+        else:
+            self.__base_path = []
+
         self._config = None
         self.__locations = tuple(map(_parse_location, load_order_location))
 
@@ -392,11 +401,13 @@ class LazyLoadConfiguration(object):
         Force load the configuration.
         """
         if self._config is None:
-            self._config = reduce(
-                lambda dic, key: dic[key],
-                self.__base_path,
-                _build_configuration(_get_all_unique_locations(self.__locations)),
-            )
+            config = _build_configuration(_get_all_unique_locations(self.__locations))
+
+            try:
+                self._config = reduce(lambda dic, key: dic[key], self.__base_path, config)
+            except KeyError as e:
+                message = str(e)
+                raise InvalidBasePathException(message[1 : len(message) - 1])
             self.__locations = None
             self.__base_path = None
 
