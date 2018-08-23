@@ -871,6 +871,11 @@ BasePath:
 
 ## Changelog
 
+### 1.4.0
+ * Adds InvalidBasePathException as an exception the can be thrown during the load phase of `LazyLoadConfiguration`.
+    * This subclasses `KeyError` maintaining compatibility with the state before this exception.
+ * `LazyLoadConfiguration`'s `base_path` argument now takes a single `str` in addition to the original `typing.Sequence[str]`
+
 ### 1.3.1
  * Adds clear_config
 
