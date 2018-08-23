@@ -184,7 +184,7 @@ def set_config(*load_order_location typ.Sequence[typ.Union[str, ConfigurationLoc
 
 def get_config(
     *load_order_location: typ.Sequence[typ.Union[str, ConfigurationLocations]],
-    base_path: typ.Optional[typ.Sequence[str]] = None
+    base_path: typ.Optional[typ.Union[str, typ.Sequence[str]]] = None
     requires_set: bool = True
 ) -> LazyLoadConfiguration:
     ...
@@ -405,7 +405,7 @@ class LazyLoadConfiguration(object): # __getattr__ implies implementing Configur
     def __init__(
         self,
         *load_order_location: typ.Sequence[typ.Union[str, ConfigurationLocations]],
-        base_path: typ.Optional[typ.Sequence[str]] = None
+        base_path: typ.Optional[typ.Union[str, typ.Sequence[str]]] = None
     ) -> None:
         ...
 
@@ -870,6 +870,11 @@ BasePath:
 &nbsp;
 
 ## Changelog
+
+### 1.4.0
+ * Adds InvalidBasePathException as an exception the can be thrown during the load phase of `LazyLoadConfiguration`.
+    * This subclasses `KeyError` maintaining compatibility with the state before this exception.
+ * `LazyLoadConfiguration`'s `base_path` argument now takes a single `str` in addition to the original `typing.Sequence[str]`
 
 ### 1.3.1
  * Adds clear_config
