@@ -53,8 +53,6 @@ def get_func(func_path):
 
 
 def handle_env(loader, node):
-    assert isinstance(loader, SafeLoader)
-
     if isinstance(node, ScalarNode):
         value = loader.construct_scalar(node)
         return LazyEval(lambda: ENV_PATTERN.sub(lambda x: load_env(**x.groupdict()), value))
@@ -63,8 +61,6 @@ def handle_env(loader, node):
 
 
 def handle_placeholder(loader, node):
-    assert isinstance(loader, SafeLoader)
-
     if isinstance(node, ScalarNode):
         value = loader.construct_scalar(node)
         return Placeholder(value)
@@ -92,7 +88,6 @@ def handle_func(value):
 
 
 def string_check(func, loader, node):
-    assert isinstance(loader, SafeLoader)
     if isinstance(node, ScalarNode):
         return LazyEval(lambda: func(loader.construct_scalar(node)))
     else:
@@ -100,9 +95,6 @@ def string_check(func, loader, node):
 
 
 def construct_mapping(cls, loader, node):
-    assert isinstance(loader, SafeLoader)
-    assert isinstance(node, MappingNode)
-
     node.value = [pair for pair in node.value if pair[1].tag != "!Del"]
     loader.flatten_mapping(node)
     return cls(loader.construct_pairs(node, deep=True))

@@ -147,3 +147,5 @@ fabric.properties
 
 # Mac specific
 .DS_Store
+
+.mypy_cache
