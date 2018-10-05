@@ -691,16 +691,26 @@ assert LazyLoadConfiguration(..., base_path=["Level1", "Level2", "Level3"]).as_d
 
 * `!Env`
   - **Usage:** `!Env '{{ENVIRONMENT_VARIABLE_THAT_EXISTS}} {{ENVIRONMENT_VARIABLE_THAT_DOES_NOT_EXIST:default value}}'`
-  - **Argument:** *String*. Returns a string produced by the string format, replacing `{{VARIABLE_NAME}}` with the Environment Variable specified. Optionally, a default value can be specified should the Environment Variable not exist.
+  - **Argument:** *str*.
+  - **Returns** a string produced by the string format, replacing `{{VARIABLE_NAME}}` with the Environment Variable specified. Optionally, a default value can be specified should the Environment Variable not exist.
+* `!ParseEnv`
+  - **Usage:** `!ParseEnv ENVIRONMENT_VARIABLE` or `!ParseEnv [ENVIRONMENT_VARIABLE, <YAML object>]`
+  - **Argument:** *Union[str, List[str, Any]*. 
+  - **Returns**:
+    - If provided a string, the Environment Variable specified will be parsed as YAML. If the Environment Variable does not exist, an error will be thrown.
+    - If provided a sequence, the second object will be returned, if the Environment Variable does not exists, instead of erroring.
+  - Note: This is recursible function. `!ParseEnv VAR`, where `VAR='!ParseEnv VAR'` will loop until the call stack reaches maximum depth.
 * `!Func`
   - **Usage:** `!Func 'path.to.function'`
-  - **Argument:** *String*. Returns a pointer to the function specified. Acts as an import of `path.to`, returning `getattr(path.to, function)`. The current working directory is added prior to attempt the import. Returned object must be callable.
+  - **Argument:** *str*.
+  - **Returns** a pointer to the function specified. Acts as an import of `path.to`, returning `getattr(path.to, function)`. The current working directory is added prior to attempt the import. Returned object must be callable.
 * `!Class`
   - **Usage:** `!Class 'path.to.function'`
   - Acts the same as `!Func` except that the returned object must subclass `object`
 * `!Placeholder`
   - **Usage:** `!Placeholder 'message'`
-  - **Argument:** *String*. Returns a `Placeholder` containing the message. If a Placeholder is not overridden, a `PlaceholderConfigurationError` exception will be thrown if accessed.
+  - **Argument:** *str*.
+  - **Returns** a `Placeholder` containing the message. If a Placeholder is not overridden, a `PlaceholderConfigurationError` exception will be thrown if accessed.
 
 &nbsp;
 
@@ -870,6 +880,9 @@ BasePath:
 &nbsp;
 
 ## Changelog
+
+### 1.5.0
+ * Adds `!ParseEnv` Tag
 
 ### 1.4.0
  * Adds InvalidBasePathException as an exception the can be thrown during the load phase of `LazyLoadConfiguration`.
