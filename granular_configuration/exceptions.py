@@ -16,3 +16,7 @@ class GetConfigReadBeforeSetException(Exception):
 
 class InvalidBasePathException(KeyError):
     pass
+
+
+class ParseEnvError(Exception):
+    pass

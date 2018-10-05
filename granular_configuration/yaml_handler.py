@@ -4,9 +4,11 @@ import importlib
 import os
 import re
 import sys
-from yaml import ScalarNode, MappingNode, SafeLoader
+from yaml import ScalarNode, SafeLoader, SequenceNode
 from functools import partial
 from collections import MutableMapping, deque
+
+from granular_configuration.exceptions import ParseEnvError
 
 consume = partial(deque, maxlen=0)
 
@@ -89,9 +91,43 @@ def handle_func(value):
 
 def string_check(func, loader, node):
     if isinstance(node, ScalarNode):
-        return LazyEval(lambda: func(loader.construct_scalar(node)))
+        value = loader.construct_scalar(node)
+        return LazyEval(lambda: func(value))
     else:
         raise ValueError("Only strings are supported by !{}".format(node.tag))
+
+
+def parse_env(loader_cls, env_var, *default):
+    env_var = str(env_var)
+    env_missing = env_var not in os.environ
+
+    if env_missing and (len(default) > 0):
+        return default[0]
+    elif env_missing:
+        raise KeyError(env_var)
+    else:
+        try:
+            value = yaml.load(  # nosec
+                os.environ[env_var], Loader=loader_cls
+            )  # ExtendSafeLoader is a subclass of SafeLoader
+        except Exception as e:
+            raise ParseEnvError("Error while parsing Environment Variable ({}): {}".format(env_var, e))
+        if isinstance(value, LazyEval):
+            return value.run()
+        else:
+            return value
+
+
+def handle_parse_env(loader, node):
+    loader_cls = loader.__class__
+    if isinstance(node, ScalarNode):
+        value = loader.construct_scalar(node)
+        return LazyEval(lambda: parse_env(loader_cls, value))
+    elif isinstance(node, SequenceNode):
+        value = loader.construct_sequence(node, True)
+        return LazyEval(lambda: parse_env(loader_cls, *value))
+    else:
+        raise ValueError("!ParseEnv only supports a string or typing.Tuple[str, typing.Any]")
 
 
 def construct_mapping(cls, loader, node):
@@ -113,5 +149,6 @@ def loads(yaml_str, obj_pairs_hook=None):
     ExtendSafeLoader.add_constructor("!Func", partial(string_check, handle_func))
     ExtendSafeLoader.add_constructor("!Class", partial(string_check, handle_class))
     ExtendSafeLoader.add_constructor("!Placeholder", handle_placeholder)
+    ExtendSafeLoader.add_constructor("!ParseEnv", handle_parse_env)
 
     return yaml.load(yaml_str, Loader=ExtendSafeLoader)  # nosec  # ExtendSafeLoader is a subclass of SafeLoader
