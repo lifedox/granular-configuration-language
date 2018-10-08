@@ -2,7 +2,7 @@
 from setuptools import setup, find_packages
 import os
 
-version = "1.4.0" + '.' + os.environ.get('BUILD_NUMBER', '0')
+version = "1.5.0" + '.' + os.environ.get('BUILD_NUMBER', '0')
 
 def load_requirements(filename):
     with open(filename) as f_obj:
@@ -18,9 +18,9 @@ setup(
     description='Granular Configuration library for Runtime-Loaded YAML Configurations',
     author='Granular GLaDOS',
     author_email='team_glados@granular.ag',
-    url='https://gitlab.encirca.auto.pioneer.com/granular-lite/granular-configuration',
+    url='https://gitlab.encirca.auto.pioneer.com/shared-services/granular-configuration',
     packages=find_packages(exclude=['tests*']),
-    package_data={},
+    package_data={"granular_configuration": ["py.typed", "*.pyi"]},
     install_requires=install_requires,
     setup_requires=['pytest-runner'],
     tests_require=tests_requires

@@ -1,0 +1,1 @@
+black -l 120 granular_configuration/*.py granular_configuration/*.pyi

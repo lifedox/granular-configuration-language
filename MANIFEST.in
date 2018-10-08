@@ -1,0 +1,2 @@
+include granular_configuration/*.pyi
+include granular_configuration/py.typed
