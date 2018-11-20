@@ -291,6 +291,18 @@ CONFIG.setting
 
 &nbsp;
 
+### Env Variable
+
+Regardless which of the above you use, if you provide the keyword argument use_env_location, the library will check the G_CONFIG_LOCATION, and append locations stored in this enviornment variable to the locations being used.  
+
+#### Example
+
+Usage:
+```python
+from granular_configuration import LazyLoadConfiguration
+CONFIG = LazyLoadConfiguration(use_env_location=True)
+```
+
 ### Testing set configuration
 
 When testing configuration that is set via `set_config`, you can call `set_config` many times and it last call always overrides the previous set-config state. But you may desire to clear the state of set-config, so that calls to `get_config` produce an error again.

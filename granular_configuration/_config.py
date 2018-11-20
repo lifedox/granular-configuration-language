@@ -387,9 +387,9 @@ class LazyLoadConfiguration(object):
             self.__base_path = []
 
         if kwargs.get("use_env_location"):
-            env_loc = os.environ.get("G_CONFIG_LOCATION")
-            if env_loc:
-                load_order_location = load_order_location + tuple([env_loc])
+            env_locs = os.environ.get("G_CONFIG_LOCATION").split(" ")
+            if env_locs:
+                load_order_location = load_order_location + tuple(env_locs)
         self._config = None
         self.__locations = tuple(map(_parse_location, load_order_location))
 
