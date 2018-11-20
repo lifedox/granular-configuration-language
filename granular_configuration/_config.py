@@ -386,6 +386,10 @@ class LazyLoadConfiguration(object):
         else:
             self.__base_path = []
 
+        if kwargs.get("use_env_location"):
+            env_loc = os.environ.get("G_CONFIG_LOCATION")
+            if env_loc:
+                load_order_location = load_order_location + tuple([env_loc])
         self._config = None
         self.__locations = tuple(map(_parse_location, load_order_location))
 
@@ -402,7 +406,6 @@ class LazyLoadConfiguration(object):
         """
         if self._config is None:
             config = _build_configuration(_get_all_unique_locations(self.__locations))
-
             try:
                 self._config = reduce(lambda dic, key: dic[key], self.__base_path, config)
             except KeyError as e:

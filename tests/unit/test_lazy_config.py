@@ -9,9 +9,9 @@ from granular_configuration.exceptions import InvalidBasePathException
 
 
 class TestLazyLoadConfiguration(unittest.TestCase):
+    BASE_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), "../assets/config_location_test"))
     def test__LazyLoadConfiguration(self):
-        base_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), "../assets/config_location_test"))
-        dir_func = partial(os.path.join, base_dir)
+        dir_func = partial(os.path.join, self.BASE_DIR)
 
         directories = list(map(dir_func, ["a/b", "a", "b", "c", "d", "c"]))
         filenames = ["t.txt", "t2.txt"]
@@ -43,8 +43,7 @@ class TestLazyLoadConfiguration(unittest.TestCase):
             loc_mock.assert_called_once_with(location)
 
     def test__LazyLoadConfiguration_with_base_path(self):
-        base_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), "../assets/config_location_test"))
-        dir_func = partial(os.path.join, base_dir)
+        dir_func = partial(os.path.join, self.BASE_DIR)
 
         directories = list(map(dir_func, ["a/b", "a", "b", "c", "d", "c"]))
         filenames = ["t.txt", "t2.txt"]
@@ -76,8 +75,7 @@ class TestLazyLoadConfiguration(unittest.TestCase):
             loc_mock.assert_called_once_with(location)
 
     def test__LazyLoadConfiguration_get(self):
-        base_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), "../assets/config_location_test"))
-        dir_func = partial(os.path.join, base_dir)
+        dir_func = partial(os.path.join, self.BASE_DIR)
 
         directories = list(map(dir_func, ["a/b", "a", "b", "c", "d", "c"]))
         filenames = ["t.txt", "t2.txt"]
@@ -138,6 +136,25 @@ class TestLazyLoadConfiguration(unittest.TestCase):
 
             self.assertEquals(config._LazyLoadConfiguration__base_path, [])
             bc_mock.assert_not_called()
+
+    def test__LazyLoadConfiguration_env_(self):
+        with patch(
+            'granular_configuration._config.os.environ',
+        ) as env_mock:
+            env_get_mock = env_mock.get
+            env_get_mock.return_value = os.path.join(
+                self.BASE_DIR,
+                'test_env_config.yaml',
+            )
+            config = LazyLoadConfiguration(
+                os.path.join(
+                    self.BASE_DIR,
+                    'mix_config.yaml',
+                ),
+                use_env_location=True,
+            )
+            env_get_mock.assert_called_with('G_CONFIG_LOCATION')
+            assert config.A.key1 == 'value2'
 
 if __name__ == "__main__":
     unittest.main()
