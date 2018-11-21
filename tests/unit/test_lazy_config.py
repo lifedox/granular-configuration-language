@@ -137,7 +137,7 @@ class TestLazyLoadConfiguration(unittest.TestCase):
             self.assertEquals(config._LazyLoadConfiguration__base_path, [])
             bc_mock.assert_not_called()
 
-    def test__LazyLoadConfiguration_env_(self):
+    def test__LazyLoadConfiguration_env(self):
         with patch(
             'granular_configuration._config.os.environ',
         ) as env_mock:
@@ -155,6 +155,23 @@ class TestLazyLoadConfiguration(unittest.TestCase):
             )
             env_get_mock.assert_called_with('G_CONFIG_LOCATION')
             assert config.A.key1 == 'value2'
+
+    def test__LazyLoadConfiguration_env_list(self):
+        with patch(
+            'granular_configuration._config.os.environ',
+        ) as env_mock:
+            env_get_mock = env_mock.get
+            env_get_mock.return_value = os.path.join(
+                self.BASE_DIR,
+                'test_env_config.yaml',
+            ) + ',' + os.path.join(
+                self.BASE_DIR,
+                'mix_config.yaml',
+            )
+            config = LazyLoadConfiguration(use_env_location=True)
+            env_get_mock.assert_called_with('G_CONFIG_LOCATION')
+            assert config.A.key1 == 'value1'
+            assert config.A.key2 == 'MyTestValue'
 
 if __name__ == "__main__":
     unittest.main()
