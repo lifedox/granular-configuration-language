@@ -138,14 +138,15 @@ class TestLazyLoadConfiguration(unittest.TestCase):
             bc_mock.assert_not_called()
 
     def test__LazyLoadConfiguration_env(self):
+        env_path = os.path.join(
+            self.BASE_DIR,
+            'test_env_config.yaml',
+        )
+
         with patch(
             'granular_configuration._config.os.environ',
+            new={'G_CONFIG_LOCATION': env_path}
         ) as env_mock:
-            env_get_mock = env_mock.get
-            env_get_mock.return_value = os.path.join(
-                self.BASE_DIR,
-                'test_env_config.yaml',
-            )
             config = LazyLoadConfiguration(
                 os.path.join(
                     self.BASE_DIR,
@@ -153,25 +154,31 @@ class TestLazyLoadConfiguration(unittest.TestCase):
                 ),
                 use_env_location=True,
             )
-            env_get_mock.assert_called_with('G_CONFIG_LOCATION')
             assert config.A.key1 == 'value2'
 
     def test__LazyLoadConfiguration_env_list(self):
+        env_path = os.path.join(
+            self.BASE_DIR,
+            'test_env_config.yaml',
+        ) + ',' + os.path.join(
+            self.BASE_DIR,
+            'mix_config.yaml',
+         )
+
         with patch(
             'granular_configuration._config.os.environ',
+            new={'G_CONFIG_LOCATION': env_path}
         ) as env_mock:
-            env_get_mock = env_mock.get
-            env_get_mock.return_value = os.path.join(
-                self.BASE_DIR,
-                'test_env_config.yaml',
-            ) + ',' + os.path.join(
-                self.BASE_DIR,
-                'mix_config.yaml',
-            )
             config = LazyLoadConfiguration(use_env_location=True)
-            env_get_mock.assert_called_with('G_CONFIG_LOCATION')
             assert config.A.key1 == 'value1'
             assert config.A.key2 == 'MyTestValue'
+
+    def test__LazyLoadConfiguration_env_none(self):
+        with patch(
+            'granular_configuration._config.os.environ', new={}
+        ) as env_mock:
+            config = LazyLoadConfiguration(use_env_location=True)
+            assert config.as_dict() == {}
 
 if __name__ == "__main__":
     unittest.main()
