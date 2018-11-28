@@ -180,5 +180,19 @@ class TestLazyLoadConfiguration(unittest.TestCase):
             config = LazyLoadConfiguration(use_env_location=True)
             assert config.as_dict() == {}
 
+    def test__LazyLoadConfiguration_like_a_mutablemapping(self):
+
+        dir_func = partial(os.path.join, self.BASE_DIR)
+
+        config = LazyLoadConfiguration(dir_func('test_env_config.yaml'))
+
+        self.assertEqual(config["A"]["key1"], 'value2')
+        config['B'] = 1
+        self.assertEqual(config["B"], 1)
+        self.assertEqual(len(config), 2)
+        del config['B']
+        self.assertSequenceEqual(list(config), ['A'])
+
+
 if __name__ == "__main__":
     unittest.main()

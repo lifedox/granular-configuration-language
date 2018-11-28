@@ -372,7 +372,7 @@ not ({})".format(
         )
 
 
-class LazyLoadConfiguration(object):
+class LazyLoadConfiguration(MutableMapping):
     """
     Provides a lazy interface for loading Configuration from ConfigurationLocations definitions on first access.
     """
@@ -396,7 +396,7 @@ class LazyLoadConfiguration(object):
     def __getattr__(self, name):
         """
         Loads (if not loaded) and fetches from the underlying Configuration object.
-        This also exposes the methods of Configuration.
+        This also exposes the methods of Configuration (except dunders).
         """
         return getattr(self.config, name)
 
@@ -422,3 +422,18 @@ class LazyLoadConfiguration(object):
         if self._config is None:
             self.load_configure()
         return self._config
+
+    def __delitem__(self, key):
+        del self.config[key]
+
+    def __getitem__(self, key):
+        return self.config[key]
+
+    def __iter__(self):
+        return iter(self.config)
+
+    def __len__(self):
+        return len(self.config)
+
+    def __setitem__(self, key, value):
+        self.config[key] = value
