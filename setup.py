@@ -2,7 +2,7 @@
 from setuptools import setup, find_packages
 import os
 
-version = "1.6.1" + '.' + os.environ.get('BUILD_NUMBER', '0')
+version = "1.6.2" + '.' + os.environ.get('BUILD_NUMBER', '0')
 
 def load_requirements(filename):
     with open(filename) as f_obj:
