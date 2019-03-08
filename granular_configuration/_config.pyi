@@ -73,7 +73,7 @@ class LazyLoadConfiguration(Configuration):
     def __init__(
         self,
         *load_order_location: typ.Union[str, ConfigurationLocations],
-        base_path: typ.Optional[typ.Union[str, typ.Sequence[str]]],
+        base_path: typ.Optional[typ.Union[str, typ.Sequence[str]]] = None,
         use_env_location: bool = False,
     ) -> None: ...
     def load_configure(self) -> None: ...
