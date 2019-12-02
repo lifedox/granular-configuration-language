@@ -23,5 +23,6 @@ setup(
     package_data={"granular_configuration": ["py.typed", "*.pyi"]},
     install_requires=install_requires,
     setup_requires=['pytest-runner'],
-    tests_require=tests_requires
+    tests_require=tests_requires,
+    python_requires=">=3.6"
 )

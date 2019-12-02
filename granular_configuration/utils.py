@@ -1,5 +1,6 @@
 from __future__ import print_function, absolute_import
-from collections import OrderedDict, MutableSet, deque
+from collections import OrderedDict, deque
+from collections.abc import MutableSet
 from functools import partial
 from six import iterkeys
 from six.moves import map

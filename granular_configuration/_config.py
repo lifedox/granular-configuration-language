@@ -1,5 +1,6 @@
 from __future__ import print_function, absolute_import
-from collections import deque, MutableMapping, Mapping
+from collections import deque
+from collections.abc import MutableMapping, Mapping
 import os
 import copy
 import operator as op
