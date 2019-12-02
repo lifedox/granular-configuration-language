@@ -88,10 +88,26 @@ class TestYamlHandler(unittest.TestCase):
         with patch.dict(os.environ, values={"unreal_env_variable": "null"}):
             self.assertIs(loads("!ParseEnv unreal_env_variable").run(), None)
 
-    def test_yaml_parse_env_scalar__bool(self):
+    def test_yaml_parse_env_scalar__bool_true(self):
         with patch.dict(os.environ, values={"unreal_env_variable": "true"}):
             self.assertEqual(loads("!ParseEnv unreal_env_variable").run(), True)
             self.assertIsInstance(loads("!ParseEnv unreal_env_variable").run(), bool)
+
+    def test_yaml_parse_env_scalar__bool_true_casing(self):
+        with patch.dict(os.environ, values={"unreal_env_variable": "True"}):
+            self.assertEqual(loads("!ParseEnv unreal_env_variable").run(), True)
+            self.assertIsInstance(loads("!ParseEnv unreal_env_variable").run(), bool)
+
+    def test_yaml_parse_env_scalar__bool_false(self):
+        with patch.dict(os.environ, values={"unreal_env_variable": "false"}):
+            self.assertEqual(loads("!ParseEnv unreal_env_variable").run(), False)
+            self.assertIsInstance(loads("!ParseEnv unreal_env_variable").run(), bool)
+
+    def test_yaml_parse_env_scalar__bool_false_casing(self):
+        with patch.dict(os.environ, values={"unreal_env_variable": "False"}):
+            self.assertEqual(loads("!ParseEnv unreal_env_variable").run(), False)
+            self.assertIsInstance(loads("!ParseEnv unreal_env_variable").run(), bool)
+
 
     def test_yaml_parse_env_scalar__dict(self):
         with patch.dict(os.environ, values={"unreal_env_variable": '{"a": "value"}'}):

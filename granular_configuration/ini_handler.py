@@ -1,6 +1,7 @@
 from __future__ import print_function
 from io import StringIO
-from collections import OrderedDict, MutableMapping, deque
+from collections import OrderedDict, deque
+from collections.abc import MutableMapping
 from six.moves import map, filterfalse, configparser
 from six import text_type
 from functools import partial
