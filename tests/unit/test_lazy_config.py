@@ -114,7 +114,7 @@ class TestLazyLoadConfiguration(unittest.TestCase):
         with patch("granular_configuration._config._build_configuration", return_value=config_dict) as bc_mock:
             config = LazyLoadConfiguration(base_path="base")
 
-            self.assertEquals(config._LazyLoadConfiguration__base_path, ["base"])
+            self.assertEqual(config._LazyLoadConfiguration__base_path, ["base"])
             bc_mock.assert_not_called()
 
 
@@ -124,7 +124,7 @@ class TestLazyLoadConfiguration(unittest.TestCase):
         with patch("granular_configuration._config._build_configuration", return_value=config_dict) as bc_mock:
             config = LazyLoadConfiguration(base_path=["base", "path"])
 
-            self.assertEquals(config._LazyLoadConfiguration__base_path, ["base", "path"])
+            self.assertEqual(config._LazyLoadConfiguration__base_path, ["base", "path"])
             bc_mock.assert_not_called()
 
 
@@ -134,7 +134,7 @@ class TestLazyLoadConfiguration(unittest.TestCase):
         with patch("granular_configuration._config._build_configuration", return_value=config_dict) as bc_mock:
             config = LazyLoadConfiguration()
 
-            self.assertEquals(config._LazyLoadConfiguration__base_path, [])
+            self.assertEqual(config._LazyLoadConfiguration__base_path, [])
             bc_mock.assert_not_called()
 
     def test__LazyLoadConfiguration_env(self):

@@ -6,7 +6,8 @@ import re
 import sys
 from yaml import ScalarNode, SafeLoader, SequenceNode
 from functools import partial
-from collections import MutableMapping, deque
+from collections import deque
+from collections.abc import MutableMapping
 
 from granular_configuration.exceptions import ParseEnvError
 
