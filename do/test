@@ -1,8 +1,6 @@
-#!/bin/bash -e
+#!/bin/sh -e
 
-if [ -z "${VIRTUAL_ENV}" ]; then
-    echo "Please run: source do/setup"
-    exit 1
-fi
-python setup.py test
-bandit -r granular_configuration -ll
+dir="$( cd "$( dirname "$0" )" && pwd )"
+cd $dir/..
+ 
+make test

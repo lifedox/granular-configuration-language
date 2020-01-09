@@ -1,13 +1,15 @@
-from __future__ import print_function
-import yaml
 import importlib
+import inspect
 import os
 import re
 import sys
-from yaml import ScalarNode, SafeLoader, SequenceNode
-from functools import partial
+import typing as typ
 from collections import deque
 from collections.abc import MutableMapping
+from functools import partial
+
+import yaml
+from yaml import MappingNode, SafeLoader, ScalarNode, SequenceNode
 
 from granular_configuration.exceptions import ParseEnvError
 
@@ -15,38 +17,41 @@ consume = partial(deque, maxlen=0)
 
 ENV_PATTERN = re.compile(r"(\{\{\s*(?P<env_name>[A-Za-z0-9-_]+)\s*(?:\:(?P<default>.*?))?\}\})")
 
+_YNODES = typ.Union[ScalarNode, MappingNode]
+_RT = typ.TypeVar("_RT")
 
-class Placeholder(object):
-    def __init__(self, message):
+
+class Placeholder:
+    def __init__(self, message: str) -> None:
         self.message = message
 
-    def __str__(self):
+    def __str__(self) -> str:
         return str(self.message)
 
 
-class LazyEval(object):
-    def __init__(self, value):
+class LazyEval(typ.Generic[_RT]):
+    def __init__(self, value: typ.Callable[[], _RT]) -> None:
         assert callable(value)
         self.value = value
 
-    def run(self):
+    def run(self) -> _RT:
         return self.value()
 
 
-def load_env(env_name, default=None):
+def load_env(env_name: str, default: typ.Optional[str] = None) -> str:
     if default is None:
         return os.environ[env_name]
     else:
         return os.getenv(env_name, default)
 
 
-def add_cwd_to_path():
+def add_cwd_to_path() -> None:
     cwd = os.getcwd()
     if sys.path[0] != cwd:
         sys.path.insert(0, cwd)
 
 
-def get_func(func_path):
+def get_func(func_path: str) -> typ.Callable:
     add_cwd_to_path()
     mod_name, func = func_path.rsplit(".", 1)
     try:
@@ -55,7 +60,7 @@ def get_func(func_path):
         raise ValueError("Could not load {}".format(func_path))
 
 
-def handle_env(loader, node):
+def handle_env(loader: SafeLoader, node: _YNODES) -> LazyEval:
     if isinstance(node, ScalarNode):
         value = loader.construct_scalar(node)
         return LazyEval(lambda: ENV_PATTERN.sub(lambda x: load_env(**x.groupdict()), value))
@@ -63,7 +68,7 @@ def handle_env(loader, node):
         raise ValueError("Only strings are supported by !Env")
 
 
-def handle_placeholder(loader, node):
+def handle_placeholder(loader: SafeLoader, node: _YNODES) -> Placeholder:
     if isinstance(node, ScalarNode):
         value = loader.construct_scalar(node)
         return Placeholder(value)
@@ -71,18 +76,15 @@ def handle_placeholder(loader, node):
         raise ValueError("Only strings are supported by !Placeholder")
 
 
-def handle_class(value):
+def handle_class(value: str) -> typ.Callable:
     class_type = get_func(value)
-    try:
-        if not issubclass(class_type, object):
-            raise ValueError("Classes loaded by !Class must subclass object")  # pragma: no cover
-        else:
-            return class_type
-    except TypeError:
+    if inspect.isclass(class_type):
+        return class_type
+    else:
         raise ValueError("Classes loaded by !Class must subclass object")
 
 
-def handle_func(value):
+def handle_func(value: str) -> typ.Callable:
     func = get_func(value)
     if not callable(func):
         raise ValueError("Functions loaded by !Func must be callable")
@@ -90,7 +92,7 @@ def handle_func(value):
         return func
 
 
-def string_check(func, loader, node):
+def string_check(func: typ.Callable[[str], _RT], loader: SafeLoader, node: _YNODES) -> LazyEval[_RT]:
     if isinstance(node, ScalarNode):
         value = loader.construct_scalar(node)
         return LazyEval(lambda: func(value))
@@ -98,7 +100,7 @@ def string_check(func, loader, node):
         raise ValueError("Only strings are supported by !{}".format(node.tag))
 
 
-def parse_env(loader_cls, env_var, *default):
+def parse_env(loader_cls: typ.Type[SafeLoader], env_var: str, *default: typ.Any) -> typ.Any:
     env_var = str(env_var)
     env_missing = env_var not in os.environ
 
@@ -119,7 +121,7 @@ def parse_env(loader_cls, env_var, *default):
             return value
 
 
-def handle_parse_env(loader, node):
+def handle_parse_env(loader: SafeLoader, node: _YNODES) -> LazyEval:
     loader_cls = loader.__class__
     if isinstance(node, ScalarNode):
         value = loader.construct_scalar(node)
@@ -131,14 +133,14 @@ def handle_parse_env(loader, node):
         raise ValueError("!ParseEnv only supports a string or typing.Tuple[str, typing.Any]")
 
 
-def construct_mapping(cls, loader, node):
+def construct_mapping(cls: typ.Type[typ.Dict], loader: SafeLoader, node: _YNODES) -> typ.Dict:
     node.value = [pair for pair in node.value if pair[1].tag != "!Del"]
     loader.flatten_mapping(node)
     return cls(loader.construct_pairs(node, deep=True))
 
 
-def loads(yaml_str, obj_pairs_hook=None):
-    class ExtendSafeLoader(SafeLoader):  # pylint: disable=too-many-ancestors
+def loads(config_str: str, obj_pairs_hook: typ.Optional[typ.Type[typ.MutableMapping]] = None) -> typ.Any:
+    class ExtendSafeLoader(SafeLoader):
         pass
 
     if obj_pairs_hook and issubclass(obj_pairs_hook, MutableMapping):
@@ -152,4 +154,4 @@ def loads(yaml_str, obj_pairs_hook=None):
     ExtendSafeLoader.add_constructor("!Placeholder", handle_placeholder)
     ExtendSafeLoader.add_constructor("!ParseEnv", handle_parse_env)
 
-    return yaml.load(yaml_str, Loader=ExtendSafeLoader)  # nosec  # ExtendSafeLoader is a subclass of SafeLoader
+    return yaml.load(config_str, Loader=ExtendSafeLoader)  # nosec  # ExtendSafeLoader is a subclass of SafeLoader

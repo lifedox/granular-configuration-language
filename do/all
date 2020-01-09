@@ -1,16 +1,12 @@
-#!/bin/bash -e
+#!/bin/sh -e
 
-source do/setup
-python --version
-./do/clean
-./do/test
+dir="$( cd "$( dirname "$0" )" && pwd )"
+cd $dir/..
 
-source do/teardown
-source do/setup3
-python --version
-./do/clean
-./do/test
-if [ "${SKIP_BUILD,,}" != "true" ]; then
-  ./do/build
+do/clean
+do/setup
+do/test
+
+if [ "${ACTION}" != "test" ]; then
+    do/package
 fi
-source do/teardown

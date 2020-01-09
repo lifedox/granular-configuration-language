@@ -1,0 +1,2 @@
+#!/usr/bin/env bash
+mypy granular_configuration tests --ignore-missing-imports --warn-redundant-casts --disallow-incomplete-defs

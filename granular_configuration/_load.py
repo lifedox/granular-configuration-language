@@ -1,10 +1,11 @@
-from __future__ import print_function, absolute_import
 import os
-from granular_configuration.yaml_handler import loads as yaml_loads
+import typing as typ
+
 from granular_configuration.ini_handler import loads as ini_loads
+from granular_configuration.yaml_handler import loads as yaml_loads
 
 
-def load_file(filename, obj_pairs_hook=None):
+def load_file(filename: str, obj_pairs_hook: typ.Optional[typ.Type[typ.MutableMapping]] = None) -> str:
     try:
         ext = os.path.splitext(filename)[1]
         if ext == ".ini":

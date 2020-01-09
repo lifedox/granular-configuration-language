@@ -1,6 +1,6 @@
-#!/bin/bash -e
+#!/bin/sh -e
 
-python setup.py clean --all
-rm -Rf dist
-rm -Rf build
-rm -Rf *.egg-info
+dir="$( cd "$( dirname "$0" )" && pwd )"
+cd $dir/..
+
+make clean

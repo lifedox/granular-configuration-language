@@ -1,16 +1,15 @@
-import unittest
-from mock import patch
 import os
+import unittest
 from functools import partial
-
+from unittest.mock import patch
 
 from granular_configuration._config import (
-    _get_files_from_locations,
-    _get_all_unique_locations,
-    _parse_location,
-    ConfigurationLocations,
     ConfigurationFiles,
+    ConfigurationLocations,
     ConfigurationMultiNamedFiles,
+    _get_all_unique_locations,
+    _get_files_from_locations,
+    _parse_location,
 )
 
 

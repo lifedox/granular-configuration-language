@@ -1,10 +1,11 @@
-import unittest
 import os
-from functools import reduce, partial
+import unittest
+from functools import partial, reduce
+
 from six import iteritems, itervalues
 
-from granular_configuration.yaml_handler import loads, Placeholder
-from granular_configuration._config import _build_configuration, Configuration
+from granular_configuration._config import Configuration, _build_configuration
+from granular_configuration.yaml_handler import Placeholder, loads
 
 
 class TestConfiguration(unittest.TestCase):
@@ -71,7 +72,6 @@ class TestConfiguration(unittest.TestCase):
         expected = dict(a="b", b=dict(a=dict(a=1)))
         assert input.as_dict() == expected
 
-
     def test_simple_patch(self):
         input = Configuration(a="b")
         with input.patch(dict(a="c")):
@@ -126,7 +126,6 @@ class TestConfiguration(unittest.TestCase):
 
             self.assertDictEqual(input.b.as_dict(), {"a": {"a": 2}})
 
-
         self.assertDictEqual(input.as_dict(), {"a": "b", "b": {"a": {"a": 1}}})
         self.assertDictEqual(input.b.as_dict(), {"a": {"a": 1}})
 
@@ -138,7 +137,6 @@ class TestConfiguration(unittest.TestCase):
 
         self.assertDictEqual(input.as_dict(), {"a": "b", "b": {"a": {"a": 1}}})
 
-
     def test_nested_patch(self):
         input = Configuration(a="b")
         with input.patch({"a": "c", "b": "b", "c": "c"}, allow_new_keys=True):
@@ -149,7 +147,6 @@ class TestConfiguration(unittest.TestCase):
 
         self.assertDictEqual(input.as_dict(), {"a": "b"})
 
-
     def test_patch_copy(self):
         input = Configuration(a="b")
         with input.patch({"a": "c", "b": "b", "c": "c"}, allow_new_keys=True):
@@ -159,6 +156,7 @@ class TestConfiguration(unittest.TestCase):
                 self.assertDictEqual(input.as_dict(), {"a": "c", "b": "b", "c": "c1", "d": "c1"})
 
                 import copy
+
                 input_copy = copy.copy(input)
                 input_deepcopy = copy.deepcopy(input)
 
@@ -169,53 +167,25 @@ class TestConfiguration(unittest.TestCase):
 
     def test_patch_nested_sibling(self):
         CONFIG = Configuration(
-            key1="value1",
-            key2="value2",
-            nested=Configuration(
-                nest_key1="nested_value1",
-                nest_key2="nested_value2"
-            )
+            key1="value1", key2="value2", nested=Configuration(nest_key1="nested_value1", nest_key2="nested_value2")
         )
-        patch = dict(
-            key1="new_value",
-            nested=dict(
-                nest_key2="new_value"
-            )
-        )
-        expected = dict(
-            key1="new_value",
-            key2="value2",
-            nested=dict(
-                nest_key1="nested_value1",
-                nest_key2="new_value"
-            )
-        )
+        patch = dict(key1="new_value", nested=dict(nest_key2="new_value"))
+        expected = dict(key1="new_value", key2="value2", nested=dict(nest_key1="nested_value1", nest_key2="new_value"))
 
         with CONFIG.patch(patch):
             self.assertDictEqual(CONFIG.as_dict(), expected)
 
     def test_nested_patch_full_override(self):
         CONFIG = Configuration(
-            key1="value1",
-            key2="value2",
-            nested=Configuration(
-                nest_key1="nested_value1",
-                nest_key2="nested_value2"
-            )
+            key1="value1", key2="value2", nested=Configuration(nest_key1="nested_value1", nest_key2="nested_value2")
         )
-        patch1 = dict(
-            key1="new value",
-            nested=dict(
-                nest_key2="new value"
-            )
-        )
-        patch2 = dict(
-            key2="new value2",
-            nested=dict(
-                nest_key1="new value2"
-            )
-        )
-        expected = {'key1': 'new value', 'key2': 'new value2', 'nested': {'nest_key1': 'new value2', 'nest_key2': 'new value'}}
+        patch1 = dict(key1="new value", nested=dict(nest_key2="new value"))
+        patch2 = dict(key2="new value2", nested=dict(nest_key1="new value2"))
+        expected = {
+            "key1": "new value",
+            "key2": "new value2",
+            "nested": {"nest_key1": "new value2", "nest_key2": "new value"},
+        }
 
         with CONFIG.patch(patch1):
             with CONFIG.patch(patch2):
