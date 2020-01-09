@@ -1,22 +1,11 @@
-
-import unittest
-from mock import patch
 import os
-from functools import reduce, partial
-from six import iteritems, itervalues
+import unittest
+from functools import reduce
+from unittest.mock import patch
 
-from granular_configuration.yaml_handler import loads, Placeholder
-from granular_configuration._config import (
-    _get_files_from_locations,
-    LazyLoadConfiguration,
-    _build_configuration,
-    Configuration,
-    _get_all_unique_locations,
-    ConfigurationLocations,
-    ConfigurationFiles,
-    ConfigurationMultiNamedFiles,
-)
-from granular_configuration.exceptions import PlaceholderConfigurationError, ParseEnvError
+from granular_configuration._config import Configuration, ConfigurationLocations
+from granular_configuration.exceptions import ParseEnvError
+from granular_configuration.yaml_handler import Placeholder, loads
 
 
 class TestYamlHandler(unittest.TestCase):
@@ -34,7 +23,9 @@ class TestYamlHandler(unittest.TestCase):
 
     def test_yaml_func(self):
         self.assertIs(loads("!Func functools.reduce").run(), reduce)
-        self.assertIs(loads("!Func granular_configuration._config.ConfigurationLocations").run(), ConfigurationLocations)
+        self.assertIs(
+            loads("!Func granular_configuration._config.ConfigurationLocations").run(), ConfigurationLocations
+        )
 
         with self.assertRaises(ValueError):
             loads("!Func unreal.garbage.func").run()
@@ -46,7 +37,9 @@ class TestYamlHandler(unittest.TestCase):
             loads("!Func [a]").run()
 
     def test_yaml_class(self):
-        self.assertIs(loads("!Class granular_configuration._config.ConfigurationLocations").run(), ConfigurationLocations)
+        self.assertIs(
+            loads("!Class granular_configuration._config.ConfigurationLocations").run(), ConfigurationLocations
+        )
 
         with self.assertRaises(ValueError):
             loads("!Class functools.reduce").run()
@@ -108,7 +101,6 @@ class TestYamlHandler(unittest.TestCase):
             self.assertEqual(loads("!ParseEnv unreal_env_variable").run(), False)
             self.assertIsInstance(loads("!ParseEnv unreal_env_variable").run(), bool)
 
-
     def test_yaml_parse_env_scalar__dict(self):
         with patch.dict(os.environ, values={"unreal_env_variable": '{"a": "value"}'}):
             self.assertDictEqual(loads("!ParseEnv unreal_env_variable").run(), {"a": "value"})
@@ -121,17 +113,18 @@ class TestYamlHandler(unittest.TestCase):
             self.assertIsInstance(value["a"], Configuration)
 
     def test_yaml_parse_env_scalar__seq(self):
-        with patch.dict(os.environ, values={"unreal_env_variable": '[1, 2, 3]'}):
+        with patch.dict(os.environ, values={"unreal_env_variable": "[1, 2, 3]"}):
             self.assertSequenceEqual(loads("!ParseEnv unreal_env_variable").run(), [1, 2, 3])
 
-
     def test_yaml_parse_env_scalar__recursive(self):
-        with patch.dict(os.environ, values={"unreal_env_variable": '!ParseEnv unreal_env_variable1', "unreal_env_variable1": "42"}):
+        with patch.dict(
+            os.environ, values={"unreal_env_variable": "!ParseEnv unreal_env_variable1", "unreal_env_variable1": "42"}
+        ):
             value = loads("!ParseEnv unreal_env_variable").run()
             self.assertEqual(loads("!ParseEnv unreal_env_variable").run(), 42)
 
     def test_yaml_parse_env_scalar__var_parse_error(self):
-        with patch.dict(os.environ, values={"unreal_env_variable": '{'}):
+        with patch.dict(os.environ, values={"unreal_env_variable": "{"}):
             with self.assertRaises(ParseEnvError):
                 loads("!ParseEnv unreal_env_variable").run()
 
@@ -147,15 +140,15 @@ class TestYamlHandler(unittest.TestCase):
 
     def test_yaml_parse_env_sequence__use_default(self):
         with patch.dict(os.environ, values={}):
-                self.assertEqual(loads('!ParseEnv ["unreal_env_vari", 1]').run(), 1)
-                self.assertEqual(loads('!ParseEnv ["unreal_env_vari", 1.5]').run(), 1.5)
-                self.assertEqual(loads('!ParseEnv ["unreal_env_vari", abc]').run(), "abc")
-                self.assertIs(loads('!ParseEnv ["unreal_env_vari", null]').run(), None)
-                self.assertEqual(loads('!ParseEnv ["unreal_env_vari", false]').run(), False)
-                value = loads('!ParseEnv ["unreal_env_vari", {"a": {"b": "value"}}]', obj_pairs_hook=Configuration).run()
-                self.assertIsInstance(value, Configuration)
-                self.assertDictEqual(value, {"a": {"b": "value"}})
-                self.assertIsInstance(value["a"], Configuration)
+            self.assertEqual(loads('!ParseEnv ["unreal_env_vari", 1]').run(), 1)
+            self.assertEqual(loads('!ParseEnv ["unreal_env_vari", 1.5]').run(), 1.5)
+            self.assertEqual(loads('!ParseEnv ["unreal_env_vari", abc]').run(), "abc")
+            self.assertIs(loads('!ParseEnv ["unreal_env_vari", null]').run(), None)
+            self.assertEqual(loads('!ParseEnv ["unreal_env_vari", false]').run(), False)
+            value = loads('!ParseEnv ["unreal_env_vari", {"a": {"b": "value"}}]', obj_pairs_hook=Configuration).run()
+            self.assertIsInstance(value, Configuration)
+            self.assertDictEqual(value, {"a": {"b": "value"}})
+            self.assertIsInstance(value["a"], Configuration)
 
     def test_yaml_parse_env_sequence__string(self):
         with patch.dict(os.environ, values={"unreal_env_variable": "test me"}):
@@ -170,6 +163,7 @@ class TestYamlHandler(unittest.TestCase):
         with patch.dict(os.environ, values={"unreal_env_variable": "3"}):
             self.assertEqual(loads("!ParseEnv [unreal_env_variable, null]").run(), 3)
             self.assertIsInstance(loads("!ParseEnv [unreal_env_variable, null]").run(), int)
+
 
 if __name__ == "__main__":
     unittest.main()

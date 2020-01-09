@@ -1,21 +1,10 @@
-import unittest
-from mock import patch
 import os
-from functools import reduce, partial
-from six import iteritems, itervalues
+import unittest
+from functools import partial
 
-from granular_configuration.yaml_handler import loads, Placeholder
-from granular_configuration._config import (
-    _get_files_from_locations,
-    LazyLoadConfiguration,
-    _build_configuration,
-    Configuration,
-    _get_all_unique_locations,
-    ConfigurationLocations,
-    ConfigurationFiles,
-    ConfigurationMultiNamedFiles,
-)
+from granular_configuration._config import Configuration, _build_configuration
 from granular_configuration.exceptions import PlaceholderConfigurationError
+from granular_configuration.yaml_handler import Placeholder
 
 
 class TestConfig(unittest.TestCase):

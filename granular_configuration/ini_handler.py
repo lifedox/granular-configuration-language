@@ -1,21 +1,24 @@
-from __future__ import print_function
-from io import StringIO
+import configparser
+import operator as op
+import typing as typ
 from collections import OrderedDict, deque
 from collections.abc import MutableMapping
-from six.moves import map, filterfalse, configparser
-from six import text_type
 from functools import partial
-from itertools import starmap, islice
-import operator as op
+from io import StringIO
+from itertools import filterfalse, islice, starmap
 
-from granular_configuration.yaml_handler import loads as yaml_loads
 from granular_configuration.exceptions import IniKeyExistAsANonMapping, IniTryToReplaceExistingKey
+from granular_configuration.yaml_handler import loads as yaml_loads
 
 consume = partial(deque, maxlen=0)
+_OPH = typ.Optional[typ.Type[typ.MutableMapping]]
 
 
 class IniLoader(object):
-    def __init__(self, parser, obj_pairs_hook=None):
+    obj_pairs_hook: typ.Type[typ.MutableMapping]
+    parser: configparser.RawConfigParser
+
+    def __init__(self, parser: configparser.RawConfigParser, *, obj_pairs_hook: _OPH = None) -> None:
         if obj_pairs_hook and issubclass(obj_pairs_hook, MutableMapping):
             self.obj_pairs_hook = obj_pairs_hook
         else:
@@ -23,30 +26,30 @@ class IniLoader(object):
 
         self.parser = parser
 
-    def _parse_value(self, value):
+    def _parse_value(self, value: str) -> typ.Any:
         return yaml_loads(str(value), obj_pairs_hook=self.obj_pairs_hook)
 
-    def _set_item(self, mapping, key, value):
+    def _set_item(self, mapping: typ.MutableMapping, key: str, value: str) -> None:
         mapping[self._parse_value(key)] = self._parse_value(value)
 
-    def _set_items(self, mapping, items):
+    def _set_items(self, mapping: typ.MutableMapping, items: typ.Iterable[typ.Tuple[str, str]]) -> None:
         consume(starmap(partial(self._set_item, mapping), items))
 
-    def _get_sections(self):
+    def _get_sections(self) -> typ.Iterator[str]:
         return filterfalse(op.methodcaller("__eq__", "ROOT"), self.parser.sections())
 
-    def _get_root(self):
+    def _get_root(self) -> typ.MutableMapping:
         if self.parser.has_section("ROOT"):
             return self._get_section("ROOT")
         else:
             return self.obj_pairs_hook()
 
-    def _get_section(self, section):
+    def _get_section(self, section: str) -> typ.MutableMapping:
         section_dict = self.obj_pairs_hook()
         self._set_items(section_dict, self.parser.items(section))
         return section_dict
 
-    def _get_path(self, mapping, keys):
+    def _get_path(self, mapping: MutableMapping, keys: typ.Iterable[str]) -> typ.MutableMapping:
         current_mapping = mapping
 
         for key in keys:
@@ -64,7 +67,7 @@ class IniLoader(object):
         else:
             raise IniKeyExistAsANonMapping("Key found as a Non-Mapping: {}".format(".".join(keys)))
 
-    def _attach_section(self, mapping, section):
+    def _attach_section(self, mapping: typ.MutableMapping, section: str) -> None:
         section_dict = self._get_section(section)
 
         keys = section.split(".")
@@ -78,7 +81,7 @@ class IniLoader(object):
         else:
             raise IniTryToReplaceExistingKey("Key already exists: {}".format(section))
 
-    def read(self):
+    def read(self) -> typ.MutableMapping:
         config_dict = self._get_root()
 
         consume(map(partial(self._attach_section, config_dict), self._get_sections()))
@@ -86,9 +89,9 @@ class IniLoader(object):
         return config_dict
 
 
-def loads(ini_str, obj_pairs_hook=None):
+def loads(config_str: str, obj_pairs_hook: _OPH = None) -> typ.Any:
     parser = configparser.RawConfigParser()
-    parser.optionxform = str
-    parser.readfp(StringIO(text_type(ini_str)))
+    parser.optionxform = str  # type: ignore
+    parser.read_file(StringIO(config_str))
 
-    return IniLoader(parser, obj_pairs_hook).read()
+    return IniLoader(parser, obj_pairs_hook=obj_pairs_hook).read()

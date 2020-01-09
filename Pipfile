@@ -1,0 +1,25 @@
+[[source]]
+url = "https://artifactory.internal.granular.ag/artifactory/api/pypi/pypi-virtual/simple"
+verify_ssl = true
+name = "artifactory-virtual"
+
+[dev-packages]
+ipdb = "*"
+pipenv = "*"
+pytest = "*"
+pytest-cov = "*"
+pytest-flake8 = "*"
+mypy = "*"
+black = "*"
+isort = "*"
+bumpversion = "*"
+bandit = "*"
+
+[packages]
+PyYAML = "*"
+
+[pipenv]
+allow_prereleases = true
+
+[requires]
+python_version = "3.7"

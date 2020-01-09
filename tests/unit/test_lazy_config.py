@@ -1,15 +1,15 @@
-import unittest
-from mock import patch
 import os
+import unittest
 from functools import partial
+from unittest.mock import patch
 
-
-from granular_configuration._config import LazyLoadConfiguration, Configuration, ConfigurationLocations
+from granular_configuration._config import Configuration, ConfigurationLocations, LazyLoadConfiguration
 from granular_configuration.exceptions import InvalidBasePathException
 
 
 class TestLazyLoadConfiguration(unittest.TestCase):
     BASE_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), "../assets/config_location_test"))
+
     def test__LazyLoadConfiguration(self):
         dir_func = partial(os.path.join, self.BASE_DIR)
 
@@ -96,7 +96,6 @@ class TestLazyLoadConfiguration(unittest.TestCase):
             assert config.get("abc") == "test"
             assert config.get("name") == "me"
 
-
     def test__LazyLoadConfiguration_bad_base_path(self):
 
         config_dict = Configuration({"abc": "test", "name": "me"})
@@ -107,7 +106,6 @@ class TestLazyLoadConfiguration(unittest.TestCase):
             with self.assertRaises(InvalidBasePathException):
                 config.load_configure()
 
-
     def test__LazyLoadConfiguration_string_base_path(self):
         config_dict = Configuration({"abc": "test", "name": "me"})
 
@@ -117,7 +115,6 @@ class TestLazyLoadConfiguration(unittest.TestCase):
             self.assertEqual(config._LazyLoadConfiguration__base_path, ["base"])
             bc_mock.assert_not_called()
 
-
     def test__LazyLoadConfiguration_list_base_path(self):
         config_dict = Configuration({"abc": "test", "name": "me"})
 
@@ -126,7 +123,6 @@ class TestLazyLoadConfiguration(unittest.TestCase):
 
             self.assertEqual(config._LazyLoadConfiguration__base_path, ["base", "path"])
             bc_mock.assert_not_called()
-
 
     def test__LazyLoadConfiguration_no_base_path(self):
         config_dict = Configuration({"abc": "test", "name": "me"})
@@ -138,45 +134,24 @@ class TestLazyLoadConfiguration(unittest.TestCase):
             bc_mock.assert_not_called()
 
     def test__LazyLoadConfiguration_env(self):
-        env_path = os.path.join(
-            self.BASE_DIR,
-            'test_env_config.yaml',
-        )
+        env_path = os.path.join(self.BASE_DIR, "test_env_config.yaml",)
 
-        with patch(
-            'granular_configuration._config.os.environ',
-            new={'G_CONFIG_LOCATION': env_path}
-        ) as env_mock:
-            config = LazyLoadConfiguration(
-                os.path.join(
-                    self.BASE_DIR,
-                    'mix_config.yaml',
-                ),
-                use_env_location=True,
-            )
-            assert config.A.key1 == 'value2'
+        with patch("granular_configuration._config.os.environ", new={"G_CONFIG_LOCATION": env_path}) as env_mock:
+            config = LazyLoadConfiguration(os.path.join(self.BASE_DIR, "mix_config.yaml",), use_env_location=True,)
+            assert config.A.key1 == "value2"
 
     def test__LazyLoadConfiguration_env_list(self):
-        env_path = os.path.join(
-            self.BASE_DIR,
-            'test_env_config.yaml',
-        ) + ',' + os.path.join(
-            self.BASE_DIR,
-            'mix_config.yaml',
-         )
+        env_path = (
+            os.path.join(self.BASE_DIR, "test_env_config.yaml",) + "," + os.path.join(self.BASE_DIR, "mix_config.yaml",)
+        )
 
-        with patch(
-            'granular_configuration._config.os.environ',
-            new={'G_CONFIG_LOCATION': env_path}
-        ) as env_mock:
+        with patch("granular_configuration._config.os.environ", new={"G_CONFIG_LOCATION": env_path}) as env_mock:
             config = LazyLoadConfiguration(use_env_location=True)
-            assert config.A.key1 == 'value1'
-            assert config.A.key2 == 'MyTestValue'
+            assert config.A.key1 == "value1"
+            assert config.A.key2 == "MyTestValue"
 
     def test__LazyLoadConfiguration_env_none(self):
-        with patch(
-            'granular_configuration._config.os.environ', new={}
-        ) as env_mock:
+        with patch("granular_configuration._config.os.environ", new={}) as env_mock:
             config = LazyLoadConfiguration(use_env_location=True)
             assert config.as_dict() == {}
 
@@ -184,14 +159,14 @@ class TestLazyLoadConfiguration(unittest.TestCase):
 
         dir_func = partial(os.path.join, self.BASE_DIR)
 
-        config = LazyLoadConfiguration(dir_func('test_env_config.yaml'))
+        config = LazyLoadConfiguration(dir_func("test_env_config.yaml"))
 
-        self.assertEqual(config["A"]["key1"], 'value2')
-        config['B'] = 1
+        self.assertEqual(config["A"]["key1"], "value2")
+        config["B"] = 1
         self.assertEqual(config["B"], 1)
         self.assertEqual(len(config), 2)
-        del config['B']
-        self.assertSequenceEqual(list(config), ['A'])
+        del config["B"]
+        self.assertSequenceEqual(list(config), ["A"])
 
 
 if __name__ == "__main__":

@@ -1,15 +1,12 @@
 #!/usr/bin/env python
-from setuptools import setup, find_packages
+from pipenv.project import Project
+from pipenv.utils import convert_deps_to_pip
+from setuptools import find_packages, setup
 import os
 
-version = "1.6.3" + '.' + os.environ.get('BUILD_NUMBER', '0')
+version = "1.7.0" + '.' + os.environ.get('BUILD_NUMBER', '0')
 
-def load_requirements(filename):
-    with open(filename) as f_obj:
-        return list(filter(lambda line: line and not line.startswith('#'), map(lambda line: line.strip(), f_obj)))
-
-install_requires = load_requirements('requirements.txt')
-tests_requires = load_requirements('test_requirements.txt')
+pfile = Project(chdir=False).parsed_pipfile
 
 
 setup(
@@ -21,8 +18,7 @@ setup(
     url='https://gitlab.encirca.auto.pioneer.com/shared-services/granular-configuration',
     packages=find_packages(exclude=['tests*']),
     package_data={"granular_configuration": ["py.typed", "*.pyi"]},
-    install_requires=install_requires,
-    setup_requires=['pytest-runner'],
-    tests_require=tests_requires,
+    install_requires=convert_deps_to_pip(pfile["packages"], r=False),
+    tests_require=convert_deps_to_pip(pfile["dev-packages"], r=False),
     python_requires=">=3.6"
 )

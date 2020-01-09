@@ -1,11 +1,8 @@
 import unittest
-from mock import patch
-
-
-from granular_configuration._config import LazyLoadConfiguration
-from granular_configuration.exceptions import GetConfigReadBeforeSetException
+from unittest.mock import patch
 
 from granular_configuration import _set_config, testing
+from granular_configuration.exceptions import GetConfigReadBeforeSetException
 
 
 class TestSetConfig(unittest.TestCase):
@@ -50,7 +47,9 @@ class TestSetConfig(unittest.TestCase):
             _set_config.get_config("c", "d", base_path="base_path")
 
             self.assertTupleEqual(_set_config._SET_CONFIG_META, ("a", "b"))
-            LazyLoadConfiguration.assert_called_once_with("c", "d", "a", "b", base_path="base_path")
+            LazyLoadConfiguration.assert_called_once_with(
+                "c", "d", "a", "b", base_path="base_path", use_env_location=False
+            )
 
         self.assertIsNone(_set_config._SET_CONFIG_META)
 
@@ -64,7 +63,7 @@ class TestSetConfig(unittest.TestCase):
             _set_config.get_config("c", "d", base_path="base_path")
 
             self.assertTupleEqual(_set_config._SET_CONFIG_META, tuple())
-            LazyLoadConfiguration.assert_called_once_with("c", "d", base_path="base_path")
+            LazyLoadConfiguration.assert_called_once_with("c", "d", base_path="base_path", use_env_location=False)
 
         self.assertIsNone(_set_config._SET_CONFIG_META)
 
@@ -87,7 +86,7 @@ class TestSetConfig(unittest.TestCase):
             _set_config.get_config("c", "d", base_path="base_path", requires_set=False)
 
             self.assertIsNone(_set_config._SET_CONFIG_META)
-            LazyLoadConfiguration.assert_called_once_with("c", "d", base_path="base_path")
+            LazyLoadConfiguration.assert_called_once_with("c", "d", base_path="base_path", use_env_location=False)
 
         self.assertIsNone(_set_config._SET_CONFIG_META)
 

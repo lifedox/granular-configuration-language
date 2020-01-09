@@ -3,4 +3,4 @@
 dir="$( cd "$( dirname "$0" )" && pwd )"
 cd $dir/..
 
-make build
+make package -W build

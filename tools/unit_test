@@ -1,0 +1,10 @@
+#!/bin/sh -e
+dir="$( cd "$( dirname "$0" )" && pwd )"
+cd $dir/..
+. $dir/util
+
+mkdir -p results
+
+logit 'running tests'
+PYTEST_ADDOPTS="--flake8" pytest $@
+bandit -r granular_configuration -ll

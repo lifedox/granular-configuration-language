@@ -1,12 +1,13 @@
 import unittest
-from functools import reduce
 from collections import OrderedDict
+from functools import reduce
 
 from yaml.parser import ParserError
-from granular_configuration.ini_handler import loads
-from granular_configuration.yaml_handler import loads as yaml_loads
+
 from granular_configuration._config import Configuration
 from granular_configuration.exceptions import IniKeyExistAsANonMapping, IniTryToReplaceExistingKey
+from granular_configuration.ini_handler import loads
+from granular_configuration.yaml_handler import loads as yaml_loads
 
 
 class TestIniHandler(unittest.TestCase):

@@ -1,0 +1,17 @@
+#!/bin/bash -e
+dir="$( cd "$( dirname "$0" )" && pwd )"
+cd $dir/..
+. $dir/util
+
+package_name=granular-configuration
+
+mkdir -p dist
+
+logit "replacing build number"
+# get revision
+BUILD_NUMBER=${BUILD_NUMBER:-0}
+
+
+logit "packaging wheel"
+# build the wheel
+BUILD_NUMBER=${BUILD_NUMBER:-0} python setup.py bdist_wheel

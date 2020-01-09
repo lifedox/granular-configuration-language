@@ -1,0 +1,27 @@
+# Host files
+Makefile
+.git
+.gitignore
+.dockerignore
+main.py
+
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+
+.pytest_cache/
+.mypy_cache/
+
+# Test reporting files
+.coverage
+
+# IDE files
+.idea
+*.sw[a-z]
+.vscode
+
+# Build artifacts
+build
+dist
+results
+granular_configuration.egg-info

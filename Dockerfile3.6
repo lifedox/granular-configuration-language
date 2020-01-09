@@ -1,0 +1,18 @@
+FROM python:3.6
+
+WORKDIR /app
+
+RUN groupadd -g 1000 -r granular \
+    && useradd -g 1000 -u 1000 --no-log-init -r -m -g granular granular \
+    && chown granular:granular /app \
+    && pip install --no-cache-dir pipenv
+
+USER granular
+
+ENV PATH="/app/tools:${PATH}"
+
+COPY --chown=granular:granular Pipfile* /app/
+
+RUN pipenv install --dev
+
+COPY --chown=granular:granular . /app/
