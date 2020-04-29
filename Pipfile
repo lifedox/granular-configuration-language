@@ -10,16 +10,17 @@ pytest = "*"
 pytest-cov = "*"
 pytest-flake8 = "*"
 mypy = "*"
-black = "*"
+black = "==19.10b0"
 isort = "*"
 bumpversion = "*"
 bandit = "*"
 
 [packages]
 PyYAML = "*"
+jsonpath-rw = "*"
 
-[pipenv]
-allow_prereleases = true
+# [pipenv]
+# allow_prereleases = true
 
 [requires]
 python_version = "3.7"

@@ -701,28 +701,40 @@ assert LazyLoadConfiguration(..., base_path=["Level1", "Level2", "Level3"]).as_d
 
 ## YAML Tags
 
+* `!Sub`
+  - **Usage:** `!Sub ${ENVIRONMENT_VARIABLE_THAT_EXISTS} ${ENVIRONMENT_VARIABLE_THAT_DOES_NOT_EXIST:-default value} ${$.jsonpath.expression}`
+  - **Argument:** *str*.
+  - **Returns:** a string produced by the string format
+  - Interpolations:
+    - `${ENVIRONMENT_VARIABLE_THAT_EXISTS}`: Replaced with the specific Environment Variable. Raises `KeyError`, if the variable does not exist.
+    - `${ENVIRONMENT_VARIABLE_THAT_EXISTS:-default value}`: (Note: specifier is `:-`, following bash style) Replaced with the specific Environment Variable, or the provided default.
+    - `${$.jsonpath.expression}`: Replaced by the the object specified in JSON Path syntax. Must begin with `$`. Paths that define one object will be `str`-ed. Paths that return many objects will be the `repr` of the list. Paths that return nothing raise `KeyError`.
+    - `${...}`: This Tag is greedy and grabs all substrings (unlike `!Env`) and does not provide escapes. Please, request escapes if they are needed.
+    - `$(...)` and `$[...]` are reserved future for use, but are not blocked for use.
+    - Note: This is a recursible function. Any cycles can cause infinite loops.
 * `!Env`
   - **Usage:** `!Env '{{ENVIRONMENT_VARIABLE_THAT_EXISTS}} {{ENVIRONMENT_VARIABLE_THAT_DOES_NOT_EXIST:default value}}'`
   - **Argument:** *str*.
-  - **Returns** a string produced by the string format, replacing `{{VARIABLE_NAME}}` with the Environment Variable specified. Optionally, a default value can be specified should the Environment Variable not exist.
+  - **Returns:** a string produced by the string format, replacing `{{VARIABLE_NAME}}` with the Environment Variable specified. Optionally, a default value can be specified should the Environment Variable not exist.
+  - Note: `!Sub` replaces this functionality and offers more options. `!Env` will not be removed but will not see future updates.
 * `!ParseEnv`
   - **Usage:** `!ParseEnv ENVIRONMENT_VARIABLE` or `!ParseEnv [ENVIRONMENT_VARIABLE, <YAML object>]`
   - **Argument:** *Union[str, List[str, Any]*. 
-  - **Returns**:
+  - **Returns:**
     - If provided a string, the Environment Variable specified will be parsed as YAML. If the Environment Variable does not exist, an error will be thrown.
     - If provided a sequence, the second object will be returned, if the Environment Variable does not exists, instead of erroring.
-  - Note: This is recursible function. `!ParseEnv VAR`, where `VAR='!ParseEnv VAR'` will loop until the call stack reaches maximum depth.
+  - Note: This is a recursible function. `!ParseEnv VAR`, where `VAR='!ParseEnv VAR'` will loop until the call stack reaches maximum depth.
 * `!Func`
   - **Usage:** `!Func 'path.to.function'`
   - **Argument:** *str*.
-  - **Returns** a pointer to the function specified. Acts as an import of `path.to`, returning `getattr(path.to, function)`. The current working directory is added prior to attempt the import. Returned object must be callable.
+  - **Returns:** a pointer to the function specified. Acts as an import of `path.to`, returning `getattr(path.to, function)`. The current working directory is added prior to attempt the import. Returned object must be callable.
 * `!Class`
   - **Usage:** `!Class 'path.to.function'`
   - Acts the same as `!Func` except that the returned object must subclass `object`
 * `!Placeholder`
   - **Usage:** `!Placeholder 'message'`
   - **Argument:** *str*.
-  - **Returns** a `Placeholder` containing the message. If a Placeholder is not overridden, a `PlaceholderConfigurationError` exception will be thrown if accessed.
+  - **Returns:** a `Placeholder` containing the message. If a Placeholder is not overridden, a `PlaceholderConfigurationError` exception will be thrown if accessed.
 
 &nbsp;
 
@@ -892,6 +904,9 @@ BasePath:
 &nbsp;
 
 ## Changelog
+
+### 1.8.0
+ * Adds `!Sub` Tag
 
 ### 1.5.0
  * Adds `!ParseEnv` Tag

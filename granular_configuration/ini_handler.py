@@ -8,6 +8,7 @@ from io import StringIO
 from itertools import filterfalse, islice, starmap
 
 from granular_configuration.exceptions import IniKeyExistAsANonMapping, IniTryToReplaceExistingKey
+from granular_configuration.yaml_handler import LazyRoot
 from granular_configuration.yaml_handler import loads as yaml_loads
 
 consume = partial(deque, maxlen=0)
@@ -18,16 +19,19 @@ class IniLoader(object):
     obj_pairs_hook: typ.Type[typ.MutableMapping]
     parser: configparser.RawConfigParser
 
-    def __init__(self, parser: configparser.RawConfigParser, *, obj_pairs_hook: _OPH = None) -> None:
+    def __init__(
+        self, parser: configparser.RawConfigParser, *, lazy_root: LazyRoot, obj_pairs_hook: _OPH = None,
+    ) -> None:
         if obj_pairs_hook and issubclass(obj_pairs_hook, MutableMapping):
             self.obj_pairs_hook = obj_pairs_hook
         else:
             self.obj_pairs_hook = OrderedDict
 
+        self.lazy_root = lazy_root
         self.parser = parser
 
     def _parse_value(self, value: str) -> typ.Any:
-        return yaml_loads(str(value), obj_pairs_hook=self.obj_pairs_hook)
+        return yaml_loads(str(value), obj_pairs_hook=self.obj_pairs_hook, lazy_root=self.lazy_root)
 
     def _set_item(self, mapping: typ.MutableMapping, key: str, value: str) -> None:
         mapping[self._parse_value(key)] = self._parse_value(value)
@@ -89,9 +93,13 @@ class IniLoader(object):
         return config_dict
 
 
-def loads(config_str: str, obj_pairs_hook: _OPH = None) -> typ.Any:
+def loads(config_str: str, obj_pairs_hook: _OPH = None, *, lazy_root: typ.Optional[LazyRoot] = None) -> typ.Any:
     parser = configparser.RawConfigParser()
     parser.optionxform = str  # type: ignore
     parser.read_file(StringIO(config_str))
 
-    return IniLoader(parser, obj_pairs_hook=obj_pairs_hook).read()
+    lazy_root = lazy_root or LazyRoot()
+
+    result = IniLoader(parser, obj_pairs_hook=obj_pairs_hook, lazy_root=lazy_root).read()
+    lazy_root.root = result
+    return result

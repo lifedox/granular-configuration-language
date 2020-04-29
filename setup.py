@@ -4,7 +4,7 @@ from pipenv.utils import convert_deps_to_pip
 from setuptools import find_packages, setup
 import os
 
-version = "1.7.0" + '.' + os.environ.get('BUILD_NUMBER', '0')
+version = "1.8.0" + '.' + os.environ.get('BUILD_NUMBER', '0')
 
 pfile = Project(chdir=False).parsed_pipfile
 

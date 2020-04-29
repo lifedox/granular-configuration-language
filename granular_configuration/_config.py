@@ -11,7 +11,7 @@ from itertools import chain, filterfalse, groupby, islice, product, starmap
 from granular_configuration._load import load_file
 from granular_configuration.exceptions import InvalidBasePathException, PlaceholderConfigurationError
 from granular_configuration.utils import OrderedSet
-from granular_configuration.yaml_handler import LazyEval, Placeholder
+from granular_configuration.yaml_handler import LazyEval, LazyRoot, Placeholder
 
 consume = partial(deque, maxlen=0)
 
@@ -72,12 +72,10 @@ class Configuration(typ.MutableMapping):
         self, *arg: typ.Union[typ.Mapping, typ.Iterable[typ.Tuple[typ.Any, typ.Any]]], **kwargs: typ.Any
     ) -> None:
         self.__data: typ.Dict = dict()
-        consume(starmap(self.__setitem__, dict(*arg, **kwargs).items()))
-
-        self.__parent_generate_name: typ.Optional[typ.Callable[[], typ.Iterator[str]]] = None
-        self.__name: typ.Optional[str] = None
-
+        self.__names: typ.Tuple[str, ...] = tuple()
         self.__patches: OrderedSet[Patch] = OrderedSet()
+
+        consume(starmap(self.__setitem__, dict(*arg, **kwargs).items()))
 
     def __iter__(self) -> typ.Iterator:
         if self.__has_patches():
@@ -94,22 +92,10 @@ class Configuration(typ.MutableMapping):
     def __delitem__(self, key: typ.Any) -> None:
         return self.__data.__delitem__(key)
 
-    def __generate_name(self, attribute: typ.Optional[str] = None) -> typ.Iterator[str]:
-        if callable(self.__parent_generate_name):
-            for name in self.__parent_generate_name():
-                yield name
-        if self.__name:
-            yield self.__name
-        if attribute:
-            yield attribute
-
-    def __get_name(self, attribute: typ.Optional[str] = None) -> str:
-        return ".".join(self.__generate_name(attribute))
+    def __get_name(self, attribute: typ.Any) -> str:
+        return ".".join(map(str, chain(self.__names, (str(attribute),))))
 
     def __setitem__(self, key: typ.Any, value: typ.Any) -> None:
-        if isinstance(value, Configuration):
-            value.__name = key
-            value.__parent_generate_name = self.__generate_name
         self.__data[key] = value
 
     def __get_from_patches(self, name: str, default: typ.Any) -> typ.Any:
@@ -118,7 +104,7 @@ class Configuration(typ.MutableMapping):
                 return patch[name]
         return default
 
-    def __get_item(self, name: str) -> typ.Any:
+    def __get_item(self, name: typ.Any) -> typ.Any:
         if self.__has_patches():
             check = object()
             patched_value = self.__get_from_patches(name, check)
@@ -144,7 +130,7 @@ class Configuration(typ.MutableMapping):
             value = self.__data[name]
         return value
 
-    def __getitem__(self, name: str) -> typ.Any:
+    def __getitem__(self, name: typ.Any) -> typ.Any:
         value = self.__get_item(name)
         if isinstance(value, Placeholder):
             raise PlaceholderConfigurationError(
@@ -152,8 +138,13 @@ class Configuration(typ.MutableMapping):
             )
         elif isinstance(value, LazyEval):
             new_value = value.run()
+            while isinstance(new_value, LazyEval):
+                new_value = new_value.run()
             self[name] = new_value
             return new_value
+        elif isinstance(value, Configuration):
+            value.__names = self.__names + (str(name),)
+            return value
         else:
             return value
 
@@ -261,9 +252,6 @@ class _ConDict(dict, Configuration):  # type: ignore
     pass
 
 
-_load_file = partial(load_file, obj_pairs_hook=Configuration)
-
-
 def _build_configuration(locations: typ.Iterable[str]) -> Configuration:
     def _recursive_build_config(base_dict: Configuration, from_dict: Configuration) -> None:
         for key, value in from_dict._raw_items():
@@ -279,11 +267,14 @@ def _build_configuration(locations: typ.Iterable[str]) -> Configuration:
 
             base_dict[key] = value
 
+    lazy_root = LazyRoot()
+    _load_file = partial(load_file, obj_pairs_hook=Configuration, lazy_root=lazy_root)
     available_configs = map(_load_file, locations)
     valid_configs = filter(lambda config: isinstance(config, Configuration), available_configs)
 
     base_conf = Configuration()
     consume(map(partial(_recursive_build_config, base_conf), valid_configs))
+    lazy_root.root = base_conf
 
     return base_conf
 
