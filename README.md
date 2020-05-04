@@ -82,7 +82,7 @@ assert CONFIG.CombinedExample == {
 ### Precedents-Ordered File Example
 
 * `.y*` defines a precedence order of `.yaml`, `.yml`.
-* `.*` defines a precedence order of `.yaml`, `.yml`, `.ini`. 
+* `.*` defines a precedence order of `.yaml`, `.yml`, `.ini`.
 
 **Example Config File:**
 
@@ -293,7 +293,7 @@ CONFIG.setting
 
 ### Env Variable
 
-Regardless which of the above you use, if you provide the keyword argument use_env_location, the library will check the G_CONFIG_LOCATION, and append locations stored in this enviornment variable to the locations being used.  
+Regardless which of the above you use, if you provide the keyword argument use_env_location, the library will check the G_CONFIG_LOCATION, and append locations stored in this enviornment variable to the locations being used.
 
 #### Example
 
@@ -618,7 +618,7 @@ Output:
 
 Order for loading your is highly important, as each successive configuration file can provide overrides to values to the previous. `LazyLoadConfiguration` takes in a list (as `*args`) of ConfigurationLocations objects or strings that each provides as list of configuration files to load. By intermixing provided objects, you should be able to clearly and tightly define the load order of your configuration and what happens when files do not exist.
 
-When providing only strings to `LazyLoadConfiguration` they will automatically be converted in `ConfigurationFiles`, `ConfigurationMultiNamedFiles`. Paths with the file extension `.*` will be converted in `ConfigurationMultiNamedFiles(directories=(dirname), filenames=(basename.yaml, basename.yml, basename.ini)` Paths with the files extensions `.y*` and `.yml` will be converted in `ConfigurationMultiNamedFiles(directories=(dirname), filenames=(basename.yaml, basename.yml)` Paths with the file extension `.ini` will be converted in `ConfigurationMultiNamedFiles(directories=(dirname), filenames=(basename.ini, basename.yaml, basename.yml)` 
+When providing only strings to `LazyLoadConfiguration` they will automatically be converted in `ConfigurationFiles`, `ConfigurationMultiNamedFiles`. Paths with the file extension `.*` will be converted in `ConfigurationMultiNamedFiles(directories=(dirname), filenames=(basename.yaml, basename.yml, basename.ini)` Paths with the files extensions `.y*` and `.yml` will be converted in `ConfigurationMultiNamedFiles(directories=(dirname), filenames=(basename.yaml, basename.yml)` Paths with the file extension `.ini` will be converted in `ConfigurationMultiNamedFiles(directories=(dirname), filenames=(basename.ini, basename.yaml, basename.yml)`
 
 Note: Duplicate file definitions are ignored and used in the first order found.
 
@@ -724,7 +724,7 @@ assert LazyLoadConfiguration(..., base_path=["Level1", "Level2", "Level3"]).as_d
   - Note: `!Sub` replaces this functionality and offers more options. `!Env` will not be removed but will not see future updates.
 * `!ParseEnv`
   - **Usage:** `!ParseEnv ENVIRONMENT_VARIABLE` or `!ParseEnv [ENVIRONMENT_VARIABLE, <YAML object>]`
-  - **Argument:** *Union[str, List[str, Any]*. 
+  - **Argument:** *Union[str, List[str, Any]*.
   - **Returns:**
     - If provided a string, the Environment Variable specified will be parsed as YAML. If the Environment Variable does not exist, an error will be thrown.
     - If provided a sequence, the second object will be returned, if the Environment Variable does not exists, instead of erroring.
