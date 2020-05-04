@@ -708,7 +708,12 @@ assert LazyLoadConfiguration(..., base_path=["Level1", "Level2", "Level3"]).as_d
   - Interpolations:
     - `${ENVIRONMENT_VARIABLE_THAT_EXISTS}`: Replaced with the specific Environment Variable. Raises `KeyError`, if the variable does not exist.
     - `${ENVIRONMENT_VARIABLE_THAT_EXISTS:-default value}`: (Note: specifier is `:-`, following bash style) Replaced with the specific Environment Variable, or the provided default.
-    - `${$.jsonpath.expression}`: Replaced by the the object specified in JSON Path syntax. Must begin with `$`. Paths that define one object will be `str`-ed. Paths that return many objects will be the `repr` of the list. Paths that return nothing raise `KeyError`.
+    - `${$.jsonpath.expression}`: Replaced by the the object in the configuration specified in JSON Path syntax.
+      - Paths must start at full root of configuration, using `$` as the first character.
+      - Results:
+        - Paths that define one object will be `str`-ed.
+        - Paths that return many objects will be the `repr` of the list.
+        - Paths that return nothing raise `KeyError`.
     - `${...}`: This Tag is greedy and grabs all substrings (unlike `!Env`) and does not provide escapes. Please, request escapes if they are needed.
     - `$(...)` and `$[...]` are reserved future for use, but are not blocked for use.
     - Note: This is a recursible function. Any cycles can cause infinite loops.
