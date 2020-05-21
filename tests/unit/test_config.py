@@ -79,6 +79,17 @@ class TestConfig(unittest.TestCase):
         assert configuration.B == {None: 1}
         assert configuration.D == {None: 1}
 
+    def test__build_configuration_sub(self):
+        base_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), "../assets/config_location_test"))
+        dir_func = partial(os.path.join, base_dir)
+
+        files = list(map(dir_func, ["sub_test1.yaml", "sub_test2.yaml"]))
+
+        configuration = _build_configuration(files)
+
+        assert isinstance(configuration, Configuration)
+        assert configuration.flags.foo == "bar"
+
 
 if __name__ == "__main__":
     unittest.main()

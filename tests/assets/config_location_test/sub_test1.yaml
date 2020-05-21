@@ -1,0 +1,6 @@
+flags:
+  defaults:
+    foo: foo
+  foo: !ParseEnv
+    - FLAGS__FOO
+    - !Sub ${$.flags.defaults.foo}

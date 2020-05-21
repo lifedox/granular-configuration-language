@@ -1,0 +1,3 @@
+flags:
+  defaults:
+    foo: bar

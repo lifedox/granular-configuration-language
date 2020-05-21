@@ -82,7 +82,7 @@ assert CONFIG.CombinedExample == {
 ### Precedents-Ordered File Example
 
 * `.y*` defines a precedence order of `.yaml`, `.yml`.
-* `.*` defines a precedence order of `.yaml`, `.yml`, `.ini`. 
+* `.*` defines a precedence order of `.yaml`, `.yml`, `.ini`.
 
 **Example Config File:**
 
@@ -293,7 +293,7 @@ CONFIG.setting
 
 ### Env Variable
 
-Regardless which of the above you use, if you provide the keyword argument use_env_location, the library will check the G_CONFIG_LOCATION, and append locations stored in this enviornment variable to the locations being used.  
+Regardless which of the above you use, if you provide the keyword argument use_env_location, the library will check the G_CONFIG_LOCATION, and append locations stored in this enviornment variable to the locations being used.
 
 #### Example
 
@@ -618,7 +618,7 @@ Output:
 
 Order for loading your is highly important, as each successive configuration file can provide overrides to values to the previous. `LazyLoadConfiguration` takes in a list (as `*args`) of ConfigurationLocations objects or strings that each provides as list of configuration files to load. By intermixing provided objects, you should be able to clearly and tightly define the load order of your configuration and what happens when files do not exist.
 
-When providing only strings to `LazyLoadConfiguration` they will automatically be converted in `ConfigurationFiles`, `ConfigurationMultiNamedFiles`. Paths with the file extension `.*` will be converted in `ConfigurationMultiNamedFiles(directories=(dirname), filenames=(basename.yaml, basename.yml, basename.ini)` Paths with the files extensions `.y*` and `.yml` will be converted in `ConfigurationMultiNamedFiles(directories=(dirname), filenames=(basename.yaml, basename.yml)` Paths with the file extension `.ini` will be converted in `ConfigurationMultiNamedFiles(directories=(dirname), filenames=(basename.ini, basename.yaml, basename.yml)` 
+When providing only strings to `LazyLoadConfiguration` they will automatically be converted in `ConfigurationFiles`, `ConfigurationMultiNamedFiles`. Paths with the file extension `.*` will be converted in `ConfigurationMultiNamedFiles(directories=(dirname), filenames=(basename.yaml, basename.yml, basename.ini)` Paths with the files extensions `.y*` and `.yml` will be converted in `ConfigurationMultiNamedFiles(directories=(dirname), filenames=(basename.yaml, basename.yml)` Paths with the file extension `.ini` will be converted in `ConfigurationMultiNamedFiles(directories=(dirname), filenames=(basename.ini, basename.yaml, basename.yml)`
 
 Note: Duplicate file definitions are ignored and used in the first order found.
 
@@ -701,28 +701,45 @@ assert LazyLoadConfiguration(..., base_path=["Level1", "Level2", "Level3"]).as_d
 
 ## YAML Tags
 
+* `!Sub`
+  - **Usage:** `!Sub ${ENVIRONMENT_VARIABLE_THAT_EXISTS} ${ENVIRONMENT_VARIABLE_THAT_DOES_NOT_EXIST:-default value} ${$.jsonpath.expression}`
+  - **Argument:** *str*.
+  - **Returns:** a string produced by the string format
+  - Interpolations:
+    - `${ENVIRONMENT_VARIABLE_THAT_EXISTS}`: Replaced with the specific Environment Variable. Raises `KeyError`, if the variable does not exist.
+    - `${ENVIRONMENT_VARIABLE_THAT_EXISTS:-default value}`: (Note: specifier is `:-`, following bash style) Replaced with the specific Environment Variable, or the provided default.
+    - `${$.jsonpath.expression}`: Replaced by the the object in the configuration specified in JSON Path syntax.
+      - Paths must start at full root of configuration, using `$` as the first character.
+      - Results:
+        - Paths that define one object will be `str`-ed.
+        - Paths that return many objects will be the `repr` of the list.
+        - Paths that return nothing raise `KeyError`.
+    - `${...}`: This Tag is greedy and grabs all substrings (unlike `!Env`) and does not provide escapes. Please, request escapes if they are needed.
+    - `$(...)` and `$[...]` are reserved future for use, but are not blocked for use.
+    - Note: This is a recursible function. Any cycles can cause infinite loops.
 * `!Env`
   - **Usage:** `!Env '{{ENVIRONMENT_VARIABLE_THAT_EXISTS}} {{ENVIRONMENT_VARIABLE_THAT_DOES_NOT_EXIST:default value}}'`
   - **Argument:** *str*.
-  - **Returns** a string produced by the string format, replacing `{{VARIABLE_NAME}}` with the Environment Variable specified. Optionally, a default value can be specified should the Environment Variable not exist.
+  - **Returns:** a string produced by the string format, replacing `{{VARIABLE_NAME}}` with the Environment Variable specified. Optionally, a default value can be specified should the Environment Variable not exist.
+  - Note: `!Sub` replaces this functionality and offers more options. `!Env` will not be removed but will not see future updates.
 * `!ParseEnv`
   - **Usage:** `!ParseEnv ENVIRONMENT_VARIABLE` or `!ParseEnv [ENVIRONMENT_VARIABLE, <YAML object>]`
-  - **Argument:** *Union[str, List[str, Any]*. 
-  - **Returns**:
+  - **Argument:** *Union[str, List[str, Any]*.
+  - **Returns:**
     - If provided a string, the Environment Variable specified will be parsed as YAML. If the Environment Variable does not exist, an error will be thrown.
     - If provided a sequence, the second object will be returned, if the Environment Variable does not exists, instead of erroring.
-  - Note: This is recursible function. `!ParseEnv VAR`, where `VAR='!ParseEnv VAR'` will loop until the call stack reaches maximum depth.
+  - Note: This is a recursible function. `!ParseEnv VAR`, where `VAR='!ParseEnv VAR'` will loop until the call stack reaches maximum depth.
 * `!Func`
   - **Usage:** `!Func 'path.to.function'`
   - **Argument:** *str*.
-  - **Returns** a pointer to the function specified. Acts as an import of `path.to`, returning `getattr(path.to, function)`. The current working directory is added prior to attempt the import. Returned object must be callable.
+  - **Returns:** a pointer to the function specified. Acts as an import of `path.to`, returning `getattr(path.to, function)`. The current working directory is added prior to attempt the import. Returned object must be callable.
 * `!Class`
   - **Usage:** `!Class 'path.to.function'`
   - Acts the same as `!Func` except that the returned object must subclass `object`
 * `!Placeholder`
   - **Usage:** `!Placeholder 'message'`
   - **Argument:** *str*.
-  - **Returns** a `Placeholder` containing the message. If a Placeholder is not overridden, a `PlaceholderConfigurationError` exception will be thrown if accessed.
+  - **Returns:** a `Placeholder` containing the message. If a Placeholder is not overridden, a `PlaceholderConfigurationError` exception will be thrown if accessed.
 
 &nbsp;
 
@@ -892,6 +909,9 @@ BasePath:
 &nbsp;
 
 ## Changelog
+
+### 1.8.0
+ * Adds `!Sub` Tag
 
 ### 1.5.0
  * Adds `!ParseEnv` Tag

@@ -120,7 +120,6 @@ class TestYamlHandler(unittest.TestCase):
         with patch.dict(
             os.environ, values={"unreal_env_variable": "!ParseEnv unreal_env_variable1", "unreal_env_variable1": "42"}
         ):
-            value = loads("!ParseEnv unreal_env_variable").run()
             self.assertEqual(loads("!ParseEnv unreal_env_variable").run(), 42)
 
     def test_yaml_parse_env_scalar__var_parse_error(self):
@@ -163,6 +162,77 @@ class TestYamlHandler(unittest.TestCase):
         with patch.dict(os.environ, values={"unreal_env_variable": "3"}):
             self.assertEqual(loads("!ParseEnv [unreal_env_variable, null]").run(), 3)
             self.assertIsInstance(loads("!ParseEnv [unreal_env_variable, null]").run(), int)
+
+    def test_yaml_sub__env(self):
+        with patch.dict(os.environ, values={"unreal_env_variable": "test me"}):
+            self.assertEqual(loads("!Sub ${unreal_env_variable}").run(), "test me")
+            self.assertEqual(loads("!Sub ${unreal_env_variable:-special}").run(), "test me")
+            self.assertEqual(loads("!Sub ${unreal_env_vari:-special case }").run(), "special case ")
+
+            with self.assertRaises(KeyError):
+                loads("!Sub ${unreal_env_vari}").run()
+
+            with self.assertRaises(ValueError):
+                loads("!Sub [a]").run()
+
+    def test_yaml_sub__jsonpath(self):
+        test_data = """\
+data:
+    dog:
+        name: nitro
+    cat:
+        name: never owned a cat
+tests:
+    a: !Sub ${$.data.dog.name}
+    b: !Sub ${$.data.dog}
+    c: !Sub ${$.data.*.name}
+    d: !Sub ${unreal_env_variable} ${$.data.dog.name} ${unreal_env_vari:-defaulting value}
+"""
+
+        with patch.dict(os.environ, values={"unreal_env_variable": "test me"}):
+            output: Configuration = loads(test_data, obj_pairs_hook=Configuration)
+            self.assertDictEqual(
+                output.tests.as_dict(),
+                dict(
+                    a="nitro",
+                    b="{'name': 'nitro'}",
+                    c="['nitro', 'never owned a cat']",
+                    d="test me nitro defaulting value",
+                ),
+            )
+
+    def test_yaml_sub__jsonpath_missing(self):
+        with self.assertRaises(KeyError):
+            loads("!Sub ${$.no_data.here}").run()
+
+    def test_Sub_can_read_config_vars(self):
+        for base_exists in (False, True):
+            for nested in (False, True):
+                for default in (False,):
+                    lines = []
+                    default_string = ":-default" if default else ""
+                    if base_exists:
+                        lines.append("base: base")
+                    if nested:
+                        lines.append("a:")
+                        lines.append("  b: !Sub foo${$.base" + default_string + "}")
+
+                        def get(config):
+                            return config.a.b
+
+                    else:
+                        lines.append("a: !Sub foo${$.base" + default_string + "}")
+
+                        def get(config):
+                            return config.a
+
+                    print("\n".join(lines))
+                    config = loads("\n".join(lines), Configuration)
+                    if not base_exists and not default:
+                        with self.assertRaises(KeyError):
+                            get(config)
+                    else:
+                        assert get(config) == "foodefault" if not base_exists else "foobase"
 
 
 if __name__ == "__main__":

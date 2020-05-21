@@ -4,6 +4,7 @@ Makefile
 .gitignore
 .dockerignore
 main.py
+Pipfile.lock
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
