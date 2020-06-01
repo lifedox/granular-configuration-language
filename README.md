@@ -19,8 +19,95 @@ This library allows a library or application to interact with typed settings tha
 - [Changelog](#changelog)
 - [Ini Configuration File Support](#ini-configuration-file-support)
 
+#
 
-## Examples
+## Getting Started
+While granular-configuration allows for many different ways to provide configuration to your application, here are two base examples as an easy way to get started.
+
+
+### Application/Service example
+In this example we are going to add a setting to call the inputs service.
+
+Start by creating a `configs` folder and place a `cofiguration.yaml` file in it that looks like the following. This is your application's configuration file.
+
+```yaml
+myapi:
+  inputs_svc:
+    hostname: !Sub "https://inputs-svc.${CLUSTERNAME}"
+```
+
+The following is an example of accessing `hostname`:
+```python
+from granular_configuration import LazyLoadConfiguration
+CONFIG = LazyLoadConfiguration("configs/configuration.yaml", base_path="myapi")
+setting = CONFIG.inputs_svc.hostname
+# or
+setting = CONFIG["inputs_svc"]["hostname"]
+```
+
+If the `CLUSTERNAME` environment variable is `cluster.granular.ag`, then `setting` is `https://inputs-svc.cluster.granular.ag`.
+
+There are no special names for the items in the config file. The names used in the config file (`myapi`, `inputs_svc` and `hostname`) can be anything you like. For instance, the `myapi` node is the root of your own service configuration. This can be any string you like but a good convention is to call it the same thing as your service or simply `api`. Use the `basepath` setting to scope your `CONFIG` variable to only contain your config values.
+
+&nbsp;
+
+Libraries can also use granular-configuration for their own config. Library consume settings from their own specific root key (typically the name of the library, please refer to the library documentation for configuration options).
+
+An example of this is granular-db. To add granular-db connection settings to your config, extend your config to look like this.
+```yaml
+granular_db:
+  # Note: This is not an example of the best usage of granular-db
+  default:
+    url: !Sub "postgresql://${DB_USER}:${DB_PASSWORD}@${POSTGRES_HOST}/mydb"
+myapi:
+  inputs_svc:
+    hostname: !Sub "https://inputs-svc.${CLUSTERNAME}"
+```
+
+For the library to be able to find your config file, set the `G_CONFIG_LOCATION` environment variable to the location of your config file (see library section below).
+
+&nbsp;
+
+In both cases, the custom `!Sub` YAML tag is being used to resolve settings from runtime environment variables. Wherever possible use this to reduce the need for different config files for different environments.
+
+If you follow standards for naming AWS resource ARNs, you can use this to set configs like this
+```yaml
+api:
+  some_lambda_function:
+    arn: !Sub "arn:aws:lambda:${REGION}:${AWS_ACCOUNT}:some_lambda_function"
+```
+The AWS related environment variables are typically set by our deployment jobs (k8s and lambdas etc.), making it easy for you to use in this way.
+
+
+&nbsp;
+
+### Library Example
+For libraries, it is encouraged to provide an embedded configuration file with sane default values and environment variables for the user to set. This saves your users from having to define configuration that rarely change but an option to do so when needed.
+
+Start by creating a `config` module and put a file named `embedded_config.yaml` in it (alongside `__init__.py`). The contents could be something like this.
+```yaml
+my-library:
+  Setting1: !Sub "${ENV_VAR_THE_USER_HAS_TO_SET}"  # Raise KeyError, if not set
+  Setting2: !Sub "${ENV_VAR_THE_USER_CAN_TO_SET:-sane_default}"  # Return "sane_default", if not set
+  Setting3: "A sane default value"
+```
+
+To allow applications to override values in your config it should be read with a snippet similar to the one below (located next to `embedded_config.yaml` in `config`).
+```python
+CONFIG = LazyLoadConfiguration(
+        os.path.join(os.path.dirname(__file__), "embedded_config.yaml"),
+        "~/my-library.*",  # Optional
+        "./my-library.*",  # Optional,
+        base_path=["my-library"],
+        use_env_location=True,
+    )
+```
+At runtime, this setup will read `embedded_config.yaml` from your package, `my-library.yaml` from the user's home directory and the current working directory, as well as any file specified in the `G_CONFIG_LOCATION` environment variable. It will prefer values in the opposite order with the embedded config being the last fallback.
+
+Document all required and optional settings in your readme, so users know what to expect.
+
+#
+## Load Behavior Examples
 
 ### Multi-File Usage Example
 
@@ -293,7 +380,7 @@ CONFIG.setting
 
 ### Env Variable
 
-Regardless which of the above you use, if you provide the keyword argument use_env_location, the library will check the G_CONFIG_LOCATION, and append locations stored in this enviornment variable to the locations being used.
+Regardless which of the above you use, if you provide the keyword argument use_env_location, the library will check the G_CONFIG_LOCATION, and append locations stored in this environment variable to the locations being used.
 
 #### Example
 
@@ -645,7 +732,7 @@ class ConfigurationFiles(ConfigurationLocations):
 
 ### `ConfigurationMultiNamedFiles`
 
-Takes in a list of possibles filenames and directories, using only the first filename that exists per directory.
+Takes in a list of possible filenames and directories, using only the first filename that exists per directory.
 
 Example:
 Note: The order of the directories in this example is not an absolute pattern, there are valid cases from the user config taking precedence over the current working directory.
@@ -768,9 +855,9 @@ Configuration files will be loaded as a YAML file unless they have a file extens
 #### General Notes
 - Use of the `[DEFAULT]` is highly discouraged.
 - Use of `[ROOT]`, while added for completeness, is also discouraged, as Base Paths are highly encouraged.
-- Support of only INI configuration is discouraged, as yaml is more flexible
+- Support of only INI configuration is discouraged, as YAML is more flexible
 - List values should be define using JSON syntax (e.g `key=['a', 'b', 'c']`), not delimited text that is parse by the user-codebase
-- Note: YAML is still preferred over INI due to superior featureset and hierarchical nature
+- Note: YAML is still preferred over INI due to a superior feature set and hierarchical nature
 
 #### Loading
 
