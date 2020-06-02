@@ -28,7 +28,7 @@ While granular-configuration allows for many different ways to provide configura
 ### Application/Service example
 In this example we are going to add a setting to call the inputs service.
 
-Start by creating a `configs` folder and place a `cofiguration.yaml` file in it that looks like the following. This is your application's configuration file.
+Start by creating a `configs` folder and place a `configuration.yaml` file in it that looks like the following. This is your application's configuration file.
 
 ```yaml
 myapi:
@@ -1022,3 +1022,8 @@ BasePath:
 ### 1.1
  * Adds `!Placeholder` Tag
  * Makes tags evaluate lazily (i.e. at first use)
+
+
+## Author
+
+Code Owner: Eric Jensen (ericjensen@granular.ag)

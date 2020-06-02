@@ -25,7 +25,7 @@ _RT = typ.TypeVar("_RT")
 
 
 class LazyRoot:
-    def __init__(self):
+    def __init__(self) -> None:
         self.root: typ.Any = None
 
 
