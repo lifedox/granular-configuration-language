@@ -1,10 +1,10 @@
 import typing as typ
 from itertools import chain
 
-from granular_configuration import LazyLoadConfiguration
+from granular_configuration._config import LazyLoadConfiguration
 from granular_configuration.exceptions import GetConfigReadBeforeSetException
 
-_SET_CONFIG_META: typ.Optional[typ.Sequence[str]] = None
+_SET_CONFIG_META: typ.Optional[typ.Tuple[str, ...]] = None
 
 
 def set_config(*load_order_location: str) -> None:

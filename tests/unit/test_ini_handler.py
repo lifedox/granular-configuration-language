@@ -11,7 +11,7 @@ from granular_configuration.yaml_handler import loads as yaml_loads
 
 
 class TestIniHandler(unittest.TestCase):
-    def test_default(self):
+    def test_default(self) -> None:
         test = """\
 [ROOT]
 a=b
@@ -19,7 +19,7 @@ b=c
 """
         assert loads(test, Configuration).as_dict() == {"a": "b", "b": "c"}
 
-    def test_default_dict(self):
+    def test_default_dict(self) -> None:
         test = """\
 [ROOT]
 a=b
@@ -31,7 +31,7 @@ b=c
 
         assert loads(test) == expected
 
-    def test_value_types(self):
+    def test_value_types(self) -> None:
         test = """\
 [ROOT]
 a=1
@@ -42,7 +42,7 @@ e='1'
 """
         assert loads(test, Configuration).as_dict() == {"a": 1, "b": True, "c": None, "d": 1.123, "e": "1"}
 
-    def test_key_types(self):
+    def test_key_types(self) -> None:
         test = """\
 [ROOT]
 '1'= "str"
@@ -63,7 +63,7 @@ false= "not"
             False: "not",
         }
 
-    def test_yaml_key_types(self):
+    def test_yaml_key_types(self) -> None:
         test = """\
 '1': "str"
 1: integer
@@ -83,7 +83,7 @@ false: "not"
             False: "not",
         }
 
-    def test_empty_dicts(self):
+    def test_empty_dicts(self) -> None:
         test = """\
 [A]
 
@@ -92,7 +92,7 @@ false: "not"
 """
         assert loads(test, Configuration).as_dict() == {"A": {}, "F": {"G": {}}}
 
-    def test_nested_types(self):
+    def test_nested_types(self) -> None:
         test = """\
 [A]
 a=b
@@ -113,7 +113,7 @@ a=b
             "F": {"G": {}},
         }
 
-    def test_tags(self):
+    def test_tags(self) -> None:
         test = """\
 [A]
 a=!Env 'no sub'
@@ -121,7 +121,7 @@ b=!Func functools.reduce
 """
         assert loads(test, Configuration).as_dict() == {"A": {"a": "no sub", "b": reduce}}
 
-    def test_bad_replace(self):
+    def test_bad_replace(self) -> None:
 
         with self.assertRaises(IniTryToReplaceExistingKey):
             test = """\
@@ -133,7 +133,7 @@ a='str'
 """
             print(loads(test, Configuration).as_dict())
 
-    def test_bad_replace_in_chain(self):
+    def test_bad_replace_in_chain(self) -> None:
 
         with self.assertRaises(IniKeyExistAsANonMapping):
             test = """\
@@ -145,7 +145,7 @@ a='str'
 """
             print(loads(test, Configuration).as_dict())
 
-    def test_bad_replace_at_root(self):
+    def test_bad_replace_at_root(self) -> None:
 
         with self.assertRaises(IniKeyExistAsANonMapping):
             test = """\
@@ -158,7 +158,7 @@ B='str'
 """
             print(loads(test, Configuration).as_dict())
 
-    def test_out_of_order(self):
+    def test_out_of_order(self) -> None:
 
         with self.assertRaises(IniTryToReplaceExistingKey):
             test = """\
@@ -170,7 +170,7 @@ B='str'
 """
             print(loads(test, Configuration).as_dict())
 
-    def test_bad_yaml(self):
+    def test_bad_yaml(self) -> None:
 
         with self.assertRaises(ParserError):
             test = """\

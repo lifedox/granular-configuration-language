@@ -1,4 +1,5 @@
 import os
+import typing as typ
 import unittest
 from functools import partial
 from unittest.mock import patch
@@ -14,7 +15,7 @@ from granular_configuration._config import (
 
 
 class TestLocations(unittest.TestCase):
-    def test__get_files_from_locations(self):
+    def test__get_files_from_locations(self) -> None:
         base_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), "../assets/config_location_test"))
         dir_func = partial(os.path.join, base_dir)
 
@@ -29,12 +30,12 @@ class TestLocations(unittest.TestCase):
 
         assert sorted(locations) == sorted(exists[:3])
 
-    def test__get_files_from_locations_no_filename(self):
+    def test__get_files_from_locations_no_filename(self) -> None:
         base_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), "../assets/config_location_test"))
         dir_func = partial(os.path.join, base_dir)
 
         directories = list(map(dir_func, ["a/b", "a", "b", "c", "d", "c"]))
-        filenames = []
+        filenames: typ.List[str] = []
         files = list(map(dir_func, ["g/b.txt", "g/h.txt"]))
 
         exists = list(map(dir_func, ["g/h.txt"]))
@@ -44,11 +45,11 @@ class TestLocations(unittest.TestCase):
 
         assert sorted(locations) == sorted(exists)
 
-    def test__get_files_from_locations_no_dirs(self):
+    def test__get_files_from_locations_no_dirs(self) -> None:
         base_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), "../assets/config_location_test"))
         dir_func = partial(os.path.join, base_dir)
 
-        directories = []
+        directories: typ.List[str] = []
         filenames = ["t.txt", "t2.txt"]
         files = list(map(dir_func, ["g/b.txt", "g/h.txt"]))
 
@@ -59,7 +60,7 @@ class TestLocations(unittest.TestCase):
 
         assert sorted(locations) == sorted(exists)
 
-    def test__ConfigurationLocations(self):
+    def test__ConfigurationLocations(self) -> None:
         base_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), "../assets/config_location_test"))
         dir_func = partial(os.path.join, base_dir)
 
@@ -86,7 +87,7 @@ class TestLocations(unittest.TestCase):
 
             assert loc_mock.call_count == 2
 
-    def test__ConfigurationFiles(self):
+    def test__ConfigurationFiles(self) -> None:
         base_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), "../assets/config_location_test"))
         dir_func = partial(os.path.join, base_dir)
 
@@ -94,7 +95,7 @@ class TestLocations(unittest.TestCase):
 
         assert list(ConfigurationFiles(files).get_locations()) == files
 
-    def test__ConfigurationFiles_from_args(self):
+    def test__ConfigurationFiles_from_args(self) -> None:
         base_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), "../assets/config_location_test"))
         dir_func = partial(os.path.join, base_dir)
 
@@ -102,7 +103,7 @@ class TestLocations(unittest.TestCase):
 
         assert list(ConfigurationFiles.from_args(*files).get_locations()) == files
 
-    def test__ConfigurationMultiNamedFiles(self):
+    def test__ConfigurationMultiNamedFiles(self) -> None:
         base_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), "../assets/config_location_test"))
         dir_func = partial(os.path.join, base_dir)
 
@@ -116,7 +117,7 @@ class TestLocations(unittest.TestCase):
             list(ConfigurationMultiNamedFiles(filenames=filenames, directories=directories).get_locations()) == exists
         )
 
-    def test__get_all_unique_locations(self):
+    def test__get_all_unique_locations(self) -> None:
         base_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), "../assets/config_location_test"))
         dir_func = partial(os.path.join, base_dir)
 
@@ -136,59 +137,74 @@ class TestLocations(unittest.TestCase):
             == exists[:3]
         )
 
-    def test__parse_location_star(self):
+    def test__parse_location_star(self) -> None:
         con_loc = _parse_location("/a/b/a.*")
+        assert con_loc.directories is not None
+        assert con_loc.filenames is not None
+        assert con_loc.files is None
         self.assertSequenceEqual(con_loc.directories, ["/a/b"])
         self.assertSequenceEqual(con_loc.filenames, ["a.yaml", "a.yml", "a.ini"])
-        self.assertIsNone(con_loc.files)
 
+    def test__parse_location_ini(self) -> None:
         con_loc = _parse_location("/a/b/a.ini")
+        assert con_loc.directories is not None
+        assert con_loc.filenames is not None
+        assert con_loc.files is None
         self.assertSequenceEqual(con_loc.directories, ["/a/b"])
         self.assertSequenceEqual(con_loc.filenames, ["a.ini", "a.yaml", "a.yml"])
-        self.assertIsNone(con_loc.files)
 
-    def test__parse_location_ystar(self):
+    def test__parse_location_ystar(self) -> None:
         con_loc = _parse_location("/a/b/a.y*")
+        assert con_loc.directories is not None
+        assert con_loc.filenames is not None
+        assert con_loc.files is None
         self.assertSequenceEqual(con_loc.directories, ["/a/b"])
         self.assertSequenceEqual(con_loc.filenames, ["a.yaml", "a.yml"])
-        self.assertIsNone(con_loc.files)
 
+    def test__parse_location_yml(self) -> None:
         con_loc = _parse_location("/a/b/a.yml")
+        assert con_loc.directories is not None
+        assert con_loc.filenames is not None
+        assert con_loc.files is None
         self.assertSequenceEqual(con_loc.directories, ["/a/b"])
         self.assertSequenceEqual(con_loc.filenames, ["a.yaml", "a.yml"])
-        self.assertIsNone(con_loc.files)
 
-    def test__parse_location_file(self):
+    def test__parse_location_file(self) -> None:
         con_loc = _parse_location("/a/b/a")
-        self.assertIsNone(con_loc.directories)
-        self.assertIsNone(con_loc.filenames)
+        assert con_loc.directories is None
+        assert con_loc.filenames is None
+        assert con_loc.files is not None
         self.assertSequenceEqual(con_loc.files, ["/a/b/a"])
 
         con_loc = _parse_location("/a/b/a.yaml")
-        self.assertIsNone(con_loc.directories)
-        self.assertIsNone(con_loc.filenames)
+        assert con_loc.directories is None
+        assert con_loc.filenames is None
+        assert con_loc.files is not None
         self.assertSequenceEqual(con_loc.files, ["/a/b/a.yaml"])
 
         con_loc = _parse_location("/a/b/a.doc")
-        self.assertIsNone(con_loc.directories)
-        self.assertIsNone(con_loc.filenames)
+        assert con_loc.directories is None
+        assert con_loc.filenames is None
+        assert con_loc.files is not None
         self.assertSequenceEqual(con_loc.files, ["/a/b/a.doc"])
 
-    def test__parse_location_home(self):
+    def test__parse_location_home(self) -> None:
         con_loc = _parse_location("~/a")
-        self.assertIsNone(con_loc.directories)
-        self.assertIsNone(con_loc.filenames)
+        assert con_loc.directories is None
+        assert con_loc.filenames is None
+        assert con_loc.files is not None
         self.assertSequenceEqual(con_loc.files, [os.path.abspath(os.path.expanduser("~/a"))])
 
-    def test__parse_location_join(self):
+    def test__parse_location_join(self) -> None:
         con_loc = _parse_location(os.path.join(__file__, "a"))
-        self.assertIsNone(con_loc.directories)
-        self.assertIsNone(con_loc.filenames)
+        assert con_loc.directories is None
+        assert con_loc.filenames is None
+        assert con_loc.files is not None
         self.assertSequenceEqual(con_loc.files, [os.path.join(__file__, "a")])
 
-    def test__parse_location_type_error(self):
+    def test__parse_location_type_error(self) -> None:
         with self.assertRaises(TypeError):
-            _parse_location(None)
+            _parse_location(None)  # type: ignore
 
 
 if __name__ == "__main__":

@@ -8,7 +8,7 @@ from granular_configuration.yaml_handler import Placeholder
 
 
 class TestConfig(unittest.TestCase):
-    def test__build_configuration(self):
+    def test__build_configuration(self) -> None:
         base_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), "../assets/config_location_test"))
         dir_func = partial(os.path.join, base_dir)
 
@@ -38,15 +38,15 @@ class TestConfig(unittest.TestCase):
 
         assert str(cm.exception) == 'Configuration value "deep_test.a.doesnotexist" does not exist'
 
-        with self.assertRaises(PlaceholderConfigurationError) as cm:
+        with self.assertRaises(PlaceholderConfigurationError) as cm_ph:
             configuration.placeholder_test.not_overridden
 
         assert (
-            str(cm.exception)
+            str(cm_ph.exception)
             == 'Configuration expects "placeholder_test.not_overridden" to be overwritten. Message: "This should not be overridden"'
         )
 
-    def test__build_configuration_placeholder_root(self):
+    def test__build_configuration_placeholder_root(self) -> None:
         base_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), "../assets/config_location_test"))
         dir_func = partial(os.path.join, base_dir)
 
@@ -63,7 +63,7 @@ class TestConfig(unittest.TestCase):
         assert isinstance(raw_value["b"], Placeholder) and (raw_value["b"].message == "Placeholder over a placeholder")
         assert isinstance(raw_value["c"], Placeholder) and (raw_value["c"].message == "Placeholder over a value")
 
-    def test__build_configuration_mixconfig(self):
+    def test__build_configuration_mixconfig(self) -> None:
         base_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), "../assets/config_location_test"))
         dir_func = partial(os.path.join, base_dir)
 
@@ -79,7 +79,7 @@ class TestConfig(unittest.TestCase):
         assert configuration.B == {None: 1}
         assert configuration.D == {None: 1}
 
-    def test__build_configuration_sub(self):
+    def test__build_configuration_sub(self) -> None:
         base_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), "../assets/config_location_test"))
         dir_func = partial(os.path.join, base_dir)
 

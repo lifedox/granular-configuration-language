@@ -9,7 +9,7 @@ from granular_configuration.yaml_handler import Placeholder, loads
 
 
 class TestConfiguration(unittest.TestCase):
-    def test_converting_Configuration_to_dict(self):
+    def test_converting_Configuration_to_dict(self) -> None:
         config = loads("a: !Func functools.reduce", Configuration)
         assert isinstance(config, Configuration)
         assert tuple(iteritems(config)) == (("a", reduce),)
@@ -26,7 +26,7 @@ class TestConfiguration(unittest.TestCase):
         config = loads("a: !Func functools.reduce", Configuration)
         assert config.popitem() == ("a", reduce)
 
-    def test_Configuration_is_dict(self):
+    def test_Configuration_is_dict(self) -> None:
         base_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), "../assets/config_location_test"))
         dir_func = partial(os.path.join, base_dir)
 
@@ -52,7 +52,7 @@ class TestConfiguration(unittest.TestCase):
         assert value.exists("a") is False
         assert new.exists("a") is False
 
-    def test_Configuration_exists(self):
+    def test_Configuration_exists(self) -> None:
         config = Configuration(a=1, b=Placeholder("tests"))
 
         assert config.exists("a") is True
@@ -67,12 +67,12 @@ class TestConfiguration(unittest.TestCase):
         assert config.get("b") is None
         assert config.get("c") is None
 
-    def test_Configuration_as_dict(self):
+    def test_Configuration_as_dict(self) -> None:
         input = Configuration(a="b", b=Configuration(a=Configuration(a=1)))
         expected = dict(a="b", b=dict(a=dict(a=1)))
         assert input.as_dict() == expected
 
-    def test_simple_patch(self):
+    def test_simple_patch(self) -> None:
         input = Configuration(a="b")
         with input.patch(dict(a="c")):
             self.assertDictEqual(input.as_dict(), dict(a="c"))
@@ -80,14 +80,14 @@ class TestConfiguration(unittest.TestCase):
 
         self.assertDictEqual(input.as_dict(), dict(a="b"))
 
-    def test_patch_new_not_allowed(self):
+    def test_patch_new_not_allowed(self) -> None:
         input = Configuration(a="b")
 
         with self.assertRaises(KeyError):
             with input.patch(dict(b="c")):
                 self.assertDictEqual(input.as_dict(), dict(a="b", b="c"))
 
-    def test_patch_new(self):
+    def test_patch_new(self) -> None:
         input = Configuration(a="b")
         with input.patch(dict(b="c"), allow_new_keys=True):
             self.assertDictEqual(input.as_dict(), dict(a="b", b="c"))
@@ -99,7 +99,7 @@ class TestConfiguration(unittest.TestCase):
         self.assertDictEqual(input.as_dict(), dict(a="b"))
         self.assertEqual(len(input), 1)
 
-    def test_patch_new_dict(self):
+    def test_patch_new_dict(self) -> None:
         input = Configuration(a="b")
         with input.patch(dict(b="c", e=dict(a=1)), allow_new_keys=True):
             self.assertDictEqual(input.as_dict(), dict(a="b", b="c", e=dict(a=1)))
@@ -110,7 +110,7 @@ class TestConfiguration(unittest.TestCase):
 
         self.assertDictEqual(input.as_dict(), dict(a="b"))
 
-    def test_patch_nest_dict_deeper(self):
+    def test_patch_nest_dict_deeper(self) -> None:
         input = Configuration(a="b")
         with input.patch({"b": {"a": {"a": 2}}}, allow_new_keys=True):
             self.assertDictEqual(input.as_dict(), {"a": "b", "b": {"a": {"a": 2}}})
@@ -118,7 +118,7 @@ class TestConfiguration(unittest.TestCase):
 
         self.assertDictEqual(input.as_dict(), dict(a="b"))
 
-    def test_patch_nest_dict(self):
+    def test_patch_nest_dict(self) -> None:
         input = Configuration(a="b", b=Configuration(a=Configuration(a=1)))
         with input.patch({"b": {"a": {"a": 2}}}):
             self.assertDictEqual(input.as_dict(), {"a": "b", "b": {"a": {"a": 2}}})
@@ -129,7 +129,7 @@ class TestConfiguration(unittest.TestCase):
         self.assertDictEqual(input.as_dict(), {"a": "b", "b": {"a": {"a": 1}}})
         self.assertDictEqual(input.b.as_dict(), {"a": {"a": 1}})
 
-    def test_patch_deep_nest_dict(self):
+    def test_patch_deep_nest_dict(self) -> None:
         input = Configuration(a="b", b=Configuration(a=Configuration(a=1)))
         with input.b.patch({"a": {"a": 2}}):
             self.assertDictEqual(input.as_dict(), {"a": "b", "b": {"a": {"a": 2}}})
@@ -137,7 +137,7 @@ class TestConfiguration(unittest.TestCase):
 
         self.assertDictEqual(input.as_dict(), {"a": "b", "b": {"a": {"a": 1}}})
 
-    def test_nested_patch(self):
+    def test_nested_patch(self) -> None:
         input = Configuration(a="b")
         with input.patch({"a": "c", "b": "b", "c": "c"}, allow_new_keys=True):
             self.assertDictEqual(input.as_dict(), {"a": "c", "b": "b", "c": "c"})
@@ -147,7 +147,7 @@ class TestConfiguration(unittest.TestCase):
 
         self.assertDictEqual(input.as_dict(), {"a": "b"})
 
-    def test_patch_copy(self):
+    def test_patch_copy(self) -> None:
         input = Configuration(a="b")
         with input.patch({"a": "c", "b": "b", "c": "c"}, allow_new_keys=True):
             self.assertDictEqual(input.as_dict(), {"a": "c", "b": "b", "c": "c"})
@@ -165,7 +165,7 @@ class TestConfiguration(unittest.TestCase):
 
         self.assertDictEqual(input.as_dict(), {"a": "b"})
 
-    def test_patch_nested_sibling(self):
+    def test_patch_nested_sibling(self) -> None:
         CONFIG = Configuration(
             key1="value1", key2="value2", nested=Configuration(nest_key1="nested_value1", nest_key2="nested_value2")
         )
@@ -175,7 +175,7 @@ class TestConfiguration(unittest.TestCase):
         with CONFIG.patch(patch):
             self.assertDictEqual(CONFIG.as_dict(), expected)
 
-    def test_nested_patch_full_override(self):
+    def test_nested_patch_full_override(self) -> None:
         CONFIG = Configuration(
             key1="value1", key2="value2", nested=Configuration(nest_key1="nested_value1", nest_key2="nested_value2")
         )

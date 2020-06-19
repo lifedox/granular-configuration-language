@@ -17,8 +17,8 @@ from granular_configuration.exceptions import ParseEnvError
 
 consume = partial(deque, maxlen=0)
 
-ENV_PATTERN: typ.Pattern = re.compile(r"(\{\{\s*(?P<env_name>[A-Za-z0-9-_]+)\s*(?:\:(?P<default>.*?))?\}\})")
-SUB_PATTERN: typ.Pattern = re.compile(r"(\$\{(?P<contents>.*?)\})")
+ENV_PATTERN: typ.Pattern[str] = re.compile(r"(\{\{\s*(?P<env_name>[A-Za-z0-9-_]+)\s*(?:\:(?P<default>.*?))?\}\})")
+SUB_PATTERN: typ.Pattern[str] = re.compile(r"(\$\{(?P<contents>.*?)\})")
 
 _YNODES = typ.Union[ScalarNode, MappingNode]
 _RT = typ.TypeVar("_RT")
@@ -56,7 +56,7 @@ class LazyEval(typ.Generic[_RT]):
         return self.value()
 
 
-class LazyEvalRootState(LazyEval):
+class LazyEvalRootState(LazyEval[_RT]):
     __slots__ = ("root",)
 
     def __init__(self, root: LazyRoot, value: typ.Callable[[typ.Any], _RT]) -> None:
@@ -65,6 +65,10 @@ class LazyEvalRootState(LazyEval):
 
     def run(self) -> _RT:
         return self.value(self.root.root)
+
+
+LazyEvalStr = LazyEval[str]
+LazyEvalRootStateStr = LazyEvalRootState[str]
 
 
 def load_env(env_name: str, default: typ.Optional[str] = None) -> str:
@@ -99,25 +103,26 @@ def add_cwd_to_path() -> None:
 
 def get_func(func_path: str) -> typ.Callable:
     add_cwd_to_path()
-    mod_name, func = func_path.rsplit(".", 1)
+    mod_name, func_name = func_path.rsplit(".", 1)
     try:
-        return getattr(importlib.import_module(mod_name), func)
+        func: typ.Callable = getattr(importlib.import_module(mod_name), func_name)
+        return func
     except (ImportError, AttributeError):
-        raise ValueError("Could not load {}".format(func_path))
+        raise ValueError(f"Could not load {func_path}")
 
 
-def handle_env(loader: SafeLoader, node: _YNODES) -> LazyEval:
+def handle_env(loader: SafeLoader, node: _YNODES) -> LazyEvalStr:
     if isinstance(node, ScalarNode):
-        value = loader.construct_scalar(node)
-        return LazyEval(lambda: ENV_PATTERN.sub(lambda x: load_env(**x.groupdict()), value))
+        value: str = loader.construct_scalar(node)
+        return LazyEvalStr(lambda: ENV_PATTERN.sub(lambda x: load_env(**x.groupdict()), value))
     else:
         raise ValueError("Only strings are supported by !Env")
 
 
-def handle_sub(loader: "ExtendSafeLoader", node: _YNODES) -> LazyEval:
+def handle_sub(loader: "ExtendSafeLoader", node: _YNODES) -> LazyEvalStr:
     if isinstance(node, ScalarNode):
-        value = loader.construct_scalar(node)
-        return LazyEvalRootState(
+        value: str = loader.construct_scalar(node)
+        return LazyEvalRootStateStr(
             loader.lazy_root_obj, lambda root: SUB_PATTERN.sub(lambda x: load_sub(root, **x.groupdict()), value)
         )
     else:
@@ -126,7 +131,7 @@ def handle_sub(loader: "ExtendSafeLoader", node: _YNODES) -> LazyEval:
 
 def handle_placeholder(loader: SafeLoader, node: _YNODES) -> Placeholder:
     if isinstance(node, ScalarNode):
-        value = loader.construct_scalar(node)
+        value: str = loader.construct_scalar(node)
         return Placeholder(value)
     else:
         raise ValueError("Only strings are supported by !Placeholder")
@@ -150,7 +155,7 @@ def handle_func(value: str) -> typ.Callable:
 
 def string_check(func: typ.Callable[[str], _RT], loader: SafeLoader, node: _YNODES) -> LazyEval[_RT]:
     if isinstance(node, ScalarNode):
-        value = loader.construct_scalar(node)
+        value: str = loader.construct_scalar(node)
         return LazyEval(lambda: func(value))
     else:
         raise ValueError("Only strings are supported by !{}".format(node.tag))
@@ -177,7 +182,7 @@ def parse_env(loader_cls: typ.Type[SafeLoader], env_var: str, *default: typ.Any)
             return value
 
 
-def handle_parse_env(loader: SafeLoader, node: _YNODES) -> LazyEval:
+def handle_parse_env(loader: SafeLoader, node: _YNODES) -> LazyEval[typ.Any]:
     loader_cls = loader.__class__
     if isinstance(node, ScalarNode):
         value = loader.construct_scalar(node)

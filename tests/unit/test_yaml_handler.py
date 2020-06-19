@@ -9,7 +9,7 @@ from granular_configuration.yaml_handler import Placeholder, loads
 
 
 class TestYamlHandler(unittest.TestCase):
-    def test_yaml_env(self):
+    def test_yaml_env(self) -> None:
         with patch.dict(os.environ, values={"unreal_env_variable": "test me"}):
             self.assertEqual(loads("!Env '{{unreal_env_variable}}'").run(), "test me")
             self.assertEqual(loads("!Env '{{unreal_env_variable:special}}'").run(), "test me")
@@ -21,7 +21,7 @@ class TestYamlHandler(unittest.TestCase):
             with self.assertRaises(ValueError):
                 loads("!Env [a]").run()
 
-    def test_yaml_func(self):
+    def test_yaml_func(self) -> None:
         self.assertIs(loads("!Func functools.reduce").run(), reduce)
         self.assertIs(
             loads("!Func granular_configuration._config.ConfigurationLocations").run(), ConfigurationLocations
@@ -36,7 +36,7 @@ class TestYamlHandler(unittest.TestCase):
         with self.assertRaises(ValueError):
             loads("!Func [a]").run()
 
-    def test_yaml_class(self):
+    def test_yaml_class(self) -> None:
         self.assertIs(
             loads("!Class granular_configuration._config.ConfigurationLocations").run(), ConfigurationLocations
         )
@@ -50,7 +50,7 @@ class TestYamlHandler(unittest.TestCase):
         with self.assertRaises(ValueError):
             loads("!Class [a]").run()
 
-    def test_yaml_placeholder(self):
+    def test_yaml_placeholder(self) -> None:
         placeholder = loads("!Placeholder value")
 
         self.assertIsInstance(placeholder, Placeholder)
@@ -59,85 +59,85 @@ class TestYamlHandler(unittest.TestCase):
         with self.assertRaises(ValueError):
             loads("!Placeholder []")
 
-    def test_yaml_parse_env_scalar__string(self):
+    def test_yaml_parse_env_scalar__string(self) -> None:
         with patch.dict(os.environ, values={"unreal_env_variable": "test me"}):
             self.assertEqual(loads("!ParseEnv unreal_env_variable").run(), "test me")
 
-    def test_yaml_parse_env_scalar__float(self):
+    def test_yaml_parse_env_scalar__float(self) -> None:
         with patch.dict(os.environ, values={"unreal_env_variable": "3.0"}):
             self.assertEqual(loads("!ParseEnv unreal_env_variable").run(), 3.0)
             self.assertIsInstance(loads("!ParseEnv unreal_env_variable").run(), float)
 
-    def test_yaml_parse_env_scalar__int(self):
+    def test_yaml_parse_env_scalar__int(self) -> None:
         with patch.dict(os.environ, values={"unreal_env_variable": "3"}):
             self.assertEqual(loads("!ParseEnv unreal_env_variable").run(), 3)
             self.assertIsInstance(loads("!ParseEnv unreal_env_variable").run(), int)
 
-    def test_yaml_parse_env_scalar__float_string(self):
+    def test_yaml_parse_env_scalar__float_string(self) -> None:
         with patch.dict(os.environ, values={"unreal_env_variable": "'3'"}):
             self.assertEqual(loads("!ParseEnv unreal_env_variable").run(), "3")
 
-    def test_yaml_parse_env_scalar__null(self):
+    def test_yaml_parse_env_scalar__null(self) -> None:
         with patch.dict(os.environ, values={"unreal_env_variable": "null"}):
             self.assertIs(loads("!ParseEnv unreal_env_variable").run(), None)
 
-    def test_yaml_parse_env_scalar__bool_true(self):
+    def test_yaml_parse_env_scalar__bool_true(self) -> None:
         with patch.dict(os.environ, values={"unreal_env_variable": "true"}):
             self.assertEqual(loads("!ParseEnv unreal_env_variable").run(), True)
             self.assertIsInstance(loads("!ParseEnv unreal_env_variable").run(), bool)
 
-    def test_yaml_parse_env_scalar__bool_true_casing(self):
+    def test_yaml_parse_env_scalar__bool_true_casing(self) -> None:
         with patch.dict(os.environ, values={"unreal_env_variable": "True"}):
             self.assertEqual(loads("!ParseEnv unreal_env_variable").run(), True)
             self.assertIsInstance(loads("!ParseEnv unreal_env_variable").run(), bool)
 
-    def test_yaml_parse_env_scalar__bool_false(self):
+    def test_yaml_parse_env_scalar__bool_false(self) -> None:
         with patch.dict(os.environ, values={"unreal_env_variable": "false"}):
             self.assertEqual(loads("!ParseEnv unreal_env_variable").run(), False)
             self.assertIsInstance(loads("!ParseEnv unreal_env_variable").run(), bool)
 
-    def test_yaml_parse_env_scalar__bool_false_casing(self):
+    def test_yaml_parse_env_scalar__bool_false_casing(self) -> None:
         with patch.dict(os.environ, values={"unreal_env_variable": "False"}):
             self.assertEqual(loads("!ParseEnv unreal_env_variable").run(), False)
             self.assertIsInstance(loads("!ParseEnv unreal_env_variable").run(), bool)
 
-    def test_yaml_parse_env_scalar__dict(self):
+    def test_yaml_parse_env_scalar__dict(self) -> None:
         with patch.dict(os.environ, values={"unreal_env_variable": '{"a": "value"}'}):
             self.assertDictEqual(loads("!ParseEnv unreal_env_variable").run(), {"a": "value"})
 
-    def test_yaml_parse_env_scalar__Configuration(self):
+    def test_yaml_parse_env_scalar__Configuration(self) -> None:
         with patch.dict(os.environ, values={"unreal_env_variable": '{"a": {"b": "value"}}'}):
             value = loads("!ParseEnv unreal_env_variable", obj_pairs_hook=Configuration).run()
             self.assertIsInstance(value, Configuration)
             self.assertDictEqual(value, {"a": {"b": "value"}})
             self.assertIsInstance(value["a"], Configuration)
 
-    def test_yaml_parse_env_scalar__seq(self):
+    def test_yaml_parse_env_scalar__seq(self) -> None:
         with patch.dict(os.environ, values={"unreal_env_variable": "[1, 2, 3]"}):
             self.assertSequenceEqual(loads("!ParseEnv unreal_env_variable").run(), [1, 2, 3])
 
-    def test_yaml_parse_env_scalar__recursive(self):
+    def test_yaml_parse_env_scalar__recursive(self) -> None:
         with patch.dict(
             os.environ, values={"unreal_env_variable": "!ParseEnv unreal_env_variable1", "unreal_env_variable1": "42"}
         ):
             self.assertEqual(loads("!ParseEnv unreal_env_variable").run(), 42)
 
-    def test_yaml_parse_env_scalar__var_parse_error(self):
+    def test_yaml_parse_env_scalar__var_parse_error(self) -> None:
         with patch.dict(os.environ, values={"unreal_env_variable": "{"}):
             with self.assertRaises(ParseEnvError):
                 loads("!ParseEnv unreal_env_variable").run()
 
-    def test_yaml_parse_env_scalar__missing(self):
+    def test_yaml_parse_env_scalar__missing(self) -> None:
         with patch.dict(os.environ, values={}):
             with self.assertRaises(KeyError):
                 loads("!ParseEnv unreal_env_vari").run()
 
-    def test_yaml_parse_env_mapping__error(self):
+    def test_yaml_parse_env_mapping__error(self) -> None:
         with patch.dict(os.environ, values={}):
             with self.assertRaises(ValueError):
                 loads('!ParseEnv {"unreal_env_vari": 1}')
 
-    def test_yaml_parse_env_sequence__use_default(self):
+    def test_yaml_parse_env_sequence__use_default(self) -> None:
         with patch.dict(os.environ, values={}):
             self.assertEqual(loads('!ParseEnv ["unreal_env_vari", 1]').run(), 1)
             self.assertEqual(loads('!ParseEnv ["unreal_env_vari", 1.5]').run(), 1.5)
@@ -149,21 +149,21 @@ class TestYamlHandler(unittest.TestCase):
             self.assertDictEqual(value, {"a": {"b": "value"}})
             self.assertIsInstance(value["a"], Configuration)
 
-    def test_yaml_parse_env_sequence__string(self):
+    def test_yaml_parse_env_sequence__string(self) -> None:
         with patch.dict(os.environ, values={"unreal_env_variable": "test me"}):
             self.assertEqual(loads("!ParseEnv [unreal_env_variable, null]").run(), "test me")
 
-    def test_yaml_parse_env_sequence__float(self):
+    def test_yaml_parse_env_sequence__float(self) -> None:
         with patch.dict(os.environ, values={"unreal_env_variable": "3.0"}):
             self.assertEqual(loads("!ParseEnv [unreal_env_variable, null]").run(), 3.0)
             self.assertIsInstance(loads("!ParseEnv [unreal_env_variable, null]").run(), float)
 
-    def test_yaml_parse_env_sequence__int(self):
+    def test_yaml_parse_env_sequence__int(self) -> None:
         with patch.dict(os.environ, values={"unreal_env_variable": "3"}):
             self.assertEqual(loads("!ParseEnv [unreal_env_variable, null]").run(), 3)
             self.assertIsInstance(loads("!ParseEnv [unreal_env_variable, null]").run(), int)
 
-    def test_yaml_sub__env(self):
+    def test_yaml_sub__env(self) -> None:
         with patch.dict(os.environ, values={"unreal_env_variable": "test me"}):
             self.assertEqual(loads("!Sub ${unreal_env_variable}").run(), "test me")
             self.assertEqual(loads("!Sub ${unreal_env_variable:-special}").run(), "test me")
@@ -175,7 +175,7 @@ class TestYamlHandler(unittest.TestCase):
             with self.assertRaises(ValueError):
                 loads("!Sub [a]").run()
 
-    def test_yaml_sub__jsonpath(self):
+    def test_yaml_sub__jsonpath(self) -> None:
         test_data = """\
 data:
     dog:
@@ -201,11 +201,11 @@ tests:
                 ),
             )
 
-    def test_yaml_sub__jsonpath_missing(self):
+    def test_yaml_sub__jsonpath_missing(self) -> None:
         with self.assertRaises(KeyError):
             loads("!Sub ${$.no_data.here}").run()
 
-    def test_Sub_can_read_config_vars(self):
+    def test_Sub_can_read_config_vars(self) -> None:
         for base_exists in (False, True):
             for nested in (False, True):
                 for default in (False,):
@@ -217,13 +217,13 @@ tests:
                         lines.append("a:")
                         lines.append("  b: !Sub foo${$.base" + default_string + "}")
 
-                        def get(config):
+                        def get(config: Configuration) -> str:
                             return config.a.b
 
                     else:
                         lines.append("a: !Sub foo${$.base" + default_string + "}")
 
-                        def get(config):
+                        def get(config: Configuration) -> str:
                             return config.a
 
                     print("\n".join(lines))

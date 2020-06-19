@@ -126,6 +126,7 @@ class Configuration(typ.MutableMapping):
                 value = patched_value
             else:
                 self.__data[name]  # raise KeyError
+                raise KeyError(str(name))  # pragma: no cover
         else:
             value = self.__data[name]
         return value
@@ -215,7 +216,7 @@ class Configuration(typ.MutableMapping):
         self.update(state)
 
     @property  # type: ignore
-    def __class__(self):
+    def __class__(self):  # type: ignore
         return _ConDict
 
     def __add_patch(self, patch: Patch) -> None:
@@ -241,7 +242,7 @@ class Configuration(typ.MutableMapping):
         patch.kill()
         self.__patches.remove(patch)
 
-    def __get_child_patches(self, name, for_patch):
+    def __get_child_patches(self, name: str, for_patch: bool) -> typ.Iterator[Patch]:
         return map(
             op.methodcaller("make_child", name, for_patch),
             filter(op.methodcaller("__contains__", name), self.__patches),
@@ -324,7 +325,7 @@ class ConfigurationLocations(object):
         self.directories = directories
         self.files = files
 
-    def get_locations(self):
+    def get_locations(self) -> OrderedSet[str]:
         return _get_files_from_locations(filenames=self.filenames, directories=self.directories, files=self.files)
 
 
@@ -444,7 +445,7 @@ class LazyLoadConfiguration(MutableMapping):
     def __delitem__(self, key: typ.Any) -> None:
         del self.config[key]
 
-    def __getitem__(self, key: typ.Any) -> None:
+    def __getitem__(self, key: typ.Any) -> typ.Any:
         return self.config[key]
 
     def __iter__(self) -> typ.Iterator[typ.Any]:
