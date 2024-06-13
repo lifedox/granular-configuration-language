@@ -1,18 +1,17 @@
+from __future__ import annotations
+
 import typing as typ
 from collections import OrderedDict, deque
 from functools import partial
 
-from six import iterkeys
-from six.moves import map
-
-consume = partial(deque, maxlen=0)
+consume = typ.cast(typ.Callable[[typ.Iterable], None], partial(deque, maxlen=0))
 
 _T = typ.TypeVar("_T")
 
 
 class OrderedSet(typ.MutableSet[_T], typ.Reversible[_T], typ.Generic[_T]):
     def __init__(self, iterable: typ.Optional[typ.Iterable[_T]] = None) -> None:
-        self.__backend: OrderedDict = OrderedDict()  # typ.OrderDict >= Python3.7.2
+        self.__backend: OrderedDict[_T, None] = OrderedDict()
         if iterable is not None:
             consume(map(self.add, iterable))
 
@@ -20,7 +19,7 @@ class OrderedSet(typ.MutableSet[_T], typ.Reversible[_T], typ.Generic[_T]):
         return item in self.__backend
 
     def __iter__(self) -> typ.Iterator[_T]:
-        return iter(iterkeys(self.__backend))
+        return iter(self.__backend)
 
     def __len__(self) -> int:
         return len(self.__backend)
@@ -30,6 +29,9 @@ class OrderedSet(typ.MutableSet[_T], typ.Reversible[_T], typ.Generic[_T]):
 
     def discard(self, value: _T) -> None:
         del self.__backend[value]
+
+    def update(self, other: OrderedSet[_T]) -> None:
+        self.__backend.update(other.__backend)
 
     def __reversed__(self) -> typ.Iterator[_T]:
         return reversed(self.__backend)

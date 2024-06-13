@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import importlib
 import inspect
 import operator as op
@@ -5,70 +7,34 @@ import os
 import re
 import sys
 import typing as typ
-from collections import deque
 from collections.abc import MutableMapping
 from functools import partial
+from pathlib import Path
+
+from ruamel.yaml import YAML
 
 import jsonpath_rw
 import yaml
 from yaml import MappingNode, SafeLoader, ScalarNode, SequenceNode
 
 from granular_configuration.exceptions import ParseEnvError
+from granular_configuration.yaml_handler.classes import LazyEval, LazyEvalRootStateStr, LazyRoot, Placeholder, LazyEvalStr
 
-consume = partial(deque, maxlen=0)
+_OPH = typ.Optional[typ.Type[typ.MutableMapping]]
 
 ENV_PATTERN: typ.Pattern[str] = re.compile(r"(\{\{\s*(?P<env_name>[A-Za-z0-9-_]+)\s*(?:\:(?P<default>.*?))?\}\})")
 SUB_PATTERN: typ.Pattern[str] = re.compile(r"(\$\{(?P<contents>.*?)\})")
 
 _YNODES = typ.Union[ScalarNode, MappingNode]
-_RT = typ.TypeVar("_RT")
 
-
-class LazyRoot:
-    def __init__(self) -> None:
-        self.root: typ.Any = None
 
 
 if typ.TYPE_CHECKING:  # pragma: no cover
 
     class ExtendSafeLoader(SafeLoader):
         lazy_root_obj: LazyRoot
-
-
-class Placeholder:
-    __slot__ = ("message",)
-
-    def __init__(self, message: str) -> None:
-        self.message = message
-
-    def __str__(self) -> str:
-        return str(self.message)
-
-
-class LazyEval(typ.Generic[_RT]):
-    __slots__ = ("value",)
-
-    def __init__(self, value: typ.Callable[[], _RT]) -> None:
-        assert callable(value)
-        self.value: typ.Callable[..., _RT] = value
-
-    def run(self) -> _RT:
-        return self.value()
-
-
-class LazyEvalRootState(LazyEval[_RT]):
-    __slots__ = ("root",)
-
-    def __init__(self, root: LazyRoot, value: typ.Callable[[typ.Any], _RT]) -> None:
-        self.value = value
-        self.root = root
-
-    def run(self) -> _RT:
-        return self.value(self.root.root)
-
-
-LazyEvalStr = LazyEval[str]
-LazyEvalRootStateStr = LazyEvalRootState[str]
+        obj_pairs_func: _OPH
+        file_relative_path: Path
 
 
 def load_env(env_name: str, default: typ.Optional[str] = None) -> str:
@@ -119,7 +85,7 @@ def handle_env(loader: SafeLoader, node: _YNODES) -> LazyEvalStr:
         raise ValueError("Only strings are supported by !Env")
 
 
-def handle_sub(loader: "ExtendSafeLoader", node: _YNODES) -> LazyEvalStr:
+def handle_sub(loader: "ExtendSafeLoader", node: _YNODES) -> LazyEvalRootStateStr:
     if isinstance(node, ScalarNode):
         value: str = loader.construct_scalar(node)
         return LazyEvalRootStateStr(
@@ -194,20 +160,38 @@ def handle_parse_env(loader: SafeLoader, node: _YNODES) -> LazyEval[typ.Any]:
         raise ValueError("!ParseEnv only supports a string or typing.Tuple[str, typing.Any]")
 
 
+def handle_parse_file(loader: ExtendSafeLoader, node: _YNODES) -> typ.Any:
+    # This is a cyclical dependency
+    from granular_configuration._load import load_file
+
+    if isinstance(node, ScalarNode):
+        value: str = loader.construct_scalar(node)
+        return load_file(
+            loader.file_relative_path / value, obj_pairs_hook=loader.obj_pairs_func, lazy_root=loader.lazy_root_obj
+        )
+    elif isinstance(node, SequenceNode):
+        raise ValueError("!ParseFile only supports a string")
+    else:
+        raise ValueError("!ParseFile only supports a string or typing.Tuple[str, typing.Any]")
+
+
 def construct_mapping(cls: typ.Type[typ.Dict], loader: SafeLoader, node: _YNODES) -> typ.Dict:
     node.value = [pair for pair in node.value if pair[1].tag != "!Del"]
     loader.flatten_mapping(node)
     return cls(loader.construct_pairs(node, deep=True))
 
 
-def loads(
+def loads_v1(
     config_str: str,
-    obj_pairs_hook: typ.Optional[typ.Type[typ.MutableMapping]] = None,
+    obj_pairs_hook: _OPH = None,
     *,
     lazy_root: typ.Optional[LazyRoot] = None,
+    file_path: typ.Optional[Path] = None,
 ) -> typ.Any:
     class ExtendSafeLoader(SafeLoader):
         lazy_root_obj = lazy_root or LazyRoot()
+        obj_pairs_func = obj_pairs_hook
+        file_relative_path = file_path.parent if file_path is not None else Path(".")
         pass
 
     if obj_pairs_hook and issubclass(obj_pairs_hook, MutableMapping):
@@ -221,7 +205,26 @@ def loads(
     ExtendSafeLoader.add_constructor("!Class", partial(string_check, handle_class))
     ExtendSafeLoader.add_constructor("!Placeholder", handle_placeholder)
     ExtendSafeLoader.add_constructor("!ParseEnv", handle_parse_env)
+    ExtendSafeLoader.add_constructor("!ParseFile", handle_parse_file)
 
     result = yaml.load(config_str, Loader=ExtendSafeLoader)  # nosec  # ExtendSafeLoader is a subclass of SafeLoader
     ExtendSafeLoader.lazy_root_obj.root = result
     return result
+
+def loads_v2(
+    config_str: str,
+    obj_pairs_hook: _OPH = None,
+    *,
+    lazy_root: typ.Optional[LazyRoot] = None,
+    file_path: typ.Optional[Path] = None,
+) -> typ.Any:
+
+    yaml = YAML(typ="safe")
+
+    yaml.constructor
+
+    
+
+
+
+loads = loads_v1

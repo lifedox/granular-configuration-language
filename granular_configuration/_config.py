@@ -2,18 +2,17 @@ import copy
 import operator as op
 import os
 import typing as typ
-from collections import deque
 from collections.abc import Mapping, MutableMapping
 from contextlib import contextmanager
 from functools import partial, reduce
-from itertools import chain, filterfalse, groupby, islice, product, starmap
+from itertools import chain, filterfalse, starmap
+from pathlib import Path
 
 from granular_configuration._load import load_file
+from granular_configuration._locations import ConfigurationLocations, get_all_unique_locations, parse_location
 from granular_configuration.exceptions import InvalidBasePathException, PlaceholderConfigurationError
-from granular_configuration.utils import OrderedSet
+from granular_configuration.utils import OrderedSet, consume
 from granular_configuration.yaml_handler import LazyEval, LazyRoot, Placeholder
-
-consume = partial(deque, maxlen=0)
 
 
 class Patch(typ.Mapping):
@@ -187,7 +186,8 @@ class Configuration(typ.MutableMapping):
         """
         return dict(
             starmap(
-                lambda key, value: (key, value.as_dict() if isinstance(value, Configuration) else value), self.items(),
+                lambda key, value: (key, value.as_dict() if isinstance(value, Configuration) else value),
+                self.items(),
             )
         )
 
@@ -253,7 +253,7 @@ class _ConDict(dict, Configuration):  # type: ignore
     pass
 
 
-def _build_configuration(locations: typ.Iterable[str]) -> Configuration:
+def _build_configuration(locations: typ.Iterable[Path]) -> Configuration:
     def _recursive_build_config(base_dict: Configuration, from_dict: Configuration) -> None:
         for key, value in from_dict._raw_items():
             if isinstance(value, Configuration) and (key in base_dict):
@@ -280,106 +280,6 @@ def _build_configuration(locations: typ.Iterable[str]) -> Configuration:
     return base_conf
 
 
-def _get_files_from_locations(
-    filenames: typ.Optional[typ.Sequence[str]] = None,
-    directories: typ.Optional[typ.Sequence[str]] = None,
-    files: typ.Optional[typ.Sequence[str]] = None,
-) -> OrderedSet[str]:
-    if not filenames or not directories:
-        filenames = []
-        directories = []
-
-    if not files:
-        files = []
-
-    return OrderedSet(
-        chain(
-            chain.from_iterable(
-                map(
-                    lambda a: islice(filter(os.path.isfile, starmap(os.path.join, a[1])), 1),
-                    groupby(product(directories, filenames), key=lambda a: a[0]),
-                )
-            ),
-            filter(os.path.isfile, OrderedSet(files)),
-        )
-    )
-
-
-class ConfigurationLocations(object):
-    filenames: typ.Optional[typ.Sequence[str]]
-    directories: typ.Optional[typ.Sequence[str]]
-    files: typ.Optional[typ.Sequence[str]]
-
-    def __init__(
-        self,
-        filenames: typ.Optional[typ.Sequence[str]] = None,
-        directories: typ.Optional[typ.Sequence[str]] = None,
-        files: typ.Optional[typ.Sequence[str]] = None,
-    ) -> None:
-        if files and (filenames or directories):
-            raise ValueError("files cannot be defined with filenames and directories.")
-        elif bool(filenames) ^ bool(directories):
-            raise ValueError("filenames and directories are a required pair.")
-
-        self.filenames = filenames
-        self.directories = directories
-        self.files = files
-
-    def get_locations(self) -> OrderedSet[str]:
-        return _get_files_from_locations(filenames=self.filenames, directories=self.directories, files=self.files)
-
-
-_CLS = typ.TypeVar("_CLS", bound="ConfigurationFiles")
-
-
-class ConfigurationFiles(ConfigurationLocations):
-    def __init__(self, files: typ.Sequence[str]) -> None:
-        super(ConfigurationFiles, self).__init__(filenames=None, directories=None, files=files)
-
-    @classmethod
-    def from_args(cls: typ.Type[_CLS], *files: str) -> _CLS:
-        return cls(files)
-
-
-class ConfigurationMultiNamedFiles(ConfigurationLocations):
-    def __init__(self, filenames: typ.Sequence[str], directories: typ.Sequence[str]) -> None:
-        super(ConfigurationMultiNamedFiles, self).__init__(filenames=filenames, directories=directories, files=None)
-
-
-def _get_all_unique_locations(locations: typ.Iterable[ConfigurationLocations]) -> OrderedSet[str]:
-    return OrderedSet(chain.from_iterable(map(op.methodcaller("get_locations"), locations)))
-
-
-def _parse_location(location: typ.Union[str, ConfigurationLocations]) -> ConfigurationLocations:
-    if isinstance(location, ConfigurationLocations):
-        return location
-    elif isinstance(location, str):
-        location = os.path.abspath(os.path.expanduser(location))
-        dirname = os.path.dirname(location)
-        basename, ext = os.path.splitext(os.path.basename(location))
-        if ext == ".*":
-            return ConfigurationMultiNamedFiles(
-                filenames=(basename + ".yaml", basename + ".yml", basename + ".ini"), directories=(dirname,)
-            )
-        elif ext in (".y*", ".yml"):
-            return ConfigurationMultiNamedFiles(
-                filenames=(basename + ".yaml", basename + ".yml"), directories=(dirname,)
-            )
-        elif ext == ".ini":
-            return ConfigurationMultiNamedFiles(
-                filenames=(basename + ".ini", basename + ".yaml", basename + ".yml"), directories=(dirname,)
-            )
-        else:
-            return ConfigurationFiles(files=(location,))
-    else:
-        raise TypeError(
-            "Expected ConfigurationFiles, ConfigurationMultiNamedFiles, ConfigurationMultiNamedFiles, or a str, \
-not ({})".format(
-                type(location).__name__
-            )
-        )
-
-
 class LazyLoadConfiguration(MutableMapping):
     """
     Provides a lazy interface for loading Configuration from ConfigurationLocations definitions on first access.
@@ -387,7 +287,7 @@ class LazyLoadConfiguration(MutableMapping):
 
     def __init__(
         self,
-        *load_order_location: typ.Union[str, ConfigurationLocations],
+        *load_order_location: typ.Union[str, ConfigurationLocations, Path],
         base_path: typ.Optional[typ.Union[str, typ.Sequence[str]]] = None,
         use_env_location: bool = False,
     ) -> None:
@@ -405,7 +305,7 @@ class LazyLoadConfiguration(MutableMapping):
                 load_order_location = tuple(chain(load_order_location, env_locs))
         self._config: typ.Optional[Configuration] = None
         self.__locations: typ.Optional[typ.Sequence[ConfigurationLocations]] = tuple(
-            map(_parse_location, load_order_location)
+            map(parse_location, load_order_location)
         )
 
     def __getattr__(self, name: str) -> typ.Any:
@@ -415,12 +315,12 @@ class LazyLoadConfiguration(MutableMapping):
         """
         return getattr(self.config, name)
 
-    def load_configure(self) -> None:
+    def load_configuration(self) -> None:
         """
         Force load the configuration.
         """
         if self._config is None and self.__base_path is not None and self.__locations is not None:
-            config = _build_configuration(_get_all_unique_locations(self.__locations))
+            config = _build_configuration(get_all_unique_locations(self.__locations))
             try:
                 self._config = reduce(lambda dic, key: dic[key], self.__base_path, config)
             except KeyError as e:
@@ -428,6 +328,8 @@ class LazyLoadConfiguration(MutableMapping):
                 raise InvalidBasePathException(message[1 : len(message) - 1])
             self.__locations = None
             self.__base_path = None
+
+    load_configure = load_configuration
 
     @property
     def config(self) -> Configuration:

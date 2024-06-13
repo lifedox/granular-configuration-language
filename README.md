@@ -794,7 +794,7 @@ assert LazyLoadConfiguration(..., base_path=["Level1", "Level2", "Level3"]).as_d
   - **Returns:** a string produced by the string format
   - Interpolations:
     - `${ENVIRONMENT_VARIABLE_THAT_EXISTS}`: Replaced with the specific Environment Variable. Raises `KeyError`, if the variable does not exist.
-    - `${ENVIRONMENT_VARIABLE_THAT_EXISTS:-default value}`: (Note: specifier is `:-`, following bash style) Replaced with the specific Environment Variable, or the provided default.
+    - `${ENVIRONMENT_VARIABLE_THAT_EXISTS:-default value}`: (Note: specifier is `:-`, following BASH style) Replaced with the specific Environment Variable, or the provided default.
     - `${$.jsonpath.expression}`: Replaced by the the object in the configuration specified in JSON Path syntax.
       - Paths must start at full root of configuration, using `$` as the first character.
       - Results:
@@ -850,7 +850,7 @@ LazyLoadConfiguration(
 
 ## Ini Configuration File Support
 
-Configuration files will be loaded as a YAML file unless they have a file extension of `.ini`. INI files will be load via an extended INI feature set.
+Configuration files will be loaded as a YAML file unless they have a file extension of `.ini`. INI files will be loaded via an extended INI feature set.
 
 #### General Notes
 - Use of the `[DEFAULT]` is highly discouraged.

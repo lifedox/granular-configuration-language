@@ -5,7 +5,8 @@ from unittest.mock import patch
 
 from granular_configuration._config import Configuration, ConfigurationLocations
 from granular_configuration.exceptions import ParseEnvError
-from granular_configuration.yaml_handler import Placeholder, loads
+from granular_configuration.yaml_handler import loads
+from granular_configuration.yaml_handler import Placeholder
 
 
 class TestYamlHandler(unittest.TestCase):
@@ -233,6 +234,39 @@ tests:
                             get(config)
                     else:
                         assert get(config) == "foodefault" if not base_exists else "foobase"
+
+    def test_yaml_nested_parse_env_default(self) -> None:
+        test_data = """\
+aws_region: !ParseEnv
+- G_ASYNC_KINESIS_AWS_REGION
+- !ParseEnv [AWS_DEFAULT_REGION, us-east-1]
+"""
+
+        with patch.dict(os.environ, values={"unreal_env_variable": "test me"}):
+            output: Configuration = loads(test_data, obj_pairs_hook=Configuration)
+            self.assertEqual(getattr(output, "aws_region"), "us-east-1")
+
+    def test_yaml_nested_parse_env_nested_env(self) -> None:
+        test_data = """\
+aws_region: !ParseEnv
+- G_ASYNC_KINESIS_AWS_REGION
+- !ParseEnv [AWS_DEFAULT_REGION, us-east-1]
+"""
+
+        with patch.dict(os.environ, values={"AWS_DEFAULT_REGION": "test me"}):
+            output: Configuration = loads(test_data, obj_pairs_hook=Configuration)
+            self.assertEqual(getattr(output, "aws_region"), "test me")
+
+    def test_yaml_nested_parse_env_env(self) -> None:
+        test_data = """\
+aws_region: !ParseEnv
+- G_ASYNC_KINESIS_AWS_REGION
+- !ParseEnv [AWS_DEFAULT_REGION, us-east-1]
+"""
+
+        with patch.dict(os.environ, values={"G_ASYNC_KINESIS_AWS_REGION": "test me"}):
+            output: Configuration = loads(test_data, obj_pairs_hook=Configuration)
+            self.assertEqual(getattr(output, "aws_region"), "test me")
 
 
 if __name__ == "__main__":

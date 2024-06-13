@@ -1,6 +1,7 @@
 import os
 import unittest
 from functools import partial
+from pathlib import Path
 
 from granular_configuration._config import Configuration, _build_configuration
 from granular_configuration.exceptions import PlaceholderConfigurationError
@@ -12,7 +13,7 @@ class TestConfig(unittest.TestCase):
         base_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), "../assets/config_location_test"))
         dir_func = partial(os.path.join, base_dir)
 
-        files = list(map(dir_func, ["a/b/t2.txt", "g/h.txt", "c/t.txt"]))
+        files = list(map(Path, map(dir_func, ["a/b/t2.txt", "g/h.txt", "c/t.txt"])))
 
         configuration = _build_configuration(files)
 
@@ -50,7 +51,7 @@ class TestConfig(unittest.TestCase):
         base_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), "../assets/config_location_test"))
         dir_func = partial(os.path.join, base_dir)
 
-        files = list(map(dir_func, ["placeholder_test1.yaml", "placeholder_test2.yaml"]))
+        files = list(map(Path, map(dir_func, ["placeholder_test1.yaml", "placeholder_test2.yaml"])))
 
         configuration = _build_configuration(files)
 
@@ -67,7 +68,7 @@ class TestConfig(unittest.TestCase):
         base_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), "../assets/config_location_test"))
         dir_func = partial(os.path.join, base_dir)
 
-        files = list(map(dir_func, ["mix_config.yaml", "mix_config.ini"]))
+        files = list(map(Path, map(dir_func, ["mix_config.yaml", "mix_config.ini"])))
 
         configuration = _build_configuration(files)
 
@@ -83,7 +84,7 @@ class TestConfig(unittest.TestCase):
         base_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), "../assets/config_location_test"))
         dir_func = partial(os.path.join, base_dir)
 
-        files = list(map(dir_func, ["sub_test1.yaml", "sub_test2.yaml"]))
+        files = list(map(Path, map(dir_func, ["sub_test1.yaml", "sub_test2.yaml"])))
 
         configuration = _build_configuration(files)
 

@@ -1,6 +1,0 @@
-#!/bin/sh -e
-
-dir="$( cd "$( dirname "$0" )" && pwd )"
-cd $dir/..
-
-make clean

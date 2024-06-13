@@ -1,2 +1,0 @@
-#!/bin/sh -eu
-mypy granular_configuration tests --ignore-missing-imports --warn-unused-configs --disallow-subclassing-any --disallow-untyped-defs --disallow-incomplete-defs --check-untyped-defs --disallow-untyped-decorators --no-implicit-optional --warn-redundant-casts --warn-unused-ignores --strict-equality

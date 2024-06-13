@@ -1,21 +1,23 @@
+from __future__ import annotations
+
 import os
 import unittest
 from functools import partial, reduce
-
-from six import iteritems, itervalues
+from pathlib import Path
 
 from granular_configuration._config import Configuration, _build_configuration
-from granular_configuration.yaml_handler import Placeholder, loads
+from granular_configuration.yaml_handler import loads
+from granular_configuration.yaml_handler import Placeholder
 
 
 class TestConfiguration(unittest.TestCase):
     def test_converting_Configuration_to_dict(self) -> None:
         config = loads("a: !Func functools.reduce", Configuration)
         assert isinstance(config, Configuration)
-        assert tuple(iteritems(config)) == (("a", reduce),)
+        assert tuple(config.items()) == (("a", reduce),)
 
         config = loads("a: !Func functools.reduce", Configuration)
-        assert tuple(itervalues(config)) == (reduce,)
+        assert tuple(config.values()) == (reduce,)
 
         config = loads("a: !Func functools.reduce", Configuration)
         assert dict(config) == {"a": reduce}
@@ -30,10 +32,9 @@ class TestConfiguration(unittest.TestCase):
         base_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), "../assets/config_location_test"))
         dir_func = partial(os.path.join, base_dir)
 
-        files = list(map(dir_func, ["g/h.txt", "c/t.txt"]))
+        files = list(map(Path, map(dir_func, ["g/h.txt", "c/t.txt"])))
 
         value = _build_configuration(files)
-        assert isinstance(value, dict)
 
         import copy
 
@@ -51,6 +52,8 @@ class TestConfiguration(unittest.TestCase):
         assert new == value
         assert value.exists("a") is False
         assert new.exists("a") is False
+
+        assert isinstance(value, dict)
 
     def test_Configuration_exists(self) -> None:
         config = Configuration(a=1, b=Placeholder("tests"))

@@ -24,9 +24,10 @@ class TestLazyLoadConfiguration(unittest.TestCase):
 
         config_dict = Configuration({"abc": "test", "name": "me"})
 
-        with patch("granular_configuration._config._build_configuration", return_value=config_dict) as bc_mock, patch(
-            "granular_configuration._config._get_all_unique_locations", return_value=files
-        ) as loc_mock:
+        with (
+            patch("granular_configuration._config._build_configuration", return_value=config_dict) as bc_mock,
+            patch("granular_configuration._config.get_all_unique_locations", return_value=files) as loc_mock,
+        ):
             config = LazyLoadConfiguration(*location)
 
             bc_mock.assert_not_called()
@@ -56,9 +57,10 @@ class TestLazyLoadConfiguration(unittest.TestCase):
 
         config_dict = Configuration(start=Configuration(id=Configuration({"abc": "test", "name": "me"})))
 
-        with patch("granular_configuration._config._build_configuration", return_value=config_dict) as bc_mock, patch(
-            "granular_configuration._config._get_all_unique_locations", return_value=files
-        ) as loc_mock:
+        with (
+            patch("granular_configuration._config._build_configuration", return_value=config_dict) as bc_mock,
+            patch("granular_configuration._config.get_all_unique_locations", return_value=files) as loc_mock,
+        ):
             config = LazyLoadConfiguration(*location, base_path=["start", "id"])
 
             bc_mock.assert_not_called()
@@ -88,9 +90,10 @@ class TestLazyLoadConfiguration(unittest.TestCase):
 
         config_dict = Configuration({"abc": "test", "name": "me"})
 
-        with patch("granular_configuration._config._build_configuration", return_value=config_dict) as bc_mock, patch(
-            "granular_configuration._config._get_all_unique_locations", return_value=files
-        ) as loc_mock:
+        with (
+            patch("granular_configuration._config._build_configuration", return_value=config_dict) as bc_mock,
+            patch("granular_configuration._config.get_all_unique_locations", return_value=files) as loc_mock,
+        ):
             config = LazyLoadConfiguration(*location)
 
             assert config.get("abc") == "test"
@@ -134,15 +137,32 @@ class TestLazyLoadConfiguration(unittest.TestCase):
             bc_mock.assert_not_called()
 
     def test__LazyLoadConfiguration_env(self) -> None:
-        env_path = os.path.join(self.BASE_DIR, "test_env_config.yaml",)
+        env_path = os.path.join(
+            self.BASE_DIR,
+            "test_env_config.yaml",
+        )
 
         with patch("granular_configuration._config.os.environ", new={"G_CONFIG_LOCATION": env_path}) as env_mock:
-            config = LazyLoadConfiguration(os.path.join(self.BASE_DIR, "mix_config.yaml",), use_env_location=True,)
+            config = LazyLoadConfiguration(
+                os.path.join(
+                    self.BASE_DIR,
+                    "mix_config.yaml",
+                ),
+                use_env_location=True,
+            )
             assert config.A.key1 == "value2"
 
     def test__LazyLoadConfiguration_env_list(self) -> None:
         env_path = (
-            os.path.join(self.BASE_DIR, "test_env_config.yaml",) + "," + os.path.join(self.BASE_DIR, "mix_config.yaml",)
+            os.path.join(
+                self.BASE_DIR,
+                "test_env_config.yaml",
+            )
+            + ","
+            + os.path.join(
+                self.BASE_DIR,
+                "mix_config.yaml",
+            )
         )
 
         with patch("granular_configuration._config.os.environ", new={"G_CONFIG_LOCATION": env_path}) as env_mock:
@@ -151,7 +171,7 @@ class TestLazyLoadConfiguration(unittest.TestCase):
             assert config.A.key2 == "MyTestValue"
 
     def test__LazyLoadConfiguration_env_none(self) -> None:
-        with patch("granular_configuration._config.os.environ", new={}) as env_mock:
+        with patch("granular_configuration._config.os.environ", new={}):
             config = LazyLoadConfiguration(use_env_location=True)
             assert config.as_dict() == {}
 

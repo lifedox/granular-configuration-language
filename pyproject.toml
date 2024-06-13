@@ -1,0 +1,101 @@
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.poetry]
+name = "granular-configuration"
+version = "1.8.0"
+description = ""
+authors = ["Eric Jensen <lifedox@live.com>"]
+readme = "README.md"
+packages = [{ include = "granular_configuration" }]
+
+[tool.poetry.dependencies]
+python = "^3.10"
+PyYAML = "*"
+jsonpath-rw = "*"
+python-jsonpath = "*"
+"ruamel.yaml" = "*"
+
+[tool.poetry.dev-dependencies]
+ipdb = "*"
+pytest = "*"
+pytest-cov = "*"
+flake8 = "*"
+mypy = "*"
+black = "*"
+isort = "*"
+bandit = "*"
+types-PyYAML = "*"
+
+[tool.black]
+line-length = 120
+target-version = ["py310"]
+exclude = '''
+/(
+    \.cache
+  | \.git
+  | .pytest_cache
+  | .venv
+  | \.vscode
+  | build
+  | configs
+  | dist*
+  | docker
+  | docs
+  | htmlcov
+)/
+'''
+
+[tool.isort]
+multi_line_output = 3
+force_grid_wrap = 0
+use_parentheses = true
+include_trailing_comma = true
+line_length = 120
+skip = []
+known_first_party = ["granular_configuration"]
+default_section = "THIRDPARTY"
+sections = ["FUTURE", "STDLIB", "THIRDPARTY", "FIRSTPARTY", "LOCALFOLDER"]
+
+[tool.pytest.ini_options]
+minversion = "6.0"
+testpaths = ["tests"]
+addopts = '''
+  -ra
+  --cov=granular_configuration
+  --cov-report xml:results/coverage.xml
+  --cov-report html:results/cov_html
+  --cov-report term-missing
+  --verbose
+'''
+
+[tool.mypy]
+python_version = "3.10"
+check_untyped_defs = true
+disallow_subclassing_any = true
+disallow_untyped_defs = true
+disallow_incomplete_defs = true
+ignore_missing_imports = true
+no_implicit_optional = true
+strict_equality = true
+warn_redundant_casts = true
+# ↓ Pylance needs help ↓
+warn_unused_ignores = false
+warn_unused_configs = true
+
+[tool.ruff]
+line-length = 120
+
+[tool.ruff.lint]
+ignore = [
+	"E501", # Let black rule
+	"F811", # typ.overload needs to be allowed
+	"E731", # lambda are one line functions
+	"E203", # Let black rule
+]
+
+[tool.ruff.lint.per-file-ignores]
+"__init__.py" = ["F401"]
+"test_*.py" = ["F841"]
+"test_ini_handler.py" = ["F601"]

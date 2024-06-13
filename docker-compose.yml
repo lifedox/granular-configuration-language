@@ -1,0 +1,27 @@
+# Main docker compose file
+# version: "3.8"
+
+x-base: &base
+  image: granular-configuration
+  build: &build
+    context: .
+    dockerfile: ./Dockerfile
+  environment:
+    SHELL: /bin/bash
+    IN_DOCKER: "true"
+  volumes:
+    - .:/app:delegated
+
+services:
+  test310:
+    <<: *base
+    build:
+      <<: *build
+      args:
+        PYTHON_VERSION: "3.10"
+  test311:
+    <<: *base
+    build:
+      <<: *build
+      args:
+        PYTHON_VERSION: "3.11"
