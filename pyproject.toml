@@ -12,7 +12,6 @@ packages = [{ include = "granular_configuration" }]
 
 [tool.poetry.dependencies]
 python = "^3.10"
-jsonpath-rw = "*"
 python-jsonpath = "*"
 "ruamel.yaml" = ">=0.18"
 
