@@ -26,18 +26,7 @@ export ROOT_DIR=$dir
 export G_CONFIG_LOCATION="$dir/configs/localdev.yaml"
 export DOCKER_MAKE=${DOCKER_MAKE:-true}
 export IN_DOCKER=${IN_DOCKER:-false}
-export DEPLOY_BUCKET=${DEPLOY_BUCKET:-localbucket}
-export ENVIRONMENT=${ENVIRONMENT:-localdev}
-export AWS_DEFAULT_REGION=${AWS_DEFAULT_REGION:-us-east-1}
-export REGION=${REGION:-us-east-1}
-export SHORTREGION=${SHORTREGION:-us}
-export ENCRYPTED_VARS=${ENCRYPTED_VARS:-""}
 
-export LOAD_TEST_HOST_BASE=${LOAD_TEST_HOST_BASE:-https://us.dev.grow.granular.ag}
-export LOAD_TEST_HOST=${LOAD_TEST_HOST:-$LOAD_TEST_HOST_BASE/api/granular-configuration}
-export LOAD_TEST_NUM_USERS=${LOAD_TEST_NUM_USERS:-80}
-export LOAD_TEST_SPAWN_RATE=${LOAD_TEST_SPAWN_RATE:-10}
-export LOAD_TEST_RUN_TIME=${LOAD_TEST_RUN_TIME:-120}
 usage=()
 
 # Any command listed here will pass through to the Makefile
@@ -93,7 +82,7 @@ _tests() {
 
 usage+=("  $0 tests - Run tests in Python 3.10 Docker")
 test310() {
-    docker_service=test310
+    docker_service=test310 
     _run_cmd poetry run ./run _tests "$@"
 }
 usage+=("  $0 tests - Run tests in Python 3.11 Docker")
@@ -101,10 +90,16 @@ test311() {
     docker_service=test311
     _run_cmd poetry run ./run _tests "$@"
 }
+usage+=("  $0 tests - Run tests in Python 3.12 Docker")
+test312() {
+    docker_service=test312
+    _run_cmd poetry run ./run _tests "$@"
+}
 usage+=("  $0 tests - Run tests in docker on all environments")
 test_all() {
     test310 "$@"
     test311 "$@"
+    test312 "$@"
 }
 
 usage+=("  $0 lint - Runs linting (black, isort, mypy) checks; non-zero exit status on failure")
@@ -119,7 +114,7 @@ _lint() {
     _logit Running mypy
     poetry run mypy .
     _logit Running bandit
-    bandit -r -ll -x tests .
+    bandit -c pyproject.toml -r .
 }
 
 usage+=("  $0 refmt - Run black and isort")

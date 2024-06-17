@@ -30,7 +30,6 @@ class LazyEval(typ.Generic[_RT]):
     __slots__ = ("value",)
 
     def __init__(self, value: typ.Callable[[], _RT]) -> None:
-        assert callable(value)
         self.value: typ.Callable[..., _RT] = value
 
     def run(self) -> _RT:

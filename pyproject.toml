@@ -12,10 +12,9 @@ packages = [{ include = "granular_configuration" }]
 
 [tool.poetry.dependencies]
 python = "^3.10"
-PyYAML = "*"
 jsonpath-rw = "*"
 python-jsonpath = "*"
-"ruamel.yaml" = "*"
+"ruamel.yaml" = ">=0.18"
 
 [tool.poetry.dev-dependencies]
 ipdb = "*"
@@ -26,7 +25,6 @@ mypy = "*"
 black = "*"
 isort = "*"
 bandit = "*"
-types-PyYAML = "*"
 
 [tool.black]
 line-length = 120
@@ -99,3 +97,6 @@ ignore = [
 "__init__.py" = ["F401"]
 "test_*.py" = ["F841"]
 "test_ini_handler.py" = ["F601"]
+
+[tool.bandit]
+exclude_dirs = ["tests"]
