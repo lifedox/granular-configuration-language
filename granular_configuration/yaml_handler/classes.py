@@ -1,6 +1,12 @@
 import typing as typ
+from dataclasses import dataclass
+from pathlib import Path
 
 _RT = typ.TypeVar("_RT")
+
+RootType = typ.NewType("RootType", object)
+Root = RootType | None
+
 
 class Placeholder:
     __slot__ = ("message",)
@@ -14,7 +20,10 @@ class Placeholder:
 
 class LazyRoot:
     def __init__(self) -> None:
-        self.root: typ.Any = None
+        self.root: Root = None
+
+    def _set_root(self, root: typ.Any) -> None:
+        self.root = root
 
 
 class LazyEval(typ.Generic[_RT]):
@@ -39,5 +48,11 @@ class LazyEvalRootState(LazyEval[_RT]):
         return self.value(self.root.root)
 
 
-LazyEvalStr = LazyEval[str]
-LazyEvalRootStateStr = LazyEvalRootState[str]
+_OPH = typ.Optional[typ.Type[typ.MutableMapping]]
+
+
+@dataclass(frozen=True, kw_only=True)
+class StateHolder:
+    lazy_root_obj: LazyRoot
+    obj_pairs_func: _OPH
+    file_relative_path: Path

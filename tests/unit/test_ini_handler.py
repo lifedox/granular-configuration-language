@@ -2,7 +2,7 @@ import unittest
 from collections import OrderedDict
 from functools import reduce
 
-from yaml.parser import ParserError
+from ruamel.yaml.parser import ParserError
 
 from granular_configuration._config import Configuration
 from granular_configuration.exceptions import IniKeyExistAsANonMapping, IniTryToReplaceExistingKey
@@ -45,8 +45,8 @@ e='1'
     def test_key_types(self) -> None:
         test = """\
 [ROOT]
-'1'= "str"
-1= integer
+'2'= "str"
+2= integer
 1.123= float
 "1.123"= 'str'
 null= test
@@ -54,8 +54,8 @@ True= "boolean"
 false= "not"
 """
         assert loads(test, Configuration).as_dict() == {
-            "1": "str",
-            1: "integer",
+            "2": "str",
+            2: "integer",
             1.123: "float",
             "1.123": "str",
             None: "test",
@@ -65,8 +65,8 @@ false= "not"
 
     def test_yaml_key_types(self) -> None:
         test = """\
-'1': "str"
-1: integer
+'2': "str"
+2: integer
 1.123: float
 "1.123": 'str'
 null: test
@@ -74,8 +74,8 @@ True: "boolean"
 false: "not"
 """
         assert yaml_loads(test, Configuration).as_dict() == {
-            "1": "str",
-            1: "integer",
+            "2": "str",
+            2: "integer",
             1.123: "float",
             "1.123": "str",
             None: "test",

@@ -811,7 +811,7 @@ assert LazyLoadConfiguration(..., base_path=["Level1", "Level2", "Level3"]).as_d
   - Note: `!Sub` replaces this functionality and offers more options. `!Env` will not be removed but will not see future updates.
 * `!ParseEnv`
   - **Usage:** `!ParseEnv ENVIRONMENT_VARIABLE` or `!ParseEnv [ENVIRONMENT_VARIABLE, <YAML object>]`
-  - **Argument:** *Union[str, List[str, Any]*.
+  - **Argument:** *Union[str, Tuple[str, Any]*.
   - **Returns:**
     - If provided a string, the Environment Variable specified will be parsed as YAML. If the Environment Variable does not exist, an error will be thrown.
     - If provided a sequence, the second object will be returned, if the Environment Variable does not exists, instead of erroring.

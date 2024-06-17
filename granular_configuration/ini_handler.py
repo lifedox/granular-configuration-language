@@ -10,7 +10,8 @@ from pathlib import Path
 
 from granular_configuration.exceptions import IniKeyExistAsANonMapping, IniTryToReplaceExistingKey
 from granular_configuration.utils import consume
-from granular_configuration.yaml_handler import LazyRoot, loads as yaml_loads
+from granular_configuration.yaml_handler import LazyRoot
+from granular_configuration.yaml_handler import loads as yaml_loads
 
 _OPH = typ.Optional[typ.Type[typ.MutableMapping]]
 
@@ -115,5 +116,5 @@ def loads(
     lazy_root = lazy_root or LazyRoot()
 
     result = IniLoader(parser, obj_pairs_hook=obj_pairs_hook, lazy_root=lazy_root, file_path=file_path).read()
-    lazy_root.root = result
+    lazy_root._set_root(result)
     return result

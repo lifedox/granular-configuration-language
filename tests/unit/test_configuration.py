@@ -6,8 +6,7 @@ from functools import partial, reduce
 from pathlib import Path
 
 from granular_configuration._config import Configuration, _build_configuration
-from granular_configuration.yaml_handler import loads
-from granular_configuration.yaml_handler import Placeholder
+from granular_configuration.yaml_handler import Placeholder, loads
 
 
 class TestConfiguration(unittest.TestCase):

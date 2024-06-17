@@ -275,7 +275,7 @@ def _build_configuration(locations: typ.Iterable[Path]) -> Configuration:
 
     base_conf = Configuration()
     consume(map(partial(_recursive_build_config, base_conf), valid_configs))
-    lazy_root.root = base_conf
+    lazy_root._set_root(base_conf)
 
     return base_conf
 

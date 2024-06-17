@@ -2,7 +2,8 @@ import typing as typ
 from pathlib import Path
 
 from granular_configuration.ini_handler import loads as ini_loads
-from granular_configuration.yaml_handler import loads as yaml_loads, LazyRoot
+from granular_configuration.yaml_handler import LazyRoot
+from granular_configuration.yaml_handler import loads as yaml_loads
 
 
 def load_file(

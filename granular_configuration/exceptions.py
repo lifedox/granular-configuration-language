@@ -20,3 +20,7 @@ class InvalidBasePathException(KeyError):
 
 class ParseEnvError(Exception):
     pass
+
+
+class JSONPathOnlyWorksOnMappings(Exception):
+    pass
