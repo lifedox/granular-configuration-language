@@ -13,18 +13,18 @@ class TestConfig(unittest.TestCase):
         base_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), "../assets/config_location_test"))
         dir_func = partial(os.path.join, base_dir)
 
-        files = list(map(Path, map(dir_func, ["a/b/t2.txt", "g/h.txt", "c/t.txt"])))
+        files = list(map(Path, map(dir_func, ["a/b/t2.yaml", "g/h.yaml", "c/t.yaml"])))
 
         configuration = _build_configuration(files)
 
         assert isinstance(configuration, Configuration)
 
-        assert configuration.d == "from c/t.txt"
-        assert configuration.c == "from c/t.txt"
-        assert configuration.b == "from c/t.txt"
-        assert configuration.h == "from g/h.txt"
-        assert configuration.a == "from a/b/t2.txt"
-        assert configuration.map == {"a": "from a/b/t2.txt", "h": "from g/h.txt", "c": "from c/t.txt"}
+        assert configuration.d == "from c/t.yaml"
+        assert configuration.c == "from c/t.yaml"
+        assert configuration.b == "from c/t.yaml"
+        assert configuration.h == "from g/h.yaml"
+        assert configuration.a == "from a/b/t2.yaml"
+        assert configuration.map == {"a": "from a/b/t2.yaml", "h": "from g/h.yaml", "c": "from c/t.yaml"}
         assert configuration.deep_test.a.b == 10
         assert configuration.placeholder_test.overridden == "This should be overridden"
         assert configuration.env_test.default == "This should be seen"

@@ -31,7 +31,7 @@ class TestConfiguration(unittest.TestCase):
         base_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), "../assets/config_location_test"))
         dir_func = partial(os.path.join, base_dir)
 
-        files = list(map(Path, map(dir_func, ["g/h.txt", "c/t.txt"])))
+        files = list(map(Path, map(dir_func, ["g/h.yaml", "c/t.yaml"])))
 
         value = _build_configuration(files)
 

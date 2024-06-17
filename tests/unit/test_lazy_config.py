@@ -14,8 +14,8 @@ class TestLazyLoadConfiguration(unittest.TestCase):
         dir_func = partial(os.path.join, self.BASE_DIR)
 
         directories = list(map(dir_func, ["a/b", "a", "b", "c", "d", "c"]))
-        filenames = ["t.txt", "t2.txt"]
-        files = list(map(dir_func, ["g/b.txt", "g/h.txt"]))
+        filenames = ["t.yaml", "t2.yaml"]
+        files = list(map(dir_func, ["g/b.yaml", "g/h.yaml"]))
 
         location = (
             ConfigurationLocations(files=files),
@@ -47,8 +47,8 @@ class TestLazyLoadConfiguration(unittest.TestCase):
         dir_func = partial(os.path.join, self.BASE_DIR)
 
         directories = list(map(dir_func, ["a/b", "a", "b", "c", "d", "c"]))
-        filenames = ["t.txt", "t2.txt"]
-        files = list(map(dir_func, ["g/b.txt", "g/h.txt"]))
+        filenames = ["t.yaml", "t2.yaml"]
+        files = list(map(dir_func, ["g/b.yaml", "g/h.yaml"]))
 
         location = (
             ConfigurationLocations(files=files),
@@ -80,8 +80,8 @@ class TestLazyLoadConfiguration(unittest.TestCase):
         dir_func = partial(os.path.join, self.BASE_DIR)
 
         directories = list(map(dir_func, ["a/b", "a", "b", "c", "d", "c"]))
-        filenames = ["t.txt", "t2.txt"]
-        files = list(map(dir_func, ["g/b.txt", "g/h.txt"]))
+        filenames = ["t.yaml", "t2.yaml"]
+        files = list(map(dir_func, ["g/b.yaml", "g/h.yaml"]))
 
         location = (
             ConfigurationLocations(files=files),

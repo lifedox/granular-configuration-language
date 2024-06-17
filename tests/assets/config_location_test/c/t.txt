@@ -1,6 +1,0 @@
-b: from c/t.txt
-c: from c/t.txt
-d: from c/t.txt
-
-map:
-  c: from c/t.txt

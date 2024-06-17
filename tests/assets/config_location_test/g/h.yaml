@@ -1,8 +1,8 @@
-b: from g/h.txt
-h: from g/h.txt
+b: from g/h.yaml
+h: from g/h.yaml
 
 map:
-  h: from g/h.txt
+  h: from g/h.yaml
 
 placeholder_test:
   overridden: 'This should be overridden'

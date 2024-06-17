@@ -21,10 +21,10 @@ class TestLocations(unittest.TestCase):
         dir_func = partial(os.path.join, base_dir)
 
         directories = list(map(Path, map(dir_func, ["a/b", "a", "b", "c", "d", "c"])))
-        filenames = ["t.txt", "t2.txt"]
-        files = list(map(Path, list(map(dir_func, ["g/b.txt", "g/h.txt"]))))
+        filenames = ["t.yaml", "t2.yaml"]
+        files = list(map(Path, list(map(dir_func, ["g/b.yaml", "g/h.yaml"]))))
 
-        exists = list(map(Path, list(map(dir_func, ["a/b/t2.txt", "g/h.txt", "c/t.txt", "c/t2.txt"]))))
+        exists = list(map(Path, list(map(dir_func, ["a/b/t2.yaml", "g/h.yaml", "c/t.yaml", "c/t2.yaml"]))))
         assert all(map(os.path.isfile, exists)), "Someone removed test assets"
 
         locations = _get_files_from_locations(filenames, directories, files)
@@ -37,9 +37,9 @@ class TestLocations(unittest.TestCase):
 
         directories = list(map(Path, map(dir_func, ["a/b", "a", "b", "c", "d", "c"])))
         filenames: typ.List[str] = []
-        files = list(map(Path, list(map(dir_func, ["g/b.txt", "g/h.txt"]))))
+        files = list(map(Path, list(map(dir_func, ["g/b.yaml", "g/h.yaml"]))))
 
-        exists = list(map(Path, map(dir_func, ["g/h.txt"])))
+        exists = list(map(Path, map(dir_func, ["g/h.yaml"])))
         assert all(map(os.path.isfile, exists)), "Someone removed test assets"
 
         locations = _get_files_from_locations(filenames, directories, files)
@@ -51,10 +51,10 @@ class TestLocations(unittest.TestCase):
         dir_func = partial(os.path.join, base_dir)
 
         directories: typ.List[Path] = []
-        filenames = ["t.txt", "t2.txt"]
-        files = list(map(Path, list(map(dir_func, ["g/b.txt", "g/h.txt"]))))
+        filenames = ["t.yaml", "t2.yaml"]
+        files = list(map(Path, list(map(dir_func, ["g/b.yaml", "g/h.yaml"]))))
 
-        exists = list(map(Path, map(dir_func, ["g/h.txt"])))
+        exists = list(map(Path, map(dir_func, ["g/h.yaml"])))
         assert all(map(os.path.isfile, exists)), "Someone removed test assets"
 
         locations = _get_files_from_locations(filenames, directories, files)
@@ -66,10 +66,10 @@ class TestLocations(unittest.TestCase):
         dir_func = partial(os.path.join, base_dir)
 
         directories = tuple(map(Path, map(dir_func, ["a/b", "a", "b", "c", "d", "c"])))
-        filenames = ("t.txt", "t2.txt")
-        files = tuple(map(Path, map(dir_func, ["g/b.txt", "g/h.txt"])))
+        filenames = ("t.yaml", "t2.yaml")
+        files = tuple(map(Path, map(dir_func, ["g/b.yaml", "g/h.yaml"])))
 
-        exists = list(map(Path, map(dir_func, ["g/h.txt", "a/b/t2.txt", "c/t.txt", "c/t2.txt"])))
+        exists = list(map(Path, map(dir_func, ["g/h.yaml", "a/b/t2.yaml", "c/t.yaml", "c/t2.yaml"])))
         assert all(map(os.path.isfile, exists)), "Someone removed test assets"
 
         with patch(
@@ -109,9 +109,9 @@ class TestLocations(unittest.TestCase):
         dir_func = partial(os.path.join, base_dir)
 
         directories = list(map(dir_func, ["a/b", "a", "b", "c", "d", "c"]))
-        filenames = ["t2.txt"]
+        filenames = ["t2.yaml"]
 
-        exists = list(map(Path, map(dir_func, ["a/b/t2.txt", "c/t2.txt"])))
+        exists = list(map(Path, map(dir_func, ["a/b/t2.yaml", "c/t2.yaml"])))
         assert all(map(os.path.isfile, exists)), "Someone removed test assets"
 
         assert (
@@ -123,10 +123,10 @@ class TestLocations(unittest.TestCase):
         dir_func = partial(os.path.join, base_dir)
 
         directories = list(map(dir_func, ["a/b", "a", "b", "c", "d", "c"]))
-        filenames = ["t.txt", "t2.txt"]
-        files = list(map(dir_func, ["g/b.txt", "g/h.txt"]))
+        filenames = ["t.yaml", "t2.yaml"]
+        files = list(map(dir_func, ["g/b.yaml", "g/h.yaml"]))
 
-        exists = list(map(Path, map(dir_func, ["g/h.txt", "a/b/t2.txt", "c/t.txt", "c/t2.txt"])))
+        exists = list(map(Path, map(dir_func, ["g/h.yaml", "a/b/t2.yaml", "c/t.yaml", "c/t2.yaml"])))
         assert all(map(os.path.isfile, exists)), "Someone removed test assets"
 
         from_files = ConfigurationLocations(files=files)

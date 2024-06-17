@@ -1,9 +1,9 @@
-a: from a/b/t2.txt
-c: from a/b/t2.txt
-h: from a/b/t2.txt
+a: from a/b/t2.yaml
+c: from a/b/t2.yaml
+h: from a/b/t2.yaml
 
 map:
-  a: from a/b/t2.txt
+  a: from a/b/t2.yaml
 
 deep_test:
   a:
