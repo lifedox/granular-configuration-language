@@ -5,7 +5,8 @@ import unittest
 from functools import partial, reduce
 from pathlib import Path
 
-from granular_configuration._config import Configuration, _build_configuration
+from granular_configuration import Configuration
+from granular_configuration._build import build_configuration
 from granular_configuration.yaml_handler import Placeholder, loads
 
 
@@ -33,7 +34,7 @@ class TestConfiguration(unittest.TestCase):
 
         files = list(map(Path, map(dir_func, ["g/h.yaml", "c/t.yaml"])))
 
-        value = _build_configuration(files)
+        value = build_configuration(files)
 
         import copy
 

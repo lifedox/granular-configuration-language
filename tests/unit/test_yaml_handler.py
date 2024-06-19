@@ -3,7 +3,7 @@ import unittest
 from functools import reduce
 from unittest.mock import patch
 
-from granular_configuration._config import Configuration, ConfigurationLocations
+from granular_configuration import Configuration, ConfigurationLocations
 from granular_configuration.exceptions import ParseEnvError
 from granular_configuration.yaml_handler import Placeholder, loads
 

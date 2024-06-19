@@ -5,4 +5,4 @@ map:
   h: from g/h.yaml
 
 placeholder_test:
-  overridden: 'This should be overridden'
+  overridden: "This should be overridden"

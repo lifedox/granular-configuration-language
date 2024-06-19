@@ -3,7 +3,8 @@ import unittest
 from functools import partial
 from pathlib import Path
 
-from granular_configuration._config import Configuration, _build_configuration
+from granular_configuration import Configuration
+from granular_configuration._build import build_configuration
 from granular_configuration.exceptions import PlaceholderConfigurationError
 from granular_configuration.yaml_handler import Placeholder
 
@@ -15,7 +16,7 @@ class TestConfig(unittest.TestCase):
 
         files = list(map(Path, map(dir_func, ["a/b/t2.yaml", "g/h.yaml", "c/t.yaml"])))
 
-        configuration = _build_configuration(files)
+        configuration = build_configuration(files)
 
         assert isinstance(configuration, Configuration)
 
@@ -53,7 +54,7 @@ class TestConfig(unittest.TestCase):
 
         files = list(map(Path, map(dir_func, ["placeholder_test1.yaml", "placeholder_test2.yaml"])))
 
-        configuration = _build_configuration(files)
+        configuration = build_configuration(files)
 
         assert isinstance(configuration, Configuration)
 
@@ -70,7 +71,7 @@ class TestConfig(unittest.TestCase):
 
         files = list(map(Path, map(dir_func, ["mix_config.yaml", "mix_config.ini"])))
 
-        configuration = _build_configuration(files)
+        configuration = build_configuration(files)
 
         assert isinstance(configuration, Configuration)
 
@@ -86,7 +87,7 @@ class TestConfig(unittest.TestCase):
 
         files = list(map(Path, map(dir_func, ["sub_test1.yaml", "sub_test2.yaml"])))
 
-        configuration = _build_configuration(files)
+        configuration = build_configuration(files)
 
         assert isinstance(configuration, Configuration)
         assert configuration.flags.foo == "bar"

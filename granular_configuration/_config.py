@@ -1,18 +1,13 @@
 import copy
 import operator as op
-import os
 import typing as typ
-from collections.abc import Mapping, MutableMapping
+from collections.abc import Mapping
 from contextlib import contextmanager
-from functools import partial, reduce
 from itertools import chain, filterfalse, starmap
-from pathlib import Path
 
-from granular_configuration._load import load_file
-from granular_configuration._locations import ConfigurationLocations, get_all_unique_locations, parse_location
-from granular_configuration.exceptions import InvalidBasePathException, PlaceholderConfigurationError
+from granular_configuration.exceptions import PlaceholderConfigurationError
 from granular_configuration.utils import OrderedSet, consume
-from granular_configuration.yaml_handler import LazyEval, LazyRoot, Placeholder
+from granular_configuration.yaml_handler import LazyEval, Placeholder
 
 
 class Patch(typ.Mapping):
@@ -131,7 +126,12 @@ class Configuration(typ.MutableMapping):
         return value
 
     def __getitem__(self, name: typ.Any) -> typ.Any:
-        value = self.__get_item(name)
+        try:
+            value = self.__get_item(name)
+        except KeyError:
+            # Start the stack trace here
+            raise KeyError(repr(name)) from None
+
         if isinstance(value, Placeholder):
             raise PlaceholderConfigurationError(
                 'Configuration expects "{}" to be overwritten. Message: "{}"'.format(self.__get_name(name), value)
@@ -251,110 +251,3 @@ class Configuration(typ.MutableMapping):
 
 class _ConDict(dict, Configuration):  # type: ignore
     pass
-
-
-def _build_configuration(locations: typ.Iterable[Path]) -> Configuration:
-    def _recursive_build_config(base_dict: Configuration, from_dict: Configuration) -> None:
-        for key, value in from_dict._raw_items():
-            if isinstance(value, Configuration) and (key in base_dict):
-                if not base_dict.exists(key):
-                    base_dict[key] = Configuration()
-                elif not isinstance(base_dict[key], Configuration):
-                    continue
-
-                new_dict = base_dict[key]
-                _recursive_build_config(new_dict, value)
-                value = new_dict
-
-            base_dict[key] = value
-
-    lazy_root = LazyRoot()
-    _load_file = partial(load_file, obj_pairs_hook=Configuration, lazy_root=lazy_root)
-    available_configs = map(_load_file, locations)
-    valid_configs = filter(lambda config: isinstance(config, Configuration), available_configs)
-
-    base_conf = Configuration()
-    consume(map(partial(_recursive_build_config, base_conf), valid_configs))
-    lazy_root._set_root(base_conf)
-
-    return base_conf
-
-
-class LazyLoadConfiguration(MutableMapping):
-    """
-    Provides a lazy interface for loading Configuration from ConfigurationLocations definitions on first access.
-    """
-
-    def __init__(
-        self,
-        *load_order_location: typ.Union[str, ConfigurationLocations, Path],
-        base_path: typ.Optional[typ.Union[str, typ.Sequence[str]]] = None,
-        use_env_location: bool = False,
-    ) -> None:
-        self.__base_path: typ.Optional[typ.Sequence[str]]
-        if isinstance(base_path, str):
-            self.__base_path = [base_path]
-        elif base_path:
-            self.__base_path = base_path
-        else:
-            self.__base_path = []
-
-        if use_env_location and ("G_CONFIG_LOCATION" in os.environ):
-            env_locs = os.environ["G_CONFIG_LOCATION"].split(",")
-            if env_locs:
-                load_order_location = tuple(chain(load_order_location, env_locs))
-        self._config: typ.Optional[Configuration] = None
-        self.__locations: typ.Optional[typ.Sequence[ConfigurationLocations]] = tuple(
-            map(parse_location, load_order_location)
-        )
-
-    def __getattr__(self, name: str) -> typ.Any:
-        """
-        Loads (if not loaded) and fetches from the underlying Configuration object.
-        This also exposes the methods of Configuration (except dunders).
-        """
-        return getattr(self.config, name)
-
-    def load_configuration(self) -> None:
-        """
-        Force load the configuration.
-        """
-        if self._config is None and self.__base_path is not None and self.__locations is not None:
-            config = _build_configuration(get_all_unique_locations(self.__locations))
-            try:
-                self._config = reduce(lambda dic, key: dic[key], self.__base_path, config)
-            except KeyError as e:
-                message = str(e)
-                raise InvalidBasePathException(message[1 : len(message) - 1])
-            self.__locations = None
-            self.__base_path = None
-
-    load_configure = load_configuration
-
-    @property
-    def config(self) -> Configuration:
-        """
-        Loads and fetches the underlying Configuration object
-        """
-        if self._config is None:
-            self.load_configure()
-
-        if self._config is None:
-            raise TypeError("LazyLoadConfiguration loaded null")
-        else:
-            return self._config
-
-    def __delitem__(self, key: typ.Any) -> None:
-        del self.config[key]
-
-    def __getitem__(self, key: typ.Any) -> typ.Any:
-        return self.config[key]
-
-    def __iter__(self) -> typ.Iterator[typ.Any]:
-        return iter(self.config)
-
-    def __len__(self) -> int:
-        return len(self.config)
-
-    def __setitem__(self, key: typ.Any, value: typ.Any) -> None:
-        self.config[key] = value

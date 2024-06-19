@@ -1,7 +1,7 @@
 import typing as typ
 from itertools import chain
 
-from granular_configuration._config import LazyLoadConfiguration
+from granular_configuration._lazy_load import LazyLoadConfiguration
 from granular_configuration.exceptions import GetConfigReadBeforeSetException
 
 _SET_CONFIG_META: typ.Optional[typ.Tuple[str, ...]] = None

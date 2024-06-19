@@ -4,7 +4,7 @@ from functools import reduce
 
 from ruamel.yaml.parser import ParserError
 
-from granular_configuration._config import Configuration
+from granular_configuration import Configuration
 from granular_configuration.exceptions import IniKeyExistAsANonMapping, IniTryToReplaceExistingKey
 from granular_configuration.ini_handler import loads
 from granular_configuration.yaml_handler import loads as yaml_loads
