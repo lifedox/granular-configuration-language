@@ -10,7 +10,7 @@ from granular_configuration.exceptions import PlaceholderConfigurationError
 from granular_configuration.yaml_handler import Placeholder
 
 
-def test__build_configuration() -> None:
+def test_build_baseline() -> None:
     base_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), "../assets/config_location_test"))
     dir_func = partial(os.path.join, base_dir)
 
@@ -39,11 +39,11 @@ def test__build_configuration() -> None:
     with pytest.raises(
         PlaceholderConfigurationError,
         match='Configuration expects "placeholder_test.not_overridden" to be overwritten. Message: "This should not be overridden"',
-    ) as cm_ph:
+    ):
         configuration.placeholder_test.not_overridden
 
 
-def test__build_configuration_placeholder_root() -> None:
+def test_build_with_a_placeholder_root() -> None:
     base_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), "../assets/config_location_test"))
     dir_func = partial(os.path.join, base_dir)
 
@@ -61,24 +61,7 @@ def test__build_configuration_placeholder_root() -> None:
     assert isinstance(raw_value["c"], Placeholder) and (raw_value["c"].message == "Placeholder over a value")
 
 
-def test__build_configuration_mixconfig() -> None:
-    base_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), "../assets/config_location_test"))
-    dir_func = partial(os.path.join, base_dir)
-
-    files = list(map(Path, map(dir_func, ["mix_config.yaml", "mix_config.ini"])))
-
-    configuration = build_configuration(files)
-
-    assert isinstance(configuration, Configuration)
-
-    assert configuration.A.key1 == "value1"
-    assert configuration.A.key2.deep_key == "Overwritten value"
-    assert configuration.A.key3 == "new value"
-    assert configuration.B == {None: 1}
-    assert configuration.D == {None: 1}
-
-
-def test__build_configuration_sub() -> None:
+def test_build_with_sub() -> None:
     base_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), "../assets/config_location_test"))
     dir_func = partial(os.path.join, base_dir)
 

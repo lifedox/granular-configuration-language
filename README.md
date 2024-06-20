@@ -17,7 +17,6 @@ This library allows a library or application to interact with typed settings tha
 - [Patch Support](#patch-support)
 - [Configuration Locations](#configuration-locations)
 - [Changelog](#changelog)
-- [Ini Configuration File Support](#ini-configuration-file-support)
 
 #### Table of Contents
 
@@ -748,160 +747,22 @@ LazyLoadConfiguration(
 
 &nbsp;
 
-## Ini Configuration File Support
-
-Configuration files will be loaded as a YAML file unless they have a file extension of `.ini`. INI files will be loaded via an extended INI feature set.
-
-#### General Notes
-
-- Use of the `[DEFAULT]` is highly discouraged.
-- Use of `[ROOT]`, while added for completeness, is also discouraged, as Base Paths are highly encouraged.
-- Support of only INI configuration is discouraged, as YAML is more flexible
-- List values should be define using JSON syntax (e.g `key=['a', 'b', 'c']`), not delimited text that is parse by the user-codebase
-- Note: YAML is still preferred over INI due to a superior feature set and hierarchical nature
-
-#### Loading
-
-The file loader type is selected purely on file extension.
-
-This example always, an INI file at `./<special>_config.ini` or `~/.granular/<special>_config.ini` to be used if the .yaml or .yml are not available.
-
-```python
-from granular_configuration import ConfigurationFiles, ConfigurationMultiNamedFiles, LazyLoadConfiguration
-
-CONFIG = LazyLoadConfiguration(
-    os.path.join(os.path.dirname(__file__), "<embedded>_config.yaml"),
-    "~/.granular/<special>_config.*",
-    "./<special>_config.*",
-     "./global_config.*", "~/.granular/global_config.*",
-    base_path=["<UniqueBasePath>"])
-```
-
-#### Nested Mappings
-
-Support for nested mappings is provided through `.` delimited section name. Base Path support for INI appears as a prefix.
-
-**Note: Compound Nodes are order sensitive**. From example, `CompoundKey` with its scaler attributes must be defined before `CompoundKey.comp_key3`
-
-**Example:**
-
-```ini
-[ROOT]
-root_key1=value1
-root_key2=value2
-
-[CompoundKey]
-comp_key1=value3
-comp_key2=value4
-
-[CompoundKey.comp_key3]
-nested_key1=value5
-
-[NewCompoundKey.comp_key4]
-
-```
-
-loads as the following Python dict:
-
-```python
-{
-  "root_key1": "value1",
-  "root_key2": "value2",
-  "CompoundKey": {
-    "comp_key1": "value3",
-    "comp_key2": "value4",
-    "comp_key3": {
-      "nested_key1": "value5"
-    }
-  },
-  "NewCompoundKey": {
-    "comp_key4": {}
-  }
-}
-```
-
-as YAML:
-
-```yaml
-root_key1: value1
-root_key2: value2
-CompoundKey:
-  comp_key1: value3
-  comp_key2: value4
-  comp_key3:
-    nested_key1: value5
-NewCompoundKey:
-  comp_key4: {}
-```
-
-&nbsp;
-
-#### Type Support
-
-The INI spec defines always keys and values to be string. In order to support the full feature set of types supported by YAML, all keys and values parsed as YAML, enabling boolean, float, integer, null, tag, and list support. **This means all keys and values must be valid single-node YAML**
-
-**Example:**
-
-```ini
-[BasePath]
-tagged_key=!Env '{{VARIABLE_THAT_DOES_NOT_EXIST:default value}}'
-func_key=!Func functools.reduce
-string_key2=string with spaces
-
-[BasePath.IntMap]
-404=NotFound
-500=GeneralError
-
-[BasePath.LessUsefulMap]
-null=1
-True=False
-1.123=!Class collections.defaultdict
-"1"='1'
-```
-
-loads as the following Python dict:
-
-```python
-{
-  'BasePath': {
-    'tagged_key': 'default value',
-    'func_key': reduce,
-    'string_key2': 'string with spaces',
-    'IntMap': {
-        404: 'NotFound',
-        500: 'GeneralError'
-    },
-    'LessUsefulMap': {
-        None: 1,
-        True: False,
-        1.123: collections.defaultdict,
-        '1': '1'
-    }
-  }
-}
-
-```
-
-as YAML:
-
-```yaml
-BasePath:
-  tagged_key: !Env "{{VARIABLE_THAT_DOES_NOT_EXIST:default value}}"
-  func_key: !Func functools.reduce
-  string_key2: string with spaces
-  IntMap:
-    404: NotFound
-    500: GeneralError
-  LessUsefulMap:
-    null: 1
-    true: False
-    1.123: !Class collections.defaultdict
-    "1": "1"
-```
-
-&nbsp;
-
 ## Changelog
+
+### 2.0.0
+
+- Removed `set_config` pattern
+- Removed INI support
+- Switched from `PyYAML` to ruamel.yaml
+  - Note: `PyYAML` is very dead
+  - This primarily means YAML Version 1.2 is the default supported version.
+    - `yes/no`, `y/n`, `on/off` is no longer `bool`
+    - Octal support is clearer: `010` means 10, `0o10` means 8.
+  - YAML 1.1 support can be explicit enabled by using the `%YAML 1.1 ---` directive
+- Switched from `jsonpath-rw` to `python-jsonpath`
+  - Note: `jsonpath-rw` is very dead
+  - Important: Both `jsonpath-rw` and `python-jsonpath` cannot be install. `jsonpath-rw` controls `jsonpath_rw` and `jsonpath` modules (despite not explicitly needing the latter). `python-jsonpath` also controls `jsonpath`, but losses in `jsonpath-rw`.
+    - `ImportError` occur on the `jsonpath` modules when both are install.
 
 ### 1.8.0
 
