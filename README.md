@@ -2,15 +2,15 @@
 
 This library allows a library or application to interact with typed settings that can be spread across separate configurations files that can have multiple locations, and allows for value overriding, enabling developer and application specify configurations that can be merged with library embedded configuration.
 
-
 #### Common Names
+
 - **Embedded Config**/**Package Config**: A configuration file the exists as package data within a library or application. Generally, a single file referenced via path to a `__file__`. This config should always exist in a library to defines defaults and form.
 - **User Config**: A configuration file that exists in `~/.granular`.
 - **Local Config**: A configuration file that exists in the current working directory.
 - **Global Config**: The set of files called `global_config.yaml` or `global_config.yml` in the current working directory and/or `~/.granular`. See [Global Configuration](#Global-Configuration)
 
-
 #### Quick Links
+
 - [YAML Tags](#yaml-tags)
 - [Base Path](#base-path)
 - [Interface Objects](#interface-objects)
@@ -19,13 +19,18 @@ This library allows a library or application to interact with typed settings tha
 - [Changelog](#changelog)
 - [Ini Configuration File Support](#ini-configuration-file-support)
 
+#### Table of Contents
+
+[TOC]
+
 #
 
 ## Getting Started
+
 While granular-configuration allows for many different ways to provide configuration to your application, here are two base examples as an easy way to get started.
 
-
 ### Application/Service example
+
 In this example we are going to add a setting to call the inputs service.
 
 Start by creating a `configs` folder and place a `configuration.yaml` file in it that looks like the following. This is your application's configuration file.
@@ -37,6 +42,7 @@ myapi:
 ```
 
 The following is an example of accessing `hostname`:
+
 ```python
 from granular_configuration import LazyLoadConfiguration
 CONFIG = LazyLoadConfiguration("configs/configuration.yaml", base_path="myapi")
@@ -54,6 +60,7 @@ There are no special names for the items in the config file. The names used in t
 Libraries can also use granular-configuration for their own config. Library consume settings from their own specific root key (typically the name of the library, please refer to the library documentation for configuration options).
 
 An example of this is granular-db. To add granular-db connection settings to your config, extend your config to look like this.
+
 ```yaml
 granular_db:
   # Note: This is not an example of the best usage of granular-db
@@ -71,28 +78,32 @@ For the library to be able to find your config file, set the `G_CONFIG_LOCATION`
 In both cases, the custom `!Sub` YAML tag is being used to resolve settings from runtime environment variables. Wherever possible use this to reduce the need for different config files for different environments.
 
 If you follow standards for naming AWS resource ARNs, you can use this to set configs like this
+
 ```yaml
 api:
   some_lambda_function:
     arn: !Sub "arn:aws:lambda:${REGION}:${AWS_ACCOUNT}:some_lambda_function"
 ```
-The AWS related environment variables are typically set by our deployment jobs (k8s and lambdas etc.), making it easy for you to use in this way.
 
+The AWS related environment variables are typically set by our deployment jobs (k8s and lambdas etc.), making it easy for you to use in this way.
 
 &nbsp;
 
 ### Library Example
+
 For libraries, it is encouraged to provide an embedded configuration file with sane default values and environment variables for the user to set. This saves your users from having to define configuration that rarely change but an option to do so when needed.
 
 Start by creating a `config` module and put a file named `embedded_config.yaml` in it (alongside `__init__.py`). The contents could be something like this.
+
 ```yaml
 my-library:
-  Setting1: !Sub "${ENV_VAR_THE_USER_HAS_TO_SET}"  # Raise KeyError, if not set
-  Setting2: !Sub "${ENV_VAR_THE_USER_CAN_TO_SET:-sane_default}"  # Return "sane_default", if not set
+  Setting1: !Sub "${ENV_VAR_THE_USER_HAS_TO_SET}" # Raise KeyError, if not set
+  Setting2: !Sub "${ENV_VAR_THE_USER_CAN_TO_SET:-sane_default}" # Return "sane_default", if not set
   Setting3: "A sane default value"
 ```
 
 To allow applications to override values in your config it should be read with a snippet similar to the one below (located next to `embedded_config.yaml` in `config`).
+
 ```python
 CONFIG = LazyLoadConfiguration(
         os.path.join(os.path.dirname(__file__), "embedded_config.yaml"),
@@ -102,11 +113,13 @@ CONFIG = LazyLoadConfiguration(
         use_env_location=True,
     )
 ```
+
 At runtime, this setup will read `embedded_config.yaml` from your package, `my-library.yaml` from the user's home directory and the current working directory, as well as any file specified in the `G_CONFIG_LOCATION` environment variable. It will prefer values in the opposite order with the embedded config being the last fallback.
 
 Document all required and optional settings in your readme, so users know what to expect.
 
 #
+
 ## Load Behavior Examples
 
 ### Multi-File Usage Example
@@ -114,6 +127,7 @@ Document all required and optional settings in your readme, so users know what t
 **Example Config File:**
 
 Path: `path1\to\configuration1.yaml`
+
 ```yaml
 BasePath:
   Key1:
@@ -125,6 +139,7 @@ BasePath:
 ```
 
 Path: `path2\to\configuration2.yaml`
+
 ```yaml
 BasePath:
   CombinedExample:
@@ -134,6 +149,7 @@ BasePath:
 ```
 
 Path: `path3\to\configuration3.yml`
+
 ```yaml
 BasePath:
   CombinedExample:
@@ -144,6 +160,7 @@ BasePath:
 
 **Setup:**
 <br>Note: This library does not pre-defined any configuration or file locations
+
 ```python
 from granular_configuration import LazyLoadConfiguration
 
@@ -153,6 +170,7 @@ CONFIG = LazyLoadConfiguration(
 ```
 
 **Runtime Usage:**
+
 ```python
 assert CONFIG.Key1.Key2.Key3 == "Multi-Tiered Value Example"
 assert CONFIG.CombinedExample == {
@@ -168,12 +186,13 @@ assert CONFIG.CombinedExample == {
 
 ### Precedents-Ordered File Example
 
-* `.y*` defines a precedence order of `.yaml`, `.yml`.
-* `.*` defines a precedence order of `.yaml`, `.yml`, `.ini`.
+- `.y*` defines a precedence order of `.yaml`, `.yml`.
+- `.*` defines a precedence order of `.yaml`, `.yml`, `.ini`.
 
 **Example Config File:**
 
 Path: `path\to\configuration.yaml`
+
 ```yaml
 BasePath1:
   Key1:
@@ -182,6 +201,7 @@ BasePath1:
 ```
 
 Path: `path\to\configuration.yml`
+
 ```yaml
 BasePath1:
   Key1:
@@ -189,9 +209,9 @@ BasePath1:
       Key3: This file will not be read, because higher priority file exists
 ```
 
-
 **Setup:**
 <br>Note: This library does not pre-defined any configuration or file locations
+
 ```python
 from granular_configuration import LazyLoadConfiguration, ConfigurationLocations
 
@@ -201,6 +221,7 @@ CONFIG = LazyLoadConfiguration(
 ```
 
 **Runtime Usage:**
+
 ```python
 assert CONFIG.Key1.Key2.Key3 == "Set by the priority file"
 ```
@@ -231,6 +252,7 @@ class LazyLoadConfiguration(object):
 #### Example
 
 Inside Library
+
 ```python
 from granular_configuration import LazyLoadConfiguration
 import os
@@ -246,130 +268,7 @@ CONFIG = LazyLoadConfiguration(
 ```
 
 Usage:
-```python
-from ... import ... CONFIG
 
-CONFIG.setting
-```
-
-&nbsp;
-
-### Set-Config
-
-**Note: Import order matters! Call `set_config` once in application. Call `get_config` once in a library.**
-
-The library sets and owns where some of its configuration files can live, and delegates some configuration files to the app. A failure of the app to provide delegated configuration files (including a empty list) is a failure to use the library.
-
-This is not a singleton factory.
-
-#### Interface
-
-```python
-def set_config(*load_order_location typ.Sequence[typ.Union[str, ConfigurationLocations]]) -> None:
-    ...
-
-
-def get_config(
-    *load_order_location: typ.Sequence[typ.Union[str, ConfigurationLocations]],
-    base_path: typ.Optional[typ.Union[str, typ.Sequence[str]]] = None
-    requires_set: bool = True
-) -> LazyLoadConfiguration:
-    ...
-```
-
-#### Behavior
-The following are functionality equivalent:
-
-```python
-set_config(*set_args)
-CONFIG = get_config(*get_args, **get_kwargs)
-```
-
-```python
-CONFIG = LazyLoadConfiguration(*get_args, *set_args, **get_kwargs)
-```
-
-
-#### Example
-
-**Inside Application**
-```python
-from granular_configuration import set_config
-import os
-
-set_config(
-    "global_config.*"
-    "~/<app_specific>_config.*",
-    "./<app_specific>_config.*",
-)
-
-```
-
-**Inside Library**
-Note: The application must call `set_config` before import, else `get_config` will throw a `GetConfigReadBeforeSetException` exception.
-
-```python
-from granular_configuration import get_config
-import os
-
-CONFIG = get_config(
-    os.path.join(os.path.dirname(__file__), "embedded_config.yaml"), # Required, since you should be using !Placeholder to represent the form, if there are no defaults
-    "~/<lib_specific>_config.*", # Optional
-    "./<lib_specific>_config.*", # Optional,
-    base_path=["lib-base-path"]
-)
-
-```
-
-Usage:
-```python
-from ... import ... CONFIG
-
-CONFIG.setting
-```
-
-&nbsp;
-
-### Middle Road
-
-**Note: Import order matters! Call `set_config` once in application. Call `get_config` once in a library.**
-
-The library sets and owns where some of its configuration files can live, and delegates some configuration files to the app. If an app wants to set configuration files, `set_config` must be called before import.
-
-#### Example
-
-**Inside Application**
-This is now optional behavior.
-```python
-from granular_configuration import set_config
-import os
-
-set_config(
-    "global_config.*"
-    "~/<app_specific>_config.*",
-    "./<app_specific>_config.*",
-)
-
-```
-
-**Inside Library**
-Note: The application must call `set_config` before import, from app-specify configs to be used, but this will not throw an exception
-
-```python
-from granular_configuration import get_config
-import os
-
-CONFIG = get_config(
-    os.path.join(os.path.dirname(__file__), "embedded_config.yaml"), # Required, since you should be using !Placeholder to represent the form, if there are no defaults
-    "~/<lib_specific>_config.*", # Optional
-    "./<lib_specific>_config.*", # Optional,
-    base_path=["lib-base-path"],
-    requires_set=False
-)
-
-```
-
-Usage:
 ```python
 from ... import ... CONFIG
 
@@ -385,27 +284,10 @@ Regardless which of the above you use, if you provide the keyword argument use_e
 #### Example
 
 Usage:
+
 ```python
 from granular_configuration import LazyLoadConfiguration
 CONFIG = LazyLoadConfiguration(use_env_location=True)
-```
-
-### Testing set configuration
-
-When testing configuration that is set via `set_config`, you can call `set_config` many times and it last call always overrides the previous set-config state. But you may desire to clear the state of set-config, so that calls to `get_config` produce an error again.
-
-Example:
-```python
-from granular_configuration import set_config, get_config
-from granular_configuration.testing import clear_config
-
-set_config() # No additional configuration paths are being provided.
-
-CONFIG = get_config("special_config.*") # Does not error, because set_config was called
-
-clear_config() # Unset set-config
-
-get_config("special_config.*") # Raises granular_configuration.exceptions.GetConfigReadBeforeSetException
 ```
 
 &nbsp;
@@ -418,7 +300,8 @@ The `Configuration` acts similarly to an `attrdict`, with the exception being th
 
 This object acts like a dictionary and has been hacked to pass `instance(CONFIG, dict)` and can be copied via `copy.copy` and `copy.deepcopy` safely.
 
-*Interface Definition:*
+_Interface Definition:_
+
 ```python
 import typing as typ
 
@@ -455,6 +338,7 @@ class Configuration(typ.MutableMapping[typ.Any, typ.Any]):
 
 
 ```
+
 See [Patch Support](#patch-support) for details of `patch`
 
 Note: The reason for keys being `typing.Any` is that the YAML allows keys to be more than strings (i.e. integer, float, boolean, null), and this library does not restrict this (as there a valid reasons to want to have an integer-to-string map and so on). Just note that you cannot used the `__getattr___` with keys that do not meet the Python attribute naming restrictions, you would have to look those up via `__getitem__` (i.e. `CONFIG[1]`).
@@ -468,17 +352,20 @@ The build and loader of Configuration that acts as the interface for the root Co
 **Standard Code Pattern:**
 
 Submodule Structure:
+
 - `config`
   - `__init__.py`
   - `_config.py`
   - `<embedded>_config.yaml`
 
 `__init__.py`:
+
 ```python
 from absolute_module_path.config._config import CONFIG
 ```
 
 `_config.py`:
+
 ```python
 import os
 from granular_configuration import ConfigurationFiles, ConfigurationMultiNamedFiles, LazyLoadConfiguration
@@ -493,7 +380,8 @@ CONFIG = LazyLoadConfiguration(
     base_path=["<UniqueBasePath>"])
 ```
 
-*Interface Definition:*
+_Interface Definition:_
+
 ```python
 import typing as typ
 
@@ -532,13 +420,12 @@ class LazyLoadConfiguration(object): # __getattr__ implies implementing Configur
 
 Note: This class does not inherit from `Configuration`, `MutableMapping`, or `dict`. It provides access to the methods of `Configuration`, but checks against type (e.g. such as `json.dumps`) should done against `LazyLoadConfiguration.config`.
 
-
 &nbsp;
-
 
 ## Patch Support
 
-*Interface Definition:*
+_Interface Definition:_
+
 ```python
 import typing as typ
 
@@ -552,6 +439,7 @@ class Configuration(typ.MutableMapping[typ.Any, typ.Any]):
         replaced with the provided patch values.
         """
 ```
+
 <br>
 
 `patch` provides an ability to temporary changes settings on a `Configuration` object. It exists primarily for testing.
@@ -562,8 +450,8 @@ Patches are <u>not</u> type-check against current values.
 
 ### Examples
 
-
 #### Simple Setting
+
 ```python
 from attrdict import AttrDict
 from granular_configuration import Configuration
@@ -585,7 +473,9 @@ with CONFIG.patch(patch1):
     assert CONFIG.key1 == "new value"
 
 ```
+
 Output:
+
 ```python
 {
     'key1': 'new value',
@@ -598,6 +488,7 @@ Output:
 ```
 
 #### Nested Settings
+
 ```python
 from attrdict import AttrDefault
 from granular_configuration import Configuration
@@ -619,7 +510,9 @@ with CONFIG.patch(patch1):
     print(CONFIG)
     assert CONFIG.key1 == "new value"
 ```
+
 Output:
+
 ```python
 {
     'key1': 'new value',
@@ -632,6 +525,7 @@ Output:
 ```
 
 #### Adding Settings
+
 ```python
 from attrdict import AttrDefault
 from granular_configuration import Configuration
@@ -647,7 +541,9 @@ with CONFIG.patch(patch1, allow_new_keys=True):
     print(CONFIG)
     assert CONFIG.key1 == "new value"
 ```
+
 Output:
+
 ```python
 {
     'key1': 'new value',
@@ -658,6 +554,7 @@ Output:
 ```
 
 #### Nested Patches Settings
+
 ```python
 from attrdict import AttrDefault
 from granular_configuration import Configuration
@@ -684,7 +581,9 @@ with CONFIG.patch(patch1):
     with CONFIG.patch(patch2):
         print(CONFIG)
 ```
+
 Output:
+
 ```python
 {
     'key1': 'new value',
@@ -697,7 +596,6 @@ Output:
 ```
 
 &nbsp;
-
 
 ## Configuration Locations
 
@@ -715,7 +613,8 @@ Note: Duplicate file definitions are ignored and used in the first order found.
 
 This is the simplest definition. Takes in a list of files and outputs all the files that exists.
 
-*Interface Definition:*
+_Interface Definition:_
+
 ```python
 import typing as typ
 
@@ -745,12 +644,13 @@ locations = ConfigurationMultiNamedFiles(
 ```
 
 Cases:
+
 - If only `./config.yaml` exists, then `locations` will be `['./config.yaml']`
 - If `./config.yaml` and `./config.yml` exists, then `locations` will be `['./config.yaml']`
 - If `./config.yml` and `~/.granular/config.yml` exists, then `locations` will be `['~/.granular/config.yml', './config.yaml']`
 
+_Interface Definition:_
 
-*Interface Definition:*
 ```python
 import typing as typ
 
@@ -770,6 +670,7 @@ Base Path is a load time filter of Configuration File. It allows for configurati
 **Example:**
 
 Config:
+
 ```yaml
 Level1:
   Level2:
@@ -778,6 +679,7 @@ Level1:
 ```
 
 Output Examples:
+
 ```python
 assert LazyLoadConfiguration(..., base_path=[]).as_dict() == {"Level1": {"Level2": {"Level3": {"a": 1}}}}
 assert LazyLoadConfiguration(..., base_path=["Level1"]).as_dict() == {"Level2": {"Level3": {"a": 1}}}
@@ -788,9 +690,9 @@ assert LazyLoadConfiguration(..., base_path=["Level1", "Level2", "Level3"]).as_d
 
 ## YAML Tags
 
-* `!Sub`
+- `!Sub`
   - **Usage:** `!Sub ${ENVIRONMENT_VARIABLE_THAT_EXISTS} ${ENVIRONMENT_VARIABLE_THAT_DOES_NOT_EXIST:-default value} ${$.jsonpath.expression}`
-  - **Argument:** *str*.
+  - **Argument:** _str_.
   - **Returns:** a string produced by the string format
   - Interpolations:
     - `${ENVIRONMENT_VARIABLE_THAT_EXISTS}`: Replaced with the specific Environment Variable. Raises `KeyError`, if the variable does not exist.
@@ -804,28 +706,28 @@ assert LazyLoadConfiguration(..., base_path=["Level1", "Level2", "Level3"]).as_d
     - `${...}`: This Tag is greedy and grabs all substrings (unlike `!Env`) and does not provide escapes. Please, request escapes if they are needed.
     - `$(...)` and `$[...]` are reserved future for use, but are not blocked for use.
     - Note: This is a recursible function. Any cycles can cause infinite loops.
-* `!Env`
+- `!Env`
   - **Usage:** `!Env '{{ENVIRONMENT_VARIABLE_THAT_EXISTS}} {{ENVIRONMENT_VARIABLE_THAT_DOES_NOT_EXIST:default value}}'`
-  - **Argument:** *str*.
+  - **Argument:** _str_.
   - **Returns:** a string produced by the string format, replacing `{{VARIABLE_NAME}}` with the Environment Variable specified. Optionally, a default value can be specified should the Environment Variable not exist.
   - Note: `!Sub` replaces this functionality and offers more options. `!Env` will not be removed but will not see future updates.
-* `!ParseEnv`
+- `!ParseEnv`
   - **Usage:** `!ParseEnv ENVIRONMENT_VARIABLE` or `!ParseEnv [ENVIRONMENT_VARIABLE, <YAML object>]`
-  - **Argument:** *Union[str, Tuple[str, Any]*.
+  - **Argument:** _Union[str, Tuple[str, Any]_.
   - **Returns:**
     - If provided a string, the Environment Variable specified will be parsed as YAML. If the Environment Variable does not exist, an error will be thrown.
     - If provided a sequence, the second object will be returned, if the Environment Variable does not exists, instead of erroring.
   - Note: This is a recursible function. `!ParseEnv VAR`, where `VAR='!ParseEnv VAR'` will loop until the call stack reaches maximum depth.
-* `!Func`
+- `!Func`
   - **Usage:** `!Func 'path.to.function'`
-  - **Argument:** *str*.
+  - **Argument:** _str_.
   - **Returns:** a pointer to the function specified. Acts as an import of `path.to`, returning `getattr(path.to, function)`. The current working directory is added prior to attempt the import. Returned object must be callable.
-* `!Class`
+- `!Class`
   - **Usage:** `!Class 'path.to.function'`
   - Acts the same as `!Func` except that the returned object must subclass `object`
-* `!Placeholder`
+- `!Placeholder`
   - **Usage:** `!Placeholder 'message'`
-  - **Argument:** *str*.
+  - **Argument:** _str_.
   - **Returns:** a `Placeholder` containing the message. If a Placeholder is not overridden, a `PlaceholderConfigurationError` exception will be thrown if accessed.
 
 &nbsp;
@@ -833,7 +735,6 @@ assert LazyLoadConfiguration(..., base_path=["Level1", "Level2", "Level3"]).as_d
 ## Global Configuration
 
 The global configuration is defined to be `global_config.yaml` available in the current working directory or the `~/.granular/` directory. The global provides allows developers and deployed applications to have a single configuration file to many libraries and applications, using Base Path to partition and isolate a single codebase's configuration.
-
 
 Add these path strings to your `LazyLoadConfiguration` to support the Global Config:
 
@@ -845,7 +746,6 @@ LazyLoadConfiguration(
 )
 ```
 
-
 &nbsp;
 
 ## Ini Configuration File Support
@@ -853,6 +753,7 @@ LazyLoadConfiguration(
 Configuration files will be loaded as a YAML file unless they have a file extension of `.ini`. INI files will be loaded via an extended INI feature set.
 
 #### General Notes
+
 - Use of the `[DEFAULT]` is highly discouraged.
 - Use of `[ROOT]`, while added for completeness, is also discouraged, as Base Paths are highly encouraged.
 - Support of only INI configuration is discouraged, as YAML is more flexible
@@ -876,7 +777,6 @@ CONFIG = LazyLoadConfiguration(
     base_path=["<UniqueBasePath>"])
 ```
 
-
 #### Nested Mappings
 
 Support for nested mappings is provided through `.` delimited section name. Base Path support for INI appears as a prefix.
@@ -884,6 +784,7 @@ Support for nested mappings is provided through `.` delimited section name. Base
 **Note: Compound Nodes are order sensitive**. From example, `CompoundKey` with its scaler attributes must be defined before `CompoundKey.comp_key3`
 
 **Example:**
+
 ```ini
 [ROOT]
 root_key1=value1
@@ -901,6 +802,7 @@ nested_key1=value5
 ```
 
 loads as the following Python dict:
+
 ```python
 {
   "root_key1": "value1",
@@ -919,6 +821,7 @@ loads as the following Python dict:
 ```
 
 as YAML:
+
 ```yaml
 root_key1: value1
 root_key2: value2
@@ -938,6 +841,7 @@ NewCompoundKey:
 The INI spec defines always keys and values to be string. In order to support the full feature set of types supported by YAML, all keys and values parsed as YAML, enabling boolean, float, integer, null, tag, and list support. **This means all keys and values must be valid single-node YAML**
 
 **Example:**
+
 ```ini
 [BasePath]
 tagged_key=!Env '{{VARIABLE_THAT_DOES_NOT_EXIST:default value}}'
@@ -956,6 +860,7 @@ True=False
 ```
 
 loads as the following Python dict:
+
 ```python
 {
   'BasePath': {
@@ -978,9 +883,10 @@ loads as the following Python dict:
 ```
 
 as YAML:
+
 ```yaml
 BasePath:
-  tagged_key: !Env '{{VARIABLE_THAT_DOES_NOT_EXIST:default value}}'
+  tagged_key: !Env "{{VARIABLE_THAT_DOES_NOT_EXIST:default value}}"
   func_key: !Func functools.reduce
   string_key2: string with spaces
   IntMap:
@@ -990,7 +896,7 @@ BasePath:
     null: 1
     true: False
     1.123: !Class collections.defaultdict
-    '1': "1"
+    "1": "1"
 ```
 
 &nbsp;
@@ -998,31 +904,37 @@ BasePath:
 ## Changelog
 
 ### 1.8.0
- * Adds `!Sub` Tag
+
+- Adds `!Sub` Tag
 
 ### 1.5.0
- * Adds `!ParseEnv` Tag
+
+- Adds `!ParseEnv` Tag
 
 ### 1.4.0
- * Adds InvalidBasePathException as an exception the can be thrown during the load phase of `LazyLoadConfiguration`.
-    * This subclasses `KeyError` maintaining compatibility with the state before this exception.
- * `LazyLoadConfiguration`'s `base_path` argument now takes a single `str` in addition to the original `typing.Sequence[str]`
+
+- Adds InvalidBasePathException as an exception the can be thrown during the load phase of `LazyLoadConfiguration`.
+  - This subclasses `KeyError` maintaining compatibility with the state before this exception.
+- `LazyLoadConfiguration`'s `base_path` argument now takes a single `str` in addition to the original `typing.Sequence[str]`
 
 ### 1.3.1
- * Adds clear_config
+
+- Adds clear_config
 
 ### 1.3
- * Adds string path support to `LazyLoadConfiguration`
- * Adds get-config pattern
- * Adds Configuration.patch
+
+- Adds string path support to `LazyLoadConfiguration`
+- Adds get-config pattern
+- Adds Configuration.patch
 
 ### 1.2
- * Adding ini support
+
+- Adding ini support
 
 ### 1.1
- * Adds `!Placeholder` Tag
- * Makes tags evaluate lazily (i.e. at first use)
 
+- Adds `!Placeholder` Tag
+- Makes tags evaluate lazily (i.e. at first use)
 
 ## Author
 
