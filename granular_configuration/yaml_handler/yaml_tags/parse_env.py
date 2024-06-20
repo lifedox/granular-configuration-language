@@ -1,8 +1,8 @@
 import os
 import typing as typ
 
+from granular_configuration._yaml_classes import _OPH
 from granular_configuration.exceptions import ParseEnvError
-from granular_configuration.yaml_handler.classes import _OPH
 from granular_configuration.yaml_handler.decorators import (
     LazyEval,
     StateHolder,

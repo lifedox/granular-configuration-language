@@ -9,7 +9,7 @@ from pathlib import Path
 from ruamel.yaml import YAML, MappingNode, Node, SafeConstructor
 from ruamel.yaml.resolver import BaseResolver
 
-from granular_configuration.yaml_handler.classes import LazyRoot, StateHolder
+from granular_configuration._yaml_classes import LazyRoot, StateHolder
 from granular_configuration.yaml_handler.yaml_tags import handlers
 
 _OPH = typ.Optional[typ.Type[MutableMapping]]

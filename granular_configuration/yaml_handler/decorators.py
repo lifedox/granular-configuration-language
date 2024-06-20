@@ -2,7 +2,7 @@ import typing as typ
 
 from ruamel.yaml import Node, SafeConstructor, ScalarNode, SequenceNode
 
-from granular_configuration.yaml_handler.classes import LazyEval, LazyEvalRootState, Root, StateHolder
+from granular_configuration._yaml_classes import LazyEval, LazyEvalRootState, Root, StateHolder
 
 _RT = typ.TypeVar("_RT")
 _T = typ.TypeVar("_T")
@@ -54,15 +54,13 @@ def lazy_exeception(func: typ.Callable[[_T], _RT]) -> typ.Callable[[_T, StateHol
 # type handling decorators
 ###############################################################################
 
+CallableConstructorType = typ.Callable[[typ.Type[SafeConstructor], StateHolder], None]
 
-def string_only_tag(
+
+def string_tag(
     tag: str,
-) -> typ.Callable[
-    [typ.Callable[[str, StateHolder], LazyEval[_T]]], typ.Callable[[typ.Type[SafeConstructor], StateHolder], None]
-]:
-    def decorator(
-        handler: typ.Callable[[str, StateHolder], LazyEval[_T]]
-    ) -> typ.Callable[[typ.Type[SafeConstructor], StateHolder], None]:
+) -> typ.Callable[[typ.Callable[[str, StateHolder], LazyEval[_T]]], CallableConstructorType]:
+    def decorator(handler: typ.Callable[[str, StateHolder], LazyEval[_T]]) -> CallableConstructorType:
         def add_handler(
             constructor: typ.Type[SafeConstructor],
             state: StateHolder,
@@ -88,11 +86,9 @@ def string_or_twople_tag(
     tag: str,
 ) -> typ.Callable[
     [typ.Callable[[StringOrTwopleType, StateHolder], LazyEval[_T]]],
-    typ.Callable[[typ.Type[SafeConstructor], StateHolder], None],
+    CallableConstructorType,
 ]:
-    def decorator(
-        handler: typ.Callable[[StringOrTwopleType, StateHolder], LazyEval[_T]]
-    ) -> typ.Callable[[typ.Type[SafeConstructor], StateHolder], None]:
+    def decorator(handler: typ.Callable[[StringOrTwopleType, StateHolder], LazyEval[_T]]) -> CallableConstructorType:
         def add_handler(
             constructor: typ.Type[SafeConstructor],
             state: StateHolder,
@@ -107,6 +103,34 @@ def string_or_twople_tag(
                     if isinstance(value, list) and (len(value) == 2) and isinstance(value[0], str):
                         return handler(tuple(value), state)
                 raise ValueError(f"{tag} supports: str | tuple[str, Any]")
+
+            constructor.add_constructor(tag, type_handler)
+
+        return add_handler
+
+    return decorator
+
+
+SequenceOfAnyType = typ.Sequence[typ.Any]
+
+
+def sequence_of_any_tag(
+    tag: str,
+) -> typ.Callable[
+    [typ.Callable[[SequenceOfAnyType, StateHolder], LazyEval[_T]]],
+    CallableConstructorType,
+]:
+    def decorator(handler: typ.Callable[[SequenceOfAnyType, StateHolder], LazyEval[_T]]) -> CallableConstructorType:
+        def add_handler(
+            constructor: typ.Type[SafeConstructor],
+            state: StateHolder,
+        ) -> None:
+            def type_handler(constructor: SafeConstructor, node: Node) -> LazyEval[_T]:
+                if isinstance(node, SequenceNode):
+                    value = constructor.construct_sequence(node)
+                    if isinstance(value, list):
+                        return handler(value, state)
+                raise ValueError(f"{tag} supports: list[Any]")
 
             constructor.add_constructor(tag, type_handler)
 

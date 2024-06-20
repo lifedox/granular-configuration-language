@@ -1,0 +1,5 @@
+basic: state
+merge: !Merge
+  - !OptionalParseFile file_does_not_exists.yaml
+  - !OptionalParseFile parsefile1.yaml
+  - from: merge

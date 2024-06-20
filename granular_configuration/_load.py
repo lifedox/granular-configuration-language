@@ -18,5 +18,7 @@ def load_file(
             loader = loads
 
         return loader(filename.read_text(), obj_pairs_hook=obj_pairs_hook, lazy_root=lazy_root, file_path=filename)
+    except FileNotFoundError as e:
+        raise FileNotFoundError(e) from None
     except Exception as e:
         raise ValueError('Problem in file "{}": {}'.format(filename, e))

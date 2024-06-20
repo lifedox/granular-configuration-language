@@ -2,16 +2,20 @@ import typing as typ
 
 from granular_configuration import Configuration, LazyLoadConfiguration
 from granular_configuration._build import _merge
+from granular_configuration.yaml_handler import LazyEval
 
 
 def merge(configs: typ.Iterable[Configuration | LazyLoadConfiguration | typ.Any]) -> Configuration:
-    def _generator(
+    def configuration_only(
         configs: typ.Iterable[Configuration | LazyLoadConfiguration | typ.Any],
     ) -> typ.Iterator[Configuration]:
         for config in configs:
+            while isinstance(config, LazyEval):
+                config = config.run()
+
             if isinstance(config, Configuration):
                 yield config
             elif isinstance(config, LazyLoadConfiguration):
                 yield config.config
 
-    return _merge(_generator(configs))
+    return _merge(configuration_only(configs))

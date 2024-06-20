@@ -181,8 +181,11 @@ stop() {
 
 usage+=("  $0 package - Build package")
 package() {
-    _logit TODO
-    exit 1
+    _run_cmd poetry run ./run _package "$@"
+}
+_package() {
+    _logit Building package
+    _run_cmd poetry build
 }
 
 cmd="$1"

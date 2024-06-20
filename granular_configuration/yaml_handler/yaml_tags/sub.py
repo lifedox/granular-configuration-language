@@ -5,7 +5,7 @@ import typing as typ
 
 import jsonpath
 
-from granular_configuration.yaml_handler.decorators import Root, make_lazy_root, string_only_tag
+from granular_configuration.yaml_handler.decorators import Root, make_lazy_root, string_tag
 
 SUB_PATTERN: typ.Pattern[str] = re.compile(r"(\$\{(?P<contents>.*?)\})")
 
@@ -27,7 +27,7 @@ def load_sub(root: typ.Any, *, contents: str) -> str:
             return os.environ[env_params[0]]
 
 
-@string_only_tag("!Sub")
+@string_tag("!Sub")
 @make_lazy_root
 def handler(value: str, root: Root) -> str:
     return SUB_PATTERN.sub(lambda x: load_sub(root, **x.groupdict()), value)
