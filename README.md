@@ -516,7 +516,7 @@ class LazyLoadConfiguration(object): # __getattr__ implies implementing Configur
         """
         ...
 
-    def load_configure(self) -> None:
+    def load_configuration(self) -> None:
         """
         Force load the configuration.
         """

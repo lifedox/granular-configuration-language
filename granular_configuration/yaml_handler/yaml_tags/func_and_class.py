@@ -9,7 +9,7 @@ from granular_configuration.yaml_handler.decorators import make_lazy, string_onl
 
 def add_cwd_to_path() -> None:
     cwd = os.getcwd()
-    if sys.path[0] != cwd:
+    if sys.path[0] != cwd:  # pragma: no cover
         sys.path.insert(0, cwd)
 
 
@@ -30,7 +30,7 @@ def class_handler(value: str) -> typ.Callable:
     if inspect.isclass(class_type):
         return class_type
     else:
-        raise ValueError("Classes loaded by !Class must subclass object")
+        raise ValueError("Classes loaded by !Class must pass `inspect.isclass`")
 
 
 @string_only_tag("!Func")

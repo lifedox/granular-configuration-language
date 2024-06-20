@@ -15,7 +15,7 @@ from granular_configuration.yaml_handler.yaml_tags import handlers
 _OPH = typ.Optional[typ.Type[MutableMapping]]
 
 
-if typ.TYPE_CHECKING:
+if typ.TYPE_CHECKING:  # pragma: no cover
 
     class ExtendedSafeConstructor(SafeConstructor):
         pass

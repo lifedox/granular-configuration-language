@@ -99,13 +99,13 @@ def test_bad_base_path() -> None:
     config = LazyLoadConfiguration(base_path="base")
 
     with pytest.raises(InvalidBasePathException):
-        config.load_configure()
+        config.load_configuration()
 
 
 def test_env() -> None:
     env_path = (ASSET_DIR / "test_env_config.yaml").as_posix()
 
-    with patch("os.environ", new={"G_CONFIG_LOCATION": env_path}):
+    with patch.dict(os.environ, values={"G_CONFIG_LOCATION": env_path}):
         config = LazyLoadConfiguration(
             (ASSET_DIR / "mix_config.yaml").as_posix(),
             use_env_location=True,
@@ -116,14 +116,14 @@ def test_env() -> None:
 def test_env_list() -> None:
     env_path = ",".join(((ASSET_DIR / "test_env_config.yaml").as_posix(), ((ASSET_DIR / "mix_config.yaml").as_posix())))
 
-    with patch("os.environ", new={"G_CONFIG_LOCATION": env_path}):
+    with patch.dict(os.environ, values={"G_CONFIG_LOCATION": env_path}):
         config = LazyLoadConfiguration(use_env_location=True)
         assert config.A.key1 == "value1"
         assert config.A.key2 == "MyTestValue"
 
 
 def test_env_none() -> None:
-    with patch("os.environ", new={}):
+    with patch.dict(os.environ, values={}):
         config = LazyLoadConfiguration(use_env_location=True)
         assert config.as_dict() == {}
 
@@ -137,3 +137,12 @@ def test_like_a_mutablemapping() -> None:
     assert len(config) == 2
     del config["B"]
     assert list(config) == ["A"]
+
+
+def test_loading_empty_is_an_empty_dict() -> None:
+    assert LazyLoadConfiguration(ASSET_DIR / "empty.yaml").config.as_dict() == {}
+
+
+def test_loading_bad_yaml_causes_error() -> None:
+    with pytest.raises(ValueError):
+        LazyLoadConfiguration(ASSET_DIR / "bad.txt").config

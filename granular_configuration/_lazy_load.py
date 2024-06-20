@@ -60,17 +60,15 @@ class LazyLoadConfiguration(MutableMapping):
             self.__locations = None
             self.__base_path = None
 
-    load_configure = load_configuration
-
     @property
     def config(self) -> Configuration:
         """
         Loads and fetches the underlying Configuration object
         """
         if self._config is None:
-            self.load_configure()
+            self.load_configuration()
 
-        if self._config is None:
+        if self._config is None:  # pragma: no cover
             raise TypeError("LazyLoadConfiguration loaded null")
         else:
             return self._config

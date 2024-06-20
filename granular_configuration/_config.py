@@ -14,7 +14,7 @@ class Patch(typ.Mapping):
     def __init__(
         self, patch_map: typ.Mapping, parent: typ.Optional["Patch"] = None, allow_new_keys: bool = False
     ) -> None:
-        if not isinstance(patch_map, Mapping):
+        if not isinstance(patch_map, Mapping):  # pragma: no cover
             raise TypeError("Patch expected a Mapping as input")
 
         self._patch = {
@@ -31,7 +31,7 @@ class Patch(typ.Mapping):
     def __iter__(self) -> typ.Iterator:
         return iter(self._patch)
 
-    def __len__(self) -> int:
+    def __len__(self) -> int:  # pragma: no cover
         return len(self._patch)
 
     def __hash__(self) -> int:
@@ -161,7 +161,7 @@ class Configuration(typ.MutableMapping):
 
         return self[name]
 
-    def __repr__(self) -> str:
+    def __repr__(self) -> str:  # pragma: no cover
         if self.__has_patches():
             return repr(self.as_dict())
         else:
@@ -206,13 +206,13 @@ class Configuration(typ.MutableMapping):
     def _raw_items(self) -> typ.Iterator[typ.Tuple[typ.Any, typ.Any]]:
         return map(lambda key: (key, self.__get_item(key)), self)
 
-    def __getnewargs__(self) -> typ.Sequence[typ.Tuple[typ.Any, typ.Any]]:
+    def __getnewargs__(self) -> typ.Sequence[typ.Tuple[typ.Any, typ.Any]]:  # pragma: no cover
         return tuple(self.items())
 
-    def __getstate__(self) -> typ.MutableMapping:
+    def __getstate__(self) -> typ.MutableMapping:  # pragma: no cover
         return self
 
-    def __setstate__(self, state: typ.Any) -> None:
+    def __setstate__(self, state: typ.Any) -> None:  # pragma: no cover
         self.update(state)
 
     @property  # type: ignore

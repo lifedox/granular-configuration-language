@@ -54,9 +54,9 @@ class ConfigurationLocations(object):
         directories: typ.Optional[typ.Sequence[PathOrStr]] = None,
         files: typ.Optional[typ.Sequence[PathOrStr]] = None,
     ) -> None:
-        if files and (filenames or directories):
+        if files and (filenames or directories):  # pragma: no cover
             raise ValueError("files cannot be defined with filenames and directories.")
-        elif bool(filenames) ^ bool(directories):
+        elif bool(filenames) ^ bool(directories):  # pragma: no cover
             raise ValueError("filenames and directories are a required pair.")
 
         self.__filenames = filenames

@@ -34,13 +34,13 @@ def make_lazy_root(func: typ.Callable[[_T, Root], _RT]) -> typ.Callable[[_T, Sta
     return lazy_wrapper
 
 
-def make_lazy_root_with_state(
-    func: typ.Callable[[_T, StateHolder, Root], _RT]
-) -> typ.Callable[[_T, StateHolder], LazyEvalRootState[_RT]]:
-    def lazy_wrapper(value: _T, state: StateHolder) -> LazyEvalRootState[_RT]:
-        return LazyEvalRootState(state.lazy_root_obj, lambda root: func(value, state, root))
+# def make_lazy_root_with_state(
+#     func: typ.Callable[[_T, StateHolder, Root], _RT]
+# ) -> typ.Callable[[_T, StateHolder], LazyEvalRootState[_RT]]:
+#     def lazy_wrapper(value: _T, state: StateHolder) -> LazyEvalRootState[_RT]:
+#         return LazyEvalRootState(state.lazy_root_obj, lambda root: func(value, state, root))
 
-    return lazy_wrapper
+#     return lazy_wrapper
 
 
 def lazy_exeception(func: typ.Callable[[_T], _RT]) -> typ.Callable[[_T, StateHolder], LazyEval[_RT]]:
