@@ -1,7 +1,6 @@
 from __future__ import annotations
 
-import os
-from functools import partial, reduce
+from functools import reduce
 from pathlib import Path
 
 import pytest
@@ -9,6 +8,8 @@ import pytest
 from granular_configuration import Configuration
 from granular_configuration._build import build_configuration
 from granular_configuration.yaml_handler import Placeholder, loads
+
+ASSET_DIR = (Path(__file__).parent / "../assets/config_location_test").resolve()
 
 
 def test_converting_Configuration_to_dict() -> None:
@@ -30,10 +31,10 @@ def test_converting_Configuration_to_dict() -> None:
 
 
 def test_Configuration_is_dict() -> None:
-    base_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), "../assets/config_location_test"))
-    dir_func = partial(os.path.join, base_dir)
-
-    files = list(map(Path, map(dir_func, ["g/h.yaml", "c/t.yaml"])))
+    files = (
+        ASSET_DIR / "g/h.yaml",
+        ASSET_DIR / "c/t.yaml",
+    )
 
     value = build_configuration(files)
 

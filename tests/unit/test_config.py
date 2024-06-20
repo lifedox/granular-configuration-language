@@ -1,5 +1,3 @@
-import os
-from functools import partial
 from pathlib import Path
 
 import pytest
@@ -9,12 +7,15 @@ from granular_configuration._build import build_configuration
 from granular_configuration.exceptions import PlaceholderConfigurationError
 from granular_configuration.yaml_handler import Placeholder
 
+ASSET_DIR = (Path(__file__).parent / "../assets/config_location_test").resolve()
+
 
 def test_build_baseline() -> None:
-    base_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), "../assets/config_location_test"))
-    dir_func = partial(os.path.join, base_dir)
-
-    files = list(map(Path, map(dir_func, ["a/b/t2.yaml", "g/h.yaml", "c/t.yaml"])))
+    files = (
+        ASSET_DIR / "a/b/t2.yaml",
+        ASSET_DIR / "g/h.yaml",
+        ASSET_DIR / "c/t.yaml",
+    )
 
     configuration = build_configuration(files)
 
@@ -44,10 +45,10 @@ def test_build_baseline() -> None:
 
 
 def test_build_with_a_placeholder_root() -> None:
-    base_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), "../assets/config_location_test"))
-    dir_func = partial(os.path.join, base_dir)
-
-    files = list(map(Path, map(dir_func, ["placeholder_test1.yaml", "placeholder_test2.yaml"])))
+    files = (
+        ASSET_DIR / "placeholder_test1.yaml",
+        ASSET_DIR / "placeholder_test2.yaml",
+    )
 
     configuration = build_configuration(files)
 
@@ -62,10 +63,10 @@ def test_build_with_a_placeholder_root() -> None:
 
 
 def test_build_with_sub() -> None:
-    base_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), "../assets/config_location_test"))
-    dir_func = partial(os.path.join, base_dir)
-
-    files = list(map(Path, map(dir_func, ["sub_test1.yaml", "sub_test2.yaml"])))
+    files = (
+        ASSET_DIR / "sub_test1.yaml",
+        ASSET_DIR / "sub_test2.yaml",
+    )
 
     configuration = build_configuration(files)
 

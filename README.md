@@ -105,7 +105,7 @@ To allow applications to override values in your config it should be read with a
 
 ```python
 CONFIG = LazyLoadConfiguration(
-        os.path.join(os.path.dirname(__file__), "embedded_config.yaml"),
+        Path(__file__).parent, "embedded_config.yaml",
         "~/my-library.*",  # Optional
         "./my-library.*",  # Optional,
         base_path=["my-library"],
@@ -257,7 +257,7 @@ from granular_configuration import LazyLoadConfiguration
 import os
 
 CONFIG = LazyLoadConfiguration(
-    os.path.join(os.path.dirname(__file__), "embedded_config.yaml"), # Required, since you should be using !Placeholder to represent the form, if there are no defaults
+    Path(__file__).parent / "embedded_config.yaml", # Required, since you should be using !Placeholder to represent the form, if there are no defaults
     "~/<lib_specific>_config.*", # Optional
     "./<lib_specific>_config.*", # Optional
     "global_config.*",
@@ -371,7 +371,7 @@ from granular_configuration import ConfigurationFiles, ConfigurationMultiNamedFi
 
 
 CONFIG = LazyLoadConfiguration(
-    os.path.join(os.path.dirname(__file__), "<embedded>_config.yaml"),
+    Path(__file__).parent /  "<embedded>_config.yaml",
     "~/.granular/<special>_config.*",
     "./<special>_config.*",
     "~/.granular/global_config.*",
@@ -638,7 +638,7 @@ Note: The order of the directories in this example is not an absolute pattern, t
 ```python
 locations = ConfigurationMultiNamedFiles(
     filenames=['config.yaml', 'config.yml'],
-    directories=(os.path.expanduser("~/.granular/"), os.getcwd())
+    directories=(Path("~/.granular/"), os.getcwd())
 ).get_locations()
 ```
 

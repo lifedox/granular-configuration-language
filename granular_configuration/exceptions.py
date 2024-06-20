@@ -24,3 +24,7 @@ class ParseEnvError(Exception):
 
 class JSONPathOnlyWorksOnMappings(Exception):
     pass
+
+
+class IniUnsupported(Exception):
+    pass

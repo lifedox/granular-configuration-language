@@ -1,5 +1,4 @@
 import os
-from functools import partial
 from pathlib import Path
 from unittest.mock import patch
 
@@ -8,17 +7,15 @@ import pytest
 from granular_configuration import Configuration, ConfigurationLocations, LazyLoadConfiguration
 from granular_configuration.exceptions import InvalidBasePathException
 
-ASSET_DIR = Path(__file__).parent / "../assets/config_location_test"
+ASSET_DIR = (Path(__file__).parent / "../assets/config_location_test").resolve()
 
 
 class TestLaziness:
 
     def test_class(self) -> None:
-        dir_func = partial(os.path.join, ASSET_DIR)
-
-        directories = list(map(dir_func, ["a/b", "a", "b", "c", "d", "c"]))
+        directories = ["a/b", "a", "b", "c", "d", "c"]
         filenames = ["t.yaml", "t2.yaml"]
-        files = list(map(dir_func, ["g/b.yaml", "g/h.yaml"]))
+        files = ["g/b.yaml", "g/h.yaml"]
 
         location = (
             ConfigurationLocations(files=files),

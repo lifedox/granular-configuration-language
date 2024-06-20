@@ -82,7 +82,7 @@ _tests() {
 
 usage+=("  $0 tests - Run tests in Python 3.10 Docker")
 test310() {
-    docker_service=test310 
+    docker_service=test310
     _run_cmd poetry run ./run _tests "$@"
 }
 usage+=("  $0 tests - Run tests in Python 3.11 Docker")
@@ -113,6 +113,8 @@ _lint() {
     poetry run black --check .
     _logit Running mypy
     poetry run mypy .
+    _logit Running flake8
+    poetry run flake8 .
     _logit Running bandit
     bandit -c pyproject.toml -r .
 }
@@ -137,10 +139,10 @@ _cleanup() {
     rm -rf build results .serverless .venv .pytest_cache .mypy_cache atlas_svc_lambda.egg-info node_modules
     find . \
         \( \
-            -iname "*.so" -or \
-            -iname "*.pyc" -or \
-            -iname "__pycache__" -or \
-            -iname "*.egg*" \
+        -iname "*.so" -or \
+        -iname "*.pyc" -or \
+        -iname "__pycache__" -or \
+        -iname "*.egg*" \
         \) \
         -exec rm -rf {} \;
 }
