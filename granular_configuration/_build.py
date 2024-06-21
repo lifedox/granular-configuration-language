@@ -23,10 +23,9 @@ def _merge_into_base(base_dict: Configuration, from_dict: Configuration) -> None
         base_dict[key] = value
 
 
-def _merge(configs: typ.Iterable[Configuration]) -> Configuration:
-    base_conf = Configuration()
-    consume(map(partial(_merge_into_base, base_conf), configs))
-    return base_conf
+def _merge(base_config: Configuration, configs: typ.Iterable[Configuration]) -> Configuration:
+    consume(map(partial(_merge_into_base, base_config), configs))
+    return base_config
 
 
 def _load_configs_from_locations(locations: typ.Iterable[Path], lazy_root: LazyRoot) -> typ.Iterator[Configuration]:
@@ -46,8 +45,10 @@ def _load_configs_from_locations(locations: typ.Iterable[Path], lazy_root: LazyR
 
 def build_configuration(locations: typ.Iterable[Path]) -> Configuration:
     lazy_root = LazyRoot()
+    base_config = Configuration()
+    lazy_root._set_root(base_config)
+
     valid_configs = _load_configs_from_locations(locations, lazy_root)
-    merged_config = _merge(valid_configs)
-    lazy_root._set_root(merged_config)
+    merged_config = _merge(base_config, valid_configs)
 
     return merged_config

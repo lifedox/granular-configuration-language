@@ -2,3 +2,4 @@ from granular_configuration._config import Configuration
 from granular_configuration._lazy_load import LazyLoadConfiguration
 from granular_configuration._locations import ConfigurationFiles, ConfigurationLocations, ConfigurationMultiNamedFiles
 from granular_configuration._merge import merge
+from granular_configuration._yaml_classes import Masked

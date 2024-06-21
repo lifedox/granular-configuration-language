@@ -69,25 +69,30 @@ def test_merging_from_files_nested() -> None:
     assert LazyLoadConfiguration(ASSET_DIR / "merge.yaml").config.as_dict() == {
         "basic": "state",
         "merge": {
-            "base": {"a": "from parsefile2.yaml", "b": "$.data"},
+            "base": {"a": "from parsefile2.yaml", "b": "From merge.yaml"},
             "data": "From parsefile1.yaml",
             "from": "merge",
+            "reach_in": "From merge.yaml",
         },
+        "data": "From merge.yaml",
+        "base": {"b": "From merge.yaml"},
     }
 
 
 def test_merging_from_files_at_root() -> None:
     assert LazyLoadConfiguration(ASSET_DIR / "merge_root.yaml").config.as_dict() == {
-        "base": {"a": "from parsefile2.yaml", "b": "$.data"},
+        "base": {"a": "from parsefile2.yaml", "b": "From parsefile1.yaml"},
         "data": "From parsefile1.yaml",
         "from": "merge",
+        "reach_in": "From parsefile1.yaml",
     }
 
 
 def test_parsefile_loading() -> None:
     assert LazyLoadConfiguration(ASSET_DIR / "parsefile1.yaml").config.as_dict() == {
-        "base": {"a": "from parsefile2.yaml", "b": "$.data"},
+        "base": {"a": "from parsefile2.yaml", "b": "From parsefile1.yaml"},
         "data": "From parsefile1.yaml",
+        "reach_in": "From parsefile1.yaml",
     }
 
 
@@ -97,12 +102,23 @@ def test_parsefile_loading_missing_file() -> None:
 
 
 def test_parsefile_redirect_loading() -> None:
-    assert loads(
-        "!ParseFile parsefile1.yaml", obj_pairs_hook=Configuration, file_path=ASSET_DIR / "dummy.yaml"
-    ).run() == {
-        "base": {"a": "from parsefile2.yaml", "b": "$.data"},
+    config = LazyLoadConfiguration(ASSET_DIR / "redirect_parsefile.yaml")
+    expect = {
+        "base": {"a": "from parsefile2.yaml", "b": "From parsefile1.yaml"},
         "data": "From parsefile1.yaml",
+        "reach_in": "From parsefile1.yaml",
     }
+    assert config.config == expect
+
+
+def test_redirect_using_merge() -> None:
+    config = LazyLoadConfiguration(ASSET_DIR / "redirect_merge.yaml")
+    expect = {
+        "base": {"a": "from parsefile2.yaml", "b": "From parsefile1.yaml"},
+        "data": "From parsefile1.yaml",
+        "reach_in": "From parsefile1.yaml",
+    }
+    assert config.config == expect
 
 
 def test_parsefile_redirect_loading_sub_syntax() -> None:
@@ -111,16 +127,21 @@ def test_parsefile_redirect_loading_sub_syntax() -> None:
             """
 file: parsefile1.yaml
 contents: !ParseFile ${$.file}
+"data": "From parse_redirct.yaml"
+"base": {"b": "From parse_redirct.yaml"}
 """,
             obj_pairs_hook=Configuration,
             file_path=ASSET_DIR / "dummy.yaml",
-        )
+        ).as_dict()
         == {
             "file": "parsefile1.yaml",
             "contents": {
-                "base": {"a": "from parsefile2.yaml", "b": "$.data"},
+                "base": {"a": "from parsefile2.yaml", "b": "From parse_redirct.yaml"},
                 "data": "From parsefile1.yaml",
+                "reach_in": "From parse_redirct.yaml",
             },
+            "data": "From parse_redirct.yaml",
+            "base": {"b": "From parse_redirct.yaml"},
         }
     )
 
@@ -131,7 +152,8 @@ def test_merging_LazyLoadConfiguration() -> None:
         LazyLoadConfiguration(ASSET_DIR / "merge_root.yaml"),
     )
     assert merge(configs).as_dict() == {
-        "base": {"a": "from parsefile2.yaml", "b": "$.data"},
+        "base": {"a": "from parsefile2.yaml", "b": "From parsefile1.yaml"},
         "data": "From parsefile1.yaml",
         "from": "merge",
+        "reach_in": "From parsefile1.yaml",
     }

@@ -1,11 +1,17 @@
 import typing as typ
 from dataclasses import dataclass
+from functools import cache
 from pathlib import Path
 
 _RT = typ.TypeVar("_RT")
 
 RootType = typ.NewType("RootType", object)
 Root = RootType | None
+
+
+class Masked(str):
+    def __repr__(self) -> str:
+        return "'<****>'"
 
 
 class Placeholder:
@@ -20,10 +26,14 @@ class Placeholder:
 
 class LazyRoot:
     def __init__(self) -> None:
-        self.root: Root = None
+        self.__root: Root = None
 
     def _set_root(self, root: typ.Any) -> None:
-        self.root = root
+        self.__root = root
+
+    @property
+    def root(self) -> Root:
+        return self.__root
 
 
 class LazyEval(typ.Generic[_RT]):
@@ -32,7 +42,11 @@ class LazyEval(typ.Generic[_RT]):
     def __init__(self, value: typ.Callable[[], _RT]) -> None:
         self.value: typ.Callable[..., _RT] = value
 
+    @cache
     def run(self) -> _RT:
+        return self._run()
+
+    def _run(self) -> _RT:
         return self.value()
 
 
@@ -43,7 +57,7 @@ class LazyEvalRootState(LazyEval[_RT]):
         self.value: typ.Callable[..., _RT] = value
         self.root = root
 
-    def run(self) -> _RT:
+    def _run(self) -> _RT:
         return self.value(self.root.root)
 
 

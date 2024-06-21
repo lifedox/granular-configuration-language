@@ -6,7 +6,7 @@ from unittest.mock import patch
 
 import pytest
 
-from granular_configuration import Configuration, ConfigurationLocations
+from granular_configuration import Configuration, ConfigurationLocations, Masked
 from granular_configuration.exceptions import ParseEnvError
 from granular_configuration.yaml_handler import Placeholder, loads
 
@@ -377,3 +377,12 @@ slash: "\\/"
 
 def test_empty_is_null() -> None:
     assert loads("") is None
+
+
+def test_mask() -> None:
+    output = loads("!Mask secret")
+
+    assert repr(output) == "'<****>'"
+    assert str(output) == "secret"
+    assert output == "secret"
+    assert isinstance(output, Masked)

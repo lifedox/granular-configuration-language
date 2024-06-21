@@ -18,4 +18,5 @@ def merge(configs: typ.Iterable[Configuration | LazyLoadConfiguration | typ.Any]
             elif isinstance(config, LazyLoadConfiguration):
                 yield config.config
 
-    return _merge(configuration_only(configs))
+    base_config = Configuration()
+    return _merge(base_config, configuration_only(configs))

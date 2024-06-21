@@ -63,5 +63,8 @@ def loads(
     yaml.Constructor = ExtendedSafeConstructor
 
     result = yaml.load(config_str)
-    state.lazy_root_obj._set_root(result)
+
+    if lazy_root is None:
+        state.lazy_root_obj._set_root(result)
+
     return result

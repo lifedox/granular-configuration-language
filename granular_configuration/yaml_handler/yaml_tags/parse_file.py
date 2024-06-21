@@ -14,8 +14,8 @@ def load(file: Path, state: StateOptions, root: Root) -> typ.Any:
     from granular_configuration._load import load_file
 
     lazy_root = LazyRoot()
-    output = load_file(file, obj_pairs_hook=state.obj_pairs_func, lazy_root=lazy_root)
     lazy_root._set_root(root)
+    output = load_file(file, obj_pairs_hook=state.obj_pairs_func, lazy_root=lazy_root)
     return output
 
 
