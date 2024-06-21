@@ -221,8 +221,12 @@ tests:
 
 
 def test_sub__jsonpath_missing() -> None:
+    test_data = """
+a: !Sub ${$.no_data.here}
+b: c
+"""
     with pytest.raises(KeyError):
-        loads("!Sub ${$.no_data.here}").run()
+        loads(test_data, obj_pairs_hook=Configuration).as_dict()
 
 
 def product_pylance_helper(*iterable: typ.Iterable[bool]) -> typ.Iterator[typ.Iterable[bool]]:
@@ -263,6 +267,19 @@ aws_region: !ParseEnv
     with patch.dict(os.environ, values={"G_ASYNC_KINESIS_AWS_REGION": "test me"}):
         output: Configuration = loads(test_data, obj_pairs_hook=Configuration)
         assert getattr(output, "aws_region") == "test me"
+
+
+def test_nested_parse_env_with_sub_jsonpath() -> None:
+    test_data = """\
+aws_region: !ParseEnv
+- G_ASYNC_KINESIS_AWS_REGION
+- !ParseEnv [AWS_DEFAULT_REGION, us-east-1]
+sub: data
+"""
+
+    with patch.dict(os.environ, values={"G_ASYNC_KINESIS_AWS_REGION": "!Sub ${$.sub}"}):
+        output: Configuration = loads(test_data, obj_pairs_hook=Configuration)
+        assert getattr(output, "aws_region") == "data"
 
 
 def test_del_removes_key() -> None:
