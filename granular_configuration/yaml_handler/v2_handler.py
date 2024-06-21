@@ -9,7 +9,7 @@ from pathlib import Path
 from ruamel.yaml import YAML, MappingNode, Node, SafeConstructor
 from ruamel.yaml.resolver import BaseResolver
 
-from granular_configuration._yaml_classes import LazyRoot, StateHolder
+from granular_configuration._yaml_classes import LazyRoot, StateHolder, StateOptions
 from granular_configuration.yaml_handler.yaml_tags import handlers
 
 _OPH = typ.Optional[typ.Type[MutableMapping]]
@@ -36,8 +36,10 @@ def loads(
 ) -> typ.Any:
     state = StateHolder(
         lazy_root_obj=lazy_root or LazyRoot(),
-        file_relative_path=file_path.parent if file_path is not None else Path("."),
-        obj_pairs_func=obj_pairs_hook,
+        options=StateOptions(
+            file_relative_path=file_path.parent if file_path is not None else Path("."),
+            obj_pairs_func=obj_pairs_hook,
+        ),
     )
 
     if config_str.startswith("%YAML"):

@@ -27,7 +27,11 @@ def load_sub(root: typ.Any, *, contents: str) -> str:
             return os.environ[env_params[0]]
 
 
+def interpolate(value: str, root: Root) -> str:
+    return SUB_PATTERN.sub(lambda x: load_sub(root, **x.groupdict()), value)
+
+
 @string_tag("!Sub")
 @make_lazy_root
 def handler(value: str, root: Root) -> str:
-    return SUB_PATTERN.sub(lambda x: load_sub(root, **x.groupdict()), value)
+    return interpolate(value, root)

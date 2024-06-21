@@ -5,7 +5,7 @@ from granular_configuration._yaml_classes import _OPH
 from granular_configuration.exceptions import ParseEnvError
 from granular_configuration.yaml_handler.decorators import (
     LazyEval,
-    StateHolder,
+    StateOptions,
     StringOrTwopleType,
     make_lazy_with_state,
     string_or_twople_tag,
@@ -35,8 +35,8 @@ def parse_env(obj_pair_hook: _OPH, env_var: str, *default: typ.Any) -> typ.Any:
 
 @string_or_twople_tag("!ParseEnv")
 @make_lazy_with_state
-def handler(value: StringOrTwopleType, state: StateHolder) -> typ.Any:
+def handler(value: StringOrTwopleType, options: StateOptions) -> typ.Any:
     if isinstance(value, str):
-        return parse_env(state.obj_pairs_func, value)
+        return parse_env(options.obj_pairs_func, value)
     else:
-        return parse_env(state.obj_pairs_func, *value)
+        return parse_env(options.obj_pairs_func, *value)

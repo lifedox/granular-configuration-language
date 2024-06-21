@@ -2,7 +2,7 @@ import typing as typ
 
 from ruamel.yaml import Node, SafeConstructor, ScalarNode, SequenceNode
 
-from granular_configuration._yaml_classes import LazyEval, LazyEvalRootState, Root, StateHolder
+from granular_configuration._yaml_classes import LazyEval, LazyEvalRootState, Root, StateHolder, StateOptions
 
 _RT = typ.TypeVar("_RT")
 _T = typ.TypeVar("_T")
@@ -20,9 +20,10 @@ def make_lazy(func: typ.Callable[[_T], _RT]) -> typ.Callable[[_T, StateHolder], 
     return lazy_wrapper
 
 
-def make_lazy_with_state(func: typ.Callable[[_T, StateHolder], _RT]) -> typ.Callable[[_T, StateHolder], LazyEval[_RT]]:
+def make_lazy_with_state(func: typ.Callable[[_T, StateOptions], _RT]) -> typ.Callable[[_T, StateHolder], LazyEval[_RT]]:
     def lazy_wrapper(value: _T, state: StateHolder) -> LazyEval[_RT]:
-        return LazyEval(lambda: func(value, state))
+        options = state.options
+        return LazyEval(lambda: func(value, options))
 
     return lazy_wrapper
 
@@ -34,13 +35,14 @@ def make_lazy_root(func: typ.Callable[[_T, Root], _RT]) -> typ.Callable[[_T, Sta
     return lazy_wrapper
 
 
-# def make_lazy_root_with_state(
-#     func: typ.Callable[[_T, StateHolder, Root], _RT]
-# ) -> typ.Callable[[_T, StateHolder], LazyEvalRootState[_RT]]:
-#     def lazy_wrapper(value: _T, state: StateHolder) -> LazyEvalRootState[_RT]:
-#         return LazyEvalRootState(state.lazy_root_obj, lambda root: func(value, state, root))
+def make_lazy_root_with_state(
+    func: typ.Callable[[_T, StateOptions, Root], _RT]
+) -> typ.Callable[[_T, StateHolder], LazyEvalRootState[_RT]]:
+    def lazy_wrapper(value: _T, state: StateHolder) -> LazyEvalRootState[_RT]:
+        options = state.options
+        return LazyEvalRootState(state.lazy_root_obj, lambda root: func(value, options, root))
 
-#     return lazy_wrapper
+    return lazy_wrapper
 
 
 def lazy_exeception(func: typ.Callable[[_T], _RT]) -> typ.Callable[[_T, StateHolder], LazyEval[_RT]]:

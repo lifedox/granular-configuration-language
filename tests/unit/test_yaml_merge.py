@@ -105,6 +105,26 @@ def test_parsefile_redirect_loading() -> None:
     }
 
 
+def test_parsefile_redirect_loading_sub_syntax() -> None:
+    assert (
+        loads(
+            """
+file: parsefile1.yaml
+contents: !ParseFile ${$.file}
+""",
+            obj_pairs_hook=Configuration,
+            file_path=ASSET_DIR / "dummy.yaml",
+        )
+        == {
+            "file": "parsefile1.yaml",
+            "contents": {
+                "base": {"a": "from parsefile2.yaml", "b": "$.data"},
+                "data": "From parsefile1.yaml",
+            },
+        }
+    )
+
+
 def test_merging_LazyLoadConfiguration() -> None:
     configs = (
         LazyLoadConfiguration(ASSET_DIR / "parsefile1.yaml"),

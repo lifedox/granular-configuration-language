@@ -51,7 +51,12 @@ _OPH = typ.Optional[typ.Type[typ.MutableMapping]]
 
 
 @dataclass(frozen=True, kw_only=True)
-class StateHolder:
-    lazy_root_obj: LazyRoot
+class StateOptions:
     obj_pairs_func: _OPH
     file_relative_path: Path
+
+
+@dataclass(frozen=True, kw_only=True)
+class StateHolder:
+    options: StateOptions
+    lazy_root_obj: LazyRoot
