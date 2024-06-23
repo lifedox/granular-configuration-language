@@ -9,8 +9,8 @@ from pathlib import Path
 from ruamel.yaml import YAML, MappingNode, Node, SafeConstructor
 from ruamel.yaml.resolver import BaseResolver
 
-from granular_configuration._yaml_classes import LazyRoot, StateHolder, StateOptions
-from granular_configuration.yaml_handler.yaml_tags import handlers
+from granular_configuration.yaml.classes import LazyRoot, StateHolder, StateOptions
+from granular_configuration.yaml.ytags import handlers
 
 _OPH = typ.Optional[typ.Type[MutableMapping]]
 
@@ -55,10 +55,10 @@ def loads(
     class ExtendedSafeConstructor(SafeConstructor):
         yaml_constructors = copy(SafeConstructor.yaml_constructors)
 
-    ExtendedSafeConstructor.add_constructor(BaseResolver.DEFAULT_MAPPING_TAG, partial(construct_mapping, oph))
-
     for handler in handlers:
         handler(ExtendedSafeConstructor, state)
+
+    ExtendedSafeConstructor.add_constructor(BaseResolver.DEFAULT_MAPPING_TAG, partial(construct_mapping, oph))
 
     yaml.Constructor = ExtendedSafeConstructor
 

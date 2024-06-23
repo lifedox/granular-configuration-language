@@ -7,7 +7,7 @@ import pytest
 
 from granular_configuration import Configuration
 from granular_configuration._build import build_configuration
-from granular_configuration.yaml_handler import Placeholder, loads
+from granular_configuration.yaml import Placeholder, loads
 
 ASSET_DIR = (Path(__file__).parent / "../assets/config_location_test").resolve()
 

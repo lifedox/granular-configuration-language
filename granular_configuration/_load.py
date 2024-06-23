@@ -2,7 +2,7 @@ import typing as typ
 from pathlib import Path
 
 from granular_configuration.exceptions import IniUnsupported
-from granular_configuration.yaml_handler import LazyRoot, loads
+from granular_configuration.yaml import LazyRoot, loads
 
 
 def load_file(

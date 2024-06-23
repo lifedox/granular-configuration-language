@@ -3,7 +3,7 @@ from pathlib import Path
 import pytest
 
 from granular_configuration import Configuration, LazyLoadConfiguration, merge
-from granular_configuration.yaml_handler import loads
+from granular_configuration.yaml import loads
 
 ASSET_DIR = (Path(__file__).parent / "../assets/config_location_test").resolve()
 

@@ -4,7 +4,7 @@ import os
 import sys
 import typing as typ
 
-from granular_configuration.yaml_handler.decorators import Tag, make_lazy, string_tag
+from granular_configuration.yaml.decorators import Tag, make_lazy, string_tag
 
 
 def add_cwd_to_path() -> None:

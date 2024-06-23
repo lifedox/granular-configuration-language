@@ -2,7 +2,7 @@ import os
 import re
 import typing as typ
 
-from granular_configuration.yaml_handler.decorators import Tag, make_lazy, string_tag
+from granular_configuration.yaml.decorators import Tag, make_lazy, string_tag
 
 ENV_PATTERN: typ.Pattern[str] = re.compile(r"(\{\{\s*(?P<env_name>[A-Za-z0-9-_]+)\s*(?:\:(?P<default>.*?))?\}\})")
 

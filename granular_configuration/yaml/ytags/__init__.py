@@ -1,7 +1,7 @@
 import typing as typ
 
-from granular_configuration.yaml_handler.decorators import CallableConstructorType
-from granular_configuration.yaml_handler.yaml_tags import (
+from granular_configuration.yaml.decorators import CallableConstructorType
+from granular_configuration.yaml.ytags import (
     del_,
     env,
     func_and_class,

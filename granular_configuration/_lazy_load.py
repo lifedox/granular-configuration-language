@@ -13,7 +13,7 @@ from granular_configuration.exceptions import InvalidBasePathException
 
 class LazyLoadConfiguration(MutableMapping):
     """
-    Provides a lazy interface for loading Configuration from ConfigurationLocations definitions on first access.
+    Provides a lazy interface for loading Configuration from file paths on first access.
     """
 
     def __init__(

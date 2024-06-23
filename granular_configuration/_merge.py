@@ -2,7 +2,7 @@ import typing as typ
 
 from granular_configuration import Configuration, LazyLoadConfiguration
 from granular_configuration._build import _merge
-from granular_configuration.yaml_handler import LazyEval
+from granular_configuration.yaml.classes import LazyEval
 
 
 def merge(configs: typ.Iterable[Configuration | LazyLoadConfiguration | typ.Any]) -> Configuration:

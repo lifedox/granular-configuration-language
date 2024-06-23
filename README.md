@@ -763,6 +763,7 @@ LazyLoadConfiguration(
   - Note: `jsonpath-rw` is very dead
   - Important: Both `jsonpath-rw` and `python-jsonpath` cannot be install. `jsonpath-rw` controls `jsonpath_rw` and `jsonpath` modules (despite not explicitly needing the latter). `python-jsonpath` also controls `jsonpath`, but losses in `jsonpath-rw`.
     - `ImportError` occur on the `jsonpath` modules when both are install.
+- Renamed `granular_configuration.yaml_handler` module to `granular_configuration.yaml`
 
 ### 1.8.0
 

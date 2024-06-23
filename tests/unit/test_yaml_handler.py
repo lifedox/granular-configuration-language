@@ -8,7 +8,7 @@ import pytest
 
 from granular_configuration import Configuration, ConfigurationLocations, Masked
 from granular_configuration.exceptions import JSONPathOnlyWorksOnMappings, ParseEnvError
-from granular_configuration.yaml_handler import Placeholder, loads
+from granular_configuration.yaml import Placeholder, loads
 
 
 def test_env() -> None:

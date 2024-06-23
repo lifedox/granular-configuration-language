@@ -2,9 +2,9 @@ import os
 import typing as typ
 from functools import partial
 
-from granular_configuration._yaml_classes import _OPH, LazyRoot
 from granular_configuration.exceptions import ParseEnvEnvironmentVaribleNotFound, ParseEnvError
-from granular_configuration.yaml_handler.decorators import (
+from granular_configuration.yaml.classes import _OPH, LazyRoot
+from granular_configuration.yaml.decorators import (
     LazyEval,
     Root,
     StateOptions,
@@ -32,7 +32,7 @@ def parse_env(load: typ.Callable[[str], typ.Any], env_var: str, *default: typ.An
 
 
 def load_advance(obj_pair_hook: _OPH, root: Root, value: str) -> typ.Any:
-    from granular_configuration.yaml_handler import loads
+    from granular_configuration.yaml import loads
 
     lazy_root = LazyRoot()
     lazy_root._set_root(root)

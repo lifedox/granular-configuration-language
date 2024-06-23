@@ -3,7 +3,7 @@ from functools import wraps
 
 from ruamel.yaml import Node, SafeConstructor, ScalarNode, SequenceNode
 
-from granular_configuration._yaml_classes import LazyEval, LazyEvalRootState, Root, StateHolder, StateOptions, Tag
+from granular_configuration.yaml.classes import LazyEval, LazyEvalRootState, Root, StateHolder, StateOptions, Tag
 
 _RT = typ.TypeVar("_RT")
 _T = typ.TypeVar("_T")

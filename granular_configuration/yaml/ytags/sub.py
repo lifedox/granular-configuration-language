@@ -6,8 +6,8 @@ import typing as typ
 import jsonpath
 
 from granular_configuration.exceptions import JSONPathOnlyWorksOnMappings
-from granular_configuration.yaml_handler.decorators import LazyEval, Root, Tag, make_lazy_root, string_tag
-from granular_configuration.yaml_handler.yaml_tags.merge import handler as merge_handler
+from granular_configuration.yaml.decorators import LazyEval, Root, Tag, make_lazy_root, string_tag
+from granular_configuration.yaml.ytags.merge import handler as merge_handler
 
 SUB_PATTERN: typ.Pattern[str] = re.compile(r"(\$\{(?P<contents>.*?)\})")
 
