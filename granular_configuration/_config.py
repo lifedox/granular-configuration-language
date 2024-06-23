@@ -134,14 +134,19 @@ class Configuration(typ.MutableMapping):
 
         if isinstance(value, Placeholder):
             raise PlaceholderConfigurationError(
-                'Configuration expects "{}" to be overwritten. Message: "{}"'.format(self.__get_name(name), value)
+                f'Configuration expects "{self.__get_name(name)}" to be overwritten. Message: "{value}"'
             )
         elif isinstance(value, LazyEval):
-            new_value = value.run()
-            while isinstance(new_value, LazyEval):
-                new_value = new_value.run()
-            self[name] = new_value
-            return new_value
+            try:
+                new_value = value.run()
+                while isinstance(new_value, LazyEval):
+                    new_value = new_value.run()
+                self[name] = new_value
+                return new_value
+            except RecursionError:
+                raise RecursionError(
+                    f"{value.tag} at `{self.__get_name(name)}` caused a recursion error. Please check your configuration for a self-referencing loop."
+                ) from None
         elif isinstance(value, Configuration):
             value.__names = self.__names + (str(name),)
             return value
@@ -157,7 +162,7 @@ class Configuration(typ.MutableMapping):
         Throws AttributeError instead of KeyError, as compared to __getitem__ when an attribute is not present.
         """
         if name not in self:
-            raise AttributeError('Configuration value "{}" does not exist'.format(self.__get_name(name)))
+            raise AttributeError(f'Configuration value "{self.__get_name(name)}" does not exist')
 
         return self[name]
 

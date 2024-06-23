@@ -5,8 +5,9 @@ from pathlib import Path
 
 _RT = typ.TypeVar("_RT")
 
-RootType = typ.NewType("RootType", object)
+RootType = typ.NewType("RootType", typ.Mapping)
 Root = RootType | None
+Tag = typ.NewType("Tag", str)
 
 
 class Masked(str):
@@ -37,10 +38,14 @@ class LazyRoot:
 
 
 class LazyEval(typ.Generic[_RT]):
-    __slots__ = ("value",)
+    __slots__ = ("value", "tag")
 
-    def __init__(self, value: typ.Callable[[], _RT]) -> None:
+    def __init__(self, tag: Tag, value: typ.Callable[[], _RT]) -> None:
+        self.tag = tag
         self.value: typ.Callable[..., _RT] = value
+
+    def __repr__(self) -> str:
+        return f"<{self.__class__.__name__}: {self.tag}>"
 
     @cache
     def run(self) -> _RT:
@@ -53,7 +58,8 @@ class LazyEval(typ.Generic[_RT]):
 class LazyEvalRootState(LazyEval[_RT]):
     __slots__ = ("root",)
 
-    def __init__(self, root: LazyRoot, value: typ.Callable[[typ.Any], _RT]) -> None:
+    def __init__(self, tag: Tag, root: LazyRoot, value: typ.Callable[[typ.Any], _RT]) -> None:
+        self.tag = tag
         self.value: typ.Callable[..., _RT] = value
         self.root = root
 

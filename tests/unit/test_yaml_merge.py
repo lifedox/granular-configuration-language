@@ -157,3 +157,42 @@ def test_merging_LazyLoadConfiguration() -> None:
         "from": "merge",
         "reach_in": "From parsefile1.yaml",
     }
+
+
+def test_merging_with_a_basic_sub_doesnt_fail() -> None:
+    test = """\
+!Merge
+- !Sub String 1
+- a: b
+"""
+    assert loads(test, obj_pairs_hook=Configuration).run().as_dict() == {"a": "b"}
+
+
+def test_merging_with_a_env_sub_doesnt_fail() -> None:
+    test = """\
+!Merge
+- !Sub ${doesn't_exists:-default}
+- a: b
+"""
+    assert loads(test, obj_pairs_hook=Configuration).run().as_dict() == {"a": "b"}
+
+
+def test_merging_with_a_jsonpath_Sub_fails_on_RecursionError() -> None:
+    test = """\
+!Merge
+- a: b
+- !Sub ${$.a}
+"""
+    with pytest.raises(RecursionError):
+        assert loads(test, obj_pairs_hook=Configuration).run().as_dict() == {"a": "b"}
+
+
+def test_merging_with_a_jsonpath_ParseFile_fails_on_RecursionError() -> None:
+    test = """\
+a: b
+c: !Merge
+    - a: b
+    - !ParseFile ${$.c}
+"""
+    with pytest.raises(RecursionError):
+        assert loads(test, obj_pairs_hook=Configuration).as_dict() == {"a": "b"}

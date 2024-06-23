@@ -4,7 +4,7 @@ import os
 import sys
 import typing as typ
 
-from granular_configuration.yaml_handler.decorators import make_lazy, string_tag
+from granular_configuration.yaml_handler.decorators import Tag, make_lazy, string_tag
 
 
 def add_cwd_to_path() -> None:
@@ -23,7 +23,7 @@ def get_func(func_path: str) -> typ.Callable:
         raise ValueError(f"Could not load {func_path}")
 
 
-@string_tag("!Class")
+@string_tag(Tag("!Class"))
 @make_lazy
 def class_handler(value: str) -> typ.Callable:
     class_type = get_func(value)
@@ -33,7 +33,7 @@ def class_handler(value: str) -> typ.Callable:
         raise ValueError("Classes loaded by !Class must pass `inspect.isclass`")
 
 
-@string_tag("!Func")
+@string_tag(Tag("!Func"))
 @make_lazy
 def func_handler(value: str) -> typ.Callable:
     func = get_func(value)

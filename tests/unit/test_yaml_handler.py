@@ -7,7 +7,7 @@ from unittest.mock import patch
 import pytest
 
 from granular_configuration import Configuration, ConfigurationLocations, Masked
-from granular_configuration.exceptions import ParseEnvError
+from granular_configuration.exceptions import JSONPathOnlyWorksOnMappings, ParseEnvError
 from granular_configuration.yaml_handler import Placeholder, loads
 
 
@@ -183,6 +183,44 @@ def test_parse_env_sequence__int() -> None:
         assert isinstance(loads("!ParseEnv [unreal_env_variable, null]").run(), int)
 
 
+def test_parse_env_safe_sequence__use_default() -> None:
+    with patch.dict(os.environ, values={}):
+        assert loads('!ParseEnvSafe ["unreal_env_vari", 1]').run() == 1
+        assert loads('!ParseEnvSafe ["unreal_env_vari", 1.5]').run() == 1.5
+        assert loads('!ParseEnvSafe ["unreal_env_vari", abc]').run() == "abc"
+        assert loads('!ParseEnvSafe ["unreal_env_vari", null]').run() is None
+        assert loads('!ParseEnvSafe ["unreal_env_vari", false]').run() is False
+        value = loads('!ParseEnvSafe ["unreal_env_vari", {"a": {"b": "value"}}]', obj_pairs_hook=Configuration).run()
+        assert isinstance(value, Configuration)
+        assert value == {"a": {"b": "value"}}
+        assert isinstance(value["a"], Configuration)
+
+
+def test_parse_env_safe_sequence__string() -> None:
+    with patch.dict(os.environ, values={"unreal_env_variable": "test me"}):
+        assert loads("!ParseEnvSafe [unreal_env_variable, null]").run() == "test me"
+
+
+def test_parse_env_safe_sequence__float() -> None:
+    with patch.dict(os.environ, values={"unreal_env_variable": "3.0"}):
+        assert loads("!ParseEnvSafe [unreal_env_variable, null]").run() == 3.0
+        assert isinstance(loads("!ParseEnvSafe [unreal_env_variable, null]").run(), float)
+
+
+def test_parse_env_safe_sequence__int() -> None:
+    with patch.dict(os.environ, values={"unreal_env_variable": "3"}):
+        assert loads("!ParseEnvSafe [unreal_env_variable, null]").run() == 3
+        assert isinstance(loads("!ParseEnvSafe [unreal_env_variable, null]").run(), int)
+
+
+def test_parse_env_safe_with_a_tag_fails() -> None:
+    with patch.dict(
+        os.environ, values={"unreal_env_variable": "!ParseEnv unreal_env_variable1", "unreal_env_variable1": "42"}
+    ):
+        with pytest.raises(ParseEnvError):
+            loads("!ParseEnvSafe unreal_env_variable").run()
+
+
 def test_sub__env() -> None:
     with patch.dict(os.environ, values={"unreal_env_variable": "test me"}):
         assert loads("!Sub ${unreal_env_variable}").run() == "test me"
@@ -227,6 +265,13 @@ b: c
 """
     with pytest.raises(KeyError):
         loads(test_data, obj_pairs_hook=Configuration).as_dict()
+
+
+def test_sub__jsonpath_on_a_scalar_value_makes_no_sense_and_must_fail() -> None:
+    test_data = """!Sub ${$.no_data.here}
+"""
+    with pytest.raises(JSONPathOnlyWorksOnMappings):
+        loads(test_data, obj_pairs_hook=Configuration).run()
 
 
 def product_pylance_helper(*iterable: typ.Iterable[bool]) -> typ.Iterator[typ.Iterable[bool]]:

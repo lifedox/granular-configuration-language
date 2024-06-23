@@ -21,6 +21,7 @@ handlers: typ.Final[typ.Sequence[CallableConstructorType]] = (
     mask.handler,
     merge.handler,
     parse_env.handler,
+    parse_env.handler_safe,
     parse_file.handler,
     parse_file.handler_optional,
     placeholder.handler,

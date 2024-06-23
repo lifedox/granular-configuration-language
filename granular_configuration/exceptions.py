@@ -22,6 +22,10 @@ class ParseEnvError(Exception):
     pass
 
 
+class ParseEnvEnvironmentVaribleNotFound(KeyError):
+    pass
+
+
 class JSONPathOnlyWorksOnMappings(Exception):
     pass
 
