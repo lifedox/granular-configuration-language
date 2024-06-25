@@ -62,9 +62,7 @@ class Patch(typ.Mapping):
 
 
 class Configuration(typ.MutableMapping):
-    def __init__(
-        self, *arg: typ.Union[typ.Mapping, typ.Iterable[typ.Tuple[typ.Any, typ.Any]]], **kwargs: typ.Any
-    ) -> None:
+    def __init__(self, *arg: typ.Mapping | typ.Iterable[typ.Tuple[typ.Any, typ.Any]], **kwargs: typ.Any) -> None:
         self.__data: typ.Dict = dict()
         self.__names: typ.Tuple[str, ...] = tuple()
         self.__patches: OrderedSet[Patch] = OrderedSet()

@@ -177,18 +177,6 @@ def test__parse_location_star() -> None:
     assert con_loc.filenames == (
         "a.yaml",
         "a.yml",
-        "a.ini",
-    )
-    assert con_loc.files is None
-
-
-def test__parse_location_ini() -> None:
-    con_loc = parse_location("/a/b/a.ini")
-    assert con_loc.directories == (Path("/a/b"),)
-    assert con_loc.filenames == (
-        "a.ini",
-        "a.yaml",
-        "a.yml",
     )
     assert con_loc.files is None
 

@@ -5,38 +5,30 @@ from pathlib import Path
 
 import pytest
 
-from granular_configuration import Configuration
-from granular_configuration._build import build_configuration
-from granular_configuration.yaml import Placeholder, loads
+from granular_configuration import Configuration, LazyLoadConfiguration
+from granular_configuration.yaml import Placeholder
 
 ASSET_DIR = (Path(__file__).parent / "../assets/config_location_test").resolve()
 
 
-def test_converting_Configuration_to_dict() -> None:
-    config = loads("a: !Func functools.reduce", Configuration)
-    assert isinstance(config, Configuration)
+def test_using_Configuration_like_dict() -> None:
+    config = LazyLoadConfiguration(ASSET_DIR / "func_test.yaml").config
+
+    assert config.a is reduce
     assert tuple(config.items()) == (("a", reduce),)
-
-    config = loads("a: !Func functools.reduce", Configuration)
     assert tuple(config.values()) == (reduce,)
-
-    config = loads("a: !Func functools.reduce", Configuration)
     assert dict(config) == {"a": reduce}
-
-    config = loads("a: !Func functools.reduce", Configuration)
     assert config.pop("a") == reduce
 
-    config = loads("a: !Func functools.reduce", Configuration)
+    config = LazyLoadConfiguration(ASSET_DIR / "func_test.yaml").config
     assert config.popitem() == ("a", reduce)
 
 
 def test_Configuration_is_dict() -> None:
-    files = (
+    value = LazyLoadConfiguration(
         ASSET_DIR / "g/h.yaml",
         ASSET_DIR / "c/t.yaml",
-    )
-
-    value = build_configuration(files)
+    ).config
 
     import copy
 

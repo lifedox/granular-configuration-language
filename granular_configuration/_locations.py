@@ -6,7 +6,7 @@ from pathlib import Path
 
 from granular_configuration.utils import OrderedSet
 
-PathOrStr = typ.Union[Path, str, os.PathLike]
+PathOrStr = Path | str | os.PathLike
 
 
 def _absolute_paths(paths: typ.Iterable[Path]) -> typ.Sequence[Path]:
@@ -105,20 +105,14 @@ def _parse_location_path(location: Path) -> ConfigurationLocations:
     basename = location.stem
     ext = location.suffix
     if ext == ".*":
-        return ConfigurationMultiNamedFiles(
-            filenames=(basename + ".yaml", basename + ".yml", basename + ".ini"), directories=(dirname,)
-        )
+        return ConfigurationMultiNamedFiles(filenames=(basename + ".yaml", basename + ".yml"), directories=(dirname,))
     elif ext in (".y*", ".yml"):
         return ConfigurationMultiNamedFiles(filenames=(basename + ".yaml", basename + ".yml"), directories=(dirname,))
-    elif ext == ".ini":
-        return ConfigurationMultiNamedFiles(
-            filenames=(basename + ".ini", basename + ".yaml", basename + ".yml"), directories=(dirname,)
-        )
     else:
         return ConfigurationFiles(files=(location,))
 
 
-def parse_location(location: typ.Union[PathOrStr, ConfigurationLocations]) -> ConfigurationLocations:
+def parse_location(location: PathOrStr | ConfigurationLocations) -> ConfigurationLocations:
     if isinstance(location, ConfigurationLocations):
         return location
     elif isinstance(location, str):

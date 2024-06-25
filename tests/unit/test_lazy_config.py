@@ -48,7 +48,7 @@ class TestLaziness:
 
         with patch("granular_configuration._lazy_load.build_configuration", return_value=config_dict) as bc_mock:
             config = LazyLoadConfiguration(base_path="base")
-            assert config._LazyLoadConfiguration__base_path == ["base"]
+            assert list(config._LazyLoadConfiguration__base_path) == ["base"]
             bc_mock.assert_not_called()
 
     def test_list_base_path(self) -> None:
@@ -57,7 +57,7 @@ class TestLaziness:
         with patch("granular_configuration._lazy_load.build_configuration", return_value=config_dict) as bc_mock:
             config = LazyLoadConfiguration(base_path=["base", "path"])
 
-            assert config._LazyLoadConfiguration__base_path == ["base", "path"]
+            assert list(config._LazyLoadConfiguration__base_path) == ["base", "path"]
             bc_mock.assert_not_called()
 
     def test_no_base_path(self) -> None:
@@ -66,7 +66,7 @@ class TestLaziness:
         with patch("granular_configuration._lazy_load.build_configuration", return_value=config_dict) as bc_mock:
             config = LazyLoadConfiguration()
 
-            assert config._LazyLoadConfiguration__base_path == []
+            assert list(config._LazyLoadConfiguration__base_path) == []
             bc_mock.assert_not_called()
 
 

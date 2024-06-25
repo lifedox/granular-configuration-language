@@ -1,7 +1,8 @@
 import typing as typ
 from dataclasses import dataclass
-from functools import cache
+from functools import cached_property
 from pathlib import Path
+from threading import Lock
 
 _RT = typ.TypeVar("_RT")
 
@@ -40,17 +41,25 @@ class LazyRoot:
 
 
 class LazyEval(typ.Generic[_RT]):
-    __slots__ = ("value", "tag")
-
     def __init__(self, tag: Tag, value: typ.Callable[[], _RT]) -> None:
         self.tag = tag
+        self.done = False
         self.value: typ.Callable[..., _RT] = value
 
     def __repr__(self) -> str:
         return f"<{self.__class__.__name__}: {self.tag}>"
 
-    @cache
     def run(self) -> _RT:
+        if self.done:
+            return self.__result
+        else:
+            with Lock():
+                result = self.__result
+                self.done = True
+                return result
+
+    @cached_property
+    def __result(self) -> _RT:
         return self._run()
 
     def _run(self) -> _RT:
@@ -58,10 +67,9 @@ class LazyEval(typ.Generic[_RT]):
 
 
 class LazyEvalRootState(LazyEval[_RT]):
-    __slots__ = ("root",)
-
-    def __init__(self, tag: Tag, root: LazyRoot, value: typ.Callable[[typ.Any], _RT]) -> None:
+    def __init__(self, tag: Tag, root: LazyRoot, value: typ.Callable[[Root], _RT]) -> None:
         self.tag = tag
+        self.done = False
         self.value: typ.Callable[..., _RT] = value
         self.root = root
 
