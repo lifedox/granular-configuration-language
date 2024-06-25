@@ -764,6 +764,8 @@ LazyLoadConfiguration(
   - Important: Both `jsonpath-rw` and `python-jsonpath` cannot be install. `jsonpath-rw` controls `jsonpath_rw` and `jsonpath` modules (despite not explicitly needing the latter). `python-jsonpath` also controls `jsonpath`, but losses in `jsonpath-rw`.
     - `ImportError` occur on the `jsonpath` modules when both are install.
 - Renamed `granular_configuration.yaml_handler` module to `granular_configuration.yaml`
+- Add JSON Pointer support where JSON Path is supported.
+- Added `!Ref`, `!Merge`, `!Del`, `ParseFile`, `ParseFileOptional`, `!ParseEnvSafe`
 
 ### 1.8.0
 
@@ -800,4 +802,4 @@ LazyLoadConfiguration(
 
 ## Author
 
-Code Owner: Eric Jensen (ericjensen@granular.ag)
+Code Owner: Eric Jensen (lifedox@live.com)

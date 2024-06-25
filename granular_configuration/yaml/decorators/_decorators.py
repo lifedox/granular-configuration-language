@@ -55,6 +55,8 @@ def lazy_exeception(func: typ.Callable[[_T], _RT]) -> typ.Callable[[Tag, _T, Sta
 
 CallableConstructorType = typ.Callable[[typ.Type[SafeConstructor], StateHolder], None]
 
+StringTagType = str
+
 
 def string_tag(
     tag: Tag,
@@ -81,17 +83,17 @@ def string_tag(
     return decorator
 
 
-StringOrTwopleType = str | tuple[str, typ.Any]
+StringOrTwopleTagType = str | tuple[str, typ.Any]
 
 
 def string_or_twople_tag(
     tag: Tag,
 ) -> typ.Callable[
-    [typ.Callable[[Tag, StringOrTwopleType, StateHolder], LazyEval[_T]]],
+    [typ.Callable[[Tag, StringOrTwopleTagType, StateHolder], LazyEval[_T]]],
     CallableConstructorType,
 ]:
     def decorator(
-        handler: typ.Callable[[Tag, StringOrTwopleType, StateHolder], LazyEval[_T]]
+        handler: typ.Callable[[Tag, StringOrTwopleTagType, StateHolder], LazyEval[_T]]
     ) -> CallableConstructorType:
         @wraps(handler)
         def add_handler(
@@ -118,17 +120,17 @@ def string_or_twople_tag(
     return decorator
 
 
-SequenceOfAnyType = typ.Sequence[typ.Any]
+SequenceOfAnyTagType = typ.Sequence[typ.Any]
 
 
 def sequence_of_any_tag(
     tag: Tag,
 ) -> typ.Callable[
-    [typ.Callable[[Tag, SequenceOfAnyType, StateHolder], LazyEval[_T]]],
+    [typ.Callable[[Tag, SequenceOfAnyTagType, StateHolder], LazyEval[_T]]],
     CallableConstructorType,
 ]:
     def decorator(
-        handler: typ.Callable[[Tag, SequenceOfAnyType, StateHolder], LazyEval[_T]]
+        handler: typ.Callable[[Tag, SequenceOfAnyTagType, StateHolder], LazyEval[_T]]
     ) -> CallableConstructorType:
         @wraps(handler)
         def add_handler(

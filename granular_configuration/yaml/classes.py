@@ -26,6 +26,8 @@ class Placeholder:
 
 
 class LazyRoot:
+    __slots__ = "__root"
+
     def __init__(self) -> None:
         self.__root: Root = None
 

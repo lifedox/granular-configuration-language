@@ -7,7 +7,7 @@ from unittest.mock import patch
 import pytest
 
 from granular_configuration import Configuration, ConfigurationLocations, Masked
-from granular_configuration.exceptions import JSONPathOnlyWorksOnMappings, ParseEnvError
+from granular_configuration.exceptions import JSONPathMustStartFromRoot, JSONPathOnlyWorksOnMappings, ParseEnvError
 from granular_configuration.yaml import Placeholder, loads
 
 
@@ -448,3 +448,74 @@ def test_mask() -> None:
     assert str(output) == "secret"
     assert output == "secret"
     assert isinstance(output, Masked)
+
+
+def test_ref__jsonpath() -> None:
+    test_data = """\
+data:
+    dog:
+        name: nitro
+    cat:
+        name: never owned a cat
+tests:
+    a: !Ref $.data.dog.name
+    b: !Ref $.data.dog
+    c: !Ref $.data.*.name
+"""
+
+    output: Configuration = loads(test_data, obj_pairs_hook=Configuration)
+    assert output.tests.as_dict() == dict(
+        a="nitro",
+        b={"name": "nitro"},
+        c="['nitro', 'never owned a cat']",
+    )
+    assert output.data.dog.name is output.tests.a
+    assert output.data.dog is output.tests.b
+
+
+def test_ref__jsonpath_missing() -> None:
+    test_data = """
+a: !Ref $.no_data.here
+b: c
+"""
+    with pytest.raises(KeyError):
+        loads(test_data, obj_pairs_hook=Configuration).as_dict()
+
+
+def test_ref__jsonpointer() -> None:
+    test_data = """\
+data:
+    dog:
+        name: nitro
+    cat:
+        name: never owned a cat
+tests:
+    a: !Ref /data/dog/name
+    b: !Ref /data/dog
+"""
+
+    output: Configuration = loads(test_data, obj_pairs_hook=Configuration)
+    assert output.tests.as_dict() == dict(
+        a="nitro",
+        b={"name": "nitro"},
+    )
+    assert output.data.dog.name is output.tests.a
+    assert output.data.dog is output.tests.b
+
+
+def test_ref__jsonpointer_missing() -> None:
+    test_data = """
+a: !Ref /no_data/here
+b: c
+"""
+    with pytest.raises(KeyError):
+        assert loads(test_data, obj_pairs_hook=Configuration).as_dict() == {}
+
+
+def test_ref__syntax_Error() -> None:
+    test_data = """
+a: !Ref no_data/here
+b: c
+"""
+    with pytest.raises(JSONPathMustStartFromRoot):
+        assert loads(test_data, obj_pairs_hook=Configuration).as_dict() == {}

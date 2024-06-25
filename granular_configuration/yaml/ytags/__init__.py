@@ -10,6 +10,7 @@ from granular_configuration.yaml.ytags import (
     parse_env,
     parse_file,
     placeholder,
+    ref,
     sub,
 )
 
@@ -25,5 +26,6 @@ handlers: typ.Final[typ.Sequence[CallableConstructorType]] = (
     parse_file.handler,
     parse_file.handler_optional,
     placeholder.handler,
+    ref.handler,
     sub.handler,
 )

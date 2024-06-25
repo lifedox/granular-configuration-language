@@ -1,4 +1,4 @@
 !Del from_file: !ParseFile &from parsefile2.yaml
 base: *from
 data: From parsefile1.yaml
-reach_in: !Sub ${$.base.b}
+reach_in: !Sub ${/base/b}

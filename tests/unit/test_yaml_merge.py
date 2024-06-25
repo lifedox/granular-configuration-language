@@ -126,7 +126,7 @@ def test_parsefile_redirect_loading_sub_syntax() -> None:
         loads(
             """
 file: parsefile1.yaml
-contents: !ParseFile ${$.file}
+contents: !ParseFile ${/file}
 "data": "From parse_redirct.yaml"
 "base": {"b": "From parse_redirct.yaml"}
 """,
@@ -193,6 +193,17 @@ a: b
 c: !Merge
     - a: b
     - !ParseFile ${$.c}
+"""
+    with pytest.raises(RecursionError):
+        assert loads(test, obj_pairs_hook=Configuration).as_dict() == {"a": "b"}
+
+
+def test_merging_with_a_jsonpointer_ParseFile_fails_on_RecursionError() -> None:
+    test = """\
+a: b
+c: !Merge
+    - a: b
+    - !ParseFile ${/c}
 """
     with pytest.raises(RecursionError):
         assert loads(test, obj_pairs_hook=Configuration).as_dict() == {"a": "b"}
