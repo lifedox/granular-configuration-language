@@ -85,7 +85,7 @@ class string_tag(TagDecoratorBase):
                     value = constructor.construct_scalar(node)
                     if isinstance(value, str):
                         return handler(tag, str(value), state)
-                    else:  # pragma: no cover
+                    else:  # pragma: no cover  # untestable branch
                         # Scalar Tags are strings by definition. Checking just creates an untestable branch
                         pass
                 raise ValueError(f"{tag} only supports a string. Got: `{repr(node)}`")
@@ -112,7 +112,7 @@ class string_or_twople_tag(TagDecoratorBase):
                     value = constructor.construct_scalar(node)
                     if isinstance(value, str):
                         return handler(tag, value, state)
-                    else:  # pragma: no cover
+                    else:  # pragma: no cover  # untestable branch
                         # Scalar Tags are strings by definition. Checking just creates an untestable branch
                         pass
                 elif isinstance(node, SequenceNode):
@@ -143,7 +143,7 @@ class sequence_of_any_tag(TagDecoratorBase):
                     value = constructor.construct_sequence(node)
                     if isinstance(value, list):
                         return handler(tag, value, state)
-                    else:  # pragma: no cover
+                    else:  # pragma: no cover  # untestable branch
                         # Sequence Tags are list by definition. Checking just creates an untestable branch
                         pass
                 raise ValueError(f"{tag} supports: list[Any]. Got: `{repr(node)}`")

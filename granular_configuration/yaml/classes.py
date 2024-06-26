@@ -56,7 +56,7 @@ class LazyEval(abc.ABC, typ.Generic[_RT]):
         return f"<{self.__class__.__name__}: {self.tag}>"
 
     def run(self) -> _RT:
-        if self.done:
+        if self.done:  # pragma: no cover
             return self.__result
         else:
             with Lock():
@@ -79,7 +79,7 @@ class LazyEval(abc.ABC, typ.Generic[_RT]):
         return self._run()
 
     @abc.abstractmethod
-    def _run(self) -> _RT: ...  # pragma: no cover
+    def _run(self) -> _RT: ...  # pragma: no cover  # abstractmethod
 
 
 _OPH = typ.Optional[typ.Type[typ.MutableMapping]]

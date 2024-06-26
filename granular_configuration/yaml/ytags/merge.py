@@ -8,7 +8,7 @@ if typ.TYPE_CHECKING:  # pragma: no cover
     # Fixes mypy `Cannot determine type of "handler"`
     # Probably forces a ForwardRef during mypy TYPE_CHECKING
     from granular_configuration._config import Configuration
-else:  # pragma: no cover
+else:  # pragma: no cover  # TYPE_CHECKING
     # Allows `inspect.get_annotations(handler, eval_str=True)`
     from granular_configuration._config import Configuration
 

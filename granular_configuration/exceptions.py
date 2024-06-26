@@ -42,5 +42,5 @@ class JSONPathQueryMatchFailed(KeyError):
     pass
 
 
-class IniUnsupported(Exception):
+class IniUnsupportedError(Exception):
     pass

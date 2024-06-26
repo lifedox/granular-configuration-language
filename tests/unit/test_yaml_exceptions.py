@@ -124,10 +124,7 @@ a: !Ref /no_data/here
 b: c
 """
     with pytest.raises(KeyError):
-        assert (
-            loads(test_data).as_dict()
-            == {}
-        )
+        assert loads(test_data).as_dict() == {}
 
 
 def test_ref__syntax_Error() -> None:
@@ -136,7 +133,4 @@ a: !Ref no_data/here
 b: c
 """
     with pytest.raises(JSONPathMustStartFromRoot):
-        assert (
-            loads(test_data).as_dict()
-            == {}
-        )
+        assert loads(test_data).as_dict() == {}

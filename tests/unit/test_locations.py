@@ -7,9 +7,7 @@ import pytest
 
 from granular_configuration._locations import (
     ConfigurationFiles,
-    ConfigurationLocations,
     ConfigurationMultiNamedFiles,
-    _get_files_from_locations,
     get_all_unique_locations,
     parse_location,
 )
@@ -51,7 +49,9 @@ def test__get_files_from_locations() -> None:
 
     exists = EXISTS
 
-    locations = _get_files_from_locations(filenames, directories, files)
+    locations = (
+        ConfigurationMultiNamedFiles(filenames, directories).get_locations() | ConfigurationFiles(files).get_locations()
+    )
 
     assert sorted(locations) == sorted(exists[:3])
 
@@ -63,7 +63,9 @@ def test__get_files_from_locations_no_filename() -> None:
 
     exists = (ASSET_DIR / "g/h.yaml",)
 
-    locations = _get_files_from_locations(filenames, directories, files)
+    locations = (
+        ConfigurationMultiNamedFiles(filenames, directories).get_locations() | ConfigurationFiles(files).get_locations()
+    )
 
     assert sorted(locations) == sorted(exists)
 
@@ -75,33 +77,11 @@ def test__get_files_from_locations_no_dirs() -> None:
 
     exists = (ASSET_DIR / "g/h.yaml",)
 
-    locations = _get_files_from_locations(filenames, directories, files)
+    locations = (
+        ConfigurationMultiNamedFiles(filenames, directories).get_locations() | ConfigurationFiles(files).get_locations()
+    )
 
     assert sorted(locations) == sorted(exists)
-
-
-def test__ConfigurationLocations() -> None:
-    directories = DIRECTORIES
-    filenames = FILENAMES
-    files = FILES
-
-    exists = EXISTS
-
-    with patch(
-        "granular_configuration._locations._get_files_from_locations", side_effect=_get_files_from_locations
-    ) as loc_mock:
-        from_files = ConfigurationLocations(files=files)
-        from_priority = ConfigurationLocations(filenames=filenames, directories=directories)
-
-        loc_mock.assert_not_called()
-
-        assert tuple(from_files.get_locations()) == exists[0:1]
-        loc_mock.assert_called_with(filenames=None, directories=None, files=files)
-
-        assert tuple(from_priority.get_locations()) == exists[1:3]
-        loc_mock.assert_called_with(filenames=filenames, directories=directories, files=None)
-
-        assert loc_mock.call_count == 2
 
 
 def test__ConfigurationFiles() -> None:
@@ -140,8 +120,8 @@ def test_get_all_unique_locations() -> None:
 
     exists = EXISTS
 
-    from_files = ConfigurationLocations(files=files)
-    from_priority = ConfigurationLocations(filenames=filenames, directories=directories)
+    from_files = ConfigurationFiles(files=files)
+    from_priority = ConfigurationMultiNamedFiles(filenames=filenames, directories=directories)
 
     assert (
         tuple(
@@ -173,65 +153,40 @@ def test_get_all_unique_locations() -> None:
 
 def test__parse_location_star() -> None:
     con_loc = parse_location("/a/b/a.*")
-    assert con_loc.directories == (Path("/a/b"),)
-    assert con_loc.filenames == (
-        "a.yaml",
-        "a.yml",
-    )
-    assert con_loc.files is None
+    assert tuple(con_loc.get_possible_locations()) == (Path("/a/b/a.yaml"), Path("/a/b/a.yml"))
 
 
 def test__parse_location_ystar() -> None:
     con_loc = parse_location("/a/b/a.y*")
-    assert con_loc.directories == (Path("/a/b"),)
-    assert con_loc.filenames == (
-        "a.yaml",
-        "a.yml",
-    )
-    assert con_loc.files is None
+    assert tuple(con_loc.get_possible_locations()) == (Path("/a/b/a.yaml"), Path("/a/b/a.yml"))
 
 
 def test__parse_location_yml() -> None:
     con_loc = parse_location("/a/b/a.yml")
-    assert con_loc.directories == (Path("/a/b"),)
-    assert con_loc.filenames == (
-        "a.yaml",
-        "a.yml",
-    )
-    assert con_loc.files is None
+    assert tuple(con_loc.get_possible_locations()) == (Path("/a/b/a.yaml"), Path("/a/b/a.yml"))
 
 
 def test__parse_location_file() -> None:
     con_loc = parse_location("/a/b/a")
-    assert con_loc.directories is None
-    assert con_loc.filenames is None
-    assert con_loc.files == (Path("/a/b/a"),)
+    assert tuple(con_loc.get_possible_locations()) == (Path("/a/b/a"),)
 
     con_loc = parse_location("/a/b/a.yaml")
-    assert con_loc.directories is None
-    assert con_loc.filenames is None
-    assert con_loc.files == (Path("/a/b/a.yaml"),)
+    assert tuple(con_loc.get_possible_locations()) == (Path("/a/b/a.yaml"),)
 
     con_loc = parse_location("/a/b/a.doc")
-    assert con_loc.directories is None
-    assert con_loc.filenames is None
-    assert con_loc.files == (Path("/a/b/a.doc"),)
+    assert tuple(con_loc.get_possible_locations()) == (Path("/a/b/a.doc"),)
 
 
 def test__parse_location_home() -> None:
     con_loc = parse_location("~/a")
-    assert con_loc.directories is None
-    assert con_loc.filenames is None
-    assert con_loc.files == (Path("~/a").expanduser().resolve(),)
+    assert tuple(con_loc.get_possible_locations()) == (Path("~/a").expanduser().resolve(),)
 
 
 def test__parse_location_join() -> None:
     con_loc = parse_location(
         Path(__file__).parent / "a",
     )
-    assert con_loc.directories is None
-    assert con_loc.filenames is None
-    assert con_loc.files == (Path(__file__).parent / "a",)
+    assert tuple(con_loc.get_possible_locations()) == (Path(__file__).parent / "a",)
 
 
 def test__parse_location_type_error() -> None:

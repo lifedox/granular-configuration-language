@@ -6,7 +6,7 @@ import pytest
 
 from granular_configuration import Configuration, LazyLoadConfiguration
 from granular_configuration._locations import ConfigurationFiles, ConfigurationMultiNamedFiles
-from granular_configuration.exceptions import InvalidBasePathException
+from granular_configuration.exceptions import IniUnsupportedError, InvalidBasePathException
 
 ASSET_DIR = (Path(__file__).parent / "../assets/config_location_test").resolve()
 
@@ -144,3 +144,8 @@ def test_loading_empty_is_an_empty_dict() -> None:
 def test_loading_bad_yaml_causes_error() -> None:
     with pytest.raises(ValueError):
         LazyLoadConfiguration(ASSET_DIR / "bad.txt").config
+
+
+def test_loading_ini_causes_error() -> None:
+    with pytest.raises(IniUnsupportedError):
+        LazyLoadConfiguration(ASSET_DIR / "dummy.ini").config

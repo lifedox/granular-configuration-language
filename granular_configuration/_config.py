@@ -5,8 +5,8 @@ from collections.abc import Mapping
 from contextlib import contextmanager
 from itertools import chain, filterfalse, starmap
 
+from granular_configuration._utils import OrderedSet, consume
 from granular_configuration.exceptions import PlaceholderConfigurationError
-from granular_configuration.utils import OrderedSet, consume
 from granular_configuration.yaml import LazyEval, Placeholder
 
 

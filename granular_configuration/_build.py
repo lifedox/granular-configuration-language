@@ -4,7 +4,7 @@ from pathlib import Path
 
 from granular_configuration import Configuration
 from granular_configuration._load import load_file
-from granular_configuration.utils import consume
+from granular_configuration._utils import consume
 from granular_configuration.yaml import LazyRoot
 
 
