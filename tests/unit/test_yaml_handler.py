@@ -6,49 +6,49 @@ from unittest.mock import patch
 
 import pytest
 
-from granular_configuration import Configuration, ConfigurationLocations, Masked
+from granular_configuration import Configuration, Masked
 from granular_configuration.exceptions import JSONPathMustStartFromRoot, JSONPathOnlyWorksOnMappings, ParseEnvError
 from granular_configuration.yaml import Placeholder, loads
 
 
 def test_env() -> None:
     with patch.dict(os.environ, values={"unreal_env_variable": "test me"}):
-        assert loads("!Env '{{unreal_env_variable}}'").run() == "test me"
-        assert loads("!Env '{{unreal_env_variable:special}}'").run() == "test me"
-        assert loads("!Env '{{unreal_env_vari:special case }}'").run() == "special case "
+        assert loads("!Env '{{unreal_env_variable}}'") == "test me"
+        assert loads("!Env '{{unreal_env_variable:special}}'") == "test me"
+        assert loads("!Env '{{unreal_env_vari:special case }}'") == "special case "
 
         with pytest.raises(KeyError):
-            loads("!Env '{{unreal_env_vari}}'").run()
+            loads("!Env '{{unreal_env_vari}}'")
 
         with pytest.raises(ValueError):
-            loads("!Env [a]").run()
+            loads("!Env [a]")
 
 
 def test_func() -> None:
-    assert loads("!Func functools.reduce").run() is reduce
-    assert loads("!Func granular_configuration.ConfigurationLocations").run() is ConfigurationLocations
+    assert loads("!Func functools.reduce") is reduce
+    assert loads("!Func granular_configuration.Masked") is Masked
 
     with pytest.raises(ValueError):
-        loads("!Func unreal.garbage.func").run()
+        loads("!Func unreal.garbage.func")
 
     with pytest.raises(ValueError):
-        loads("!Func sys.stdout").run()
+        loads("!Func sys.stdout")
 
     with pytest.raises(ValueError):
-        loads("!Func [a]").run()
+        loads("!Func [a]")
 
 
 def test_class() -> None:
-    assert loads("!Class granular_configuration.ConfigurationLocations").run() is ConfigurationLocations
+    assert loads("!Class granular_configuration.Masked") is Masked
 
     with pytest.raises(ValueError):
-        loads("!Class functools.reduce").run()
+        loads("!Class functools.reduce")
 
     with pytest.raises(ValueError):
-        loads("!Class unreal.garbage.func").run()
+        loads("!Class unreal.garbage.func")
 
     with pytest.raises(ValueError):
-        loads("!Class [a]").run()
+        loads("!Class [a]")
 
 
 def test_placeholder() -> None:
@@ -65,59 +65,59 @@ def test_placeholder() -> None:
 
 def test_parse_env_scalar__string() -> None:
     with patch.dict(os.environ, values={"unreal_env_variable": "test me"}):
-        assert loads("!ParseEnv unreal_env_variable").run() == "test me"
+        assert loads("!ParseEnv unreal_env_variable") == "test me"
 
 
 def test_parse_env_scalar__float() -> None:
     with patch.dict(os.environ, values={"unreal_env_variable": "3.0"}):
-        assert loads("!ParseEnv unreal_env_variable").run() == 3.0
-        assert isinstance(loads("!ParseEnv unreal_env_variable").run(), float)
+        assert loads("!ParseEnv unreal_env_variable") == 3.0
+        assert isinstance(loads("!ParseEnv unreal_env_variable"), float)
 
 
 def test_parse_env_scalar__int() -> None:
     with patch.dict(os.environ, values={"unreal_env_variable": "3"}):
-        assert loads("!ParseEnv unreal_env_variable").run() == 3
-        assert isinstance(loads("!ParseEnv unreal_env_variable").run(), int)
+        assert loads("!ParseEnv unreal_env_variable") == 3
+        assert isinstance(loads("!ParseEnv unreal_env_variable"), int)
 
 
 def test_parse_env_scalar__float_string() -> None:
     with patch.dict(os.environ, values={"unreal_env_variable": "'3'"}):
-        assert loads("!ParseEnv unreal_env_variable").run() == "3"
+        assert loads("!ParseEnv unreal_env_variable") == "3"
 
 
 def test_parse_env_scalar__null() -> None:
     with patch.dict(os.environ, values={"unreal_env_variable": "null"}):
-        assert loads("!ParseEnv unreal_env_variable").run() is None
+        assert loads("!ParseEnv unreal_env_variable") is None
 
 
 def test_parse_env_scalar__bool_true() -> None:
     with patch.dict(os.environ, values={"unreal_env_variable": "true"}):
-        assert loads("!ParseEnv unreal_env_variable").run() is True
+        assert loads("!ParseEnv unreal_env_variable") is True
 
 
 def test_parse_env_scalar__bool_true_casing() -> None:
     with patch.dict(os.environ, values={"unreal_env_variable": "True"}):
-        assert loads("!ParseEnv unreal_env_variable").run() is True
+        assert loads("!ParseEnv unreal_env_variable") is True
 
 
 def test_parse_env_scalar__bool_false() -> None:
     with patch.dict(os.environ, values={"unreal_env_variable": "false"}):
-        assert loads("!ParseEnv unreal_env_variable").run() is False
+        assert loads("!ParseEnv unreal_env_variable") is False
 
 
 def test_parse_env_scalar__bool_false_casing() -> None:
     with patch.dict(os.environ, values={"unreal_env_variable": "False"}):
-        assert loads("!ParseEnv unreal_env_variable").run() is False
+        assert loads("!ParseEnv unreal_env_variable") is False
 
 
 def test_parse_env_scalar__dict() -> None:
     with patch.dict(os.environ, values={"unreal_env_variable": '{"a": "value"}'}):
-        assert loads("!ParseEnv unreal_env_variable").run() == {"a": "value"}
+        assert loads("!ParseEnv unreal_env_variable") == {"a": "value"}
 
 
 def test_parse_env_scalar__Configuration() -> None:
     with patch.dict(os.environ, values={"unreal_env_variable": '{"a": {"b": "value"}}'}):
-        value = loads("!ParseEnv unreal_env_variable", obj_pairs_hook=Configuration).run()
+        value = loads("!ParseEnv unreal_env_variable", obj_pairs_hook=Configuration)
         assert isinstance(value, Configuration)
         assert value == {"a": {"b": "value"}}
         assert isinstance(value["a"], Configuration)
@@ -125,26 +125,26 @@ def test_parse_env_scalar__Configuration() -> None:
 
 def test_parse_env_scalar__seq() -> None:
     with patch.dict(os.environ, values={"unreal_env_variable": "[1, 2, 3]"}):
-        assert loads("!ParseEnv unreal_env_variable").run() == [1, 2, 3]
+        assert loads("!ParseEnv unreal_env_variable") == [1, 2, 3]
 
 
 def test_parse_env_scalar__recursive() -> None:
     with patch.dict(
         os.environ, values={"unreal_env_variable": "!ParseEnv unreal_env_variable1", "unreal_env_variable1": "42"}
     ):
-        assert loads("!ParseEnv unreal_env_variable").run() == 42
+        assert loads("!ParseEnv unreal_env_variable") == 42
 
 
 def test_parse_env_scalar__var_parse_error() -> None:
     with patch.dict(os.environ, values={"unreal_env_variable": "{"}):
         with pytest.raises(ParseEnvError):
-            loads("!ParseEnv unreal_env_variable").run()
+            loads("!ParseEnv unreal_env_variable")
 
 
 def test_parse_env_scalar__missing() -> None:
     with patch.dict(os.environ, values={}):
         with pytest.raises(KeyError):
-            loads("!ParseEnv unreal_env_vari").run()
+            loads("!ParseEnv unreal_env_vari")
 
 
 def test_parse_env_mapping__error() -> None:
@@ -155,12 +155,12 @@ def test_parse_env_mapping__error() -> None:
 
 def test_parse_env_sequence__use_default() -> None:
     with patch.dict(os.environ, values={}):
-        assert loads('!ParseEnv ["unreal_env_vari", 1]').run() == 1
-        assert loads('!ParseEnv ["unreal_env_vari", 1.5]').run() == 1.5
-        assert loads('!ParseEnv ["unreal_env_vari", abc]').run() == "abc"
-        assert loads('!ParseEnv ["unreal_env_vari", null]').run() is None
-        assert loads('!ParseEnv ["unreal_env_vari", false]').run() is False
-        value = loads('!ParseEnv ["unreal_env_vari", {"a": {"b": "value"}}]', obj_pairs_hook=Configuration).run()
+        assert loads('!ParseEnv ["unreal_env_vari", 1]') == 1
+        assert loads('!ParseEnv ["unreal_env_vari", 1.5]') == 1.5
+        assert loads('!ParseEnv ["unreal_env_vari", abc]') == "abc"
+        assert loads('!ParseEnv ["unreal_env_vari", null]') is None
+        assert loads('!ParseEnv ["unreal_env_vari", false]') is False
+        value = loads('!ParseEnv ["unreal_env_vari", {"a": {"b": "value"}}]', obj_pairs_hook=Configuration)
         assert isinstance(value, Configuration)
         assert value == {"a": {"b": "value"}}
         assert isinstance(value["a"], Configuration)
@@ -168,29 +168,29 @@ def test_parse_env_sequence__use_default() -> None:
 
 def test_parse_env_sequence__string() -> None:
     with patch.dict(os.environ, values={"unreal_env_variable": "test me"}):
-        assert loads("!ParseEnv [unreal_env_variable, null]").run() == "test me"
+        assert loads("!ParseEnv [unreal_env_variable, null]") == "test me"
 
 
 def test_parse_env_sequence__float() -> None:
     with patch.dict(os.environ, values={"unreal_env_variable": "3.0"}):
-        assert loads("!ParseEnv [unreal_env_variable, null]").run() == 3.0
-        assert isinstance(loads("!ParseEnv [unreal_env_variable, null]").run(), float)
+        assert loads("!ParseEnv [unreal_env_variable, null]") == 3.0
+        assert isinstance(loads("!ParseEnv [unreal_env_variable, null]"), float)
 
 
 def test_parse_env_sequence__int() -> None:
     with patch.dict(os.environ, values={"unreal_env_variable": "3"}):
-        assert loads("!ParseEnv [unreal_env_variable, null]").run() == 3
-        assert isinstance(loads("!ParseEnv [unreal_env_variable, null]").run(), int)
+        assert loads("!ParseEnv [unreal_env_variable, null]") == 3
+        assert isinstance(loads("!ParseEnv [unreal_env_variable, null]"), int)
 
 
 def test_parse_env_safe_sequence__use_default() -> None:
     with patch.dict(os.environ, values={}):
-        assert loads('!ParseEnvSafe ["unreal_env_vari", 1]').run() == 1
-        assert loads('!ParseEnvSafe ["unreal_env_vari", 1.5]').run() == 1.5
-        assert loads('!ParseEnvSafe ["unreal_env_vari", abc]').run() == "abc"
-        assert loads('!ParseEnvSafe ["unreal_env_vari", null]').run() is None
-        assert loads('!ParseEnvSafe ["unreal_env_vari", false]').run() is False
-        value = loads('!ParseEnvSafe ["unreal_env_vari", {"a": {"b": "value"}}]', obj_pairs_hook=Configuration).run()
+        assert loads('!ParseEnvSafe ["unreal_env_vari", 1]') == 1
+        assert loads('!ParseEnvSafe ["unreal_env_vari", 1.5]') == 1.5
+        assert loads('!ParseEnvSafe ["unreal_env_vari", abc]') == "abc"
+        assert loads('!ParseEnvSafe ["unreal_env_vari", null]') is None
+        assert loads('!ParseEnvSafe ["unreal_env_vari", false]') is False
+        value = loads('!ParseEnvSafe ["unreal_env_vari", {"a": {"b": "value"}}]', obj_pairs_hook=Configuration)
         assert isinstance(value, Configuration)
         assert value == {"a": {"b": "value"}}
         assert isinstance(value["a"], Configuration)
@@ -198,19 +198,19 @@ def test_parse_env_safe_sequence__use_default() -> None:
 
 def test_parse_env_safe_sequence__string() -> None:
     with patch.dict(os.environ, values={"unreal_env_variable": "test me"}):
-        assert loads("!ParseEnvSafe [unreal_env_variable, null]").run() == "test me"
+        assert loads("!ParseEnvSafe [unreal_env_variable, null]") == "test me"
 
 
 def test_parse_env_safe_sequence__float() -> None:
     with patch.dict(os.environ, values={"unreal_env_variable": "3.0"}):
-        assert loads("!ParseEnvSafe [unreal_env_variable, null]").run() == 3.0
-        assert isinstance(loads("!ParseEnvSafe [unreal_env_variable, null]").run(), float)
+        assert loads("!ParseEnvSafe [unreal_env_variable, null]") == 3.0
+        assert isinstance(loads("!ParseEnvSafe [unreal_env_variable, null]"), float)
 
 
 def test_parse_env_safe_sequence__int() -> None:
     with patch.dict(os.environ, values={"unreal_env_variable": "3"}):
-        assert loads("!ParseEnvSafe [unreal_env_variable, null]").run() == 3
-        assert isinstance(loads("!ParseEnvSafe [unreal_env_variable, null]").run(), int)
+        assert loads("!ParseEnvSafe [unreal_env_variable, null]") == 3
+        assert isinstance(loads("!ParseEnvSafe [unreal_env_variable, null]"), int)
 
 
 def test_parse_env_safe_with_a_tag_fails() -> None:
@@ -218,20 +218,20 @@ def test_parse_env_safe_with_a_tag_fails() -> None:
         os.environ, values={"unreal_env_variable": "!ParseEnv unreal_env_variable1", "unreal_env_variable1": "42"}
     ):
         with pytest.raises(ParseEnvError):
-            loads("!ParseEnvSafe unreal_env_variable").run()
+            loads("!ParseEnvSafe unreal_env_variable")
 
 
 def test_sub__env() -> None:
     with patch.dict(os.environ, values={"unreal_env_variable": "test me"}):
-        assert loads("!Sub ${unreal_env_variable}").run() == "test me"
-        assert loads("!Sub ${unreal_env_variable:-special}").run() == "test me"
-        assert loads("!Sub ${unreal_env_vari:-special case }").run() == "special case "
+        assert loads("!Sub ${unreal_env_variable}") == "test me"
+        assert loads("!Sub ${unreal_env_variable:-special}") == "test me"
+        assert loads("!Sub ${unreal_env_vari:-special case }") == "special case "
 
         with pytest.raises(KeyError):
-            loads("!Sub ${unreal_env_vari}").run()
+            loads("!Sub ${unreal_env_vari}")
 
         with pytest.raises(ValueError):
-            loads("!Sub [a]").run()
+            loads("!Sub [a]")
 
 
 def test_sub__jsonpath() -> None:
@@ -271,7 +271,7 @@ def test_sub__jsonpath_on_a_scalar_value_makes_no_sense_and_must_fail() -> None:
     test_data = """!Sub ${$.no_data.here}
 """
     with pytest.raises(JSONPathOnlyWorksOnMappings):
-        loads(test_data, obj_pairs_hook=Configuration).run()
+        loads(test_data, obj_pairs_hook=Configuration)
 
 
 def product_pylance_helper(*iterable: typ.Iterable[bool]) -> typ.Iterator[typ.Iterable[bool]]:

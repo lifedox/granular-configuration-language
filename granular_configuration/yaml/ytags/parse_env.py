@@ -3,12 +3,12 @@ import typing as typ
 from functools import partial
 
 from granular_configuration.exceptions import ParseEnvEnvironmentVaribleNotFound, ParseEnvError
-from granular_configuration.yaml.classes import _OPH, LazyEval, LazyRoot, Root, StateOptions
+from granular_configuration.yaml.classes import _OPH, LazyRoot, LoadOptions, Root
 from granular_configuration.yaml.decorators import (
     StringOrTwopleTagType,
     Tag,
     make_lazy,
-    make_lazy_root_with_state,
+    make_lazy_with_root_and_load_options,
     string_or_twople_tag,
 )
 
@@ -29,14 +29,10 @@ def parse_env(load: typ.Callable[[str], typ.Any], env_var: str, *default: typ.An
 
 
 def load_advance(obj_pair_hook: _OPH, root: Root, value: str) -> typ.Any:
-    from granular_configuration.yaml import loads
+    from granular_configuration.yaml.load import internal
 
-    lazy_root = LazyRoot()
-    lazy_root._set_root(root)
-    value = loads(value, obj_pairs_hook=obj_pair_hook, lazy_root=lazy_root)
-    while isinstance(value, LazyEval):
-        return value.run()
-    return value
+    lazy_root = LazyRoot.with_root(root)
+    return internal(value, obj_pairs_hook=obj_pair_hook, lazy_root=lazy_root)
 
 
 def load_safe(value: str) -> typ.Any:
@@ -53,8 +49,8 @@ def parse_input(load: typ.Callable[[str], typ.Any], value: StringOrTwopleTagType
 
 
 @string_or_twople_tag(Tag("!ParseEnv"))
-@make_lazy_root_with_state
-def handler(value: StringOrTwopleTagType, options: StateOptions, root: Root) -> typ.Any:
+@make_lazy_with_root_and_load_options
+def handler(value: StringOrTwopleTagType, options: LoadOptions, root: Root) -> typ.Any:
     return parse_input(partial(load_advance, options.obj_pairs_func, root), value)
 
 

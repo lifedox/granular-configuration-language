@@ -39,6 +39,12 @@ class LazyRoot:
     def root(self) -> Root:
         return self.__root
 
+    @staticmethod
+    def with_root(root: typ.Mapping | Root) -> "LazyRoot":
+        lazy_root = LazyRoot()
+        lazy_root._set_root(root)
+        return lazy_root
+
 
 class LazyEval(typ.Generic[_RT]):
     def __init__(self, tag: Tag, value: typ.Callable[[], _RT]) -> None:
@@ -57,6 +63,16 @@ class LazyEval(typ.Generic[_RT]):
                 result = self.__result
                 self.done = True
                 return result
+
+    @cached_property
+    def result(self) -> typ.Any:
+        """
+        Result of LazyEval, completing any chains
+        """
+        result = self.run()
+        while isinstance(result, LazyEval):
+            result = result.run()
+        return result
 
     @cached_property
     def __result(self) -> _RT:
@@ -81,12 +97,12 @@ _OPH = typ.Optional[typ.Type[typ.MutableMapping]]
 
 
 @dataclass(frozen=True, kw_only=True)
-class StateOptions:
+class LoadOptions:
     obj_pairs_func: _OPH
     file_relative_path: Path
 
 
 @dataclass(frozen=True, kw_only=True)
 class StateHolder:
-    options: StateOptions
+    options: LoadOptions
     lazy_root_obj: LazyRoot

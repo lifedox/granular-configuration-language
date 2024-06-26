@@ -5,7 +5,7 @@ from functools import wraps
 
 from ruamel.yaml import Node, SafeConstructor, ScalarNode, SequenceNode
 
-from granular_configuration.yaml.classes import LazyEval, LazyEvalRootState, Root, StateHolder, StateOptions, Tag
+from granular_configuration.yaml.classes import LazyEval, LazyEvalRootState, LoadOptions, Root, StateHolder, Tag
 
 _RT = typ.TypeVar("_RT")
 _T = typ.TypeVar("_T")
@@ -24,7 +24,9 @@ def make_lazy(func: typ.Callable[[_T], _RT]) -> typ.Callable[[Tag, _T, StateHold
     return lazy_wrapper
 
 
-def make_lazy_root(func: typ.Callable[[_T, Root], _RT]) -> typ.Callable[[Tag, _T, StateHolder], LazyEvalRootState[_RT]]:
+def make_lazy_with_root(
+    func: typ.Callable[[_T, Root], _RT]
+) -> typ.Callable[[Tag, _T, StateHolder], LazyEvalRootState[_RT]]:
     @wraps(func)
     def lazy_wrapper(tag: Tag, value: _T, state: StateHolder) -> LazyEvalRootState[_RT]:
         return LazyEvalRootState(tag, state.lazy_root_obj, lambda root: func(value, root))
@@ -32,8 +34,8 @@ def make_lazy_root(func: typ.Callable[[_T, Root], _RT]) -> typ.Callable[[Tag, _T
     return lazy_wrapper
 
 
-def make_lazy_root_with_state(
-    func: typ.Callable[[_T, StateOptions, Root], _RT]
+def make_lazy_with_root_and_load_options(
+    func: typ.Callable[[_T, LoadOptions, Root], _RT]
 ) -> typ.Callable[[Tag, _T, StateHolder], LazyEvalRootState[_RT]]:
     @wraps(func)
     def lazy_wrapper(tag: Tag, value: _T, state: StateHolder) -> LazyEvalRootState[_RT]:
@@ -43,7 +45,7 @@ def make_lazy_root_with_state(
     return lazy_wrapper
 
 
-def lazy_exeception(func: typ.Callable[[_T], _RT]) -> typ.Callable[[Tag, _T, StateHolder], LazyEval[_RT]]:
+def make_lazy_exeception(func: typ.Callable[[_T], _RT]) -> typ.Callable[[Tag, _T, StateHolder], LazyEval[_RT]]:
     @wraps(func)
     def lazy_wrapper(tag: Tag, value: _T, state: StateHolder) -> LazyEval[_RT]:
         return func(value)  # type: ignore  # Pretend to be LazyEval, so I don't have to explicitly handle the two cases
@@ -79,7 +81,6 @@ def string_tag(
 
             constructor.add_constructor(tag, type_handler)
 
-        setattr(add_handler, "_yaml_tag", tag)
         return add_handler
 
     return decorator
@@ -116,7 +117,6 @@ def string_or_twople_tag(
 
             constructor.add_constructor(tag, type_handler)
 
-        setattr(add_handler, "_yaml_tag", tag)
         return add_handler
 
     return decorator
@@ -149,7 +149,6 @@ def sequence_of_any_tag(
 
             constructor.add_constructor(tag, type_handler)
 
-        setattr(add_handler, "_yaml_tag", tag)
         return add_handler
 
     return decorator

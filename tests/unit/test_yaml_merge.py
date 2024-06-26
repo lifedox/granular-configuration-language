@@ -25,7 +25,7 @@ def test_merging_string_returns_empty_dict() -> None:
 - String 2
 - String 3
 """
-    assert loads(test, obj_pairs_hook=Configuration).run().as_dict() == {}
+    assert loads(test, obj_pairs_hook=Configuration).as_dict() == {}
 
 
 def test_merging_mix_returns_ignores_nondict() -> None:
@@ -37,7 +37,7 @@ def test_merging_mix_returns_ignores_nondict() -> None:
 - true
 - a: b
 """
-    assert loads(test, obj_pairs_hook=Configuration).run().as_dict() == {"a": "b"}
+    assert loads(test, obj_pairs_hook=Configuration).as_dict() == {"a": "b"}
 
 
 def test_merging_three_dicts() -> None:
@@ -54,7 +54,7 @@ def test_merging_three_dicts() -> None:
 - d: i
   j: k
 """
-    assert loads(test, obj_pairs_hook=Configuration).run().as_dict() == {"a": "c", "d": "i", "f": "h", "j": "k"}
+    assert loads(test, obj_pairs_hook=Configuration).as_dict() == {"a": "c", "d": "i", "f": "h", "j": "k"}
 
 
 def test_merging_one_dict() -> None:
@@ -62,7 +62,7 @@ def test_merging_one_dict() -> None:
 !Merge
 - a: b
 """
-    assert loads(test, obj_pairs_hook=Configuration).run().as_dict() == {"a": "b"}
+    assert loads(test, obj_pairs_hook=Configuration).as_dict() == {"a": "b"}
 
 
 def test_merging_from_files_nested() -> None:
@@ -98,7 +98,7 @@ def test_parsefile_loading() -> None:
 
 def test_parsefile_loading_missing_file() -> None:
     with pytest.raises(FileNotFoundError):
-        loads("!ParseFile does_not_exist.yaml", obj_pairs_hook=Configuration, file_path=ASSET_DIR / "dummy.yaml").run()
+        loads("!ParseFile does_not_exist.yaml", obj_pairs_hook=Configuration, file_path=ASSET_DIR / "dummy.yaml")
 
 
 def test_parsefile_redirect_loading() -> None:
@@ -165,7 +165,7 @@ def test_merging_with_a_basic_sub_doesnt_fail() -> None:
 - !Sub String 1
 - a: b
 """
-    assert loads(test, obj_pairs_hook=Configuration).run().as_dict() == {"a": "b"}
+    assert loads(test, obj_pairs_hook=Configuration).as_dict() == {"a": "b"}
 
 
 def test_merging_with_a_env_sub_doesnt_fail() -> None:
@@ -174,7 +174,7 @@ def test_merging_with_a_env_sub_doesnt_fail() -> None:
 - !Sub ${doesn't_exists:-default}
 - a: b
 """
-    assert loads(test, obj_pairs_hook=Configuration).run().as_dict() == {"a": "b"}
+    assert loads(test, obj_pairs_hook=Configuration).as_dict() == {"a": "b"}
 
 
 def test_merging_with_a_jsonpath_Sub_fails_on_RecursionError() -> None:
@@ -184,7 +184,7 @@ def test_merging_with_a_jsonpath_Sub_fails_on_RecursionError() -> None:
 - !Sub ${$.a}
 """
     with pytest.raises(RecursionError):
-        assert loads(test, obj_pairs_hook=Configuration).run().as_dict() == {"a": "b"}
+        assert loads(test, obj_pairs_hook=Configuration).as_dict() == {"a": "b"}
 
 
 def test_merging_with_a_jsonpath_ParseFile_fails_on_RecursionError() -> None:

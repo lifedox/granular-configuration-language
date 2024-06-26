@@ -4,7 +4,8 @@ from unittest.mock import patch
 
 import pytest
 
-from granular_configuration import Configuration, ConfigurationLocations, LazyLoadConfiguration
+from granular_configuration import Configuration, LazyLoadConfiguration
+from granular_configuration._locations import ConfigurationFiles, ConfigurationMultiNamedFiles
 from granular_configuration.exceptions import InvalidBasePathException
 
 ASSET_DIR = (Path(__file__).parent / "../assets/config_location_test").resolve()
@@ -18,8 +19,8 @@ class TestLaziness:
         files = ["g/b.yaml", "g/h.yaml"]
 
         location = (
-            ConfigurationLocations(files=files),
-            ConfigurationLocations(filenames=filenames, directories=directories),
+            ConfigurationFiles(files),
+            ConfigurationMultiNamedFiles(filenames=filenames, directories=directories),
         )
 
         config_dict = Configuration({"abc": "test", "name": "me"})

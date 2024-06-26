@@ -7,7 +7,7 @@ from itertools import chain, filterfalse, starmap
 
 from granular_configuration.exceptions import PlaceholderConfigurationError
 from granular_configuration.utils import OrderedSet, consume
-from granular_configuration.yaml.classes import LazyEval, Placeholder
+from granular_configuration.yaml import LazyEval, Placeholder
 
 
 class Patch(typ.Mapping):
@@ -136,9 +136,7 @@ class Configuration(typ.MutableMapping):
             )
         elif isinstance(value, LazyEval):
             try:
-                new_value = value.run()
-                while isinstance(new_value, LazyEval):
-                    new_value = new_value.run()
+                new_value = value.result
                 self[name] = new_value
                 return new_value
             except RecursionError:

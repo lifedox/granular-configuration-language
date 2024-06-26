@@ -3,13 +3,10 @@ import re
 import typing as typ
 
 from granular_configuration.yaml.classes import Root
-from granular_configuration.yaml.decorators import Tag, make_lazy_root, string_tag
-from granular_configuration.yaml.ytags.merge import handler as merge_handler
+from granular_configuration.yaml.decorators import Tag, make_lazy_with_root, string_tag
 from granular_configuration.yaml.ytags.ref import resolve_json_ref
 
 SUB_PATTERN: typ.Pattern[str] = re.compile(r"(\$\{(?P<contents>.*?)\})")
-
-merge_tag = getattr(merge_handler, "_yaml_tag")
 
 
 def load_sub(root: Root, *, contents: str) -> str:
@@ -28,6 +25,6 @@ def interpolate(value: str, root: Root) -> str:
 
 
 @string_tag(Tag("!Sub"))
-@make_lazy_root
+@make_lazy_with_root
 def handler(value: str, root: Root) -> str:
     return interpolate(value, root)

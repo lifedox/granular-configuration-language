@@ -5,7 +5,7 @@ from pathlib import Path
 from granular_configuration import Configuration
 from granular_configuration._load import load_file
 from granular_configuration.utils import consume
-from granular_configuration.yaml.classes import LazyEval, LazyRoot
+from granular_configuration.yaml import LazyRoot
 
 
 def _merge_into_base(base_dict: Configuration, from_dict: Configuration) -> None:
@@ -33,9 +33,6 @@ def _load_configs_from_locations(locations: typ.Iterable[Path], lazy_root: LazyR
         configs: typ.Iterable[Configuration | typ.Any],
     ) -> typ.Iterator[Configuration]:
         for config in configs:
-            while isinstance(config, LazyEval):
-                config = config.run()
-
             if isinstance(config, Configuration):
                 yield config
 
@@ -44,9 +41,8 @@ def _load_configs_from_locations(locations: typ.Iterable[Path], lazy_root: LazyR
 
 
 def build_configuration(locations: typ.Iterable[Path]) -> Configuration:
-    lazy_root = LazyRoot()
     base_config = Configuration()
-    lazy_root._set_root(base_config)
+    lazy_root = LazyRoot.with_root(base_config)
 
     valid_configs = _load_configs_from_locations(locations, lazy_root)
     merged_config = _merge(base_config, valid_configs)
