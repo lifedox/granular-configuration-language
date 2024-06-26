@@ -16,7 +16,7 @@ _T = typ.TypeVar("_T")
 ###############################################################################
 
 
-def make_lazy(func: typ.Callable[[_T], _RT]) -> typ.Callable[[Tag, _T, StateHolder], LazyEval[_RT]]:
+def as_lazy(func: typ.Callable[[_T], _RT]) -> typ.Callable[[Tag, _T, StateHolder], LazyEval[_RT]]:
     @wraps(func)
     def lazy_wrapper(tag: Tag, value: _T, state: StateHolder) -> LazyEval[_RT]:
         return LazyEval(tag, lambda: func(value))
@@ -24,7 +24,7 @@ def make_lazy(func: typ.Callable[[_T], _RT]) -> typ.Callable[[Tag, _T, StateHold
     return lazy_wrapper
 
 
-def make_lazy_with_root(
+def as_lazy_with_root(
     func: typ.Callable[[_T, Root], _RT]
 ) -> typ.Callable[[Tag, _T, StateHolder], LazyEvalRootState[_RT]]:
     @wraps(func)
@@ -34,7 +34,7 @@ def make_lazy_with_root(
     return lazy_wrapper
 
 
-def make_lazy_with_root_and_load_options(
+def as_lazy_with_root_and_load_options(
     func: typ.Callable[[_T, LoadOptions, Root], _RT]
 ) -> typ.Callable[[Tag, _T, StateHolder], LazyEvalRootState[_RT]]:
     @wraps(func)
@@ -45,10 +45,10 @@ def make_lazy_with_root_and_load_options(
     return lazy_wrapper
 
 
-def make_lazy_exeception(func: typ.Callable[[_T], _RT]) -> typ.Callable[[Tag, _T, StateHolder], LazyEval[_RT]]:
+def as_not_lazy(func: typ.Callable[[_T], _RT]) -> typ.Callable[[Tag, _T, StateHolder], _RT]:
     @wraps(func)
-    def lazy_wrapper(tag: Tag, value: _T, state: StateHolder) -> LazyEval[_RT]:
-        return func(value)  # type: ignore  # Pretend to be LazyEval, so I don't have to explicitly handle the two cases
+    def lazy_wrapper(tag: Tag, value: _T, state: StateHolder) -> _RT:
+        return func(value)
 
     return lazy_wrapper
 
@@ -68,9 +68,9 @@ class TagDecoratorBase:
 
 
 class string_tag(TagDecoratorBase):
-    Type = str
+    Type: typ.TypeAlias = str
 
-    def __call__(self, handler: typ.Callable[[Tag, Type, StateHolder], LazyEval[_RT]]) -> CallableConstructorType:
+    def __call__(self, handler: typ.Callable[[Tag, Type, StateHolder], _RT]) -> CallableConstructorType:
         tag = self.tag
 
         @wraps(handler)
@@ -79,7 +79,7 @@ class string_tag(TagDecoratorBase):
             state: StateHolder,
         ) -> None:
             @wraps(handler)
-            def type_handler(constructor: SafeConstructor, node: Node) -> LazyEval[_RT]:
+            def type_handler(constructor: SafeConstructor, node: Node) -> _RT:
                 if isinstance(node, ScalarNode):
                     value = constructor.construct_scalar(node)
                     if isinstance(value, str):
@@ -92,9 +92,9 @@ class string_tag(TagDecoratorBase):
 
 
 class string_or_twople_tag(TagDecoratorBase):
-    Type = str | tuple[str, typ.Any]
+    Type: typ.TypeAlias = str | tuple[str, typ.Any]
 
-    def __call__(self, handler: typ.Callable[[Tag, Type, StateHolder], LazyEval[_RT]]) -> CallableConstructorType:
+    def __call__(self, handler: typ.Callable[[Tag, Type, StateHolder], _RT]) -> CallableConstructorType:
         tag = self.tag
 
         @wraps(handler)
@@ -103,7 +103,7 @@ class string_or_twople_tag(TagDecoratorBase):
             state: StateHolder,
         ) -> None:
             @wraps(handler)
-            def type_handler(constructor: SafeConstructor, node: Node) -> LazyEval[_RT]:
+            def type_handler(constructor: SafeConstructor, node: Node) -> _RT:
                 if isinstance(node, ScalarNode):
                     value = constructor.construct_scalar(node)
                     if isinstance(value, str):
@@ -120,9 +120,9 @@ class string_or_twople_tag(TagDecoratorBase):
 
 
 class sequence_of_any_tag(TagDecoratorBase):
-    Type = typ.Sequence[typ.Any]
+    Type: typ.TypeAlias = typ.Sequence[typ.Any]
 
-    def __call__(self, handler: typ.Callable[[Tag, Type, StateHolder], LazyEval[_RT]]) -> CallableConstructorType:
+    def __call__(self, handler: typ.Callable[[Tag, Type, StateHolder], _RT]) -> CallableConstructorType:
         tag = self.tag
 
         @wraps(handler)
@@ -131,7 +131,7 @@ class sequence_of_any_tag(TagDecoratorBase):
             state: StateHolder,
         ) -> None:
             @wraps(handler)
-            def type_handler(constructor: SafeConstructor, node: Node) -> LazyEval[_RT]:
+            def type_handler(constructor: SafeConstructor, node: Node) -> _RT:
                 if isinstance(node, SequenceNode):
                     value = constructor.construct_sequence(node)
                     if isinstance(value, list):

@@ -11,7 +11,7 @@ from granular_configuration.exceptions import (
     JSONPathQueryMatchFailed,
 )
 from granular_configuration.yaml.classes import LazyEval, Root
-from granular_configuration.yaml.decorators import Tag, make_lazy_with_root, string_tag
+from granular_configuration.yaml.decorators import Tag, as_lazy_with_root, string_tag
 from granular_configuration.yaml.ytags.merge import merge_tag
 
 SUB_PATTERN: typ.Pattern[str] = re.compile(r"(\$\{(?P<contents>.*?)\})")
@@ -74,6 +74,6 @@ def resolve_json_ref(query: str, root: Root) -> typ.Any:
 
 
 @string_tag(Tag("!Ref"))
-@make_lazy_with_root
+@as_lazy_with_root
 def handler(value: str, root: Root) -> str:
     return resolve_json_ref(value, root)

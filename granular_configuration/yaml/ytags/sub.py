@@ -3,7 +3,7 @@ import re
 import typing as typ
 
 from granular_configuration.yaml.classes import Root
-from granular_configuration.yaml.decorators import Tag, make_lazy_with_root, string_tag
+from granular_configuration.yaml.decorators import Tag, as_lazy_with_root, string_tag
 from granular_configuration.yaml.ytags.ref import resolve_json_ref
 
 SUB_PATTERN: typ.Pattern[str] = re.compile(r"(\$\{(?P<contents>.*?)\})")
@@ -25,6 +25,6 @@ def interpolate(value: str, root: Root) -> str:
 
 
 @string_tag(Tag("!Sub"))
-@make_lazy_with_root
+@as_lazy_with_root
 def handler(value: str, root: Root) -> str:
     return interpolate(value, root)

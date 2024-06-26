@@ -2,7 +2,7 @@ import typing as typ
 from pathlib import Path
 
 from granular_configuration.yaml.classes import LazyRoot, LoadOptions, Root
-from granular_configuration.yaml.decorators import Tag, make_lazy_with_root_and_load_options, string_tag
+from granular_configuration.yaml.decorators import Tag, as_lazy_with_root_and_load_options, string_tag
 from granular_configuration.yaml.ytags.sub import interpolate
 
 
@@ -19,7 +19,7 @@ def load(file: Path, state: LoadOptions, root: Root) -> typ.Any:
 
 
 @string_tag(Tag("!ParseFile"))
-@make_lazy_with_root_and_load_options
+@as_lazy_with_root_and_load_options
 def handler(value: str, options: LoadOptions, root: Root) -> typ.Any:
     file = interpolate_value(value, options, root)
 
@@ -27,7 +27,7 @@ def handler(value: str, options: LoadOptions, root: Root) -> typ.Any:
 
 
 @string_tag(Tag("!OptionalParseFile"))
-@make_lazy_with_root_and_load_options
+@as_lazy_with_root_and_load_options
 def handler_optional(value: str, options: LoadOptions, root: Root) -> typ.Any:
     file = interpolate_value(value, options, root)
 

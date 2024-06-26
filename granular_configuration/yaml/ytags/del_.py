@@ -1,7 +1,7 @@
-from granular_configuration.yaml.decorators import Tag, make_lazy_exeception, string_tag
+from granular_configuration.yaml.decorators import Tag, as_not_lazy, string_tag
 
 
 @string_tag(Tag("!Del"))
-@make_lazy_exeception
+@as_not_lazy
 def handler(value: str) -> str:
     return value

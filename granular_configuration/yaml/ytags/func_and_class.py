@@ -4,7 +4,7 @@ import os
 import sys
 import typing as typ
 
-from granular_configuration.yaml.decorators import Tag, make_lazy, string_tag
+from granular_configuration.yaml.decorators import Tag, as_lazy, string_tag
 
 
 def add_cwd_to_path() -> None:
@@ -24,7 +24,7 @@ def get_func(func_path: str) -> typ.Callable:
 
 
 @string_tag(Tag("!Class"))
-@make_lazy
+@as_lazy
 def class_handler(value: str) -> typ.Callable:
     class_type = get_func(value)
     if inspect.isclass(class_type):
@@ -34,7 +34,7 @@ def class_handler(value: str) -> typ.Callable:
 
 
 @string_tag(Tag("!Func"))
-@make_lazy
+@as_lazy
 def func_handler(value: str) -> typ.Callable:
     func = get_func(value)
     if not callable(func):

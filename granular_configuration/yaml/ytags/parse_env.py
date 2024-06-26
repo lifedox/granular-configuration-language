@@ -6,8 +6,8 @@ from granular_configuration.exceptions import ParseEnvEnvironmentVaribleNotFound
 from granular_configuration.yaml.classes import _OPH, LazyRoot, LoadOptions, Root
 from granular_configuration.yaml.decorators import (
     Tag,
-    make_lazy,
-    make_lazy_with_root_and_load_options,
+    as_lazy,
+    as_lazy_with_root_and_load_options,
     string_or_twople_tag,
 )
 
@@ -48,12 +48,12 @@ def parse_input(load: typ.Callable[[str], typ.Any], value: string_or_twople_tag.
 
 
 @string_or_twople_tag(Tag("!ParseEnv"))
-@make_lazy_with_root_and_load_options
+@as_lazy_with_root_and_load_options
 def handler(value: string_or_twople_tag.Type, options: LoadOptions, root: Root) -> typ.Any:
     return parse_input(partial(load_advance, options.obj_pairs_func, root), value)
 
 
 @string_or_twople_tag(Tag("!ParseEnvSafe"))
-@make_lazy
+@as_lazy
 def handler_safe(value: string_or_twople_tag.Type) -> typ.Any:
     return parse_input(load_safe, value)

@@ -2,7 +2,7 @@ import os
 import re
 import typing as typ
 
-from granular_configuration.yaml.decorators import Tag, make_lazy, string_tag
+from granular_configuration.yaml.decorators import Tag, as_lazy, string_tag
 
 ENV_PATTERN: typ.Pattern[str] = re.compile(r"(\{\{\s*(?P<env_name>[A-Za-z0-9-_]+)\s*(?:\:(?P<default>.*?))?\}\})")
 
@@ -15,6 +15,6 @@ def load_env(env_name: str, default: typ.Optional[str] = None) -> str:
 
 
 @string_tag(Tag("!Env"))
-@make_lazy
+@as_lazy
 def handler(value: str) -> str:
     return ENV_PATTERN.sub(lambda x: load_env(**x.groupdict()), value)
