@@ -22,8 +22,10 @@ if typ.TYPE_CHECKING:  # pragma: no cover
 
 
 def construct_mapping(cls: typ.Type, constructor: ExtendedSafeConstructor, node: Node) -> typ.MutableMapping:
-    if isinstance(node, MappingNode):
-        node.value = [pair for pair in node.value if pair[0].tag != "!Del"]
+    if not isinstance(node, MappingNode):  # pragma: no cover
+        # Definitional never going to happen. Untestable branch
+        raise ValueError(f"`construct_mapping` only supports mappings. Got: `{repr(node)}`")
+    node.value = [pair for pair in node.value if pair[0].tag != "!Del"]
     return cls(constructor.construct_mapping(node, deep=True))
 
 

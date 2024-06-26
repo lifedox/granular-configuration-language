@@ -1,3 +1,4 @@
+import abc
 import typing as typ
 from dataclasses import dataclass
 from functools import cached_property
@@ -46,11 +47,10 @@ class LazyRoot:
         return lazy_root
 
 
-class LazyEval(typ.Generic[_RT]):
-    def __init__(self, tag: Tag, value: typ.Callable[[], _RT]) -> None:
+class LazyEval(abc.ABC, typ.Generic[_RT]):
+    def __init__(self, tag: Tag) -> None:
         self.tag = tag
         self.done = False
-        self.value: typ.Callable[..., _RT] = value
 
     def __repr__(self) -> str:
         return f"<{self.__class__.__name__}: {self.tag}>"
@@ -78,19 +78,8 @@ class LazyEval(typ.Generic[_RT]):
     def __result(self) -> _RT:
         return self._run()
 
-    def _run(self) -> _RT:
-        return self.value()
-
-
-class LazyEvalRootState(LazyEval[_RT]):
-    def __init__(self, tag: Tag, root: LazyRoot, value: typ.Callable[[Root], _RT]) -> None:
-        self.tag = tag
-        self.done = False
-        self.value: typ.Callable[..., _RT] = value
-        self.root = root
-
-    def _run(self) -> _RT:
-        return self.value(self.root.root)
+    @abc.abstractmethod
+    def _run(self) -> _RT: ...  # pragma: no cover
 
 
 _OPH = typ.Optional[typ.Type[typ.MutableMapping]]

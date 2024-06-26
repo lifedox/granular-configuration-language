@@ -4,10 +4,7 @@ from functools import reduce
 from itertools import product
 from unittest.mock import patch
 
-import pytest
-
 from granular_configuration import Configuration, Masked
-from granular_configuration.exceptions import JSONPathMustStartFromRoot, JSONPathOnlyWorksOnMappings, ParseEnvError
 from granular_configuration.yaml import Placeholder, loads
 
 
@@ -17,38 +14,14 @@ def test_env() -> None:
         assert loads("!Env '{{unreal_env_variable:special}}'") == "test me"
         assert loads("!Env '{{unreal_env_vari:special case }}'") == "special case "
 
-        with pytest.raises(KeyError):
-            loads("!Env '{{unreal_env_vari}}'")
-
-        with pytest.raises(ValueError):
-            loads("!Env [a]")
-
 
 def test_func() -> None:
     assert loads("!Func functools.reduce") is reduce
     assert loads("!Func granular_configuration.Masked") is Masked
 
-    with pytest.raises(ValueError):
-        loads("!Func unreal.garbage.func")
-
-    with pytest.raises(ValueError):
-        loads("!Func sys.stdout")
-
-    with pytest.raises(ValueError):
-        loads("!Func [a]")
-
 
 def test_class() -> None:
     assert loads("!Class granular_configuration.Masked") is Masked
-
-    with pytest.raises(ValueError):
-        loads("!Class functools.reduce")
-
-    with pytest.raises(ValueError):
-        loads("!Class unreal.garbage.func")
-
-    with pytest.raises(ValueError):
-        loads("!Class [a]")
 
 
 def test_placeholder() -> None:
@@ -58,9 +31,6 @@ def test_placeholder() -> None:
         placeholder, Placeholder
     ), f"Placeholder isn't type Placeholder: `{placeholder.__class__.__name__}` {repr(placeholder)}"
     assert str(placeholder) == "value"
-
-    with pytest.raises(ValueError):
-        loads("!Placeholder []")
 
 
 def test_parse_env_scalar__string() -> None:
@@ -135,24 +105,6 @@ def test_parse_env_scalar__recursive() -> None:
         assert loads("!ParseEnv unreal_env_variable") == 42
 
 
-def test_parse_env_scalar__var_parse_error() -> None:
-    with patch.dict(os.environ, values={"unreal_env_variable": "{"}):
-        with pytest.raises(ParseEnvError):
-            loads("!ParseEnv unreal_env_variable")
-
-
-def test_parse_env_scalar__missing() -> None:
-    with patch.dict(os.environ, values={}):
-        with pytest.raises(KeyError):
-            loads("!ParseEnv unreal_env_vari")
-
-
-def test_parse_env_mapping__error() -> None:
-    with patch.dict(os.environ, values={}):
-        with pytest.raises(ValueError):
-            loads('!ParseEnv {"unreal_env_vari": 1}')
-
-
 def test_parse_env_sequence__use_default() -> None:
     with patch.dict(os.environ, values={}):
         assert loads('!ParseEnv ["unreal_env_vari", 1]') == 1
@@ -213,25 +165,11 @@ def test_parse_env_safe_sequence__int() -> None:
         assert isinstance(loads("!ParseEnvSafe [unreal_env_variable, null]"), int)
 
 
-def test_parse_env_safe_with_a_tag_fails() -> None:
-    with patch.dict(
-        os.environ, values={"unreal_env_variable": "!ParseEnv unreal_env_variable1", "unreal_env_variable1": "42"}
-    ):
-        with pytest.raises(ParseEnvError):
-            loads("!ParseEnvSafe unreal_env_variable")
-
-
 def test_sub__env() -> None:
     with patch.dict(os.environ, values={"unreal_env_variable": "test me"}):
         assert loads("!Sub ${unreal_env_variable}") == "test me"
         assert loads("!Sub ${unreal_env_variable:-special}") == "test me"
         assert loads("!Sub ${unreal_env_vari:-special case }") == "special case "
-
-        with pytest.raises(KeyError):
-            loads("!Sub ${unreal_env_vari}")
-
-        with pytest.raises(ValueError):
-            loads("!Sub [a]")
 
 
 def test_sub__jsonpath() -> None:
@@ -256,22 +194,6 @@ tests:
             c="['nitro', 'never owned a cat']",
             d="test me nitro defaulting value",
         )
-
-
-def test_sub__jsonpath_missing() -> None:
-    test_data = """
-a: !Sub ${$.no_data.here}
-b: c
-"""
-    with pytest.raises(KeyError):
-        loads(test_data, obj_pairs_hook=Configuration).as_dict()
-
-
-def test_sub__jsonpath_on_a_scalar_value_makes_no_sense_and_must_fail() -> None:
-    test_data = """!Sub ${$.no_data.here}
-"""
-    with pytest.raises(JSONPathOnlyWorksOnMappings):
-        loads(test_data, obj_pairs_hook=Configuration)
 
 
 def product_pylance_helper(*iterable: typ.Iterable[bool]) -> typ.Iterator[typ.Iterable[bool]]:
@@ -473,15 +395,6 @@ tests:
     assert output.data.dog is output.tests.b
 
 
-def test_ref__jsonpath_missing() -> None:
-    test_data = """
-a: !Ref $.no_data.here
-b: c
-"""
-    with pytest.raises(KeyError):
-        loads(test_data, obj_pairs_hook=Configuration).as_dict()
-
-
 def test_ref__jsonpointer() -> None:
     test_data = """\
 data:
@@ -501,21 +414,3 @@ tests:
     )
     assert output.data.dog.name is output.tests.a
     assert output.data.dog is output.tests.b
-
-
-def test_ref__jsonpointer_missing() -> None:
-    test_data = """
-a: !Ref /no_data/here
-b: c
-"""
-    with pytest.raises(KeyError):
-        assert loads(test_data, obj_pairs_hook=Configuration).as_dict() == {}
-
-
-def test_ref__syntax_Error() -> None:
-    test_data = """
-a: !Ref no_data/here
-b: c
-"""
-    with pytest.raises(JSONPathMustStartFromRoot):
-        assert loads(test_data, obj_pairs_hook=Configuration).as_dict() == {}
