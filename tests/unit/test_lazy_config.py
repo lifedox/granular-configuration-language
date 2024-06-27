@@ -5,7 +5,7 @@ from unittest.mock import patch
 import pytest
 
 from granular_configuration import Configuration, LazyLoadConfiguration
-from granular_configuration._locations import ConfigurationFiles, ConfigurationMultiNamedFiles
+from granular_configuration._lazy_load import Locations, build_configuration
 from granular_configuration.exceptions import IniUnsupportedError, InvalidBasePathException
 
 ASSET_DIR = (Path(__file__).parent / "../assets/config_location_test").resolve()
@@ -14,35 +14,20 @@ ASSET_DIR = (Path(__file__).parent / "../assets/config_location_test").resolve()
 class TestLaziness:
 
     def test_class(self) -> None:
-        directories = ["a/b", "a", "b", "c", "d", "c"]
-        filenames = ["t.yaml", "t2.yaml"]
-        files = ["g/b.yaml", "g/h.yaml"]
-
-        location = (
-            ConfigurationFiles(files),
-            ConfigurationMultiNamedFiles(filenames=filenames, directories=directories),
-        )
-
-        config_dict = Configuration({"abc": "test", "name": "me"})
-
         with (
-            patch("granular_configuration._lazy_load.build_configuration", return_value=config_dict) as bc_mock,
-            patch("granular_configuration._lazy_load.get_all_unique_locations", return_value=files) as loc_mock,
+            patch("granular_configuration._lazy_load.build_configuration", side_effect=build_configuration) as bc_mock,
         ):
-            config = LazyLoadConfiguration(*location)
+            files = [ASSET_DIR / "test_env_config.yaml"]
+
+            config = LazyLoadConfiguration(*files)
 
             bc_mock.assert_not_called()
-            loc_mock.assert_not_called()
+            assert list(config._LazyLoadConfiguration__locations) == files
 
-            assert config.abc == "test"
+            assert config.A.key1 == "value2"
+            assert config.A.key2 == "MyTestValue"
 
-            bc_mock.assert_called_once_with(files)
-            loc_mock.assert_called_once_with(location)
-
-            assert config.name == "me"
-
-            bc_mock.assert_called_once_with(files)
-            loc_mock.assert_called_once_with(location)
+            bc_mock.assert_called_once_with(Locations(files))
 
     def test_string_base_path(self) -> None:
         config_dict = Configuration({"abc": "test", "name": "me"})

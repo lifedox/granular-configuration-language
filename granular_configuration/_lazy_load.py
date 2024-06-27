@@ -4,12 +4,11 @@ import typing as typ
 from collections.abc import MutableMapping
 from functools import cached_property, reduce
 from itertools import chain
-from pathlib import Path
 from threading import Lock
 
 from granular_configuration._build import build_configuration
 from granular_configuration._config import Configuration
-from granular_configuration._locations import ConfigurationLocations, get_all_unique_locations, parse_location
+from granular_configuration._locations import Locations, PathOrStr
 from granular_configuration.exceptions import InvalidBasePathException
 
 
@@ -22,13 +21,11 @@ def _read_base_path(base_path: str | typ.Sequence[str] | None) -> typ.Sequence[s
         return tuple()
 
 
-def _read_locations(
-    load_order_location: typ.Iterable[str | ConfigurationLocations | Path], use_env_location: bool
-) -> typ.Sequence[ConfigurationLocations]:
+def _read_locations(load_order_location: typ.Iterable[PathOrStr], use_env_location: bool) -> Locations:
     if use_env_location and ("G_CONFIG_LOCATION" in os.environ):
         env_locs = os.environ["G_CONFIG_LOCATION"].split(",")
         load_order_location = chain(load_order_location, env_locs)
-    return tuple(map(parse_location, load_order_location))
+    return Locations(load_order_location)
 
 
 class LazyLoadConfiguration(MutableMapping):
@@ -38,7 +35,7 @@ class LazyLoadConfiguration(MutableMapping):
 
     def __init__(
         self,
-        *load_order_location: str | ConfigurationLocations | Path,
+        *load_order_location: PathOrStr,
         base_path: str | typ.Sequence[str] | None = None,
         use_env_location: bool = False,
     ) -> None:
@@ -64,13 +61,13 @@ class LazyLoadConfiguration(MutableMapping):
         else:
             with Lock():
                 config = self.__config
-                self.__locations = tuple()
+                self.__locations = Locations(tuple())
                 self.__base_path = tuple()
                 return config
 
     @cached_property
     def __config(self) -> Configuration:
-        config = build_configuration(get_all_unique_locations(self.__locations))
+        config = build_configuration(self.__locations)
         try:
             config = reduce(op.getitem, self.__base_path, config)
         except KeyError as e:

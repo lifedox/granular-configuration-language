@@ -1,4 +1,3 @@
-import abc
 import operator as op
 import os
 import typing as typ
@@ -10,83 +9,83 @@ from granular_configuration._utils import OrderedSet
 PathOrStr = Path | str | os.PathLike
 
 
-def _absolute_paths(paths: typ.Iterable[Path]) -> typ.Sequence[Path]:
-    return tuple(map(op.methodcaller("resolve"), map(op.methodcaller("expanduser"), paths)))
+class BaseLocation(typ.Iterable[Path]):
+    pass
 
 
-class ConfigurationLocations(abc.ABC):
+class PrioritizedLocations(BaseLocation):
+    __slots__ = ("paths",)
 
-    @abc.abstractmethod
-    def get_locations(self) -> OrderedSet[Path]: ...  # pragma: no cover  # abstractmethod
+    def __init__(self, paths: typ.Sequence[Path]) -> None:
+        self.paths: typ.Final = paths
 
-    @abc.abstractmethod
-    def get_possible_locations(self) -> OrderedSet[Path]: ...  # pragma: no cover  # abstractmethod
+    def __iter__(self) -> typ.Iterator[Path]:
+        return islice(filter(op.methodcaller("is_file"), self.paths), 1)
 
+    def __eq__(self, value: object) -> bool:
+        return isinstance(value, PrioritizedLocations) and self.paths == value.paths
 
-_CLS = typ.TypeVar("_CLS", bound="ConfigurationFiles")
-
-
-class ConfigurationFiles(ConfigurationLocations):
-    def __init__(self, files: typ.Sequence[PathOrStr]) -> None:
-        self.files: typ.Final = _absolute_paths(map(Path, files))
-
-    @classmethod
-    def from_args(cls: typ.Type[_CLS], *files: PathOrStr) -> _CLS:
-        return cls(files)
-
-    def get_locations(self) -> OrderedSet[Path]:
-        return OrderedSet(filter(op.methodcaller("is_file"), self.get_possible_locations()))
-
-    def get_possible_locations(self) -> OrderedSet[Path]:
-        return OrderedSet(self.files)
+    def __repr__(self) -> str:  # pragma: no cover
+        return f"<PrioritizedLocations=[{','.join(map(repr, self.paths))}]>"
 
 
-class ConfigurationMultiNamedFiles(ConfigurationLocations):
-    def __init__(self, filenames: typ.Sequence[str], directories: typ.Sequence[PathOrStr]) -> None:
-        self.filenames: typ.Final = filenames
-        self.directories: typ.Final = _absolute_paths(map(Path, directories))
+class Location(BaseLocation):
+    __slots__ = "path"
+
+    def __init__(self, path: Path) -> None:
+        self.path: typ.Final = path
+
+    def __iter__(self) -> typ.Iterator[Path]:
+        if self.path.is_file():
+            yield self.path
+
+    def __eq__(self, value: object) -> bool:
+        return isinstance(value, Location) and self.path == value.path
+
+    def __repr__(self) -> str:  # pragma: no cover
+        return f"<Location={repr(self.path)}>"
 
 
-    def get_locations(self) -> OrderedSet[Path]:
-        def _get_first_existing_file_from_directory(directory: Path) -> typ.Iterator[Path]:
-            return islice(filter(op.methodcaller("is_file"), map(directory.__truediv__, self.filenames)), 1)
-
-        return OrderedSet(chain.from_iterable(map(_get_first_existing_file_from_directory, self.directories)))
-
-    def get_possible_locations(self) -> OrderedSet[Path]:
-        def _get_first_existing_file_from_directory(directory: Path) -> typ.Iterator[Path]:
-            return map(directory.__truediv__, self.filenames)
-
-        return OrderedSet(chain.from_iterable(map(_get_first_existing_file_from_directory, self.directories)))
+SUFFIX_CONFIG: typ.Final[dict[str, typ.Sequence[str]]] = {
+    ".*": (".yaml", ".yml"),
+    ".y*": (".yaml", ".yml"),
+    ".yml": (".yaml", ".yml"),
+}
 
 
-def get_all_unique_locations(locations: typ.Iterable[ConfigurationLocations]) -> OrderedSet[Path]:
-    return OrderedSet(chain.from_iterable(map(op.methodcaller("get_locations"), locations)))
+class Locations(BaseLocation):
 
-
-def _parse_location_path(location: Path) -> ConfigurationLocations:
-    dirname = location.parent
-    basename = location.stem
-    ext = location.suffix
-    if ext == ".*":
-        return ConfigurationMultiNamedFiles(filenames=(basename + ".yaml", basename + ".yml"), directories=(dirname,))
-    elif ext in (".y*", ".yml"):
-        return ConfigurationMultiNamedFiles(filenames=(basename + ".yaml", basename + ".yml"), directories=(dirname,))
-    else:
-        return ConfigurationFiles(files=(location,))
-
-
-def parse_location(location: PathOrStr | ConfigurationLocations) -> ConfigurationLocations:
-    if isinstance(location, ConfigurationLocations):
-        return location
-    elif isinstance(location, str):
-        return _parse_location_path(Path(location))
-    elif isinstance(location, Path):
-        return _parse_location_path(location)
-    else:
-        raise TypeError(
-            "Expected ConfigurationFiles, ConfigurationMultiNamedFiles, ConfigurationMultiNamedFiles, pathlib.Path\
-, or a str. Not ({})".format(
-                type(location).__name__
-            )
+    def __init__(self, locations: typ.Iterable[PathOrStr]) -> None:
+        self.locations: typ.Final = tuple(
+            map(self.__convert_to_base_location, map(self.__expand_path, map(self.__convert_to_path, locations)))
         )
+
+    @staticmethod
+    def __convert_to_path(path: PathOrStr) -> Path:
+        if isinstance(path, Path):
+            return path
+        else:
+            return Path(path)
+
+    @staticmethod
+    def __expand_path(path: Path) -> Path:
+        return path.expanduser().resolve()
+
+    @staticmethod
+    def __convert_to_base_location(path: Path) -> BaseLocation:
+        if path.suffix in SUFFIX_CONFIG:
+            return PrioritizedLocations(tuple(map(path.with_suffix, SUFFIX_CONFIG[path.suffix])))
+        else:
+            return Location(path)
+
+    def __iter__(self) -> typ.Iterator[Path]:
+        return iter(OrderedSet(chain.from_iterable(self.locations)))
+
+    def __bool__(self) -> bool:
+        return bool(self.locations)
+
+    def __eq__(self, value: object) -> bool:
+        return isinstance(value, Locations) and self.locations == value.locations
+
+    def __repr__(self) -> str:  # pragma: no cover
+        return f"<Locations=[{','.join(map(repr, self.locations))}]>"
