@@ -8,7 +8,7 @@ import pytest
 from granular_configuration import Configuration, LazyLoadConfiguration
 from granular_configuration.yaml import Placeholder
 
-ASSET_DIR = (Path(__file__).parent / "../assets/config_location_test").resolve()
+ASSET_DIR = (Path(__file__).parent / "../assets").resolve()
 
 
 def test_using_Configuration_like_dict() -> None:
@@ -26,8 +26,8 @@ def test_using_Configuration_like_dict() -> None:
 
 def test_Configuration_is_dict() -> None:
     value = LazyLoadConfiguration(
-        ASSET_DIR / "g/h.yaml",
-        ASSET_DIR / "c/t.yaml",
+        ASSET_DIR / "old" / "g/h.yaml",
+        ASSET_DIR / "old" / "c/t.yaml",
     ).config
 
     import copy

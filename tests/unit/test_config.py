@@ -7,14 +7,14 @@ from granular_configuration._build import build_configuration
 from granular_configuration.exceptions import PlaceholderConfigurationError
 from granular_configuration.yaml import Placeholder
 
-ASSET_DIR = (Path(__file__).parent / "../assets/config_location_test").resolve()
+ASSET_DIR = (Path(__file__).parent / "../assets").resolve()
 
 
 def test_build_baseline() -> None:
     files = (
-        ASSET_DIR / "a/b/t2.yaml",
-        ASSET_DIR / "g/h.yaml",
-        ASSET_DIR / "c/t.yaml",
+        ASSET_DIR / "old" / "a/b/t2.yaml",
+        ASSET_DIR / "old" / "g/h.yaml",
+        ASSET_DIR / "old" / "c/t.yaml",
     )
 
     configuration = build_configuration(files)
