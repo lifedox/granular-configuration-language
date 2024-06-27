@@ -30,8 +30,5 @@ class OrderedSet(typ.MutableSet[_T], typ.Reversible[_T], typ.Generic[_T]):
     def discard(self, value: _T) -> None:
         del self.__backend[value]
 
-    def update(self, other: OrderedSet[_T]) -> None:
-        self.__backend.update(other.__backend)
-
     def __reversed__(self) -> typ.Iterator[_T]:
         return reversed(self.__backend)

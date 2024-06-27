@@ -8,7 +8,7 @@ from granular_configuration import Configuration, LazyLoadConfiguration
 from granular_configuration._lazy_load import Locations, build_configuration
 from granular_configuration.exceptions import IniUnsupportedError, InvalidBasePathException
 
-ASSET_DIR = (Path(__file__).parent / "../assets").resolve()
+ASSET_DIR = (Path(__file__).parent / "assets").resolve()
 
 
 class TestLaziness:
