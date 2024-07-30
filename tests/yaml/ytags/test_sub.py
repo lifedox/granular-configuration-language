@@ -19,11 +19,13 @@ data:
         name: nitro
     cat:
         name: never owned a cat
+    number: 123
 tests:
     a: !Sub ${$.data.dog.name}
     b: !Sub ${$.data.dog}
     c: !Sub ${$.data.*.name}
     d: !Sub ${unreal_env_variable} ${$.data.dog.name} ${unreal_env_vari:-defaulting value}
+    e: !Sub ${$.data.number}
 """
 
     with patch.dict(os.environ, values={"unreal_env_variable": "test me"}):
@@ -33,5 +35,5 @@ tests:
             b="{'name': 'nitro'}",
             c="['nitro', 'never owned a cat']",
             d="test me nitro defaulting value",
+            e="123",
         )
-

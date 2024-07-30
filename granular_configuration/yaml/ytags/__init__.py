@@ -12,9 +12,12 @@ from granular_configuration.yaml.ytags import (
     placeholder,
     ref,
     sub,
+    date,
 )
 
 handlers: typ.Final[typ.Sequence[CallableConstructorType]] = (
+    date.date_handler,
+    date.datetime_handler,
     del_.handler,
     env.handler,
     func_and_class.class_handler,
