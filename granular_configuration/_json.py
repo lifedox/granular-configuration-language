@@ -12,5 +12,5 @@ def json_default(value: typ.Any) -> typ.Any:
         return str(value)
     elif isinstance(value, (date, datetime)):
         return value.isoformat()
-    else:
+    else:  # pragma: no cover
         return value

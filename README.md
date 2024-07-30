@@ -770,6 +770,7 @@ LazyLoadConfiguration(
   - `dict` inheritence was done for compatible with `json.dumps` and other library that only support the primitive `dict`, instead of `Mapping`. However, faking the inheritance has always been sketchy. 
 - added `!Date`, `!DateTime`
   - Uses `python-dateutil` from python `<3.11`
+- added `!UUID`
 
 ### 1.8.0
 

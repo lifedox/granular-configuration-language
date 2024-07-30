@@ -2,9 +2,9 @@ import os
 import re
 import typing as typ
 
+from granular_configuration.yaml._tags._ref import resolve_json_ref
 from granular_configuration.yaml.classes import Root
 from granular_configuration.yaml.decorators import Tag, as_lazy_with_root, string_tag
-from granular_configuration.yaml.ytags.ref import resolve_json_ref
 
 SUB_PATTERN: typ.Pattern[str] = re.compile(r"(\$\{(?P<contents>.*?)\})")
 

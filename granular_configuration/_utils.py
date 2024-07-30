@@ -9,7 +9,7 @@ consume = typ.cast(typ.Callable[[typ.Iterable], None], partial(deque, maxlen=0))
 _T = typ.TypeVar("_T")
 
 
-class OrderedSet(typ.MutableSet[_T], typ.Reversible[_T], typ.Generic[_T]):
+class OrderedSet(typ.MutableSet[_T], typ.Reversible[_T], typ.Generic[_T]):  # pragma: no cover
     def __init__(self, iterable: typ.Optional[typ.Iterable[_T]] = None) -> None:
         self.__backend: OrderedDict[_T, None] = OrderedDict()
         if iterable is not None:

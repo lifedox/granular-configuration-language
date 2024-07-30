@@ -9,8 +9,8 @@ from pathlib import Path
 from ruamel.yaml import YAML, MappingNode, Node, SafeConstructor
 from ruamel.yaml.resolver import BaseResolver
 
+from granular_configuration.yaml._tags import handlers
 from granular_configuration.yaml.classes import _OPH, LazyRoot, LoadOptions, StateHolder
-from granular_configuration.yaml.ytags import handlers
 
 if typ.TYPE_CHECKING:  # pragma: no cover
 
@@ -48,7 +48,7 @@ def internal(
 
     if obj_pairs_hook and issubclass(obj_pairs_hook, MutableMapping):
         oph = obj_pairs_hook
-    else:
+    else:  # pragma: no cover
         oph = dict
 
     class ExtendedSafeConstructor(SafeConstructor):

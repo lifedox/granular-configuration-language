@@ -1,9 +1,9 @@
 import typing as typ
 from pathlib import Path
 
+from granular_configuration.yaml._tags._sub import interpolate
 from granular_configuration.yaml.classes import LazyRoot, LoadOptions, Root
 from granular_configuration.yaml.decorators import Tag, as_lazy_with_root_and_load_options, string_tag
-from granular_configuration.yaml.ytags.sub import interpolate
 
 
 def interpolate_value(value: str, options: LoadOptions, root: Root) -> Path:

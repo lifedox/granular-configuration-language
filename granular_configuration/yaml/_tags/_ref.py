@@ -9,9 +9,9 @@ from granular_configuration.exceptions import (
     JSONPathOnlyWorksOnMappings,
     JSONPathQueryMatchFailed,
 )
+from granular_configuration.yaml._tags._merge import merge_tag
 from granular_configuration.yaml.classes import LazyEval, Root
 from granular_configuration.yaml.decorators import Tag, as_lazy_with_root, string_tag
-from granular_configuration.yaml.ytags.merge import merge_tag
 
 SUB_PATTERN: typ.Pattern[str] = re.compile(r"(\$\{(?P<contents>.*?)\})")
 
