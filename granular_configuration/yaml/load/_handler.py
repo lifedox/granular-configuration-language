@@ -9,11 +9,8 @@ from pathlib import Path
 from ruamel.yaml import YAML, MappingNode, Node, SafeConstructor
 from ruamel.yaml.resolver import BaseResolver
 
-from granular_configuration.yaml.classes import LazyEval, LazyRoot, LoadOptions, StateHolder
+from granular_configuration.yaml.classes import _OPH, LazyRoot, LoadOptions, StateHolder
 from granular_configuration.yaml.ytags import handlers
-
-_OPH = typ.Optional[typ.Type[MutableMapping]]
-
 
 if typ.TYPE_CHECKING:  # pragma: no cover
 
@@ -70,17 +67,3 @@ def internal(
         state.lazy_root_obj._set_root(result)
 
     return result
-
-
-def external(
-    config_str: str,
-    obj_pairs_hook: _OPH = None,
-    *,
-    lazy_root: typ.Optional[LazyRoot] = None,
-    file_path: typ.Optional[Path] = None,
-) -> typ.Any:
-    result = internal(config_str, obj_pairs_hook=obj_pairs_hook, lazy_root=lazy_root, file_path=file_path)
-    if isinstance(result, LazyEval):
-        return result.result
-    else:
-        return result

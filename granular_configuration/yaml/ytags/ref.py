@@ -5,7 +5,6 @@ import typing as typ
 import jsonpath
 
 from granular_configuration.exceptions import (
-    JSONPathMustPointToASingleValue,
     JSONPathMustStartFromRoot,
     JSONPathOnlyWorksOnMappings,
     JSONPathQueryMatchFailed,
@@ -45,8 +44,7 @@ def _resolve_path(query: str, root: typ.Mapping) -> typ.Any:
         elif len(result) == 0:
             raise JSONPathQueryMatchFailed(f"JSON Path `{query}` did not find a match.")
         else:
-            return repr(result)
-            raise JSONPathMustPointToASingleValue(f"JSON Path `{query}` did not find a match.")  # pragma: no cover
+            return result
 
     except RecursionError:  # pragma: no cover
         # Coverage is missing this, but it could be the RecursionError and the upstream catch-and-replace

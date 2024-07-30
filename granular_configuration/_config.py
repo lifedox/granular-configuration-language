@@ -7,12 +7,16 @@ from granular_configuration.exceptions import PlaceholderConfigurationError
 from granular_configuration.yaml import LazyEval, Placeholder
 
 
-class Configuration(typ.MutableMapping):
-    def __init__(self, *arg: typ.Mapping | typ.Iterable[typ.Tuple[typ.Any, typ.Any]], **kwargs: typ.Any) -> None:
-        self.__data: typ.Dict = dict()
-        self.__names: typ.Tuple[str, ...] = tuple()
+class Configuration(typ.MutableMapping[typ.Any, typ.Any]):
+    def __init__(self, *arg: typ.Mapping | typ.Iterable[tuple[typ.Any, typ.Any]], **kwargs: typ.Any) -> None:
+        self.__data: dict[typ.Any, typ.Any] = dict()
+        self.__names: tuple[str, ...] = tuple()
 
         consume(starmap(self.__setitem__, dict(*arg, **kwargs).items()))
+
+    #################################################################
+    # Required for MutableMapping
+    #################################################################
 
     def __iter__(self) -> typ.Iterator:
         return iter(self.__data)
@@ -22,9 +26,6 @@ class Configuration(typ.MutableMapping):
 
     def __delitem__(self, key: typ.Any) -> None:
         return self.__data.__delitem__(key)
-
-    def __get_name(self, attribute: typ.Any) -> str:
-        return ".".join(map(str, chain(self.__names, (str(attribute),))))
 
     def __setitem__(self, key: typ.Any, value: typ.Any) -> None:
         self.__data[key] = value
@@ -55,8 +56,19 @@ class Configuration(typ.MutableMapping):
         else:
             return value
 
+    #################################################################
+    # Overridden MutableMapping methods
+    #################################################################
+
+    def __contains__(self, key: typ.Any) -> bool:
+        return key in self.__data
+
     def get(self, key: typ.Any, default: typ.Any = None) -> typ.Any:
         return self[key] if self.exists(key) else default
+
+    #################################################################
+    # Required behavior overides
+    #################################################################
 
     def __getattr__(self, name: str) -> typ.Any:
         """
@@ -71,8 +83,32 @@ class Configuration(typ.MutableMapping):
     def __repr__(self) -> str:  # pragma: no cover
         return repr(self.__data)
 
-    def __contains__(self, key: typ.Any) -> bool:
-        return key in self.__data
+    def __deepcopy__(self, memo: dict[int, typ.Any]) -> "Configuration":
+        other = Configuration()
+        memo[id(self)] = other
+        other.__data = copy.deepcopy(self.__data, memo=memo)
+        return other
+
+    def __copy__(self) -> "Configuration":
+        other = Configuration()
+        other.__data = copy.copy(self.__data)
+        return other
+
+    copy = __copy__
+
+    #################################################################
+    # Internal methods
+    #################################################################
+
+    def __get_name(self, attribute: typ.Any) -> str:
+        return ".".join(map(str, chain(self.__names, (str(attribute),))))
+
+    def _raw_items(self) -> typ.Iterator[tuple[typ.Any, typ.Any]]:
+        return map(lambda key: (key, self.__data[key]), self)
+
+    #################################################################
+    # Public interface methods
+    #################################################################
 
     def exists(self, key: typ.Any) -> bool:
         """
@@ -80,7 +116,7 @@ class Configuration(typ.MutableMapping):
         """
         return (key in self) and not isinstance(self.__data[key], Placeholder)
 
-    def as_dict(self) -> typ.Dict:
+    def as_dict(self) -> dict[typ.Any, typ.Any]:
         """
         Returns the Configuration settings as standard Python dict.
         Nested Configartion object will also be converted.
@@ -92,35 +128,3 @@ class Configuration(typ.MutableMapping):
                 self.items(),
             )
         )
-
-    def __deepcopy__(self, memo: typ.Dict) -> "Configuration":
-        other = Configuration()
-        memo[id(self)] = other
-        for key, value in self.__data.items():
-            other[copy.deepcopy(key, memo)] = copy.deepcopy(value, memo)
-        return other
-
-    def __copy__(self) -> "Configuration":
-        return copy.deepcopy(self)
-
-    copy = __copy__
-
-    def _raw_items(self) -> typ.Iterator[typ.Tuple[typ.Any, typ.Any]]:
-        return map(lambda key: (key, self.__data[key]), self)
-
-    def __getnewargs__(self) -> typ.Sequence[typ.Tuple[typ.Any, typ.Any]]:  # pragma: no cover
-        return tuple(self.items())
-
-    def __getstate__(self) -> typ.MutableMapping:  # pragma: no cover
-        return self
-
-    def __setstate__(self, state: typ.Any) -> None:  # pragma: no cover
-        self.update(state)
-
-    @property  # type: ignore
-    def __class__(self):  # type: ignore
-        return _ConDict
-
-
-class _ConDict(dict, Configuration):  # type: ignore
-    pass

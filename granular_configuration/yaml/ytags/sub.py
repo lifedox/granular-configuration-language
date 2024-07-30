@@ -11,7 +11,13 @@ SUB_PATTERN: typ.Pattern[str] = re.compile(r"(\$\{(?P<contents>.*?)\})")
 
 def load_sub(root: Root, *, contents: str) -> str:
     if contents.startswith("$") or contents.startswith("/"):
-        return str(resolve_json_ref(contents, root))
+        value = resolve_json_ref(contents, root)
+        if isinstance(value, str):
+            return value
+        elif isinstance(value, (typ.Mapping, typ.Sequence)):
+            return repr(value)
+        else:
+            return str(value)
     else:
         env_params = contents.split(":-", maxsplit=1)
         if len(env_params) > 1:

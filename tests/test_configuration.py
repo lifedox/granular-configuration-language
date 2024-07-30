@@ -22,7 +22,7 @@ def test_using_Configuration_like_dict() -> None:
     assert config.popitem() == ("a", reduce)
 
 
-def test_Configuration_is_dict() -> None:
+def test_Configuration_making_copies() -> None:
     value = LazyLoadConfiguration(
         ASSET_DIR / "old" / "g/h.yaml",
         ASSET_DIR / "old" / "c/t.yaml",
@@ -44,8 +44,6 @@ def test_Configuration_is_dict() -> None:
     assert new == value
     assert value.exists("a") is False
     assert new.exists("a") is False
-
-    assert isinstance(value, dict)
 
 
 def test_Configuration_exists() -> None:

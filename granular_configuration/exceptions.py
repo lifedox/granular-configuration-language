@@ -34,10 +34,6 @@ class JSONPathMustStartFromRoot(Exception):
     pass
 
 
-class JSONPathMustPointToASingleValue(KeyError):
-    pass
-
-
 class JSONPathQueryMatchFailed(KeyError):
     pass
 
