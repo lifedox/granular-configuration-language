@@ -1,8 +1,8 @@
 import sys
-from granular_configuration.yaml.decorators import Tag, as_lazy, string_tag
 from datetime import date, datetime
-
 from functools import partial
+
+from granular_configuration.yaml.decorators import Tag, as_lazy, string_tag
 
 if sys.version_info >= (3, 11):  # pragma: no cover
     date_fromisoformat = date.fromisoformat

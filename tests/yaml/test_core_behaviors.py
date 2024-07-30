@@ -1,4 +1,3 @@
-from granular_configuration import Configuration
 from granular_configuration.yaml import loads
 
 
@@ -12,7 +11,7 @@ null: test
 True: "boolean"
 false: "not"
 """
-    assert loads(test, obj_pairs_hook=Configuration).as_dict() == {
+    assert loads(test).as_dict() == {
         "2": "str",
         2: "integer",
         1.123: "float",
@@ -32,7 +31,7 @@ whole:
     <<: *part
     e: f
 """
-    assert loads(test, obj_pairs_hook=Configuration).as_dict() == {
+    assert loads(test).as_dict() == {
         "whole": {
             "a": "b",
             "c": "d",
@@ -56,7 +55,7 @@ real_octal: 0o010
 number: 1_000
 slash: "\\/"
 """
-    assert loads(test, obj_pairs_hook=Configuration).as_dict() == {
+    assert loads(test).as_dict() == {
         True: ["y", "yes", "on"],
         False: ["n", "no", "off"],
         "old_octal": 10,
@@ -83,7 +82,7 @@ real_octal: 0o010
 number: 1_000
 slash: "\\/"
 """
-    assert loads(test, obj_pairs_hook=Configuration).as_dict() == {
+    assert loads(test).as_dict() == {
         True: [True, True, True],
         False: [False, False, False],
         "old_octal": 8,

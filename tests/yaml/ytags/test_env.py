@@ -9,4 +9,3 @@ def test_loading_from_environment() -> None:
         assert loads("!Env '{{unreal_env_variable}}'") == "test me"
         assert loads("!Env '{{unreal_env_variable:special}}'") == "test me"
         assert loads("!Env '{{unreal_env_vari:special case }}'") == "special case "
-

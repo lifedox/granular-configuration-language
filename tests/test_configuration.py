@@ -1,15 +1,16 @@
 from __future__ import annotations
 
+import json
 from functools import reduce
 from pathlib import Path
 
-from granular_configuration import Configuration, LazyLoadConfiguration
-from granular_configuration.yaml import Placeholder
+from granular_configuration import Configuration, LazyLoadConfiguration, json_default
+from granular_configuration.yaml import Placeholder, loads
 
 ASSET_DIR = (Path(__file__).parent / "assets").resolve()
 
 
-def test_using_Configuration_like_dict() -> None:
+def test_using_like_dict() -> None:
     config = LazyLoadConfiguration(ASSET_DIR / "func_test.yaml").config
 
     assert config.a is reduce
@@ -22,7 +23,7 @@ def test_using_Configuration_like_dict() -> None:
     assert config.popitem() == ("a", reduce)
 
 
-def test_Configuration_making_copies() -> None:
+def test_making_copies() -> None:
     value = LazyLoadConfiguration(
         ASSET_DIR / "old" / "g/h.yaml",
         ASSET_DIR / "old" / "c/t.yaml",
@@ -46,7 +47,7 @@ def test_Configuration_making_copies() -> None:
     assert new.exists("a") is False
 
 
-def test_Configuration_exists() -> None:
+def test_exists() -> None:
     config = Configuration(a=1, b=Placeholder("tests"))
 
     assert config.exists("a") is True
@@ -62,7 +63,18 @@ def test_Configuration_exists() -> None:
     assert config.get("c") is None
 
 
-def test_Configuration_as_dict() -> None:
+def test_as_dict() -> None:
     input = Configuration(a="b", b=Configuration(a=Configuration(a=1)))
     expected = dict(a="b", b=dict(a=dict(a=1)))
     assert input.as_dict() == expected
+
+
+def test_json_dump() -> None:
+    test: Configuration = loads(
+        """
+a: b
+          """
+    )
+
+    expected = """{"a": "b"}"""
+    assert json.dumps(test, default=json_default) == expected

@@ -29,7 +29,7 @@ tests:
 """
 
     with patch.dict(os.environ, values={"unreal_env_variable": "test me"}):
-        output: Configuration = loads(test_data, obj_pairs_hook=Configuration)
+        output: Configuration = loads(test_data)
         assert output.tests.as_dict() == dict(
             a="nitro",
             b="{'name': 'nitro'}",

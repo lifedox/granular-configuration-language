@@ -1,8 +1,8 @@
-from granular_configuration.yaml import loads
-from datetime import date, datetime, timedelta, timezone
 import json
+from datetime import date, datetime, timedelta, timezone
 
 from granular_configuration import json_default
+from granular_configuration.yaml import loads
 
 
 def test_date() -> None:

@@ -61,7 +61,7 @@ def test_scalar__dict() -> None:
 
 def test_scalar__Configuration() -> None:
     with patch.dict(os.environ, values={"unreal_env_variable": '{"a": {"b": "value"}}'}):
-        value = loads("!ParseEnv unreal_env_variable", obj_pairs_hook=Configuration)
+        value = loads("!ParseEnv unreal_env_variable")
         assert isinstance(value, Configuration)
         assert value == {"a": {"b": "value"}}
         assert isinstance(value["a"], Configuration)
@@ -86,7 +86,7 @@ def test_sequence__use_default() -> None:
         assert loads('!ParseEnv ["unreal_env_vari", abc]') == "abc"
         assert loads('!ParseEnv ["unreal_env_vari", null]') is None
         assert loads('!ParseEnv ["unreal_env_vari", false]') is False
-        value = loads('!ParseEnv ["unreal_env_vari", {"a": {"b": "value"}}]', obj_pairs_hook=Configuration)
+        value = loads('!ParseEnv ["unreal_env_vari", {"a": {"b": "value"}}]')
         assert isinstance(value, Configuration)
         assert value == {"a": {"b": "value"}}
         assert isinstance(value["a"], Configuration)
@@ -116,7 +116,7 @@ def test_safe_sequence__use_default() -> None:
         assert loads('!ParseEnvSafe ["unreal_env_vari", abc]') == "abc"
         assert loads('!ParseEnvSafe ["unreal_env_vari", null]') is None
         assert loads('!ParseEnvSafe ["unreal_env_vari", false]') is False
-        value = loads('!ParseEnvSafe ["unreal_env_vari", {"a": {"b": "value"}}]', obj_pairs_hook=Configuration)
+        value = loads('!ParseEnvSafe ["unreal_env_vari", {"a": {"b": "value"}}]')
         assert isinstance(value, Configuration)
         assert value == {"a": {"b": "value"}}
         assert isinstance(value["a"], Configuration)
@@ -151,7 +151,7 @@ aws_region: !ParseEnv
 """
 
     with patch.dict(os.environ, values={"unreal_env_variable": "test me"}):
-        output: Configuration = loads(test_data, obj_pairs_hook=Configuration)
+        output: Configuration = loads(test_data)
         assert getattr(output, "aws_region") == "us-east-1"
 
 
@@ -163,7 +163,7 @@ aws_region: !ParseEnv
 """
 
     with patch.dict(os.environ, values={"AWS_DEFAULT_REGION": "test me"}):
-        output: Configuration = loads(test_data, obj_pairs_hook=Configuration)
+        output: Configuration = loads(test_data)
         assert getattr(output, "aws_region") == "test me"
 
 
@@ -175,7 +175,7 @@ aws_region: !ParseEnv
 """
 
     with patch.dict(os.environ, values={"G_ASYNC_KINESIS_AWS_REGION": "test me"}):
-        output: Configuration = loads(test_data, obj_pairs_hook=Configuration)
+        output: Configuration = loads(test_data)
         assert getattr(output, "aws_region") == "test me"
 
 
@@ -188,5 +188,5 @@ sub: data
 """
 
     with patch.dict(os.environ, values={"G_ASYNC_KINESIS_AWS_REGION": "!Sub ${$.sub}"}):
-        output: Configuration = loads(test_data, obj_pairs_hook=Configuration)
+        output: Configuration = loads(test_data)
         assert getattr(output, "aws_region") == "data"

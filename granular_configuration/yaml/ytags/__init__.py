@@ -2,6 +2,7 @@ import typing as typ
 
 from granular_configuration.yaml.decorators import CallableConstructorType
 from granular_configuration.yaml.ytags import (
+    date,
     del_,
     env,
     func_and_class,
@@ -12,7 +13,6 @@ from granular_configuration.yaml.ytags import (
     placeholder,
     ref,
     sub,
-    date,
 )
 
 handlers: typ.Final[typ.Sequence[CallableConstructorType]] = (

@@ -15,7 +15,7 @@ tests:
     c: !Ref $.data.*.name
 """
 
-    output: Configuration = loads(test_data, obj_pairs_hook=Configuration)
+    output: Configuration = loads(test_data)
     assert output.tests.as_dict() == dict(
         a="nitro",
         b={"name": "nitro"},
@@ -37,7 +37,7 @@ tests:
     b: !Ref /data/dog
 """
 
-    output: Configuration = loads(test_data, obj_pairs_hook=Configuration)
+    output: Configuration = loads(test_data)
     assert output.tests.as_dict() == dict(
         a="nitro",
         b={"name": "nitro"},

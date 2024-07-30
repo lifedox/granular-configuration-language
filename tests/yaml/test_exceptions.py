@@ -1,14 +1,10 @@
 import os
-from functools import partial
 from unittest.mock import patch
 
 import pytest
 
-from granular_configuration import Configuration
 from granular_configuration.exceptions import JSONPathMustStartFromRoot, JSONPathOnlyWorksOnMappings, ParseEnvError
 from granular_configuration.yaml import loads
-
-loads = partial(loads, obj_pairs_hook=Configuration)
 
 
 def test_string_is_scalar_exception() -> None:
