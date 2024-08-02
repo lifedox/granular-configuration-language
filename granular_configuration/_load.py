@@ -1,7 +1,7 @@
 import typing as typ
 from pathlib import Path
 
-from granular_configuration.exceptions import IniUnsupportedError
+from granular_configuration.exceptions import ErrorWhileLoadingFileOccurred, IniUnsupportedError
 from granular_configuration.yaml import LazyRoot, loads
 
 
@@ -23,4 +23,4 @@ def load_file(
     except FileNotFoundError as e:
         raise FileNotFoundError(e) from None
     except Exception as e:
-        raise ValueError('Problem in file "{}": {}'.format(filename, e))
+        raise ErrorWhileLoadingFileOccurred('Problem in file "{}": {}'.format(filename, e))

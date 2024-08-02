@@ -6,7 +6,12 @@ import pytest
 
 from granular_configuration import Configuration, LazyLoadConfiguration
 from granular_configuration._lazy_load import Locations, build_configuration
-from granular_configuration.exceptions import IniUnsupportedError, InvalidBasePathException
+from granular_configuration.exceptions import (
+    EnvironmentVaribleNotFound,
+    ErrorWhileLoadingFileOccurred,
+    IniUnsupportedError,
+    InvalidBasePathException,
+)
 
 ASSET_DIR = (Path(__file__).parent / "assets").resolve()
 
@@ -127,10 +132,16 @@ def test_loading_empty_is_an_empty_dict() -> None:
 
 
 def test_loading_bad_yaml_causes_error() -> None:
-    with pytest.raises(ValueError):
+    with pytest.raises(ErrorWhileLoadingFileOccurred):
         LazyLoadConfiguration(ASSET_DIR / "bad.txt").config
 
 
 def test_loading_ini_causes_error() -> None:
     with pytest.raises(IniUnsupportedError):
         LazyLoadConfiguration(ASSET_DIR / "dummy.ini").config
+
+
+def test_missing_environment_variable_in_base_path() -> None:
+    with patch.dict(os.environ, values={}):
+        with pytest.raises(EnvironmentVaribleNotFound):
+            LazyLoadConfiguration(ASSET_DIR / "bad_env_var_base_path.yaml", base_path=tuple("ab")).config

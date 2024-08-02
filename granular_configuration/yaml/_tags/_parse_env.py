@@ -2,7 +2,7 @@ import os
 import typing as typ
 from functools import partial
 
-from granular_configuration.exceptions import ParseEnvEnvironmentVaribleNotFound, ParseEnvError
+from granular_configuration.exceptions import EnvironmentVaribleNotFound, ParseEnvParsingError
 from granular_configuration.yaml.classes import _OPH, LazyRoot, LoadOptions, Root
 from granular_configuration.yaml.decorators import (
     Tag,
@@ -13,18 +13,17 @@ from granular_configuration.yaml.decorators import (
 
 
 def parse_env(load: typ.Callable[[str], typ.Any], env_var: str, *default: typ.Any) -> typ.Any:
-    env_var = str(env_var)
     env_missing = env_var not in os.environ
 
     if env_missing and (len(default) > 0):
         return default[0]
     elif env_missing:
-        raise ParseEnvEnvironmentVaribleNotFound(env_var)
+        raise EnvironmentVaribleNotFound(env_var)
     else:
         try:
             return load(os.environ[env_var])
         except Exception as e:
-            raise ParseEnvError("Error while parsing Environment Variable ({}): {}".format(env_var, e))
+            raise ParseEnvParsingError("Error while parsing Environment Variable ({}): {}".format(env_var, e))
 
 
 def load_advance(obj_pair_hook: _OPH, root: Root, value: str) -> typ.Any:

@@ -1,10 +1,9 @@
 from __future__ import annotations
 
-import json
 from functools import reduce
 from pathlib import Path
 
-from granular_configuration import Configuration, LazyLoadConfiguration, json_default
+from granular_configuration import Configuration, LazyLoadConfiguration
 from granular_configuration.yaml import Placeholder, loads
 
 ASSET_DIR = (Path(__file__).parent / "assets").resolve()
@@ -77,4 +76,4 @@ a: b
     )
 
     expected = """{"a": "b"}"""
-    assert json.dumps(test, default=json_default) == expected
+    assert test.as_json_string() == expected

@@ -1,7 +1,7 @@
-import os
 import re
 import typing as typ
 
+from granular_configuration._utils import get_environment_variable
 from granular_configuration.yaml._tags._ref import resolve_json_ref
 from granular_configuration.yaml.classes import Root
 from granular_configuration.yaml.decorators import Tag, as_lazy_with_root, string_tag
@@ -19,11 +19,7 @@ def load_sub(root: Root, *, contents: str) -> str:
         else:
             return str(value)
     else:
-        env_params = contents.split(":-", maxsplit=1)
-        if len(env_params) > 1:
-            return os.getenv(env_params[0], env_params[1])
-        else:
-            return os.environ[env_params[0]]
+        return get_environment_variable(*contents.split(":-", maxsplit=1))
 
 
 def interpolate(value: str, root: Root) -> str:

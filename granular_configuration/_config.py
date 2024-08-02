@@ -1,4 +1,5 @@
 import copy
+import json
 import typing as typ
 from itertools import chain, starmap
 
@@ -118,9 +119,11 @@ class Configuration(typ.MutableMapping[typ.Any, typ.Any]):
 
     def as_dict(self) -> dict[typ.Any, typ.Any]:
         """
-        Returns the Configuration settings as standard Python dict.
-        Nested Configartion object will also be converted.
-        This will evaluated all lazy tag functions and throw an exception on Placeholders.
+        Returns this `Configuration` as standard Python `dict`.
+        Nested `Configuration` objects will also be converted.
+
+        Note: This will evaluated all lazy tag functions and throw an exception
+        on Placeholders.
         """
         return dict(
             starmap(
@@ -128,3 +131,16 @@ class Configuration(typ.MutableMapping[typ.Any, typ.Any]):
                 self.items(),
             )
         )
+
+    def as_json_string(self, *, default: typ.Callable[[typ.Any], typ.Any] | None = None, **kwds: typ.Any) -> str:
+        """
+        Returns this `Configuration` as a JSON string, using standard `json`
+        library and (as default) the default factory provided by this library
+        (`granular_configuration.json_default`).
+
+        Note: This will evaluated all lazy tag functions and throw an exception
+        on Placeholders.
+        """
+        from granular_configuration import json_default
+
+        return json.dumps(self, default=default or json_default, **kwds)

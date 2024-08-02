@@ -7,7 +7,8 @@ import jsonpath
 from granular_configuration.exceptions import (
     JSONPathMustStartFromRoot,
     JSONPathOnlyWorksOnMappings,
-    JSONPathQueryMatchFailed,
+    JSONPathQueryFailed,
+    JSONPointerQueryFailed,
 )
 from granular_configuration.yaml._tags._merge import merge_tag
 from granular_configuration.yaml.classes import LazyEval, Root
@@ -23,7 +24,7 @@ def _resolve_pointer(query: str, root: typ.Mapping) -> typ.Any:
         result = jsonpath.JSONPointer(query).resolve(root, default=not_found)
 
         if result is not_found:
-            raise JSONPathQueryMatchFailed(f"JSON Pointer `{query}` did not find a match.")
+            raise JSONPointerQueryFailed(f"JSON Pointer `{query}` did not find a match.")
         else:
             return result
 
@@ -42,7 +43,7 @@ def _resolve_path(query: str, root: typ.Mapping) -> typ.Any:
         if len(result) == 1:
             return result[0]
         elif len(result) == 0:
-            raise JSONPathQueryMatchFailed(f"JSON Path `{query}` did not find a match.")
+            raise JSONPathQueryFailed(f"JSON Path `{query}` did not find a match.")
         else:
             return result
 

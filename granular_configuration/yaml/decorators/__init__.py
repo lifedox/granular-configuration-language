@@ -1,5 +1,4 @@
 from granular_configuration.yaml.decorators._decorators import (
-    CallableConstructorType,
     Tag,
     as_lazy,
     as_lazy_with_root,

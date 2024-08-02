@@ -3,7 +3,10 @@ import typing as typ
 from itertools import product
 from unittest.mock import patch
 
+import pytest
+
 from granular_configuration import Configuration
+from granular_configuration.exceptions import EnvironmentVaribleNotFound, ParseEnvParsingError
 from granular_configuration.yaml import loads
 
 
@@ -190,3 +193,23 @@ sub: data
     with patch.dict(os.environ, values={"G_ASYNC_KINESIS_AWS_REGION": "!Sub ${$.sub}"}):
         output: Configuration = loads(test_data)
         assert getattr(output, "aws_region") == "data"
+
+
+def test_parsing_bad_data_throws_exception() -> None:
+    with patch.dict(os.environ, values={"unreal_env_variable": "{"}):
+        with pytest.raises(ParseEnvParsingError):
+            loads("!ParseEnv unreal_env_variable")
+
+
+def test_missing_env_var_throws_exception() -> None:
+    with patch.dict(os.environ, values={}):
+        with pytest.raises(EnvironmentVaribleNotFound):
+            loads("!ParseEnv unreal_env_vari")
+
+
+def test_parse_env_safe_with_a_tag_fails() -> None:
+    with patch.dict(
+        os.environ, values={"unreal_env_variable": "!ParseEnv unreal_env_variable1", "unreal_env_variable1": "42"}
+    ):
+        with pytest.raises(ParseEnvParsingError):
+            loads("!ParseEnvSafe unreal_env_variable")

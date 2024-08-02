@@ -1,15 +1,18 @@
 from __future__ import annotations
 
+import os
 import typing as typ
 from collections import OrderedDict, deque
 from functools import partial
+
+from granular_configuration.exceptions import EnvironmentVaribleNotFound
 
 consume = typ.cast(typ.Callable[[typ.Iterable], None], partial(deque, maxlen=0))
 
 _T = typ.TypeVar("_T")
 
 
-class OrderedSet(typ.MutableSet[_T], typ.Reversible[_T], typ.Generic[_T]):  # pragma: no cover
+class OrderedSet(typ.MutableSet[_T], typ.Reversible[_T], typ.Generic[_T]):
     def __init__(self, iterable: typ.Optional[typ.Iterable[_T]] = None) -> None:
         self.__backend: OrderedDict[_T, None] = OrderedDict()
         if iterable is not None:
@@ -32,3 +35,13 @@ class OrderedSet(typ.MutableSet[_T], typ.Reversible[_T], typ.Generic[_T]):  # pr
 
     def __reversed__(self) -> typ.Iterator[_T]:
         return reversed(self.__backend)
+
+
+def get_environment_variable(name: str, default: str | None = None) -> str:
+    try:
+        if default is None:
+            return os.environ[name]
+        else:
+            return os.getenv(name, default)
+    except KeyError:
+        raise EnvironmentVaribleNotFound(name) from None

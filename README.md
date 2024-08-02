@@ -767,10 +767,14 @@ LazyLoadConfiguration(
 - Add JSON Pointer support where JSON Path is supported.
 - Added `!Ref`, `!Merge`, `!Del`, `ParseFile`, `ParseFileOptional`, `!ParseEnvSafe`
 - Configuration no longer fakes being a subclass of `dict`. It remains a MutableMapping.
-  - `dict` inheritence was done for compatible with `json.dumps` and other library that only support the primitive `dict`, instead of `Mapping`. However, faking the inheritance has always been sketchy. 
+  - `dict` inheritence was done for compatible with `json.dumps` and other library that only support the primitive `dict`, instead of `Mapping`. However, faking the inheritance has always been sketchy.
 - added `!Date`, `!DateTime`
   - Uses `python-dateutil` from python `<3.11`
 - added `!UUID`
+- Renamed Exceptions:
+  - `ParseEnvError` → `ParseEnvParsingError`
+  - `ParseEnvEnvironmentVaribleNotFound` → `EnvironmentVaribleNotFound`
+  - `JSONPathQueryMatchFailed` → `JSONPathQueryFailed`
 
 ### 1.8.0
 

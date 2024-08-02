@@ -71,8 +71,11 @@ class LazyLoadConfiguration(MutableMapping):
         try:
             config = reduce(op.getitem, self.__base_path, config)
         except KeyError as e:
-            message = str(e)
-            raise InvalidBasePathException(message[1 : len(message) - 1])
+            if e.__class__ is KeyError:
+                message = str(e)
+                raise InvalidBasePathException(message[1 : len(message) - 1])
+            else:
+                raise
         return config
 
     def load_configuration(self) -> None:

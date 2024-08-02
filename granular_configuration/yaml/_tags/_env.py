@@ -1,17 +1,14 @@
-import os
 import re
 import typing as typ
 
+from granular_configuration._utils import get_environment_variable
 from granular_configuration.yaml.decorators import Tag, as_lazy, string_tag
 
 ENV_PATTERN: typ.Pattern[str] = re.compile(r"(\{\{\s*(?P<env_name>[A-Za-z0-9-_]+)\s*(?:\:(?P<default>.*?))?\}\})")
 
 
 def load_env(env_name: str, default: typ.Optional[str] = None) -> str:
-    if default is None:
-        return os.environ[env_name]
-    else:
-        return os.getenv(env_name, default)
+    return get_environment_variable(env_name, default)
 
 
 @string_tag(Tag("!Env"))

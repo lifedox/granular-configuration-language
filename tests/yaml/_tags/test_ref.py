@@ -1,4 +1,7 @@
+import pytest
+
 from granular_configuration import Configuration
+from granular_configuration.exceptions import JSONPathMustStartFromRoot, JSONPathQueryFailed, JSONPointerQueryFailed
 from granular_configuration.yaml import loads
 
 
@@ -44,3 +47,30 @@ tests:
     )
     assert output.data.dog.name is output.tests.a
     assert output.data.dog is output.tests.b
+
+
+def test_jsonpath_missing_throws_exception() -> None:
+    test_data = """
+a: !Ref $.no_data.here
+b: c
+"""
+    with pytest.raises(JSONPathQueryFailed):
+        loads(test_data).as_dict()
+
+
+def test_jsonpointer_missing_throws_exception() -> None:
+    test_data = """
+a: !Ref /no_data/here
+b: c
+"""
+    with pytest.raises(JSONPointerQueryFailed):
+        assert loads(test_data).as_dict() == {}
+
+
+def test_syntax_error_throws_exception() -> None:
+    test_data = """
+a: !Ref no_data/here
+b: c
+"""
+    with pytest.raises(JSONPathMustStartFromRoot):
+        assert loads(test_data).as_dict() == {}

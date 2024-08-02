@@ -18,11 +18,11 @@ class InvalidBasePathException(KeyError):
     pass
 
 
-class ParseEnvError(Exception):
+class ParseEnvParsingError(Exception):
     pass
 
 
-class ParseEnvEnvironmentVaribleNotFound(KeyError):
+class EnvironmentVaribleNotFound(KeyError):
     pass
 
 
@@ -34,9 +34,29 @@ class JSONPathMustStartFromRoot(Exception):
     pass
 
 
-class JSONPathQueryMatchFailed(KeyError):
+class JSONPathQueryFailed(KeyError):
+    pass
+
+
+class JSONPointerQueryFailed(KeyError):
     pass
 
 
 class IniUnsupportedError(Exception):
+    pass
+
+
+class IsNotCallable(ValueError):
+    pass
+
+
+class IsNotAClass(ValueError):
+    pass
+
+
+class DoesNotExist(ValueError):
+    pass
+
+
+class ErrorWhileLoadingFileOccurred(ValueError):
     pass

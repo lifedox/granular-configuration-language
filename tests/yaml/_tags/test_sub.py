@@ -1,7 +1,14 @@
 import os
 from unittest.mock import patch
 
+import pytest
+
 from granular_configuration import Configuration
+from granular_configuration.exceptions import (
+    EnvironmentVaribleNotFound,
+    JSONPathOnlyWorksOnMappings,
+    JSONPathQueryFailed,
+)
 from granular_configuration.yaml import loads
 
 
@@ -37,3 +44,25 @@ tests:
             d="test me nitro defaulting value",
             e="123",
         )
+
+
+def test_missing_env_var_throws_exception() -> None:
+    with patch.dict(os.environ, values={}):
+        with pytest.raises(EnvironmentVaribleNotFound):
+            loads("!Sub ${unreal_env_vari}")
+
+
+def test_jsonpath_missing_throw_exception() -> None:
+    test_data = """
+a: !Sub ${$.no_data.here}
+b: c
+"""
+    with pytest.raises(JSONPathQueryFailed):
+        loads(test_data).as_dict()
+
+
+def test_jsonpath_on_a_scalar_value_makes_no_sense_and_must_fail() -> None:
+    test_data = """!Sub ${$.no_data.here}
+"""
+    with pytest.raises(JSONPathOnlyWorksOnMappings):
+        loads(test_data)

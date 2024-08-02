@@ -4,6 +4,7 @@ import os
 import sys
 import typing as typ
 
+from granular_configuration.exceptions import DoesNotExist, IsNotAClass, IsNotCallable
 from granular_configuration.yaml.decorators import Tag, as_lazy, string_tag
 
 
@@ -20,7 +21,7 @@ def get_func(func_path: str) -> typ.Callable:
         func: typ.Callable = getattr(importlib.import_module(mod_name), func_name)
         return func
     except (ImportError, AttributeError):
-        raise ValueError(f"Could not load {func_path}")
+        raise DoesNotExist(f"Could not load {func_path}")
 
 
 @string_tag(Tag("!Class"))
@@ -30,14 +31,14 @@ def class_handler(value: str) -> typ.Callable:
     if inspect.isclass(class_type):
         return class_type
     else:
-        raise ValueError("Classes loaded by !Class must pass `inspect.isclass`")
+        raise IsNotAClass(f"Classes loaded by !Class must pass `inspect.isclass`: `{value}` is not a class")
 
 
 @string_tag(Tag("!Func"))
 @as_lazy
 def func_handler(value: str) -> typ.Callable:
     func = get_func(value)
-    if not callable(func):
-        raise ValueError("Functions loaded by !Func must be callable")
-    else:
+    if callable(func):
         return func
+    else:
+        raise IsNotCallable(f"Functions loaded by !Func must be callable: `{value}` is not callble")

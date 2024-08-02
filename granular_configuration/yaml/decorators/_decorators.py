@@ -58,7 +58,27 @@ def as_not_lazy(func: typ.Callable[[_T], _RT]) -> typ.Callable[[Tag, _T, StateHo
 # type handling decorators
 ###############################################################################
 
-CallableConstructorType = typ.Callable[[typ.Type[SafeConstructor], StateHolder], None]
+
+class TagConstructor(typ.Hashable):
+    __slots__ = ("tag", "constructor")
+
+    def __init__(self, tag: Tag, constructor: typ.Callable[[typ.Type[SafeConstructor], StateHolder], None]) -> None:
+        self.tag: typ.Final = tag
+        self.constructor: typ.Final = constructor
+
+    def __hash__(self) -> int:
+        return hash(self.tag)
+
+    def __eq__(self, value: object) -> bool:  # pragma: no cover
+        return (isinstance(value, self.__class__) and self.tag == value.tag) or (
+            isinstance(value, str) and self.tag == value
+        )
+
+    def __call__(self, constructor: typ.Type[SafeConstructor], state: StateHolder) -> None:
+        return self.constructor(constructor, state)
+
+    def __repr__(self) -> str:  # pragma: no cover
+        return f"<TagConstructor(`{self.tag}`): {self.constructor.__module__}.{self.constructor.__name__}>"
 
 
 class TagDecoratorBase:
@@ -71,7 +91,7 @@ class TagDecoratorBase:
 class string_tag(TagDecoratorBase):
     Type: typ.TypeAlias = str
 
-    def __call__(self, handler: typ.Callable[[Tag, Type, StateHolder], _RT]) -> CallableConstructorType:
+    def __call__(self, handler: typ.Callable[[Tag, Type, StateHolder], _RT]) -> TagConstructor:
         tag = self.tag
 
         @wraps(handler)
@@ -92,13 +112,13 @@ class string_tag(TagDecoratorBase):
 
             constructor.add_constructor(tag, type_handler)
 
-        return add_handler
+        return TagConstructor(tag, add_handler)
 
 
 class string_or_twople_tag(TagDecoratorBase):
     Type: typ.TypeAlias = str | tuple[str, typ.Any]
 
-    def __call__(self, handler: typ.Callable[[Tag, Type, StateHolder], _RT]) -> CallableConstructorType:
+    def __call__(self, handler: typ.Callable[[Tag, Type, StateHolder], _RT]) -> TagConstructor:
         tag = self.tag
 
         @wraps(handler)
@@ -123,13 +143,13 @@ class string_or_twople_tag(TagDecoratorBase):
 
             constructor.add_constructor(tag, type_handler)
 
-        return add_handler
+        return TagConstructor(tag, add_handler)
 
 
 class sequence_of_any_tag(TagDecoratorBase):
     Type: typ.TypeAlias = typ.Sequence[typ.Any]
 
-    def __call__(self, handler: typ.Callable[[Tag, Type, StateHolder], _RT]) -> CallableConstructorType:
+    def __call__(self, handler: typ.Callable[[Tag, Type, StateHolder], _RT]) -> TagConstructor:
         tag = self.tag
 
         @wraps(handler)
@@ -150,4 +170,4 @@ class sequence_of_any_tag(TagDecoratorBase):
 
             constructor.add_constructor(tag, type_handler)
 
-        return add_handler
+        return TagConstructor(tag, add_handler)
