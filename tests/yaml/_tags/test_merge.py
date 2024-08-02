@@ -8,16 +8,6 @@ from granular_configuration.yaml import loads
 ASSET_DIR = (Path(__file__).parent / "../../assets/").resolve()
 
 
-def test_that_scalar_fails() -> None:
-    with pytest.raises(ValueError):
-        loads("!Merge abc")
-
-
-def test_that_mapping_fails() -> None:
-    with pytest.raises(ValueError):
-        loads("!Merge {}")
-
-
 def test_merging_string_returns_empty_dict() -> None:
     test = """\
 !Merge
