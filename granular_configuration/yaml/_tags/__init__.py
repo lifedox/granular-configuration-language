@@ -1,37 +1,23 @@
+import inspect
 import typing as typ
+from itertools import chain
+from pathlib import Path
 
-from granular_configuration.yaml._tags import (
-    _date,
-    _del,
-    _env,
-    _func_and_class,
-    _mask,
-    _merge,
-    _parse_env,
-    _parse_file,
-    _placeholder,
-    _ref,
-    _sub,
-    _uuid,
-)
+from granular_configuration.yaml.decorators._tag_loader import get_tags
+
+package_prefix = (str(__package__) + ".").__add__
 
 handlers: typ.Final = frozenset(
-    (
-        _date.date_handler,
-        _date.datetime_handler,
-        _del.handler,
-        _env.handler,
-        _func_and_class.class_handler,
-        _func_and_class.func_handler,
-        _mask.handler,
-        _merge.handler,
-        _parse_env.handler,
-        _parse_env.handler_safe,
-        _parse_file.handler,
-        _parse_file.handler_optional,
-        _placeholder.handler,
-        _ref.handler,
-        _sub.handler,
-        _uuid.handler,
+    chain.from_iterable(
+        map(
+            get_tags,
+            map(
+                package_prefix,
+                map(
+                    inspect.getmodulename,  # type: ignore Pylance is being wrong
+                    Path(__file__).parent.glob(r"_[a-zA-Z]*.py"),
+                ),
+            ),
+        )
     )
 )

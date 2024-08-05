@@ -30,9 +30,17 @@ def json_default(value: typ.Any) -> typ.Any:
     elif isinstance(value, (date, datetime)):
         return value.isoformat()
     elif inspect.isclass(value):
-        return f"<{value.__module__}.{value.__name__}>"
+        try:
+            return f"<{value.__module__}.{value.__name__}>"
+        except Exception:  # pragma: no cover
+            return f"<{value}>"
+    elif isinstance(value, partial):
+        return f"<{repr(value)}>"
     elif callable(value):
-        return f"<{value.__module__}.{value.__name__}>"
+        try:
+            return f"<{value.__module__}.{value.__name__}>"
+        except Exception:  # pragma: no cover
+            return f"<{value}>"
     else:  # pragma: no cover
         return value
 
