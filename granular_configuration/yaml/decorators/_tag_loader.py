@@ -2,7 +2,7 @@ import importlib
 import inspect
 import typing as typ
 
-from granular_configuration.yaml.decorators._decorators import TagConstructor
+from granular_configuration.yaml.decorators._base import TagConstructor
 
 
 def is_TagConstructor(obj: typ.Any) -> typ.TypeGuard[TagConstructor]:
