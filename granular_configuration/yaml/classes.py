@@ -79,7 +79,7 @@ class LazyEval(abc.ABC, typ.Generic[_RT]):
         return self._run()
 
     @abc.abstractmethod
-    def _run(self) -> _RT: ...  # pragma: no cover  # abstractmethod
+    def _run(self) -> _RT: ...  # pragma: no cover
 
 
 _OPH = typ.Optional[typ.Type[typ.MutableMapping]]

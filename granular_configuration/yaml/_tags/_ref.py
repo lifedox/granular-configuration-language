@@ -47,9 +47,7 @@ def _resolve_path(query: str, root: typ.Mapping) -> typ.Any:
         else:
             return result
 
-    except RecursionError:  # pragma: no cover
-        # Coverage is missing this, but it could be the RecursionError and the upstream catch-and-replace
-        # Replacing RecursionError with Exception shows that test is running
+    except RecursionError:
         raise RecursionError(
             (
                 f"JSON Path `{query}` caused a recursion error. Please check your configuration for a self-referencing loop."

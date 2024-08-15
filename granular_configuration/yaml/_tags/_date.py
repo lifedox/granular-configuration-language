@@ -7,7 +7,7 @@ from granular_configuration.yaml.decorators import Tag, as_lazy, string_tag
 if sys.version_info >= (3, 11):  # pragma: no cover
     date_fromisoformat = date.fromisoformat
     datetime_fromisoformat = datetime.fromisoformat
-else:  # pragma: no cover
+else:  # pragma: no cover  # sys.version_info
     from dateutil.parser import parse
 
     datetime_fromisoformat = partial(parse, yearfirst=True, dayfirst=False)

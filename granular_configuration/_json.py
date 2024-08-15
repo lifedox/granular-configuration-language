@@ -33,14 +33,14 @@ def json_default(value: typ.Any) -> typ.Any:
         try:
             return f"<{value.__module__}.{value.__name__}>"
         except Exception:  # pragma: no cover
-            return f"<{value}>"
+            return f"<{repr(value)}>"
     elif isinstance(value, partial):
         return f"<{repr(value)}>"
     elif callable(value):
         try:
             return f"<{value.__module__}.{value.__name__}>"
         except Exception:  # pragma: no cover
-            return f"<{value}>"
+            return f"<{repr(value)}>"
     else:  # pragma: no cover
         return value
 
