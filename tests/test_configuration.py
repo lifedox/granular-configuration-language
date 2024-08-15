@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import typing as typ
-from functools import reduce
 from pathlib import Path
 
 import pytest
@@ -13,16 +12,17 @@ ASSET_DIR = (Path(__file__).parent / "assets").resolve()
 
 
 def test_using_like_dict() -> None:
-    config = LazyLoadConfiguration(ASSET_DIR / "func_test.yaml").config
+    config = LazyLoadConfiguration(ASSET_DIR / "base_path1.yaml").config.start.id
 
-    assert config.a is reduce
-    assert tuple(config.items()) == (("a", reduce),)
-    assert tuple(config.values()) == (reduce,)
-    assert dict(config) == {"a": reduce}
-    assert config.pop("a") == reduce
+    assert config.name == "me"
+    assert tuple(config.items()) == (("name", "me"),)
+    assert tuple(config.values()) == ("me",)
+    assert dict(config) == {"name": "me"}
+    assert config.pop("name") == "me"
 
-    config = LazyLoadConfiguration(ASSET_DIR / "func_test.yaml").config
-    assert config.popitem() == ("a", reduce)
+    config = LazyLoadConfiguration(ASSET_DIR / "base_path1.yaml").config.start.id
+
+    assert config.popitem() == ("name", "me")
 
 
 def test_making_copies() -> None:
