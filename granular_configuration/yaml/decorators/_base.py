@@ -55,6 +55,7 @@ class TagDecoratorBase(typ.Generic[_T], abc.ABC):
         return value
 
     def __call__(self, handler: typ.Callable[[Tag, _T, StateHolder], _RT]) -> TagConstructor:
+        # Don't capture self in the function generation
         tag = self.tag
         user_friendly_type = self.user_friendly_type
         scalar_node_type_check = self.scalar_node_type_check
@@ -73,16 +74,12 @@ class TagDecoratorBase(typ.Generic[_T], abc.ABC):
                     value = constructor.construct_scalar(node)
                     if isinstance(value, str) and scalar_node_type_check(value):
                         return handler(tag, scalar_node_transformer(value), state)
-                    else:  # pragma: no cover  # untestable branch
-                        # Scalar Tags are strings by definition. Checking just creates an untestable branch
-                        pass
                 elif isinstance(node, SequenceNode):
                     value = constructor.construct_sequence(node)
                     if isinstance(value, typ.MutableSequence) and sequence_node_type_check(value):
                         return handler(tag, sequence_node_transformers(value), state)
-                    else:  # pragma: no cover  # untestable branch
-                        # Sequence Tags are list by definition. Checking just creates an untestable branch
-                        pass
+
+                # Fallback Exception
                 raise ValueError(f"{tag} supports: {user_friendly_type}. Got: `{repr(node)}`")
 
             constructor.add_constructor(tag, type_handler)
