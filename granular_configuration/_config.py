@@ -1,11 +1,28 @@
+from __future__ import annotations
+
 import copy
 import json
+import sys
 import typing as typ
 from itertools import chain, starmap
 
 from granular_configuration._utils import consume
 from granular_configuration.exceptions import PlaceholderConfigurationError
 from granular_configuration.yaml import LazyEval, Placeholder
+
+if sys.version_info >= (3, 11):  # pragma: no cover
+    from typing import Generic, TypedDict, Unpack
+elif typ.TYPE_CHECKING:  # pragma: no cover
+    from typing_extensions import Generic, TypedDict, Unpack
+
+
+_T = typ.TypeVar("_T")
+
+if sys.version_info >= (3, 11) or typ.TYPE_CHECKING:  # pragma: no cover
+
+    class Kwords_typed_get(Generic[_T], TypedDict, total=False):
+        default: _T
+        predicate: typ.Callable[[typ.Any], typ.TypeGuard[_T]]
 
 
 class Configuration(typ.MutableMapping[typ.Any, typ.Any]):
@@ -68,7 +85,7 @@ class Configuration(typ.MutableMapping[typ.Any, typ.Any]):
         return self[key] if self.exists(key) else default
 
     #################################################################
-    # Required behavior overides
+    # Required behavior overrides
     #################################################################
 
     def __getattr__(self, name: str) -> typ.Any:
@@ -144,3 +161,82 @@ class Configuration(typ.MutableMapping[typ.Any, typ.Any]):
         from granular_configuration import json_default
 
         return json.dumps(self, default=default or json_default, **kwds)
+
+    @typ.overload
+    def typed_get(self, type: typ.Type[_T], key: typ.Any) -> _T:
+        """
+        Provides a typed-checked `get` option
+
+        - `type`: Wanted typed
+        - `key`: Key for wanted value
+        """
+        ...  # pragma: no cover
+
+    @typ.overload
+    def typed_get(self, type: typ.Type[_T], key: typ.Any, *, default: _T) -> _T:
+        """
+        Provides a typed-checked `get` option
+
+        - `type`: Wanted typed
+        - `key`: Key for wanted value
+
+        Options:
+        - `default`: Provides a default value like `dict.get`
+        """
+        ...  # pragma: no cover
+
+    @typ.overload
+    def typed_get(
+        self, type: typ.Type[_T], key: typ.Any, *, predicate: typ.Callable[[typ.Any], typ.TypeGuard[_T]]
+    ) -> _T:
+        """
+        Provides a typed-checked `get` option
+
+        - `type`: Wanted typed
+        - `key`: Key for wanted value
+
+        Options:
+        - `predicate`: Replaces the `isinstance(value, type)` check with a custom method `predicate(value) -> bool`
+        """
+        ...  # pragma: no cover
+
+    @typ.overload
+    def typed_get(
+        self, type: typ.Type[_T], key: typ.Any, *, default: _T, predicate: typ.Callable[[typ.Any], typ.TypeGuard[_T]]
+    ) -> _T:
+        """
+        Provides a typed-checked `get` option
+
+        - `type`: Wanted typed
+        - `key`: Key for wanted value
+
+        Options:
+        - `default`: Provides a default value like `dict.get`
+        - `predicate`: Replaces the `isinstance(value, type)` check with a custom method `predicate(value) -> bool`
+
+        """
+        ...  # pragma: no cover
+
+    def typed_get(self, type: typ.Type[_T], key: typ.Any, **kwds: Unpack[Kwords_typed_get[_T]]) -> _T:
+        """
+        Provides a typed-checked `get` option
+
+        - `type`: Wanted typed
+        - `key`: Key for wanted value
+
+        Options:
+        - `default`: Provides a default value like `dict.get`
+        - `predicate`: Replaces the `isinstance(value, type)` check with a custom method `predicate(value) -> bool`
+        """
+        try:
+            value = self[key]
+        except KeyError:
+            if "default" in kwds:
+                return kwds["default"]
+            else:
+                raise
+
+        if (("predicate" in kwds) and kwds["predicate"](value)) or isinstance(value, type):
+            return value
+        else:
+            raise ValueError(f"Incorrect type. Got: `{repr(value)}`. Wanted: `{repr(type)}`")

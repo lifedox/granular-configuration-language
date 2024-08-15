@@ -1,7 +1,10 @@
 from __future__ import annotations
 
+import typing as typ
 from functools import reduce
 from pathlib import Path
+
+import pytest
 
 from granular_configuration import Configuration, LazyLoadConfiguration
 from granular_configuration.yaml import Placeholder, loads
@@ -77,3 +80,78 @@ a: b
 
     expected = """{"a": "b"}"""
     assert test.as_json_string() == expected
+
+
+def test_typed_get() -> None:
+    test: Configuration = loads(
+        """
+a: b
+b: 1
+c: 1.0
+d: true
+          """
+    )
+
+    assert test.typed_get(str, "a") == "b"
+    assert test.typed_get(int, "b") == 1
+    assert test.typed_get(float, "c") == 1.0
+    assert test.typed_get(bool, "d") is True
+
+
+def test_typed_get_fails_on_incorrect_type() -> None:
+    test: Configuration = loads(
+        """
+a: b
+          """
+    )
+
+    with pytest.raises(ValueError):
+        test.typed_get(int, "a")
+
+
+def test_typed_get_keyerrors_as_a_dict_should() -> None:
+    test: Configuration = loads(
+        """
+a: b
+          """
+    )
+
+    with pytest.raises(KeyError):
+        test.typed_get(int, "b")
+
+
+def test_typed_get_default_as_a_dict_should() -> None:
+    test: Configuration = loads(
+        """
+a: b
+          """
+    )
+
+    assert test.typed_get(int, "b", default=1) == 1
+
+
+def test_typed_get_predicate_replacement() -> None:
+    test: Configuration = loads(
+        """
+a: null
+          """
+    )
+
+    def isNone(value: typ.Any) -> typ.TypeGuard[str]:
+        return value is None
+
+    assert test.typed_get(str, "a", default=1, predicate=isNone) is None
+
+
+def test_typed_get_predicate_replacement_failure() -> None:
+    test: Configuration = loads(
+        """
+a: null
+          """
+    )
+
+    def isNone(value: typ.Any) -> typ.TypeGuard[str]:
+        return False
+
+    with pytest.raises(ValueError):
+        test.typed_get(str, "a", default=1, predicate=isNone)

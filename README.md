@@ -340,7 +340,7 @@ class Configuration(typ.MutableMapping[typ.Any, typ.Any]):
 
 See [Patch Support](#patch-support) for details of `patch`
 
-Note: The reason for keys being `typing.Any` is that the YAML allows keys to be more than strings (i.e. integer, float, boolean, null), and this library does not restrict this (as there a valid reasons to want to have an integer-to-string map and so on). Just note that you cannot used the `__getattr___` with keys that do not meet the Python attribute naming restrictions, you would have to look those up via `__getitem__` (i.e. `CONFIG[1]`).
+Note: The reason for keys being `typing.Any` is that the YAML allows keys to be more than strings (i.e. integer, float, Boolean, null), and this library does not restrict this (as there a valid reasons to want to have an integer-to-string map and so on). Just note that you cannot used the `__getattr___` with keys that do not meet the Python attribute naming restrictions, you would have to look those up via `__getitem__` (i.e. `CONFIG[1]`).
 
 &nbsp;
 
@@ -753,7 +753,7 @@ LazyLoadConfiguration(
 
 - Removed `set_config` pattern
 - Removed INI support
-- Switched from `PyYAML` to ruamel.yaml
+- Switched from `PyYAML` to `ruamel.yaml`
   - Note: `PyYAML` is very dead
   - This primarily means YAML Version 1.2 is the default supported version.
     - `yes/no`, `y/n`, `on/off` is no longer `bool`
@@ -767,7 +767,7 @@ LazyLoadConfiguration(
 - Add JSON Pointer support where JSON Path is supported.
 - Added `!Ref`, `!Merge`, `!Del`, `ParseFile`, `ParseFileOptional`, `!ParseEnvSafe`
 - Configuration no longer fakes being a subclass of `dict`. It remains a MutableMapping.
-  - `dict` inheritence was done for compatible with `json.dumps` and other library that only support the primitive `dict`, instead of `Mapping`. However, faking the inheritance has always been sketchy.
+  - `dict` inheritance was done for compatible with `json.dumps` and other library that only support the primitive `dict`, instead of `Mapping`. However, faking the inheritance has always been sketchy and `json.dumps` have failed in rare occurrences.
 - added `!Date`, `!DateTime`
   - Uses `python-dateutil` from python `<3.11`
 - added `!UUID`
@@ -775,6 +775,8 @@ LazyLoadConfiguration(
   - `ParseEnvError` → `ParseEnvParsingError`
   - `ParseEnvEnvironmentVaribleNotFound` → `EnvironmentVaribleNotFound`
   - `JSONPathQueryMatchFailed` → `JSONPathQueryFailed`
+- Added `Configuration.typed_get`
+- Completely internalized location logic, removing `ConfigurationFiles`, `ConfigurationMultiNamedFiles`. Just use `pathlib.Path` or `str`.
 
 ### 1.8.0
 

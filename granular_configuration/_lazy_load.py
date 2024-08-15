@@ -54,7 +54,7 @@ class LazyLoadConfiguration(MutableMapping):
         """
         Load and fetch the configuration
 
-        This call is threadsafe and locks while the configuration is loaded to prevent duplicative processing and data
+        This call is thread-safe and locks while the configuration is loaded to prevent duplicative processing and data
         """
         if not self.__locations:
             return self.__config
