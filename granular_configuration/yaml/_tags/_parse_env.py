@@ -29,10 +29,10 @@ def parse_env(load: typ.Callable[[str], typ.Any], env_var: str, *default: typ.An
 
 
 def load_advance(obj_pair_hook: _OPH, root: Root, value: str) -> typ.Any:
-    from granular_configuration.yaml.load import internal
+    from granular_configuration.yaml import loads
 
     lazy_root = LazyRoot.with_root(root)
-    return internal(value, obj_pairs_hook=obj_pair_hook, lazy_root=lazy_root)
+    return loads(value, obj_pairs_hook=obj_pair_hook, lazy_root=lazy_root)
 
 
 def load_safe(value: str) -> typ.Any:
