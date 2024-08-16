@@ -1,9 +1,10 @@
 import re
 import typing as typ
 from functools import wraps
+from html import unescape
 
 from granular_configuration._utils import get_environment_variable
-from granular_configuration.yaml.decorators import Root
+from granular_configuration.yaml.classes import Root
 from granular_configuration.yaml.decorators.ref import resolve_json_ref
 
 SUB_PATTERN: typ.Pattern[str] = re.compile(r"(\$\{(?P<contents>.*?)\})")
@@ -21,6 +22,8 @@ def load_sub(root: Root, *, contents: str) -> str:
             return repr(value)
         else:
             return str(value)
+    elif contents.startswith("&") and contents.endswith(";"):
+        return unescape(contents)
     else:
         return get_environment_variable(*contents.split(":-", maxsplit=1))
 

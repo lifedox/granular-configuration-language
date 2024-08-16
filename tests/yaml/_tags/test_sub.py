@@ -66,3 +66,8 @@ def test_jsonpath_on_a_scalar_value_makes_no_sense_and_must_fail() -> None:
 """
     with pytest.raises(JSONPathOnlyWorksOnMappings):
         loads(test_data)
+
+
+def test_get_dollar_curly_brackets_via_html_unescape() -> None:
+    test_data = "!Sub ${&#x24;&#x7B;!Sub&#x7D;}"
+    assert loads(test_data) == r"${!Sub}"

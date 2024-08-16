@@ -10,7 +10,6 @@ from granular_configuration.exceptions import (
     JSONPathQueryFailed,
     JSONPointerQueryFailed,
 )
-from granular_configuration.yaml._tags._merge import merge_tag
 from granular_configuration.yaml.classes import LazyEval
 from granular_configuration.yaml.decorators import Root
 
@@ -56,7 +55,7 @@ def _resolve_path(query: str, root: typ.Mapping) -> typ.Any:
 
 
 def resolve_json_ref(query: str, root: Root) -> typ.Any:
-    if isinstance(root, LazyEval) and root.tag == merge_tag:
+    if isinstance(root, LazyEval) and root.tag == "!Merge":
         raise RecursionError(
             f"JSON Query `{query}` attempted recursion. Please check your configuration for a self-referencing loop."
         )
