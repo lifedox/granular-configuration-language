@@ -11,8 +11,8 @@ from granular_configuration.exceptions import (
     JSONPointerQueryFailed,
 )
 from granular_configuration.yaml._tags._merge import merge_tag
-from granular_configuration.yaml.classes import LazyEval, Root
-from granular_configuration.yaml.decorators import Tag, as_lazy_with_root, string_tag
+from granular_configuration.yaml.classes import LazyEval
+from granular_configuration.yaml.decorators import Root, Tag, as_lazy_with_root, string_tag
 
 SUB_PATTERN: typ.Pattern[str] = re.compile(r"(\$\{(?P<contents>.*?)\})")
 

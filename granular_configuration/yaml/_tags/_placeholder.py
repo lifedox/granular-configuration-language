@@ -1,5 +1,4 @@
-from granular_configuration.yaml.classes import Placeholder
-from granular_configuration.yaml.decorators import Tag, as_not_lazy, string_tag
+from granular_configuration.yaml.decorators import Placeholder, Tag, as_not_lazy, string_tag
 
 
 @string_tag(Tag("!Placeholder"))

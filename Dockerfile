@@ -1,6 +1,6 @@
 ARG PYTHON_VERSION
 
-FROM python:${PYTHON_VERSION}
+FROM python:${PYTHON_VERSION:?error}
 
 USER root
 
@@ -18,3 +18,10 @@ COPY --chown=granular:granular pyproject.toml poetry.lock README.md /app/
 WORKDIR /app
 
 RUN poetry install --no-root
+
+# For testing entry-points/plugins, an install is needed
+# Doing it seperating from the --no-rooot install to have Docker cache the virtualenv
+# and then quickly append the dist-info every change
+COPY --chown=granular:granular granular_configuration/ /app/granular_configuration/
+
+RUN poetry install

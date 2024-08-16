@@ -27,6 +27,9 @@ black = "*"
 isort = "*"
 bandit = "*"
 
+[tool.poetry.plugins.gc20tag]
+"official_extra" = "granular_configuration.yaml._tags.func_and_class"
+
 [tool.black]
 line-length = 120
 target-version = ["py310"]

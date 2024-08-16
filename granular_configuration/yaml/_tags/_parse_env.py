@@ -3,8 +3,10 @@ import typing as typ
 from functools import partial
 
 from granular_configuration.exceptions import EnvironmentVaribleNotFound, ParseEnvParsingError
-from granular_configuration.yaml.classes import _OPH, LazyRoot, LoadOptions, Root
+from granular_configuration.yaml.classes import _OPH, LazyRoot
 from granular_configuration.yaml.decorators import (
+    LoadOptions,
+    Root,
     Tag,
     as_lazy,
     as_lazy_with_root_and_load_options,
