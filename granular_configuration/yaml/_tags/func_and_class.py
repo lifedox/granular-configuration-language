@@ -5,7 +5,7 @@ import sys
 import typing as typ
 
 from granular_configuration.exceptions import DoesNotExist, IsNotAClass, IsNotCallable
-from granular_configuration.yaml.decorators import Tag, as_lazy, string_tag
+from granular_configuration.yaml.decorators import Tag, as_lazy, interpolate_value_without_ref, string_tag
 
 
 def add_cwd_to_path() -> None:
@@ -26,6 +26,7 @@ def get_func(func_path: str) -> typ.Callable:
 
 @string_tag(Tag("!Class"))
 @as_lazy
+@interpolate_value_without_ref
 def class_handler(value: str) -> typ.Callable:
     class_type = get_func(value)
     if inspect.isclass(class_type):
@@ -36,6 +37,7 @@ def class_handler(value: str) -> typ.Callable:
 
 @string_tag(Tag("!Func"))
 @as_lazy
+@interpolate_value_without_ref
 def func_handler(value: str) -> typ.Callable:
     func = get_func(value)
     if callable(func):

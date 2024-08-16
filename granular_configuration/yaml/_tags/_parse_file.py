@@ -1,19 +1,19 @@
 import typing as typ
 from pathlib import Path
 
-from granular_configuration.yaml._tags._sub import interpolate
 from granular_configuration.yaml.classes import LazyRoot
 from granular_configuration.yaml.decorators import (
     LoadOptions,
     Root,
     Tag,
     as_lazy_with_root_and_load_options,
+    interpolate_value_with_sub_rules,
     string_tag,
 )
 
 
-def interpolate_value(value: str, options: LoadOptions, root: Root) -> Path:
-    return options.file_relative_path / interpolate(value, root)
+def as_file_path(value: str, options: LoadOptions) -> Path:
+    return options.file_relative_path / value
 
 
 def load(file: Path, state: LoadOptions, root: Root) -> typ.Any:
@@ -26,16 +26,18 @@ def load(file: Path, state: LoadOptions, root: Root) -> typ.Any:
 
 @string_tag(Tag("!ParseFile"))
 @as_lazy_with_root_and_load_options
-def handler(value: str, options: LoadOptions, root: Root) -> typ.Any:
-    file = interpolate_value(value, options, root)
+@interpolate_value_with_sub_rules
+def handler(value: str, root: Root, options: LoadOptions) -> typ.Any:
+    file = as_file_path(value, options)
 
     return load(file, options, root)
 
 
 @string_tag(Tag("!OptionalParseFile"))
 @as_lazy_with_root_and_load_options
-def handler_optional(value: str, options: LoadOptions, root: Root) -> typ.Any:
-    file = interpolate_value(value, options, root)
+@interpolate_value_with_sub_rules
+def handler_optional(value: str, root: Root, options: LoadOptions) -> typ.Any:
+    file = as_file_path(value, options)
 
     if file.exists():
         return load(file, options, root)

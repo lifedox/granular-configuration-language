@@ -3,7 +3,7 @@ import typing as typ
 from dataclasses import dataclass
 from functools import cached_property
 from pathlib import Path
-from threading import Lock
+from threading import RLock
 
 _RT = typ.TypeVar("_RT")
 
@@ -51,6 +51,7 @@ class LazyEval(abc.ABC, typ.Generic[_RT]):
     def __init__(self, tag: Tag) -> None:
         self.tag = tag
         self.done = False
+        self.lock = RLock()
 
     def __repr__(self) -> str:
         return f"<{self.__class__.__name__}: {self.tag}>"
@@ -59,10 +60,12 @@ class LazyEval(abc.ABC, typ.Generic[_RT]):
         if self.done:  # pragma: no cover
             return self.__result
         else:
-            with Lock():
+            with self.lock:
                 result = self.__result
                 self.done = True
-                return result
+
+            del self.lock
+            return result
 
     @cached_property
     def result(self) -> typ.Any:

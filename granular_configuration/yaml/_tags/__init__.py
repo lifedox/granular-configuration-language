@@ -7,7 +7,6 @@ from pathlib import Path
 
 from granular_configuration.yaml.decorators._tag_loader import get_tags
 
-
 PRIVATE_SUB_MODULE_REGEX: typ.Final = r"_[a-zA-Z]*.py"
 add_package_prefix: typ.Final = (str(__package__) + ".").__add__
 

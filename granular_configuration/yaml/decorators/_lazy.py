@@ -29,12 +29,12 @@ def as_lazy_with_root(
 
 
 def as_lazy_with_root_and_load_options(
-    func: typ.Callable[[_T, LoadOptions, Root], _RT]
+    func: typ.Callable[[_T, Root, LoadOptions], _RT]
 ) -> typ.Callable[[Tag, _T, StateHolder], LazyEvalWithRoot[_RT]]:
     @wraps(func)
     def lazy_wrapper(tag: Tag, value: _T, state: StateHolder) -> LazyEvalWithRoot[_RT]:
         options = state.options
-        return LazyEvalWithRoot(tag, state.lazy_root_obj, lambda root: func(value, options, root))
+        return LazyEvalWithRoot(tag, state.lazy_root_obj, lambda root: func(value, root, options))
 
     return lazy_wrapper
 

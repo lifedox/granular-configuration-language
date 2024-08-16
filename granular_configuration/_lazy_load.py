@@ -41,6 +41,7 @@ class LazyLoadConfiguration(MutableMapping):
     ) -> None:
         self.__base_path = _read_base_path(base_path)
         self.__locations = _read_locations(load_order_location, use_env_location)
+        self.__lock = Lock()
 
     def __getattr__(self, name: str) -> typ.Any:
         """
@@ -59,11 +60,13 @@ class LazyLoadConfiguration(MutableMapping):
         if not self.__locations:
             return self.__config
         else:
-            with Lock():
+            with self.__lock:
                 config = self.__config
                 self.__locations = Locations(tuple())
                 self.__base_path = tuple()
-                return config
+
+            del self.__lock
+            return config
 
     @cached_property
     def __config(self) -> Configuration:

@@ -55,6 +55,17 @@ def test_merging_one_dict() -> None:
     assert loads(test).as_dict() == {"a": "b"}
 
 
+def test_merging_with_refs() -> None:
+    test = """\
+a: !Merge
+- a: !Sub ${/data}
+- b: !Sub ${/data}
+- c: !Sub ${/data}
+data: core
+"""
+    assert loads(test).a.as_dict() == {"a": "core", "b": "core", "c": "core"}
+
+
 def test_merging_from_files_nested() -> None:
     assert LazyLoadConfiguration(ASSET_DIR / "merge.yaml").config.as_dict() == {
         "basic": "state",

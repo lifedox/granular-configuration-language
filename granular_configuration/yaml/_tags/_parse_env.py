@@ -50,7 +50,7 @@ def parse_input(load: typ.Callable[[str], typ.Any], value: string_or_twople_tag.
 
 @string_or_twople_tag(Tag("!ParseEnv"))
 @as_lazy_with_root_and_load_options
-def handler(value: string_or_twople_tag.Type, options: LoadOptions, root: Root) -> typ.Any:
+def handler(value: string_or_twople_tag.Type, root: Root, options: LoadOptions) -> typ.Any:
     return parse_input(partial(load_advance, options.obj_pairs_func, root), value)
 
 
