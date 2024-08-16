@@ -8,6 +8,13 @@ from uuid import UUID
 from granular_configuration import Configuration
 
 
+def get_name(value: typ.Callable) -> str:
+    try:
+        return f"<{value.__module__}.{value.__name__}>"
+    except Exception:  # pragma: no cover
+        return f"<{repr(value)}>"
+
+
 def json_default(value: typ.Any) -> typ.Any:
     """
     A factory function to be used by the `json.dump` family of functions.
@@ -30,17 +37,11 @@ def json_default(value: typ.Any) -> typ.Any:
     elif isinstance(value, (date, datetime)):
         return value.isoformat()
     elif inspect.isclass(value):
-        try:
-            return f"<{value.__module__}.{value.__name__}>"
-        except Exception:  # pragma: no cover
-            return f"<{repr(value)}>"
+        return get_name(value)
     elif isinstance(value, partial):
         return f"<{repr(value)}>"
     elif callable(value):
-        try:
-            return f"<{value.__module__}.{value.__name__}>"
-        except Exception:  # pragma: no cover
-            return f"<{repr(value)}>"
+        return get_name(value)
     else:  # pragma: no cover
         return value
 

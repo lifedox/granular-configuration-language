@@ -12,13 +12,8 @@ from ruamel.yaml.resolver import BaseResolver
 from granular_configuration.yaml._tags import handlers
 from granular_configuration.yaml.classes import _OPH, LazyRoot, LoadOptions, StateHolder
 
-if typ.TYPE_CHECKING:  # pragma: no cover
 
-    class ExtendedSafeConstructor(SafeConstructor):
-        pass
-
-
-def construct_mapping(cls: typ.Type, constructor: ExtendedSafeConstructor, node: MappingNode) -> typ.MutableMapping:
+def construct_mapping(cls: typ.Type, constructor: SafeConstructor, node: MappingNode) -> typ.MutableMapping:
     node.value = [pair for pair in node.value if pair[0].tag != "!Del"]
     return cls(constructor.construct_mapping(node, deep=True))
 
