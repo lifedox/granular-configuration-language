@@ -60,3 +60,7 @@ class DoesNotExist(ValueError):
 
 class ErrorWhileLoadingFileOccurred(ValueError):
     pass
+
+
+class ErrorWhileLoadingTags(Exception):
+    pass

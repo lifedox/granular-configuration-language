@@ -10,15 +10,12 @@ _RT = typ.TypeVar("_RT")
 _T = typ.TypeVar("_T")
 
 
-class TagConstructor(typ.Hashable):
+class TagConstructor():
     __slots__ = ("tag", "constructor")
 
     def __init__(self, tag: Tag, constructor: typ.Callable[[typ.Type[SafeConstructor], StateHolder], None]) -> None:
         self.tag: typ.Final = tag
         self.constructor: typ.Final = constructor
-
-    def __hash__(self) -> int:
-        return hash(self.tag)
 
     def __eq__(self, value: object) -> bool:  # pragma: no cover
         return (isinstance(value, self.__class__) and self.tag == value.tag) or (
