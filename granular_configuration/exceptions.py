@@ -1,4 +1,20 @@
-class PlaceholderConfigurationError(Exception):
+class DoesNotExist(ValueError):
+    pass
+
+
+class EnvironmentVaribleNotFound(KeyError):
+    pass
+
+
+class ErrorWhileLoadingFileOccurred(ValueError):
+    pass
+
+
+class ErrorWhileLoadingTags(Exception):
+    pass
+
+
+class GetConfigReadBeforeSetException(Exception):
     pass
 
 
@@ -10,7 +26,7 @@ class IniTryToReplaceExistingKey(Exception):
     pass
 
 
-class GetConfigReadBeforeSetException(Exception):
+class IniUnsupportedError(Exception):
     pass
 
 
@@ -18,19 +34,19 @@ class InvalidBasePathException(KeyError):
     pass
 
 
-class ParseEnvParsingError(Exception):
+class IsNotAClass(ValueError):
     pass
 
 
-class EnvironmentVaribleNotFound(KeyError):
-    pass
-
-
-class JSONPathOnlyWorksOnMappings(Exception):
+class IsNotCallable(ValueError):
     pass
 
 
 class JSONPathMustStartFromRoot(Exception):
+    pass
+
+
+class JSONPathOnlyWorksOnMappings(Exception):
     pass
 
 
@@ -42,25 +58,11 @@ class JSONPointerQueryFailed(KeyError):
     pass
 
 
-class IniUnsupportedError(Exception):
+class ParseEnvParsingError(Exception):
     pass
 
 
-class IsNotCallable(ValueError):
+class PlaceholderConfigurationError(Exception):
     pass
 
 
-class IsNotAClass(ValueError):
-    pass
-
-
-class DoesNotExist(ValueError):
-    pass
-
-
-class ErrorWhileLoadingFileOccurred(ValueError):
-    pass
-
-
-class ErrorWhileLoadingTags(Exception):
-    pass
