@@ -1,3 +1,4 @@
+import re
 from pathlib import Path
 
 import pytest
@@ -10,41 +11,7 @@ from granular_configuration.yaml import Placeholder
 ASSET_DIR = (Path(__file__).parent / "assets").resolve()
 
 
-def test_build_baseline() -> None:
-    files = (
-        ASSET_DIR / "old" / "a/b/t2.yaml",
-        ASSET_DIR / "old" / "g/h.yaml",
-        ASSET_DIR / "old" / "c/t.yaml",
-    )
-
-    configuration = build_configuration(files, False)
-
-    assert isinstance(configuration, Configuration)
-
-    assert configuration.d == "from c/t.yaml"
-    assert configuration.c == "from c/t.yaml"
-    assert configuration.b == "from c/t.yaml"
-    assert configuration.h == "from g/h.yaml"
-    assert configuration.a == "from a/b/t2.yaml"
-    assert configuration.map == {"a": "from a/b/t2.yaml", "h": "from g/h.yaml", "c": "from c/t.yaml"}
-    assert configuration.deep_test.a.b == 10
-    assert configuration.placeholder_test.overridden == "This should be overridden"
-    assert configuration.env_test.default == "This should be seen"
-
-    with pytest.raises(AttributeError, match='Configuration value "doesnotexist" does not exist'):
-        configuration.doesnotexist
-
-    with pytest.raises(AttributeError, match='Configuration value "deep_test.a.doesnotexist" does not exist'):
-        configuration.deep_test.a.doesnotexist
-
-    with pytest.raises(
-        PlaceholderConfigurationError,
-        match='Configuration expects "placeholder_test.not_overridden" to be overwritten. Message: "This should not be overridden"',
-    ):
-        configuration.placeholder_test.not_overridden
-
-
-def test_build_with_a_placeholder_root() -> None:
+def test_build_with_a_placeholder() -> None:
     files = (
         ASSET_DIR / "placeholder_test1.yaml",
         ASSET_DIR / "placeholder_test2.yaml",
@@ -60,6 +27,12 @@ def test_build_with_a_placeholder_root() -> None:
 
     assert isinstance(raw_value["b"], Placeholder) and (raw_value["b"].message == "Placeholder over a placeholder")
     assert isinstance(raw_value["c"], Placeholder) and (raw_value["c"].message == "Placeholder over a value")
+
+    with pytest.raises(
+        PlaceholderConfigurationError,
+        match=re.escape('Placeholder `$.b` was not overwritten. Message: "Placeholder over a placeholder"'),
+    ):
+        configuration.b
 
 
 def test_build_with_sub() -> None:

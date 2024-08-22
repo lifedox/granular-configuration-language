@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import re
 import typing as typ
 from pathlib import Path
 
@@ -199,3 +200,33 @@ a: null
 
     with pytest.raises(ValueError):
         test.typed_get(str, "a", default=1, predicate=isNone)
+
+
+def test_missing_attribute_raise_useful_message() -> None:
+    test: Configuration = loads(
+        """
+a:
+  b:
+    c: Here
+          """
+    )
+
+    with pytest.raises(AttributeError, match=re.escape("Request attribute `$.a.b.doesnotexist` does not exist")):
+        test.a.b.doesnotexist
+
+
+def test_attribute_name_is_assign_at_read() -> None:
+    test: Configuration = loads(
+        """
+a:
+  b:
+    c:
+      d:
+e: !Ref $.a
+          """
+    )
+
+    assert str(test.a._Configuration__attribute_name) == "$.a"
+    assert str(test.e._Configuration__attribute_name) == "$.e"
+    assert str(test.a.b.c._Configuration__attribute_name) == "$.a.b.c"
+    assert str(test.e.b.c._Configuration__attribute_name) == "$.e.b.c"

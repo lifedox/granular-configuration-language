@@ -4,7 +4,8 @@ import copy
 import json
 import sys
 import typing as typ
-from itertools import chain, starmap
+import weakref
+from itertools import starmap
 
 from granular_configuration._s import setter_secret
 from granular_configuration.exceptions import PlaceholderConfigurationError
@@ -25,10 +26,37 @@ if sys.version_info >= (3, 11) or typ.TYPE_CHECKING:  # pragma: no cover
         predicate: typ.Callable[[typ.Any], typ.TypeGuard[_T]]
 
 
+class AttributeName(typ.Iterable[str]):
+    def __init__(self, prev: AttributeName | typ.Iterable[str], name: str) -> None:
+        self.__prev = prev
+        self.__name = name
+
+    @staticmethod
+    def as_root() -> AttributeName:
+        return AttributeName(tuple(), "$")
+
+    def append_suffix(self, name: str) -> AttributeName:
+        return AttributeName(weakref.proxy(self), name)
+
+    def with_suffix(self, name: str) -> str:
+        return ".".join(self._plus_one(name))
+
+    def __iter__(self) -> typ.Iterator[str]:
+        yield from self.__prev
+        yield self.__name
+
+    def _plus_one(self, last: str) -> typ.Iterator[str]:
+        yield from iter(self)
+        yield last
+
+    def __str__(self) -> str:
+        return ".".join(self)
+
+
 class Configuration(typ.Mapping[typ.Any, typ.Any]):
     def __init__(self, *arg: typ.Mapping | typ.Iterable[tuple[typ.Any, typ.Any]], **kwargs: typ.Any) -> None:
         self.__data: dict[typ.Any, typ.Any] = dict(*arg, **kwargs)
-        self.__names: tuple[str, ...] = tuple()
+        self.__attribute_name = AttributeName.as_root()
 
     #################################################################
     # Required for Mapping
@@ -49,19 +77,19 @@ class Configuration(typ.Mapping[typ.Any, typ.Any]):
 
         if isinstance(value, Placeholder):
             raise PlaceholderConfigurationError(
-                f'Configuration expects "{self.__get_name(name)}" to be overwritten. Message: "{value}"'
+                f'Placeholder `{self.__attribute_name.with_suffix(name)}` was not overwritten. Message: "{value}"'
             )
         elif isinstance(value, LazyEval):
             try:
-                new_value = value.result
-                self._private_set(name, new_value, setter_secret)
-                return new_value
+                value = value.result
+                self._private_set(name, value, setter_secret)
             except RecursionError:
                 raise RecursionError(
-                    f"{value.tag} at `{self.__get_name(name)}` caused a recursion error. Please check your configuration for a self-referencing loop."
+                    f"{value.tag} at `{self.__attribute_name.with_suffix(name)}` caused a recursion error. Please check your configuration for a self-referencing loop."
                 ) from None
-        elif isinstance(value, Configuration):
-            value.__names = self.__names + (str(name),)
+
+        if isinstance(value, Configuration):
+            value.__attribute_name = self.__attribute_name.append_suffix(str(name))
             return value
         else:
             return value
@@ -86,20 +114,20 @@ class Configuration(typ.Mapping[typ.Any, typ.Any]):
         Throws AttributeError instead of KeyError, as compared to __getitem__ when an attribute is not present.
         """
         if name not in self:
-            raise AttributeError(f'{self.__class__.__name__} value "{self.__get_name(name)}" does not exist')
+            raise AttributeError(f"Request attribute `{self.__attribute_name.with_suffix(name)}` does not exist")
 
         return self[name]
 
     def __repr__(self) -> str:  # pragma: no cover
         return repr(self.__data)
 
-    def __deepcopy__(self, memo: dict[int, typ.Any]) -> "Configuration":
+    def __deepcopy__(self, memo: dict[int, typ.Any]) -> Configuration:
         other = Configuration()
         memo[id(self)] = other
         other.__data = copy.deepcopy(self.__data, memo=memo)
         return other
 
-    def __copy__(self) -> "Configuration":
+    def __copy__(self) -> Configuration:
         other = Configuration()
         other.__data = copy.copy(self.__data)
         return other
@@ -115,9 +143,6 @@ class Configuration(typ.Mapping[typ.Any, typ.Any]):
             self.__data[key] = value
         else:
             raise TypeError("`_private_set` is private and not for external use")
-
-    def __get_name(self, attribute: typ.Any) -> str:
-        return ".".join(map(str, chain(self.__names, (str(attribute),))))
 
     def _raw_items(self) -> typ.Iterator[tuple[typ.Any, typ.Any]]:
         return map(lambda key: (key, self.__data[key]), self)
@@ -251,14 +276,14 @@ class MutableConfiguration(typ.MutableMapping[typ.Any, typ.Any], Configuration):
     def __setitem__(self, key: typ.Any, value: typ.Any) -> None:
         self._Configuration__data[key] = value
 
-    def __deepcopy__(self, memo: dict[int, typ.Any]) -> "MutableConfiguration":
+    def __deepcopy__(self, memo: dict[int, typ.Any]) -> MutableConfiguration:
         other = MutableConfiguration()
         memo[id(self)] = other
         # Use setattr to avoid mypy and pylance being confused
         setattr(other, "_Configuration__data", copy.deepcopy(self._Configuration__data, memo=memo))
         return other
 
-    def __copy__(self) -> "MutableConfiguration":
+    def __copy__(self) -> MutableConfiguration:
         other = MutableConfiguration()
         # Use setattr to avoid mypy and pylance being confused
         setattr(other, "_Configuration__data", copy.copy(self._Configuration__data))
