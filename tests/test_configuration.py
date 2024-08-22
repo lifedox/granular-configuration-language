@@ -6,9 +6,20 @@ from pathlib import Path
 import pytest
 
 from granular_configuration import Configuration, LazyLoadConfiguration, MutableLazyLoadConfiguration
+from granular_configuration._s import setter_secret
 from granular_configuration.yaml import Placeholder, loads
 
 ASSET_DIR = (Path(__file__).parent / "assets").resolve()
+
+
+def test_private_set_is_protected() -> None:
+    config = Configuration()
+
+    with pytest.raises(TypeError):
+        config._private_set("a", 1, "hello")
+
+    config._private_set("a", 1, setter_secret)
+    assert config["a"] == 1
 
 
 def test_using_like_mapping() -> None:
@@ -36,6 +47,30 @@ def test_using_MutableConfiguration_like_dict() -> None:
 
 def test_making_copies() -> None:
     value = LazyLoadConfiguration(
+        ASSET_DIR / "old" / "g/h.yaml",
+        ASSET_DIR / "old" / "c/t.yaml",
+    ).config
+
+    import copy
+
+    new = copy.deepcopy(value)
+    assert new == value
+    assert value.exists("a") is False
+    assert new.exists("a") is False
+
+    new = copy.copy(value)
+    assert new == value
+    assert value.exists("a") is False
+    assert new.exists("a") is False
+
+    new = value.copy()
+    assert new == value
+    assert value.exists("a") is False
+    assert new.exists("a") is False
+
+
+def test_making_mutable_copies() -> None:
+    value = MutableLazyLoadConfiguration(
         ASSET_DIR / "old" / "g/h.yaml",
         ASSET_DIR / "old" / "c/t.yaml",
     ).config

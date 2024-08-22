@@ -2,7 +2,7 @@ from pathlib import Path
 
 import pytest
 
-from granular_configuration import Configuration, LazyLoadConfiguration
+from granular_configuration import LazyLoadConfiguration
 from granular_configuration.yaml import loads
 
 ASSET_DIR = (Path(__file__).parent / "../../assets/").resolve()
@@ -18,7 +18,7 @@ def test_parsefile_loading() -> None:
 
 def test_parsefile_loading_missing_file() -> None:
     with pytest.raises(FileNotFoundError):
-        loads("!ParseFile does_not_exist.yaml", obj_pairs_hook=Configuration, file_path=ASSET_DIR / "dummy.yaml")
+        loads("!ParseFile does_not_exist.yaml", file_path=ASSET_DIR / "dummy.yaml")
 
 
 def test_parsefile_redirect_loading() -> None:
@@ -40,7 +40,6 @@ contents: !ParseFile ${/file}
 "data": "From parse_redirct.yaml"
 "base": {"b": "From parse_redirct.yaml"}
 """,
-            obj_pairs_hook=Configuration,
             file_path=ASSET_DIR / "dummy.yaml",
         ).as_dict()
         == {

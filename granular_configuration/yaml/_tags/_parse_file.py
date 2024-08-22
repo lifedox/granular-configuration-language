@@ -13,14 +13,14 @@ from granular_configuration.yaml.decorators import (
 
 
 def as_file_path(value: str, options: LoadOptions) -> Path:
-    return options.file_relative_path / value
+    return options.relative_to_directory / value
 
 
-def load(file: Path, state: LoadOptions, root: Root) -> typ.Any:
+def load(file: Path, option: LoadOptions, root: Root) -> typ.Any:
     from granular_configuration._load import load_file
 
     lazy_root = LazyRoot.with_root(root)
-    output = load_file(file, obj_pairs_hook=state.obj_pairs_func, lazy_root=lazy_root)
+    output = load_file(file, lazy_root=lazy_root, mutable=option.mutable)
     return output
 
 
@@ -42,4 +42,4 @@ def handler_optional(value: str, root: Root, options: LoadOptions) -> typ.Any:
     if file.exists():
         return load(file, options, root)
     else:
-        return (options.obj_pairs_func or dict)()
+        return options.obj_pairs_func()

@@ -3,7 +3,7 @@ import typing as typ
 from functools import partial
 
 from granular_configuration.exceptions import EnvironmentVaribleNotFound, ParseEnvParsingError
-from granular_configuration.yaml.classes import _OPH, LazyRoot
+from granular_configuration.yaml.classes import LazyRoot
 from granular_configuration.yaml.decorators import (
     LoadOptions,
     Root,
@@ -28,11 +28,11 @@ def parse_env(load: typ.Callable[[str], typ.Any], env_var: str, *default: typ.An
             raise ParseEnvParsingError("Error while parsing Environment Variable ({}): {}".format(env_var, e))
 
 
-def load_advance(obj_pair_hook: _OPH, root: Root, value: str) -> typ.Any:
+def load_advance(options: LoadOptions, root: Root, value: str) -> typ.Any:
     from granular_configuration.yaml import loads
 
     lazy_root = LazyRoot.with_root(root)
-    return loads(value, obj_pairs_hook=obj_pair_hook, lazy_root=lazy_root)
+    return loads(value, lazy_root=lazy_root, mutable=options.mutable)
 
 
 def load_safe(value: str) -> typ.Any:
@@ -51,7 +51,7 @@ def parse_input(load: typ.Callable[[str], typ.Any], value: string_or_twople_tag.
 @string_or_twople_tag(Tag("!ParseEnv"))
 @as_lazy_with_root_and_load_options
 def handler(value: string_or_twople_tag.Type, root: Root, options: LoadOptions) -> typ.Any:
-    return parse_input(partial(load_advance, options.obj_pairs_func, root), value)
+    return parse_input(partial(load_advance, options, root), value)
 
 
 @string_or_twople_tag(Tag("!ParseEnvSafe"))

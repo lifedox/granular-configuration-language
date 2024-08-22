@@ -2,11 +2,12 @@ import typing as typ
 from functools import partial
 from pathlib import Path
 
-from granular_configuration import Configuration, MutableConfiguration
+from granular_configuration import Configuration
 from granular_configuration._load import load_file
 from granular_configuration._s import setter_secret
 from granular_configuration._utils import consume
 from granular_configuration.yaml import LazyRoot
+from granular_configuration.yaml.load import obj_pairs_func
 
 _C = typ.TypeVar("_C", bound=Configuration)
 
@@ -32,7 +33,7 @@ def _merge(configuration_type: typ.Type[_C], base_config: _C, configs: typ.Itera
 
 
 def _load_configs_from_locations(
-    configuration_type: typ.Type[_C], locations: typ.Iterable[Path], lazy_root: LazyRoot
+    configuration_type: typ.Type[_C], locations: typ.Iterable[Path], lazy_root: LazyRoot, mutable: bool
 ) -> typ.Iterator[_C]:
     def configuration_only(
         configs: typ.Iterable[_C | typ.Any],
@@ -41,16 +42,16 @@ def _load_configs_from_locations(
             if isinstance(config, configuration_type):
                 yield config
 
-    _load_file = partial(load_file, obj_pairs_hook=configuration_type, lazy_root=lazy_root)
+    _load_file = partial(load_file, lazy_root=lazy_root, mutable=mutable)
     return configuration_only(map(_load_file, locations))
 
 
 def build_configuration(locations: typ.Iterable[Path], mutable: bool) -> Configuration:
-    configuration_type = MutableConfiguration if mutable else Configuration
+    configuration_type = obj_pairs_func(mutable)
     base_config = configuration_type()
     lazy_root = LazyRoot.with_root(base_config)
 
-    valid_configs = _load_configs_from_locations(configuration_type, locations, lazy_root)
+    valid_configs = _load_configs_from_locations(configuration_type, locations, lazy_root, mutable)
     merged_config = _merge(configuration_type, base_config, valid_configs)
 
     return merged_config

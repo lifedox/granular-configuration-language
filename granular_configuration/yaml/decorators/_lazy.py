@@ -18,6 +18,17 @@ def as_lazy(func: typ.Callable[[_T], _RT]) -> typ.Callable[[Tag, _T, StateHolder
     return lazy_wrapper
 
 
+def as_lazy_with_load_options(
+    func: typ.Callable[[_T, LoadOptions], _RT]
+) -> typ.Callable[[Tag, _T, StateHolder], LazyEvalBasic[_RT]]:
+    @wraps(func)
+    def lazy_wrapper(tag: Tag, value: _T, state: StateHolder) -> LazyEvalBasic[_RT]:
+        options = state.options
+        return LazyEvalBasic(tag, lambda: func(value, options))
+
+    return lazy_wrapper
+
+
 def as_lazy_with_root(
     func: typ.Callable[[_T, Root], _RT]
 ) -> typ.Callable[[Tag, _T, StateHolder], LazyEvalWithRoot[_RT]]:

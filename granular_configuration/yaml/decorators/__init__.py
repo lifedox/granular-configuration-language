@@ -6,6 +6,7 @@ from granular_configuration.yaml.decorators._interpolate import (
 )
 from granular_configuration.yaml.decorators._lazy import (
     as_lazy,
+    as_lazy_with_load_options,
     as_lazy_with_root,
     as_lazy_with_root_and_load_options,
     as_not_lazy,

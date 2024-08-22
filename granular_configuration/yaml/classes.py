@@ -85,13 +85,12 @@ class LazyEval(abc.ABC, typ.Generic[_RT]):
     def _run(self) -> _RT: ...  # pragma: no cover
 
 
-_OPH = typ.Optional[typ.Type[typ.Mapping]]
-
-
 @dataclass(frozen=True, kw_only=True)
 class LoadOptions:
-    obj_pairs_func: _OPH
-    file_relative_path: Path
+    obj_pairs_func: typ.Type[typ.Mapping]
+    mutable: bool
+    file_location: Path | None
+    relative_to_directory: Path
 
 
 @dataclass(frozen=True, kw_only=True)

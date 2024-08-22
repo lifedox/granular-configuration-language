@@ -114,13 +114,7 @@ class Configuration(typ.Mapping[typ.Any, typ.Any]):
         if secret is setter_secret:
             self.__data[key] = value
         else:
-            raise Exception("_private_set is private")
-
-    def _private_del(self, key: typ.Any, secret: object) -> None:
-        if secret is setter_secret:
-            del self.__data[key]
-        else:
-            raise Exception("_private_set is private")
+            raise TypeError("`_private_set` is private and not for external use")
 
     def __get_name(self, attribute: typ.Any) -> str:
         return ".".join(map(str, chain(self.__names, (str(attribute),))))
@@ -247,22 +241,27 @@ class Configuration(typ.Mapping[typ.Any, typ.Any]):
 
 
 class MutableConfiguration(typ.MutableMapping[typ.Any, typ.Any], Configuration):
+    # Remember `Configuration.__data` is really `Configuration._Configuration__data`
+    # Type checkers do ignore this fact, because this is something to be avoided.
+    # I want to continue to use self.__data to avoid people being tempted to reach in.
 
     def __delitem__(self, key: typ.Any) -> None:
-        self._private_del(key, setter_secret)
+        del self._Configuration__data[key]
 
     def __setitem__(self, key: typ.Any, value: typ.Any) -> None:
-        self._private_set(key, value, setter_secret)
+        self._Configuration__data[key] = value
 
     def __deepcopy__(self, memo: dict[int, typ.Any]) -> "MutableConfiguration":
         other = MutableConfiguration()
         memo[id(self)] = other
-        other.__data = copy.deepcopy(self.__data, memo=memo)
+        # Use setattr to avoid mypy and pylance being confused
+        setattr(other, "_Configuration__data", copy.deepcopy(self._Configuration__data, memo=memo))
         return other
 
     def __copy__(self) -> "MutableConfiguration":
         other = MutableConfiguration()
-        other.__data = copy.copy(self.__data)
+        # Use setattr to avoid mypy and pylance being confused
+        setattr(other, "_Configuration__data", copy.copy(self._Configuration__data))
         return other
 
     copy = __copy__

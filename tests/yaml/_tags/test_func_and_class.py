@@ -13,7 +13,7 @@ def test_func_loads_function() -> None:
     assert loads("!Func granular_configuration.Masked") is Masked
     assert (
         dumps(loads("!Func granular_configuration.yaml.loads"))
-        == '''"<granular_configuration.yaml.load._external.external>"'''
+        == '''"<granular_configuration.yaml.load._external.loads>"'''
     )
     assert (
         dumps(loads("!Func granular_configuration._utils.consume"))
