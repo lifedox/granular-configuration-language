@@ -3,20 +3,12 @@ from __future__ import annotations
 import copy
 import re
 import typing as typ
-from pathlib import Path
 
 import pytest
 
-from granular_configuration import (
-    Configuration,
-    LazyLoadConfiguration,
-    MutableConfiguration,
-    MutableLazyLoadConfiguration,
-)
+from granular_configuration import Configuration, MutableConfiguration
 from granular_configuration._s import setter_secret
 from granular_configuration.yaml import Placeholder, loads
-
-ASSET_DIR = (Path(__file__).parent / "assets").resolve()
 
 
 def test_private_set_is_protected() -> None:
@@ -30,7 +22,7 @@ def test_private_set_is_protected() -> None:
 
 
 def test_using_like_mapping() -> None:
-    config = LazyLoadConfiguration(ASSET_DIR / "base_path1.yaml").config.start.id
+    config = Configuration(name="me")
 
     assert config.name == "me"
     assert tuple(config.items()) == (("name", "me"),)
@@ -39,7 +31,7 @@ def test_using_like_mapping() -> None:
 
 
 def test_using_MutableConfiguration_like_dict() -> None:
-    config = MutableLazyLoadConfiguration(ASSET_DIR / "base_path1.yaml").config.start.id
+    config = MutableConfiguration(name="me")
 
     assert config.name == "me"
     assert tuple(config.items()) == (("name", "me"),)
@@ -47,7 +39,7 @@ def test_using_MutableConfiguration_like_dict() -> None:
     assert dict(config) == {"name": "me"}
     assert config.pop("name") == "me"
 
-    config = MutableLazyLoadConfiguration(ASSET_DIR / "base_path1.yaml").config.start.id
+    config = MutableConfiguration(name="me")
 
     assert config.popitem() == ("name", "me")
 

@@ -5,7 +5,7 @@ import pytest
 from granular_configuration import LazyLoadConfiguration
 from granular_configuration.yaml import loads
 
-ASSET_DIR = (Path(__file__).parent / "../../assets/").resolve()
+ASSET_DIR = (Path(__file__).parent / "../../assets/" / "merging_and_parsefile").resolve()
 
 
 def test_merging_string_returns_empty_dict() -> None:

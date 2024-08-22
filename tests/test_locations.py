@@ -4,7 +4,7 @@ from pathlib import Path
 
 from granular_configuration._locations import Locations
 
-ASSET_DIR = (Path(__file__).parent / "assets/location_test").resolve()
+ASSET_DIR = (Path(__file__).parent / "assets" / "test_locations").resolve()
 
 
 def test_assets_are_as_expect() -> None:

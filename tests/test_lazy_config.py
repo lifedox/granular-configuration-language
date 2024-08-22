@@ -13,7 +13,7 @@ from granular_configuration.exceptions import (
     InvalidBasePathException,
 )
 
-ASSET_DIR = (Path(__file__).parent / "assets").resolve()
+ASSET_DIR = (Path(__file__).parent / "assets" / "test_lazy_config").resolve()
 
 
 class TestLaziness:

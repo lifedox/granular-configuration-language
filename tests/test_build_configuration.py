@@ -8,7 +8,7 @@ from granular_configuration._build import build_configuration
 from granular_configuration.exceptions import PlaceholderConfigurationError
 from granular_configuration.yaml import Placeholder
 
-ASSET_DIR = (Path(__file__).parent / "assets").resolve()
+ASSET_DIR = (Path(__file__).parent / "assets" / "test_build_configuration").resolve()
 
 
 def test_build_with_a_placeholder() -> None:
