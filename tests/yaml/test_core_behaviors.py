@@ -55,9 +55,17 @@ real_octal: 0o010
 number: 1_000
 slash: "\\/"
 """
-    assert loads(test).as_dict() == {
+    assert loads(test, mutable=True) == {
         True: ["y", "yes", "on"],
         False: ["n", "no", "off"],
+        "old_octal": 10,
+        "real_octal": 8,
+        "number": 1000,  # Technicality YAML 1.1 behavior, but Python3 behavior
+        "slash": "/",
+    }
+    assert loads(test) == {
+        True: ("y", "yes", "on"),
+        False: ("n", "no", "off"),
         "old_octal": 10,
         "real_octal": 8,
         "number": 1000,  # Technicality YAML 1.1 behavior, but Python3 behavior
@@ -82,9 +90,17 @@ real_octal: 0o010
 number: 1_000
 slash: "\\/"
 """
-    assert loads(test).as_dict() == {
+    assert loads(test, mutable=True) == {
         True: [True, True, True],
         False: [False, False, False],
+        "old_octal": 8,
+        "real_octal": "0o010",
+        "number": 1000,
+        "slash": "/",  # Technicality YAML 1.2 behavior
+    }
+    assert loads(test) == {
+        True: (True, True, True),
+        False: (False, False, False),
         "old_octal": 8,
         "real_octal": "0o010",
         "number": 1000,

@@ -19,6 +19,7 @@ def loads(
             file_location=file_path,
             relative_to_directory=file_path.parent if file_path is not None else Path("."),
             obj_pairs_func=obj_pairs_func(mutable),
+            sequence_func=sequence_func(mutable),
             mutable=mutable,
         ),
     )
@@ -36,3 +37,7 @@ def loads(
 
 def obj_pairs_func(mutable: bool) -> typ.Type[Configuration] | typ.Type[MutableConfiguration]:
     return MutableConfiguration if mutable else Configuration
+
+
+def sequence_func(mutable: bool) -> typ.Type[list] | typ.Type[tuple]:
+    return list if mutable else tuple

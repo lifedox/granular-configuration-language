@@ -88,6 +88,7 @@ class LazyEval(abc.ABC, typ.Generic[_RT]):
 @dataclass(frozen=True, kw_only=True)
 class LoadOptions:
     obj_pairs_func: typ.Type[typ.Mapping]
+    sequence_func: typ.Type[typ.Sequence]
     mutable: bool
     file_location: Path | None
     relative_to_directory: Path

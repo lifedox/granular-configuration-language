@@ -782,7 +782,7 @@ LazyLoadConfiguration(
   - `MutableConfiguration` has been added to extend back the `MutableMapping` interface
   - `LazyLoadConfiguration` no longer provides a `MutableMapping` interface, just `Mapping`
   - `MutableLazyLoadConfiguration` has been added to extend back the `MutableMapping` interface and remove needing to cast to `MutableConfiguration`
-  - TODO: Sequences, !Merge
+  - When immutable, `tuple` is used instead of `list`
 
 ### 1.8.0
 

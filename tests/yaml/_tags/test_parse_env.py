@@ -72,7 +72,8 @@ def test_scalar__Configuration() -> None:
 
 def test_scalar__seq() -> None:
     with patch.dict(os.environ, values={"unreal_env_variable": "[1, 2, 3]"}):
-        assert loads("!ParseEnv unreal_env_variable") == [1, 2, 3]
+        assert loads("!ParseEnv unreal_env_variable", mutable=True) == [1, 2, 3]
+        assert loads("!ParseEnv unreal_env_variable", mutable=False) == (1, 2, 3)
 
 
 def test_scalar__recursive() -> None:
