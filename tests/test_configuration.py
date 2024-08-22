@@ -1,12 +1,18 @@
 from __future__ import annotations
 
+import copy
 import re
 import typing as typ
 from pathlib import Path
 
 import pytest
 
-from granular_configuration import Configuration, LazyLoadConfiguration, MutableLazyLoadConfiguration
+from granular_configuration import (
+    Configuration,
+    LazyLoadConfiguration,
+    MutableConfiguration,
+    MutableLazyLoadConfiguration,
+)
 from granular_configuration._s import setter_secret
 from granular_configuration.yaml import Placeholder, loads
 
@@ -47,48 +53,44 @@ def test_using_MutableConfiguration_like_dict() -> None:
 
 
 def test_making_copies() -> None:
-    value = LazyLoadConfiguration(
-        ASSET_DIR / "old" / "g/h.yaml",
-        ASSET_DIR / "old" / "c/t.yaml",
-    ).config
-
-    import copy
+    value = Configuration(b=1, c=2)
 
     new = copy.deepcopy(value)
+    assert type(value) is Configuration
     assert new == value
     assert value.exists("a") is False
     assert new.exists("a") is False
 
     new = copy.copy(value)
+    assert type(value) is Configuration
     assert new == value
     assert value.exists("a") is False
     assert new.exists("a") is False
 
     new = value.copy()
+    assert type(value) is Configuration
     assert new == value
     assert value.exists("a") is False
     assert new.exists("a") is False
 
 
 def test_making_mutable_copies() -> None:
-    value = MutableLazyLoadConfiguration(
-        ASSET_DIR / "old" / "g/h.yaml",
-        ASSET_DIR / "old" / "c/t.yaml",
-    ).config
-
-    import copy
+    value = MutableConfiguration(b=1, c=2)
 
     new = copy.deepcopy(value)
+    assert type(value) is MutableConfiguration
     assert new == value
     assert value.exists("a") is False
     assert new.exists("a") is False
 
     new = copy.copy(value)
+    assert type(value) is MutableConfiguration
     assert new == value
     assert value.exists("a") is False
     assert new.exists("a") is False
 
     new = value.copy()
+    assert type(value) is MutableConfiguration
     assert new == value
     assert value.exists("a") is False
     assert new.exists("a") is False

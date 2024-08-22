@@ -1,6 +1,0 @@
-b: from c/t.yaml
-c: from c/t.yaml
-d: from c/t.yaml
-
-map:
-  c: from c/t.yaml
