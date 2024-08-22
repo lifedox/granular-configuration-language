@@ -17,7 +17,7 @@ def test_build_baseline() -> None:
         ASSET_DIR / "old" / "c/t.yaml",
     )
 
-    configuration = build_configuration(files)
+    configuration = build_configuration(files, False)
 
     assert isinstance(configuration, Configuration)
 
@@ -50,7 +50,7 @@ def test_build_with_a_placeholder_root() -> None:
         ASSET_DIR / "placeholder_test2.yaml",
     )
 
-    configuration = build_configuration(files)
+    configuration = build_configuration(files, False)
 
     assert isinstance(configuration, Configuration)
 
@@ -68,7 +68,7 @@ def test_build_with_sub() -> None:
         ASSET_DIR / "sub_test2.yaml",
     )
 
-    configuration = build_configuration(files)
+    configuration = build_configuration(files, False)
 
     assert isinstance(configuration, Configuration)
     assert configuration.flags.foo == "bar"

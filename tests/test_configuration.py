@@ -5,14 +5,23 @@ from pathlib import Path
 
 import pytest
 
-from granular_configuration import Configuration, LazyLoadConfiguration
+from granular_configuration import Configuration, LazyLoadConfiguration, MutableLazyLoadConfiguration
 from granular_configuration.yaml import Placeholder, loads
 
 ASSET_DIR = (Path(__file__).parent / "assets").resolve()
 
 
-def test_using_like_dict() -> None:
+def test_using_like_mapping() -> None:
     config = LazyLoadConfiguration(ASSET_DIR / "base_path1.yaml").config.start.id
+
+    assert config.name == "me"
+    assert tuple(config.items()) == (("name", "me"),)
+    assert tuple(config.values()) == ("me",)
+    assert dict(config) == {"name": "me"}
+
+
+def test_using_MutableConfiguration_like_dict() -> None:
+    config = MutableLazyLoadConfiguration(ASSET_DIR / "base_path1.yaml").config.start.id
 
     assert config.name == "me"
     assert tuple(config.items()) == (("name", "me"),)
@@ -20,7 +29,7 @@ def test_using_like_dict() -> None:
     assert dict(config) == {"name": "me"}
     assert config.pop("name") == "me"
 
-    config = LazyLoadConfiguration(ASSET_DIR / "base_path1.yaml").config.start.id
+    config = MutableLazyLoadConfiguration(ASSET_DIR / "base_path1.yaml").config.start.id
 
     assert config.popitem() == ("name", "me")
 

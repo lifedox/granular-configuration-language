@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import typing as typ
-from collections.abc import MutableMapping
+from collections.abc import Mapping
 from copy import copy
 from functools import partial
 from pathlib import Path
@@ -38,7 +38,7 @@ def internal(
     else:
         yaml = YAML(typ="safe")
 
-    if obj_pairs_hook and issubclass(obj_pairs_hook, MutableMapping):
+    if obj_pairs_hook and issubclass(obj_pairs_hook, Mapping):
         oph = obj_pairs_hook
     else:  # pragma: no cover
         oph = dict

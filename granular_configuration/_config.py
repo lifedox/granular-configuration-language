@@ -6,7 +6,7 @@ import sys
 import typing as typ
 from itertools import chain, starmap
 
-from granular_configuration._utils import consume
+from granular_configuration._s import setter_secret
 from granular_configuration.exceptions import PlaceholderConfigurationError
 from granular_configuration.yaml import LazyEval, Placeholder
 
@@ -25,15 +25,13 @@ if sys.version_info >= (3, 11) or typ.TYPE_CHECKING:  # pragma: no cover
         predicate: typ.Callable[[typ.Any], typ.TypeGuard[_T]]
 
 
-class Configuration(typ.MutableMapping[typ.Any, typ.Any]):
+class Configuration(typ.Mapping[typ.Any, typ.Any]):
     def __init__(self, *arg: typ.Mapping | typ.Iterable[tuple[typ.Any, typ.Any]], **kwargs: typ.Any) -> None:
-        self.__data: dict[typ.Any, typ.Any] = dict()
+        self.__data: dict[typ.Any, typ.Any] = dict(*arg, **kwargs)
         self.__names: tuple[str, ...] = tuple()
 
-        consume(starmap(self.__setitem__, dict(*arg, **kwargs).items()))
-
     #################################################################
-    # Required for MutableMapping
+    # Required for Mapping
     #################################################################
 
     def __iter__(self) -> typ.Iterator:
@@ -41,12 +39,6 @@ class Configuration(typ.MutableMapping[typ.Any, typ.Any]):
 
     def __len__(self) -> int:
         return len(self.__data)
-
-    def __delitem__(self, key: typ.Any) -> None:
-        return self.__data.__delitem__(key)
-
-    def __setitem__(self, key: typ.Any, value: typ.Any) -> None:
-        self.__data[key] = value
 
     def __getitem__(self, name: typ.Any) -> typ.Any:
         try:
@@ -62,7 +54,7 @@ class Configuration(typ.MutableMapping[typ.Any, typ.Any]):
         elif isinstance(value, LazyEval):
             try:
                 new_value = value.result
-                self[name] = new_value
+                self._private_set(name, new_value, setter_secret)
                 return new_value
             except RecursionError:
                 raise RecursionError(
@@ -75,7 +67,7 @@ class Configuration(typ.MutableMapping[typ.Any, typ.Any]):
             return value
 
     #################################################################
-    # Overridden MutableMapping methods
+    # Overridden Mapping methods
     #################################################################
 
     def __contains__(self, key: typ.Any) -> bool:
@@ -94,7 +86,7 @@ class Configuration(typ.MutableMapping[typ.Any, typ.Any]):
         Throws AttributeError instead of KeyError, as compared to __getitem__ when an attribute is not present.
         """
         if name not in self:
-            raise AttributeError(f'Configuration value "{self.__get_name(name)}" does not exist')
+            raise AttributeError(f'{self.__class__.__name__} value "{self.__get_name(name)}" does not exist')
 
         return self[name]
 
@@ -117,6 +109,18 @@ class Configuration(typ.MutableMapping[typ.Any, typ.Any]):
     #################################################################
     # Internal methods
     #################################################################
+
+    def _private_set(self, key: typ.Any, value: typ.Any, secret: object) -> None:
+        if secret is setter_secret:
+            self.__data[key] = value
+        else:
+            raise Exception("_private_set is private")
+
+    def _private_del(self, key: typ.Any, secret: object) -> None:
+        if secret is setter_secret:
+            del self.__data[key]
+        else:
+            raise Exception("_private_set is private")
 
     def __get_name(self, attribute: typ.Any) -> str:
         return ".".join(map(str, chain(self.__names, (str(attribute),))))
@@ -240,3 +244,25 @@ class Configuration(typ.MutableMapping[typ.Any, typ.Any]):
             return value
         else:
             raise ValueError(f"Incorrect type. Got: `{repr(value)}`. Wanted: `{repr(type)}`")
+
+
+class MutableConfiguration(typ.MutableMapping[typ.Any, typ.Any], Configuration):
+
+    def __delitem__(self, key: typ.Any) -> None:
+        self._private_del(key, setter_secret)
+
+    def __setitem__(self, key: typ.Any, value: typ.Any) -> None:
+        self._private_set(key, value, setter_secret)
+
+    def __deepcopy__(self, memo: dict[int, typ.Any]) -> "MutableConfiguration":
+        other = MutableConfiguration()
+        memo[id(self)] = other
+        other.__data = copy.deepcopy(self.__data, memo=memo)
+        return other
+
+    def __copy__(self) -> "MutableConfiguration":
+        other = MutableConfiguration()
+        other.__data = copy.copy(self.__data)
+        return other
+
+    copy = __copy__

@@ -85,7 +85,7 @@ class LazyEval(abc.ABC, typ.Generic[_RT]):
     def _run(self) -> _RT: ...  # pragma: no cover
 
 
-_OPH = typ.Optional[typ.Type[typ.MutableMapping]]
+_OPH = typ.Optional[typ.Type[typ.Mapping]]
 
 
 @dataclass(frozen=True, kw_only=True)

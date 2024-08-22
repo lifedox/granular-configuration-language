@@ -1,13 +1,13 @@
 import operator as op
 import os
 import typing as typ
-from collections.abc import MutableMapping
+from collections.abc import Mapping, MutableMapping
 from functools import cached_property, reduce
 from itertools import chain
 from threading import Lock
 
 from granular_configuration._build import build_configuration
-from granular_configuration._config import Configuration
+from granular_configuration._config import Configuration, MutableConfiguration
 from granular_configuration._locations import Locations, PathOrStr
 from granular_configuration.exceptions import InvalidBasePathException
 
@@ -28,7 +28,7 @@ def _read_locations(load_order_location: typ.Iterable[PathOrStr], use_env_locati
     return Locations(load_order_location)
 
 
-class LazyLoadConfiguration(MutableMapping):
+class LazyLoadConfiguration(Mapping):
     """
     Provides a lazy interface for loading Configuration from file paths on first access.
     """
@@ -38,7 +38,9 @@ class LazyLoadConfiguration(MutableMapping):
         *load_order_location: PathOrStr,
         base_path: str | typ.Sequence[str] | None = None,
         use_env_location: bool = False,
+        mutable_configuration: bool = False,
     ) -> None:
+        self.__mutable_config = mutable_configuration
         self.__base_path = _read_base_path(base_path)
         self.__locations = _read_locations(load_order_location, use_env_location)
         self.__lock = Lock()
@@ -70,7 +72,7 @@ class LazyLoadConfiguration(MutableMapping):
 
     @cached_property
     def __config(self) -> Configuration:
-        config = build_configuration(self.__locations)
+        config = build_configuration(self.__locations, self.__mutable_config)
         try:
             config = reduce(op.getitem, self.__base_path, config)
         except KeyError as e:
@@ -89,9 +91,6 @@ class LazyLoadConfiguration(MutableMapping):
         # Now that logic is in the cached_property, so this legacy/clear code just calls the property
         self.config
 
-    def __delitem__(self, key: typ.Any) -> None:
-        del self.config[key]
-
     def __getitem__(self, key: typ.Any) -> typ.Any:
         return self.config[key]
 
@@ -100,6 +99,28 @@ class LazyLoadConfiguration(MutableMapping):
 
     def __len__(self) -> int:
         return len(self.config)
+
+
+class MutableLazyLoadConfiguration(LazyLoadConfiguration, MutableMapping):
+    def __init__(
+        self,
+        *load_order_location: PathOrStr,
+        base_path: str | typ.Sequence[str] | None = None,
+        use_env_location: bool = False,
+    ) -> None:
+        super().__init__(
+            *load_order_location,
+            base_path=base_path,
+            use_env_location=use_env_location,
+            mutable_configuration=True,
+        )
+
+    @property
+    def config(self) -> MutableConfiguration:
+        return typ.cast(MutableConfiguration, super().config)
+
+    def __delitem__(self, key: typ.Any) -> None:
+        del self.config[key]
 
     def __setitem__(self, key: typ.Any, value: typ.Any) -> None:
         self.config[key] = value

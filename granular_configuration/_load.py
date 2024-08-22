@@ -3,12 +3,13 @@ from pathlib import Path
 
 from granular_configuration.exceptions import ErrorWhileLoadingFileOccurred, IniUnsupportedError
 from granular_configuration.yaml import LazyRoot, loads
+from granular_configuration.yaml.classes import _OPH
 
 
 def load_file(
     filename: Path,
     *,
-    obj_pairs_hook: typ.Optional[typ.Type[typ.MutableMapping]] = None,
+    obj_pairs_hook: _OPH = None,
     lazy_root: typ.Optional[LazyRoot] = None,
 ) -> typ.Any:
     try:

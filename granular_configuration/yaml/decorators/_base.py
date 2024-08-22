@@ -10,7 +10,7 @@ _RT = typ.TypeVar("_RT")
 _T = typ.TypeVar("_T")
 
 
-class TagConstructor():
+class TagConstructor:
     __slots__ = ("tag", "constructor")
 
     def __init__(self, tag: Tag, constructor: typ.Callable[[typ.Type[SafeConstructor], StateHolder], None]) -> None:

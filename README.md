@@ -767,7 +767,7 @@ LazyLoadConfiguration(
 - Add JSON Pointer support where JSON Path is supported.
 - Added `!Ref`, `!Merge`, `!Del`, `ParseFile`, `ParseFileOptional`, `!ParseEnvSafe`
 - Configuration no longer fakes being a subclass of `dict`. It remains a MutableMapping.
-  - `dict` inheritance was done for compatible with `json.dumps` and other library that only support the primitive `dict`, instead of `Mapping`. However, faking the inheritance has always been sketchy and `json.dumps` have failed in rare occurrences.
+  - `dict` inheritance was done for compatible with `json.dumps` and other library that only support the primitive `dict`, instead of `Mapping`. However, faking the inheritance has always been sketchy and `json.dumps` has failed in rare occurrences.
 - added `!Date`, `!DateTime`
   - Uses `python-dateutil` from python `<3.11`
 - added `!UUID`
@@ -777,6 +777,12 @@ LazyLoadConfiguration(
   - `JSONPathQueryMatchFailed` → `JSONPathQueryFailed`
 - Added `Configuration.typed_get`
 - Completely internalized location logic, removing `ConfigurationFiles`, `ConfigurationMultiNamedFiles`. Just use `pathlib.Path` or `str`.
+- Introduced `mutable_configuration` flag, with immutable as default.
+  - `Configuration` is no longer a `MutableMapping`, just `Mapping`.
+  - `MutableConfiguration` has been added to extend back the `MutableMapping` interface
+  - `LazyLoadConfiguration` no longer provides a `MutableMapping` interface, just `Mapping`
+  - `MutableLazyLoadConfiguration` has been added to extend back the `MutableMapping` interface and remove needing to cast to `MutableConfiguration`
+  - TODO: Sequences, !Merge
 
 ### 1.8.0
 

@@ -1,15 +1,15 @@
 import inspect
 import typing as typ
+from collections import OrderedDict
 from importlib import import_module
 from importlib.metadata import entry_points
 from importlib.util import resolve_name
 from itertools import chain, filterfalse
 from operator import attrgetter
 from pathlib import Path
-from collections import OrderedDict
 
-from granular_configuration.yaml.decorators._base import Tag, TagConstructor
 from granular_configuration.exceptions import ErrorWhileLoadingTags
+from granular_configuration.yaml.decorators._base import Tag, TagConstructor
 
 PRIVATE_SUB_MODULE_REGEX: typ.Final = r"_[a-zA-Z]*.py"
 

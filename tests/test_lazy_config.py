@@ -4,7 +4,7 @@ from unittest.mock import patch
 
 import pytest
 
-from granular_configuration import Configuration, LazyLoadConfiguration
+from granular_configuration import Configuration, LazyLoadConfiguration, MutableLazyLoadConfiguration
 from granular_configuration._lazy_load import Locations, build_configuration
 from granular_configuration.exceptions import (
     EnvironmentVaribleNotFound,
@@ -32,7 +32,23 @@ class TestLaziness:
             assert config.A.key1 == "value2"
             assert config.A.key2 == "MyTestValue"
 
-            bc_mock.assert_called_once_with(Locations(files))
+            bc_mock.assert_called_once_with(Locations(files), False)
+
+    def test_class_mutable(self) -> None:
+        with (
+            patch("granular_configuration._lazy_load.build_configuration", side_effect=build_configuration) as bc_mock,
+        ):
+            files = [ASSET_DIR / "test_env_config.yaml"]
+
+            config = LazyLoadConfiguration(*files, mutable_configuration=True)
+
+            bc_mock.assert_not_called()
+            assert list(config._LazyLoadConfiguration__locations) == files
+
+            assert config.A.key1 == "value2"
+            assert config.A.key2 == "MyTestValue"
+
+            bc_mock.assert_called_once_with(Locations(files), True)
 
     def test_string_base_path(self) -> None:
         config_dict = Configuration({"abc": "test", "name": "me"})
@@ -116,8 +132,17 @@ def test_env_none() -> None:
         assert config.as_dict() == {}
 
 
-def test_like_a_mutablemapping() -> None:
+def test_like_a_mapping() -> None:
     config = LazyLoadConfiguration(ASSET_DIR / "test_env_config.yaml")
+
+    assert config["A"]["key1"] == "value2"
+    assert len(config) == 1
+    assert list(config) == ["A"]
+    assert "A" in config
+
+
+def test_MutableLazyLoadConfiguration_is_like_a_mutablemapping() -> None:
+    config = MutableLazyLoadConfiguration(ASSET_DIR / "test_env_config.yaml")
 
     assert config["A"]["key1"] == "value2"
     config["B"] = 1
