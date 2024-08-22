@@ -25,7 +25,7 @@ class PrioritizedLocations(BaseLocation):
     def __eq__(self, value: object) -> bool:
         return isinstance(value, PrioritizedLocations) and self.paths == value.paths
 
-    def __repr__(self) -> str:  # pragma: no cover
+    def __repr__(self) -> str:
         return f"<PrioritizedLocations=[{','.join(map(repr, self.paths))}]>"
 
 
@@ -42,7 +42,7 @@ class Location(BaseLocation):
     def __eq__(self, value: object) -> bool:
         return isinstance(value, Location) and self.path == value.path
 
-    def __repr__(self) -> str:  # pragma: no cover
+    def __repr__(self) -> str:
         return f"<Location={repr(self.path)}>"
 
 
@@ -87,5 +87,5 @@ class Locations(BaseLocation):
     def __eq__(self, value: object) -> bool:
         return isinstance(value, Locations) and self.locations == value.locations
 
-    def __repr__(self) -> str:  # pragma: no cover
+    def __repr__(self) -> str:
         return f"<Locations=[{','.join(map(repr, self.locations))}]>"

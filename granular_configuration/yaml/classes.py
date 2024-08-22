@@ -82,7 +82,7 @@ class LazyEval(abc.ABC, typ.Generic[_RT]):
         return self._run()
 
     @abc.abstractmethod
-    def _run(self) -> _RT: ...  # pragma: no cover
+    def _run(self) -> _RT: ...
 
 
 @dataclass(frozen=True, kw_only=True)

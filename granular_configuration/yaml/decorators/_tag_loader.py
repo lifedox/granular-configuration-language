@@ -11,8 +11,6 @@ from pathlib import Path
 from granular_configuration.exceptions import ErrorWhileLoadingTags
 from granular_configuration.yaml.decorators._base import Tag, TagConstructor
 
-PRIVATE_SUB_MODULE_REGEX: typ.Final = r"_[a-zA-Z]*.py"
-
 
 def is_TagConstructor(obj: typ.Any) -> typ.TypeGuard[TagConstructor]:
     return isinstance(obj, TagConstructor)
@@ -29,6 +27,7 @@ def get_internal_tag_plugins() -> typ.Iterator[str]:
 
     tags_package = tags.__package__
     tags_module_path = Path(tags.__file__).parent
+    private_sub_module_regex = r"_[a-zA-Z]*.py"
 
     def get_abs_name(module_name: str) -> str:
         return resolve_name("." + module_name, package=tags_package)
@@ -39,7 +38,7 @@ def get_internal_tag_plugins() -> typ.Iterator[str]:
             None,
             map(
                 inspect.getmodulename,
-                tags_module_path.glob(PRIVATE_SUB_MODULE_REGEX),
+                tags_module_path.glob(private_sub_module_regex),
             ),
         ),
     )
@@ -49,7 +48,7 @@ def get_external_tag_plugins() -> typ.Iterator[tuple[str, str]]:
     return map(attrgetter("name", "module"), entry_points(group="gc20tag"))
 
 
-def get_tag_plugins(*, disable_plugin: typ.Collection[str] = tuple()) -> typ.Iterator[str]:
+def get_all_tag_plugins(*, disable_plugin: typ.Collection[str] = tuple()) -> typ.Iterator[str]:
     for module in get_internal_tag_plugins():
         yield module
 
@@ -83,7 +82,7 @@ class TagSet(typ.Iterable[TagConstructor], typ.Container[str]):
     def does_not_have_tags(self, *tags: Tag | str) -> bool:
         return not any(map(self.__contains__, tags))
 
-    def __repr__(self) -> str:  # pragma: no cover
+    def __repr__(self) -> str:
         return f"TagSet{{{','.join(sorted(self.__state.keys()))}}}"
 
 
@@ -95,6 +94,6 @@ def load_tags(
     return TagSet(
         filterfalse(
             disable_tag.__contains__,
-            chain.from_iterable(map(get_tags, get_tag_plugins(disable_plugin=disable_plugin))),
+            chain.from_iterable(map(get_tags, get_all_tag_plugins(disable_plugin=disable_plugin))),
         )
     )

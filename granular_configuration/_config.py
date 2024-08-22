@@ -11,15 +11,15 @@ from granular_configuration._s import setter_secret
 from granular_configuration.exceptions import PlaceholderConfigurationError
 from granular_configuration.yaml import LazyEval, Placeholder
 
-if sys.version_info >= (3, 11):  # pragma: no cover
+if sys.version_info >= (3, 11):
     from typing import Generic, TypedDict, Unpack
-elif typ.TYPE_CHECKING:  # pragma: no cover
+elif typ.TYPE_CHECKING:
     from typing_extensions import Generic, TypedDict, Unpack
 
 
 _T = typ.TypeVar("_T")
 
-if sys.version_info >= (3, 11) or typ.TYPE_CHECKING:  # pragma: no cover
+if sys.version_info >= (3, 11) or typ.TYPE_CHECKING:
 
     class Kwords_typed_get(Generic[_T], TypedDict, total=False):
         default: _T
@@ -118,7 +118,7 @@ class Configuration(typ.Mapping[typ.Any, typ.Any]):
 
         return self[name]
 
-    def __repr__(self) -> str:  # pragma: no cover
+    def __repr__(self) -> str:
         return repr(self.__data)
 
     def __deepcopy__(self, memo: dict[int, typ.Any]) -> Configuration:
@@ -193,7 +193,7 @@ class Configuration(typ.Mapping[typ.Any, typ.Any]):
         - `type`: Wanted typed
         - `key`: Key for wanted value
         """
-        ...  # pragma: no cover
+        ...
 
     @typ.overload
     def typed_get(self, type: typ.Type[_T], key: typ.Any, *, default: _T) -> _T:
@@ -206,7 +206,7 @@ class Configuration(typ.Mapping[typ.Any, typ.Any]):
         Options:
         - `default`: Provides a default value like `dict.get`
         """
-        ...  # pragma: no cover
+        ...
 
     @typ.overload
     def typed_get(
@@ -221,7 +221,7 @@ class Configuration(typ.Mapping[typ.Any, typ.Any]):
         Options:
         - `predicate`: Replaces the `isinstance(value, type)` check with a custom method `predicate(value) -> bool`
         """
-        ...  # pragma: no cover
+        ...
 
     @typ.overload
     def typed_get(
@@ -238,7 +238,7 @@ class Configuration(typ.Mapping[typ.Any, typ.Any]):
         - `predicate`: Replaces the `isinstance(value, type)` check with a custom method `predicate(value) -> bool`
 
         """
-        ...  # pragma: no cover
+        ...
 
     def typed_get(self, type: typ.Type[_T], key: typ.Any, **kwds: Unpack[Kwords_typed_get[_T]]) -> _T:
         """

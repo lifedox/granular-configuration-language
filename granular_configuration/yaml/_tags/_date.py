@@ -4,10 +4,10 @@ from functools import partial
 
 from granular_configuration.yaml.decorators import Tag, as_lazy, interpolate_value_without_ref, string_tag
 
-if sys.version_info >= (3, 11):  # pragma: no cover
+if sys.version_info >= (3, 11):
     date_fromisoformat = date.fromisoformat
     datetime_fromisoformat = datetime.fromisoformat
-else:  # pragma: no cover  # sys.version_info
+else:  # if sys.version_info
     from dateutil.parser import parse
 
     datetime_fromisoformat = partial(parse, yearfirst=True, dayfirst=False)

@@ -17,7 +17,7 @@ class TagConstructor:
         self.tag: typ.Final = tag
         self.constructor: typ.Final = constructor
 
-    def __eq__(self, value: object) -> bool:  # pragma: no cover
+    def __eq__(self, value: object) -> bool:
         return (isinstance(value, self.__class__) and self.tag == value.tag) or (
             isinstance(value, str) and self.tag == value
         )
@@ -25,7 +25,7 @@ class TagConstructor:
     def __call__(self, constructor: typ.Type[SafeConstructor], state: StateHolder) -> None:
         return self.constructor(constructor, state)
 
-    def __repr__(self) -> str:  # pragma: no cover
+    def __repr__(self) -> str:
         return f"<TagConstructor(`{self.tag}`): {self.constructor.__module__}.{self.constructor.__name__}>"
 
 
@@ -37,7 +37,7 @@ class TagDecoratorBase(typ.Generic[_T], abc.ABC):
 
     @property
     @abc.abstractmethod
-    def user_friendly_type(self) -> str: ...  # pragma: no cover
+    def user_friendly_type(self) -> str: ...
 
     def scalar_node_type_check(self, value: str) -> typ.TypeGuard[_T]:
         return False
