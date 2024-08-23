@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import abc
 import typing as typ
 from dataclasses import dataclass
@@ -57,7 +59,7 @@ class LazyEval(abc.ABC, typ.Generic[_RT]):
         return f"<{self.__class__.__name__}: {self.tag}>"
 
     def run(self) -> _RT:
-        if self.done:  # pragma: no cover
+        if self.done:
             return self.__result
         else:
             with self.lock:
@@ -83,6 +85,14 @@ class LazyEval(abc.ABC, typ.Generic[_RT]):
 
     @abc.abstractmethod
     def _run(self) -> _RT: ...
+
+    def __deepcopy__(self, memo: dict[int, typ.Any]) -> LazyEval:
+        # Don't copy LazyEval's
+        return self
+
+    def __copy__(self) -> LazyEval:
+        # Don't copy LazyEval's
+        return self
 
 
 @dataclass(frozen=True, kw_only=True)

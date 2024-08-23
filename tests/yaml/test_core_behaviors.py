@@ -1,4 +1,8 @@
-from granular_configuration.yaml import loads
+import copy
+from datetime import date
+
+from granular_configuration import Configuration
+from granular_configuration.yaml import LazyEval, loads
 
 
 def test_supported_key_types() -> None:
@@ -110,3 +114,22 @@ slash: "\\/"
 
 def test_empty_is_null() -> None:
     assert loads("") is None
+
+
+def test_LazyEval_does_not_copy() -> None:
+    config: Configuration = loads("a: !Date 20121031")
+    lazy_eval: LazyEval = next(config._raw_items())[1]
+
+    copy1 = copy.copy(lazy_eval)
+    copy2 = copy.deepcopy(lazy_eval)
+    assert copy1 is lazy_eval
+    assert copy2 is lazy_eval
+
+    config_copy = copy.deepcopy(config)
+
+    assert config.a == date(2012, 10, 31)
+
+    copy3: LazyEval = next(config_copy._raw_items())[1]
+    assert copy3 is lazy_eval
+
+    assert config_copy.a == date(2012, 10, 31)
