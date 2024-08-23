@@ -118,7 +118,8 @@ def test_empty_is_null() -> None:
 
 def test_LazyEval_does_not_copy() -> None:
     config: Configuration = loads("a: !Date 20121031")
-    lazy_eval: LazyEval = next(config._raw_items())[1]
+    lazy_eval: LazyEval[date] = next(config._raw_items())[1]
+    assert isinstance(lazy_eval, LazyEval)
 
     copy1 = copy.copy(lazy_eval)
     copy2 = copy.deepcopy(lazy_eval)
@@ -128,8 +129,10 @@ def test_LazyEval_does_not_copy() -> None:
     config_copy = copy.deepcopy(config)
 
     assert config.a == date(2012, 10, 31)
+    assert config.a is lazy_eval.result
 
-    copy3: LazyEval = next(config_copy._raw_items())[1]
+    copy3: LazyEval[date] = next(config_copy._raw_items())[1]
     assert copy3 is lazy_eval
 
     assert config_copy.a == date(2012, 10, 31)
+    assert config_copy.a is lazy_eval.result

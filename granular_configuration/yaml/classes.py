@@ -58,7 +58,7 @@ class LazyEval(abc.ABC, typ.Generic[_RT]):
     def __repr__(self) -> str:
         return f"<{self.__class__.__name__}: {self.tag}>"
 
-    def run(self) -> _RT:
+    def __run(self) -> _RT:
         if self.done:
             return self.__result
         else:
@@ -70,14 +70,14 @@ class LazyEval(abc.ABC, typ.Generic[_RT]):
             return result
 
     @cached_property
-    def result(self) -> typ.Any:
+    def result(self) -> _RT:
         """
         Result of LazyEval, completing any chains
         """
-        result = self.run()
+        result = self.__run()
         while isinstance(result, LazyEval):
-            result = result.run()
-        return result
+            result = result.__run()
+        return result  # type: ignore
 
     @cached_property
     def __result(self) -> _RT:

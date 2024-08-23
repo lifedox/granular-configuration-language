@@ -79,12 +79,12 @@ branch = true
 [tool.coverage.report]
 exclude_also = [
     "def __repr__",
-    "raise NotImplementedError",
     "if __name__ == .__main__.:",
+    "if sys.version_info",
     "(if)|(else).*?TYPE_CHECKING",
     "class .*?\\(.*?,?Protocol,?.*?\\):",
     "@(abc\\.)?abstractmethod",
-    "if sys.version_info",
+    "raise NotImplementedError",
     "\\.\\.\\."
     ]
 

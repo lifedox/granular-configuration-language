@@ -785,6 +785,7 @@ LazyLoadConfiguration(
   - When immutable, `tuple` is used instead of `list`
 - Fixed `LazyEval` making copies of `Root`
   - Note: Copying with `LazyEval` still links copies unexpectedly. Now, it is just always connected to the original root (immutability is default now).
+- `LazyEval.run()` usage replaced with `LazyEval.result`
 
 ### 1.8.0
 
