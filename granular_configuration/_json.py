@@ -1,8 +1,9 @@
 import inspect
 import json
 import typing as typ
+from collections.abc import Mapping, Sequence
 from datetime import date, datetime
-from functools import partial
+from functools import partial, update_wrapper
 from uuid import UUID
 
 from granular_configuration import Configuration
@@ -28,6 +29,8 @@ def json_default(value: typ.Any) -> typ.Any:
     - `!DateTime` -- `datetime.datetime` as `isoformat`
     - `!Func` -- callable as `f"<{func.__module__}.{func.__name__}>"`
     - `!Class` -- class as `f"<{class.__module__}.{class.__name__}>"`
+
+    For niceness, `Mapping` and non-`str` `Sequence` are converted to `dict` and `tuple`
     """
 
     if isinstance(value, Configuration):
@@ -42,8 +45,12 @@ def json_default(value: typ.Any) -> typ.Any:
         return f"<{repr(value)}>"
     elif callable(value):
         return get_name(value)
-    else:  # pragma: no cover
-        return value
+    elif isinstance(value, Mapping):
+        return dict(value)
+    elif isinstance(value, Sequence) and not isinstance(value, str):
+        return tuple(value)
+    else:
+        return json.JSONEncoder().default(value)
 
 
-dumps = partial(json.dumps, default=json_default)
+dumps = update_wrapper(partial(json.dumps, default=json_default), json.dumps)

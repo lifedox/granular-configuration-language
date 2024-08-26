@@ -1,5 +1,6 @@
 import copy
 from datetime import date
+from unittest.mock import Mock, patch
 
 from granular_configuration import Configuration
 from granular_configuration.yaml import LazyEval, loads
@@ -136,3 +137,22 @@ def test_LazyEval_does_not_copy() -> None:
 
     assert config_copy.a == date(2012, 10, 31)
     assert config_copy.a is lazy_eval.result
+
+
+def test_LazyEval_result_runs_once() -> None:
+    config: Configuration = loads("a: !Date 20121031")
+    lazy_eval: LazyEval[date] = next(config._raw_items())[1]
+    assert isinstance(lazy_eval, LazyEval)
+
+    with patch.object(lazy_eval, "_run", new=Mock(side_effect=lazy_eval._run)) as mock:
+        # Get the result a multiple times
+        result = lazy_eval.result
+        result = lazy_eval.result
+        result = lazy_eval.result
+
+        # Simulation a two-threads calling before property is cached by removing the cached value
+        del lazy_eval.result
+
+        assert lazy_eval.result is result
+
+        mock.assert_called_once()

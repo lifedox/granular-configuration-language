@@ -10,7 +10,7 @@ from granular_configuration.yaml.decorators import Tag, as_lazy, interpolate_val
 
 def add_cwd_to_path() -> None:
     cwd = os.getcwd()
-    if sys.path[0] != cwd:
+    if sys.path[0] != cwd:  # pragma: no cover
         sys.path.insert(0, cwd)
 
 
