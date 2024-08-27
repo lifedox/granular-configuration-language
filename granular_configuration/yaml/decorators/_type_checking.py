@@ -26,7 +26,7 @@ class string_or_twople_tag(TagDecoratorBase[str | tuple[str, typ.Any]]):
     def scalar_node_type_check(self, value: str) -> typ.TypeGuard[str]:
         return True
 
-    def sequence_node_type_check(self, value: typ.MutableSequence) -> typ.TypeGuard[tuple[str, typ.Any]]:
+    def sequence_node_type_check(self, value: typ.Sequence) -> typ.TypeGuard[tuple[str, typ.Any]]:
         return (len(value) == 2) and isinstance(value[0], str)
 
     def sequence_node_transformer(self, value: typ.Any) -> Type:
@@ -40,5 +40,5 @@ class sequence_of_any_tag(TagDecoratorBase[typ.Sequence[typ.Any]]):
     def user_friendly_type(self) -> str:
         return "list[Any]"
 
-    def sequence_node_type_check(self, value: typ.MutableSequence) -> typ.TypeGuard[typ.Sequence[typ.Any]]:
+    def sequence_node_type_check(self, value: typ.Sequence) -> typ.TypeGuard[typ.Sequence[typ.Any]]:
         return True

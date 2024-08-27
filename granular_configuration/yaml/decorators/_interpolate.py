@@ -1,19 +1,19 @@
 import re
 import typing as typ
+import warnings
 from functools import wraps
 from html import unescape
 
 from granular_configuration._utils import get_environment_variable
+from granular_configuration.exceptions import InterpolationWarning
 from granular_configuration.yaml.classes import Root
 from granular_configuration.yaml.decorators.ref import resolve_json_ref
-
-SUB_PATTERN: typ.Pattern[str] = re.compile(r"(\$\{(?P<contents>.*?)\})")
 
 _P = typ.ParamSpec("_P")
 _RT = typ.TypeVar("_RT")
 
 
-def load_sub(root: Root, *, contents: str) -> str:
+def curly_sub(root: Root, *, contents: str) -> str:
     if root and contents.startswith("$") or contents.startswith("/"):
         value = resolve_json_ref(contents, root)
         if isinstance(value, str):
@@ -28,8 +28,27 @@ def load_sub(root: Root, *, contents: str) -> str:
         return get_environment_variable(*contents.split(":-", maxsplit=1))
 
 
+def round_sub(root: Root, *, contents: str) -> str:
+    warnings.warn("`!Sub $()` is reserved", InterpolationWarning)
+    return "$(" + contents + ")"
+
+
+def square_sub(root: Root, *, contents: str) -> str:
+    warnings.warn("`!Sub $[]` is reserved", InterpolationWarning)
+    return "$[" + contents + "]"
+
+
+SUB_PATTERNS: typ.Final[typ.Sequence[tuple[typ.Callable, typ.Pattern[str]]]] = (
+    (round_sub, re.compile(r"(\$\((?P<contents>.*?)\))")),
+    (square_sub, re.compile(r"(\$\[(?P<contents>.*?)\])")),
+    (curly_sub, re.compile(r"(\$\{(?P<contents>.*?)\})")),
+)
+
+
 def interpolate(value: str, root: Root) -> str:
-    return SUB_PATTERN.sub(lambda x: load_sub(root, **x.groupdict()), value)
+    for sub, pat in SUB_PATTERNS:
+        value = pat.sub(lambda x: sub(root, **x.groupdict()), value)
+    return value
 
 
 def interpolate_value_with_sub_rules(

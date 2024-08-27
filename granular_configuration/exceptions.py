@@ -18,6 +18,10 @@ class GetConfigReadBeforeSetException(Exception):
     pass
 
 
+class InterpolationWarning(Warning):
+    pass
+
+
 class IniKeyExistAsANonMapping(Exception):
     pass
 

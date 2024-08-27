@@ -1,4 +1,5 @@
 import os
+import re
 from unittest.mock import patch
 
 import pytest
@@ -6,6 +7,7 @@ import pytest
 from granular_configuration import Configuration
 from granular_configuration.exceptions import (
     EnvironmentVaribleNotFound,
+    InterpolationWarning,
     JSONPathOnlyWorksOnMappings,
     JSONPathQueryFailed,
 )
@@ -70,4 +72,26 @@ def test_jsonpath_on_a_scalar_value_makes_no_sense_and_must_fail() -> None:
 
 def test_get_dollar_curly_brackets_via_html_unescape() -> None:
     test_data = "!Sub ${&#x24;&#x7B;!Sub&#x7D;}"
-    assert loads(test_data) == r"${!Sub}"
+    assert loads(test_data) == "${!Sub}"
+
+
+def test_get_dollar_round_brackets_via_html_unescape() -> None:
+    test_data = "!Sub ${&#x24;&#40;!Sub&#41;}"
+    assert loads(test_data) == "$(!Sub)"
+
+
+def test_get_dollar_square_brackets_via_html_unescape() -> None:
+    test_data = "!Sub ${&#x24;&#91;!Sub&#93;}"
+    assert loads(test_data) == "$[!Sub]"
+
+
+def test_round_brackets_produces_a_warning() -> None:
+    test_data = "!Sub $($.help)"
+    with pytest.warns(InterpolationWarning, match=re.escape("$()")):
+        assert loads(test_data) == "$($.help)"
+
+
+def test_square_brackets_produces_a_warning() -> None:
+    test_data = "!Sub $[$.help]"
+    with pytest.warns(InterpolationWarning, match=re.escape("$[]")):
+        assert loads(test_data) == "$[$.help]"

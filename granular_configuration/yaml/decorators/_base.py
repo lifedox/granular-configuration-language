@@ -42,7 +42,7 @@ class TagDecoratorBase(typ.Generic[_T], abc.ABC):
     def scalar_node_type_check(self, value: str) -> typ.TypeGuard[_T]:
         return False
 
-    def sequence_node_type_check(self, value: typ.MutableSequence) -> typ.TypeGuard[_T]:
+    def sequence_node_type_check(self, value: typ.Sequence) -> typ.TypeGuard[_T]:
         return False
 
     def scalar_node_transformer(self, value: typ.Any) -> _T:
@@ -73,7 +73,7 @@ class TagDecoratorBase(typ.Generic[_T], abc.ABC):
                         return handler(tag, scalar_node_transformer(value), state)
                 elif isinstance(node, SequenceNode):
                     value = constructor.construct_sequence(node)
-                    if isinstance(value, typ.MutableSequence) and sequence_node_type_check(value):
+                    if isinstance(value, typ.Sequence) and sequence_node_type_check(value):
                         return handler(tag, sequence_node_transformers(value), state)
 
                 # Fallback Exception
