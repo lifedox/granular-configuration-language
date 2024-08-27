@@ -51,7 +51,7 @@ def interpolate(value: str, root: Root) -> str:
     return value
 
 
-def interpolate_value_with_sub_rules(
+def interpolate_value_with_ref(
     func: typ.Callable[typ.Concatenate[str, Root, _P], _RT]
 ) -> typ.Callable[typ.Concatenate[str, Root, _P], _RT]:
     @wraps(func)

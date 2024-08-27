@@ -7,7 +7,7 @@ from granular_configuration.yaml.decorators import (
     Root,
     Tag,
     as_lazy_with_root_and_load_options,
-    interpolate_value_with_sub_rules,
+    interpolate_value_with_ref,
     string_tag,
 )
 
@@ -26,7 +26,7 @@ def load(file: Path, option: LoadOptions, root: Root) -> typ.Any:
 
 @string_tag(Tag("!ParseFile"))
 @as_lazy_with_root_and_load_options
-@interpolate_value_with_sub_rules
+@interpolate_value_with_ref
 def handler(value: str, root: Root, options: LoadOptions) -> typ.Any:
     file = as_file_path(value, options)
 
@@ -35,7 +35,7 @@ def handler(value: str, root: Root, options: LoadOptions) -> typ.Any:
 
 @string_tag(Tag("!OptionalParseFile"))
 @as_lazy_with_root_and_load_options
-@interpolate_value_with_sub_rules
+@interpolate_value_with_ref
 def handler_optional(value: str, root: Root, options: LoadOptions) -> typ.Any:
     file = as_file_path(value, options)
 
