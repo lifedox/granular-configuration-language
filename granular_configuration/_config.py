@@ -27,6 +27,8 @@ if sys.version_info >= (3, 11) or typ.TYPE_CHECKING:
 
 
 class AttributeName(typ.Iterable[str]):
+    __slots__ = ("__prev", "__name", "__weakref__")
+
     def __init__(self, prev: AttributeName | typ.Iterable[str], name: str) -> None:
         self.__prev = prev
         self.__name = name

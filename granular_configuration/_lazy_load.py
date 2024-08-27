@@ -1,24 +1,13 @@
-import operator as op
 import os
 import typing as typ
 from collections.abc import Mapping, MutableMapping
-from functools import cached_property, reduce
+from functools import cached_property
 from itertools import chain
-from threading import Lock
 
-from granular_configuration._build import build_configuration
+from granular_configuration._cache import NoteOfIntentToRead, prepare_to_load_configuration
 from granular_configuration._config import Configuration, MutableConfiguration
 from granular_configuration._locations import Locations, PathOrStr
-from granular_configuration.exceptions import InvalidBasePathException
-
-
-def _read_base_path(base_path: str | typ.Sequence[str] | None) -> typ.Sequence[str]:
-    if isinstance(base_path, str):
-        return (base_path,)
-    elif base_path:
-        return base_path
-    else:
-        return tuple()
+from granular_configuration.exceptions import ErrorWhileLoadingConfig
 
 
 def _read_locations(load_order_location: typ.Iterable[PathOrStr], use_env_location: bool) -> Locations:
@@ -39,11 +28,14 @@ class LazyLoadConfiguration(Mapping):
         base_path: str | typ.Sequence[str] | None = None,
         use_env_location: bool = False,
         mutable_configuration: bool = False,
+        disable_caching: bool = False,
     ) -> None:
-        self.__mutable_config = mutable_configuration
-        self.__base_path = _read_base_path(base_path)
-        self.__locations = _read_locations(load_order_location, use_env_location)
-        self.__lock = Lock()
+        self.__shared_config_recipt: NoteOfIntentToRead | None = prepare_to_load_configuration(
+            locations=_read_locations(load_order_location, use_env_location),
+            base_path=base_path,
+            mutable_configuration=mutable_configuration,
+            disable_cache=disable_caching,
+        )
 
     def __getattr__(self, name: str) -> typ.Any:
         """
@@ -59,29 +51,19 @@ class LazyLoadConfiguration(Mapping):
 
         This call is thread-safe and locks while the configuration is loaded to prevent duplicative processing and data
         """
-        if not self.__locations:
-            return self.__config
-        else:
-            with self.__lock:
-                config = self.__config
-                self.__locations = Locations(tuple())
-                self.__base_path = tuple()
-
-            del self.__lock
-            return config
+        # Note: This is to hide the setter behavior cached_property
+        return self.__config
 
     @cached_property
     def __config(self) -> Configuration:
-        config = build_configuration(self.__locations, self.__mutable_config)
-        try:
-            config = reduce(op.getitem, self.__base_path, config)
-        except KeyError as e:
-            if e.__class__ is KeyError:
-                message = str(e)
-                raise InvalidBasePathException(message[1 : len(message) - 1])
-            else:
-                raise
-        return config
+        if self.__shared_config_recipt:
+            config = self.__shared_config_recipt.config
+            self.__shared_config_recipt = None
+            return config
+        else:
+            raise ErrorWhileLoadingConfig(
+                "Config reference was lost before `cached_property` cached it."
+            )  # pragma: no cover
 
     def load_configuration(self) -> None:
         """
@@ -107,11 +89,13 @@ class MutableLazyLoadConfiguration(LazyLoadConfiguration, MutableMapping):
         *load_order_location: PathOrStr,
         base_path: str | typ.Sequence[str] | None = None,
         use_env_location: bool = False,
+        disable_caching: bool = True,
     ) -> None:
         super().__init__(
             *load_order_location,
             base_path=base_path,
             use_env_location=use_env_location,
+            disable_caching=disable_caching,
             mutable_configuration=True,
         )
 

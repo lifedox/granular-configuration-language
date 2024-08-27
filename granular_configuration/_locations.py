@@ -1,6 +1,7 @@
 import operator as op
 import os
 import typing as typ
+from functools import lru_cache
 from itertools import chain, islice
 from pathlib import Path
 
@@ -9,14 +10,30 @@ from granular_configuration._utils import OrderedSet
 PathOrStr = Path | str | os.PathLike
 
 
-class BaseLocation(typ.Iterable[Path]):
+@lru_cache()
+def _resolve_path(path: Path) -> Path:
+    return path.expanduser().resolve()
+
+
+def _convert_to_path(path: PathOrStr) -> Path:
+    if isinstance(path, Path):
+        return path
+    else:
+        return Path(path)
+
+
+def path_repr(path: Path) -> str:  # pragma: no cover
+    return str(path.relative_to(Path.cwd()))
+
+
+class BaseLocation(typ.Iterable[Path], typ.Hashable):
     pass
 
 
 class PrioritizedLocations(BaseLocation):
     __slots__ = ("paths",)
 
-    def __init__(self, paths: typ.Sequence[Path]) -> None:
+    def __init__(self, paths: tuple[Path, ...]) -> None:
         self.paths: typ.Final = paths
 
     def __iter__(self) -> typ.Iterator[Path]:
@@ -25,8 +42,11 @@ class PrioritizedLocations(BaseLocation):
     def __eq__(self, value: object) -> bool:
         return isinstance(value, PrioritizedLocations) and self.paths == value.paths
 
+    def __hash__(self) -> int:
+        return hash(self.paths)
+
     def __repr__(self) -> str:
-        return f"<PrioritizedLocations=[{','.join(map(repr, self.paths))}]>"
+        return f"<PrioritizedLocations=[{','.join(map(path_repr, self.paths))}]>"
 
 
 class Location(BaseLocation):
@@ -42,8 +62,11 @@ class Location(BaseLocation):
     def __eq__(self, value: object) -> bool:
         return isinstance(value, Location) and self.path == value.path
 
+    def __hash__(self) -> int:
+        return hash(self.path)
+
     def __repr__(self) -> str:
-        return f"<Location={repr(self.path)}>"
+        return f"<Location={path_repr(self.path)}>"
 
 
 SUFFIX_CONFIG: typ.Final[dict[str, typ.Sequence[str]]] = {
@@ -53,30 +76,20 @@ SUFFIX_CONFIG: typ.Final[dict[str, typ.Sequence[str]]] = {
 }
 
 
+@lru_cache()
+def _convert_to_location(path: Path) -> BaseLocation:
+    if path.suffix in SUFFIX_CONFIG:
+        return PrioritizedLocations(tuple(map(path.with_suffix, SUFFIX_CONFIG[path.suffix])))
+    else:
+        return Location(path)
+
+
 class Locations(BaseLocation):
 
     def __init__(self, locations: typ.Iterable[PathOrStr]) -> None:
         self.locations: typ.Final = tuple(
-            map(self.__convert_to_base_location, map(self.__expand_path, map(self.__convert_to_path, locations)))
+            map(_convert_to_location, map(_resolve_path, map(_convert_to_path, locations)))
         )
-
-    @staticmethod
-    def __convert_to_path(path: PathOrStr) -> Path:
-        if isinstance(path, Path):
-            return path
-        else:
-            return Path(path)
-
-    @staticmethod
-    def __expand_path(path: Path) -> Path:
-        return path.expanduser().resolve()
-
-    @staticmethod
-    def __convert_to_base_location(path: Path) -> BaseLocation:
-        if path.suffix in SUFFIX_CONFIG:
-            return PrioritizedLocations(tuple(map(path.with_suffix, SUFFIX_CONFIG[path.suffix])))
-        else:
-            return Location(path)
 
     def __iter__(self) -> typ.Iterator[Path]:
         return iter(OrderedSet(chain.from_iterable(self.locations)))
@@ -86,6 +99,9 @@ class Locations(BaseLocation):
 
     def __eq__(self, value: object) -> bool:
         return isinstance(value, Locations) and self.locations == value.locations
+
+    def __hash__(self) -> int:
+        return hash(self.locations)
 
     def __repr__(self) -> str:
         return f"<Locations=[{','.join(map(repr, self.locations))}]>"

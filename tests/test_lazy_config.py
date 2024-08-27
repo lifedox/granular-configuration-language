@@ -1,11 +1,12 @@
 import os
+from contextlib import AbstractContextManager
 from pathlib import Path
-from unittest.mock import patch
+from unittest.mock import AsyncMock, MagicMock, patch
 
 import pytest
 
-from granular_configuration import Configuration, LazyLoadConfiguration, MutableLazyLoadConfiguration
-from granular_configuration._lazy_load import Locations, build_configuration
+from granular_configuration import LazyLoadConfiguration, MutableLazyLoadConfiguration
+from granular_configuration._lazy_load import Locations
 from granular_configuration.exceptions import (
     EnvironmentVaribleNotFound,
     ErrorWhileLoadingFileOccurred,
@@ -16,18 +17,21 @@ from granular_configuration.exceptions import (
 ASSET_DIR = (Path(__file__).parent / "assets" / "test_lazy_config").resolve()
 
 
+def build_configuration_pach() -> AbstractContextManager[AsyncMock | MagicMock]:
+    from granular_configuration._cache import build_configuration
+
+    return patch("granular_configuration._cache.build_configuration", side_effect=build_configuration)
+
+
 class TestLaziness:
 
     def test_class(self) -> None:
-        with (
-            patch("granular_configuration._lazy_load.build_configuration", side_effect=build_configuration) as bc_mock,
-        ):
+        with (build_configuration_pach() as bc_mock,):
             files = [ASSET_DIR / "test_env_config.yaml"]
 
             config = LazyLoadConfiguration(*files)
 
             bc_mock.assert_not_called()
-            assert list(config._LazyLoadConfiguration__locations) == files
 
             assert config.A.key1 == "value2"
             assert config.A.key2 == "MyTestValue"
@@ -35,46 +39,17 @@ class TestLaziness:
             bc_mock.assert_called_once_with(Locations(files), False)
 
     def test_class_mutable(self) -> None:
-        with (
-            patch("granular_configuration._lazy_load.build_configuration", side_effect=build_configuration) as bc_mock,
-        ):
+        with (build_configuration_pach() as bc_mock,):
             files = [ASSET_DIR / "test_env_config.yaml"]
 
             config = LazyLoadConfiguration(*files, mutable_configuration=True)
 
             bc_mock.assert_not_called()
-            assert list(config._LazyLoadConfiguration__locations) == files
 
             assert config.A.key1 == "value2"
             assert config.A.key2 == "MyTestValue"
 
             bc_mock.assert_called_once_with(Locations(files), True)
-
-    def test_string_base_path(self) -> None:
-        config_dict = Configuration({"abc": "test", "name": "me"})
-
-        with patch("granular_configuration._lazy_load.build_configuration", return_value=config_dict) as bc_mock:
-            config = LazyLoadConfiguration(base_path="base")
-            assert list(config._LazyLoadConfiguration__base_path) == ["base"]
-            bc_mock.assert_not_called()
-
-    def test_list_base_path(self) -> None:
-        config_dict = Configuration({"abc": "test", "name": "me"})
-
-        with patch("granular_configuration._lazy_load.build_configuration", return_value=config_dict) as bc_mock:
-            config = LazyLoadConfiguration(base_path=["base", "path"])
-
-            assert list(config._LazyLoadConfiguration__base_path) == ["base", "path"]
-            bc_mock.assert_not_called()
-
-    def test_no_base_path(self) -> None:
-        config_dict = Configuration({"abc": "test", "name": "me"})
-
-        with patch("granular_configuration._lazy_load.build_configuration", return_value=config_dict) as bc_mock:
-            config = LazyLoadConfiguration()
-
-            assert list(config._LazyLoadConfiguration__base_path) == []
-            bc_mock.assert_not_called()
 
 
 def test_with_base_path() -> None:

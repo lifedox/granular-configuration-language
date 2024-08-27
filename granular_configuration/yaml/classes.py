@@ -53,20 +53,24 @@ class LazyEval(abc.ABC, typ.Generic[_RT]):
     def __init__(self, tag: Tag) -> None:
         self.tag = tag
         self.done = False
-        self.lock = RLock()
+        self.__lock = RLock()
 
-    def __repr__(self) -> str:
-        return f"<{self.__class__.__name__}: {self.tag}>"
+    @abc.abstractmethod
+    def _run(self) -> _RT: ...
+
+    @cached_property
+    def __result(self) -> _RT:
+        return self._run()
 
     def __run(self) -> _RT:
         if self.done:
             return self.__result
         else:
-            with self.lock:
+            with self.__lock:
                 result = self.__result
                 self.done = True
 
-            del self.lock
+            del self.__lock
             return result
 
     @cached_property
@@ -79,12 +83,8 @@ class LazyEval(abc.ABC, typ.Generic[_RT]):
             result = result.__run()
         return result  # type: ignore
 
-    @cached_property
-    def __result(self) -> _RT:
-        return self._run()
-
-    @abc.abstractmethod
-    def _run(self) -> _RT: ...
+    def __repr__(self) -> str:
+        return f"<{self.__class__.__name__}: {self.tag}>"
 
     def __deepcopy__(self, memo: dict[int, typ.Any]) -> LazyEval:
         # Don't copy LazyEval's

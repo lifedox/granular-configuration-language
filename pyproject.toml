@@ -70,7 +70,7 @@ addopts = '''
   --cov-report term-missing
   --verbose
   --durations 0
-  --durations-min .05
+  --durations-min .04
 '''
 
 [tool.coverage.run]

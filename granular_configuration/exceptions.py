@@ -10,6 +10,10 @@ class ErrorWhileLoadingFileOccurred(ValueError):
     pass
 
 
+class ErrorWhileLoadingConfig(Exception):
+    pass
+
+
 class ErrorWhileLoadingTags(Exception):
     pass
 

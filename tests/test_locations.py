@@ -21,12 +21,14 @@ def test_assets_are_as_expect() -> None:
 def test_no_file() -> None:
     test = (ASSET_DIR / "no_file.yaml",)
     expected: typ.Sequence[Path] = tuple()
+    hash(Locations(test))
     assert tuple(Locations(test)) == expected
 
 
 def test_single_file() -> None:
     test = (ASSET_DIR / "just_yaml.yaml",)
     expected = (ASSET_DIR / "just_yaml.yaml",)
+    hash(Locations(test))
     assert tuple(Locations(test)) == expected
 
 
@@ -39,6 +41,7 @@ def test_two_files() -> None:
         ASSET_DIR / "just_yaml.yaml",
         ASSET_DIR / "different_ext.txt",
     )
+    hash(Locations(test))
     assert tuple(Locations(test)) == expected
 
 
@@ -54,6 +57,7 @@ def test_star_select() -> None:
         ASSET_DIR / "just_yml.yml",
         ASSET_DIR / "both.yaml",
     )
+    hash(Locations(test))
     assert tuple(Locations(test)) == expected
 
 
@@ -69,6 +73,7 @@ def test_ystar_select() -> None:
         ASSET_DIR / "just_yml.yml",
         ASSET_DIR / "both.yaml",
     )
+    hash(Locations(test))
     assert tuple(Locations(test)) == expected
 
 
@@ -84,6 +89,8 @@ def test_yml_select() -> None:
         ASSET_DIR / "just_yml.yml",
         ASSET_DIR / "both.yaml",
     )
+
+    hash(Locations(test))
     assert tuple(Locations(test)) == expected
 
 
@@ -104,3 +111,11 @@ def test_equality_of_mix() -> None:
 
     for case in cases:
         assert Locations(test) != Locations(case)
+
+
+def test_Locations_is_truthy() -> None:
+    assert bool(Locations(tuple())) is False
+    assert bool(Locations((ASSET_DIR / "anything",))) is True
+
+    assert Locations(tuple()) == Locations(tuple())
+    assert Locations((ASSET_DIR / "anything",)).locations[0] == Locations((ASSET_DIR / "anything",)).locations[0]
