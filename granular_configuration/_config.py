@@ -270,7 +270,7 @@ class Configuration(typ.Mapping[typ.Any, typ.Any]):
         if (("predicate" in kwds) and kwds["predicate"](value)) or isinstance(value, type):
             return value
         else:
-            raise ValueError(f"Incorrect type. Got: `{repr(value)}`. Wanted: `{repr(type)}`")
+            raise TypeError(f"Incorrect type. Got: `{repr(value)}`. Wanted: `{repr(type)}`")
 
 
 class MutableConfiguration(typ.MutableMapping[typ.Any, typ.Any], Configuration):

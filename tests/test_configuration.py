@@ -144,7 +144,7 @@ a: b
           """
     )
 
-    with pytest.raises(ValueError):
+    with pytest.raises(TypeError):
         test.typed_get(int, "a")
 
 
@@ -192,7 +192,7 @@ a: null
     def isNone(value: typ.Any) -> typ.TypeGuard[str]:
         return False
 
-    with pytest.raises(ValueError):
+    with pytest.raises(TypeError):
         test.typed_get(str, "a", default=1, predicate=isNone)
 
 
