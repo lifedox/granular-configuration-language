@@ -89,7 +89,6 @@ def test_yml_select() -> None:
         ASSET_DIR / "just_yml.yml",
         ASSET_DIR / "both.yaml",
     )
-
     hash(Locations(test))
     assert tuple(Locations(test)) == expected
 

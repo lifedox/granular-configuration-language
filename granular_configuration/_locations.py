@@ -1,7 +1,7 @@
 import operator as op
 import os
 import typing as typ
-from functools import lru_cache
+from functools import cached_property, lru_cache
 from itertools import chain, islice
 from pathlib import Path
 
@@ -43,6 +43,10 @@ class PrioritizedLocations(BaseLocation):
         return isinstance(value, PrioritizedLocations) and self.paths == value.paths
 
     def __hash__(self) -> int:
+        return self.__hash
+
+    @cached_property
+    def __hash(self) -> int:
         return hash(self.paths)
 
     def __repr__(self) -> str:
@@ -63,6 +67,10 @@ class Location(BaseLocation):
         return isinstance(value, Location) and self.path == value.path
 
     def __hash__(self) -> int:
+        return self.__hash
+
+    @cached_property
+    def __hash(self) -> int:
         return hash(self.path)
 
     def __repr__(self) -> str:
@@ -85,7 +93,6 @@ def _convert_to_location(path: Path) -> BaseLocation:
 
 
 class Locations(BaseLocation):
-
     def __init__(self, locations: typ.Iterable[PathOrStr]) -> None:
         self.locations: typ.Final = tuple(
             map(_convert_to_location, map(_resolve_path, map(_convert_to_path, locations)))
@@ -101,7 +108,11 @@ class Locations(BaseLocation):
         return isinstance(value, Locations) and self.locations == value.locations
 
     def __hash__(self) -> int:
-        return hash(self.locations)
+        return self.__hash
+
+    @cached_property
+    def __hash(self) -> int:
+        return sum(map(hash, self.locations))
 
     def __repr__(self) -> str:
         return f"<Locations=[{','.join(map(repr, self.locations))}]>"
