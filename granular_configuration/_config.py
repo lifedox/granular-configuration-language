@@ -8,7 +8,8 @@ import weakref
 from itertools import starmap
 
 from granular_configuration._s import setter_secret
-from granular_configuration.exceptions import PlaceholderConfigurationError
+from granular_configuration.base_path import BasePathPart
+from granular_configuration.exceptions import InvalidBasePathException, PlaceholderConfigurationError
 from granular_configuration.yaml import LazyEval, Placeholder
 
 if sys.version_info >= (3, 11):
@@ -29,7 +30,7 @@ if sys.version_info >= (3, 11) or typ.TYPE_CHECKING:
 class AttributeName(typ.Iterable[str]):
     __slots__ = ("__prev", "__name", "__weakref__")
 
-    def __init__(self, prev: AttributeName | typ.Iterable[str], name: str) -> None:
+    def __init__(self, prev: AttributeName | typ.Iterable[str], name: typ.Any) -> None:
         self.__prev = prev
         self.__name = name
 
@@ -37,19 +38,19 @@ class AttributeName(typ.Iterable[str]):
     def as_root() -> AttributeName:
         return AttributeName(tuple(), "$")
 
-    def append_suffix(self, name: str) -> AttributeName:
+    def append_suffix(self, name: typ.Any) -> AttributeName:
         return AttributeName(weakref.proxy(self), name)
 
-    def with_suffix(self, name: str) -> str:
+    def with_suffix(self, name: typ.Any) -> str:
         return ".".join(self._plus_one(name))
 
     def __iter__(self) -> typ.Iterator[str]:
         yield from self.__prev
-        yield self.__name
+        yield self.__name if isinstance(self.__name, str) else f"`{repr(self.__name)}`"
 
     def _plus_one(self, last: str) -> typ.Iterator[str]:
         yield from iter(self)
-        yield last
+        yield last if isinstance(last, str) else f"`{repr(last)}`"
 
     def __str__(self) -> str:
         return ".".join(self)
@@ -75,7 +76,12 @@ class Configuration(typ.Mapping[typ.Any, typ.Any]):
             value = self.__data[name]
         except KeyError:
             # Start the stack trace here
-            raise KeyError(repr(name)) from None
+            if isinstance(name, BasePathPart):
+                raise InvalidBasePathException(
+                    f"Base Path `{self.__attribute_name.with_suffix(name)}` does not exist."
+                ) from None
+            else:
+                raise KeyError(repr(name)) from None
 
         if isinstance(value, Placeholder):
             raise PlaceholderConfigurationError(
@@ -91,7 +97,7 @@ class Configuration(typ.Mapping[typ.Any, typ.Any]):
                 ) from None
 
         if isinstance(value, Configuration):
-            value.__attribute_name = self.__attribute_name.append_suffix(str(name))
+            value.__attribute_name = self.__attribute_name.append_suffix(name)
             return value
         else:
             return value

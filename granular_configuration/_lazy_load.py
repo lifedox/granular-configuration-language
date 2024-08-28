@@ -30,7 +30,7 @@ class LazyLoadConfiguration(Mapping):
         mutable_configuration: bool = False,
         disable_caching: bool = False,
     ) -> None:
-        self.__shared_config_recipt: NoteOfIntentToRead | None = prepare_to_load_configuration(
+        self.__receipt: NoteOfIntentToRead | None = prepare_to_load_configuration(
             locations=_read_locations(load_order_location, use_env_location),
             base_path=base_path,
             mutable_configuration=mutable_configuration,
@@ -56,9 +56,9 @@ class LazyLoadConfiguration(Mapping):
 
     @cached_property
     def __config(self) -> Configuration:
-        if self.__shared_config_recipt:
-            config = self.__shared_config_recipt.config
-            self.__shared_config_recipt = None
+        if self.__receipt:
+            config = self.__receipt.config
+            self.__receipt = None
             return config
         else:
             raise ErrorWhileLoadingConfig(
@@ -89,13 +89,12 @@ class MutableLazyLoadConfiguration(LazyLoadConfiguration, MutableMapping):
         *load_order_location: PathOrStr,
         base_path: str | typ.Sequence[str] | None = None,
         use_env_location: bool = False,
-        disable_caching: bool = True,
     ) -> None:
         super().__init__(
             *load_order_location,
             base_path=base_path,
             use_env_location=use_env_location,
-            disable_caching=disable_caching,
+            disable_caching=True,
             mutable_configuration=True,
         )
 

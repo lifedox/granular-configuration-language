@@ -1,13 +1,18 @@
 import typing as typ
 
-BasePath = typ.NewType("BasePath", tuple[str])
+
+class BasePathPart(str):
+    pass
+
+
+class BasePath(tuple[BasePathPart]):
+    pass
 
 
 def read_base_path(base_path: str | typ.Sequence[str] | None) -> BasePath:
     if isinstance(base_path, str):
-        result: typ.Sequence[str] = (base_path,)
+        return BasePath((BasePathPart(base_path),))
     elif base_path:
-        result = base_path if isinstance(base_path, tuple) else tuple(base_path)
+        return BasePath(map(BasePathPart, base_path))
     else:
-        result = tuple()
-    return typ.cast(BasePath, result)
+        return BasePath()
