@@ -10,9 +10,13 @@ from granular_configuration._locations import Locations, PathOrStr
 from granular_configuration.exceptions import ErrorWhileLoadingConfig
 
 
-def _read_locations(load_order_location: typ.Iterable[PathOrStr], use_env_location: bool) -> Locations:
-    if use_env_location and ("G_CONFIG_LOCATION" in os.environ):
-        env_locs = os.environ["G_CONFIG_LOCATION"].split(",")
+def _read_locations(
+    load_order_location: typ.Iterable[PathOrStr],
+    use_env_location: bool,
+    env_location_var_name: str,
+) -> Locations:
+    if use_env_location and (env_location_var_name in os.environ):
+        env_locs = os.environ[env_location_var_name].split(",")
         load_order_location = chain(load_order_location, env_locs)
     return Locations(load_order_location)
 
@@ -27,11 +31,12 @@ class LazyLoadConfiguration(Mapping):
         *load_order_location: PathOrStr,
         base_path: str | typ.Sequence[str] | None = None,
         use_env_location: bool = False,
+        env_location_var_name: str = "G_CONFIG_LOCATION",
         mutable_configuration: bool = False,
         disable_caching: bool = False,
     ) -> None:
         self.__receipt: NoteOfIntentToRead | None = prepare_to_load_configuration(
-            locations=_read_locations(load_order_location, use_env_location),
+            locations=_read_locations(load_order_location, use_env_location, env_location_var_name),
             base_path=base_path,
             mutable_configuration=mutable_configuration,
             disable_cache=disable_caching,
@@ -51,15 +56,14 @@ class LazyLoadConfiguration(Mapping):
 
         This call is thread-safe and locks while the configuration is loaded to prevent duplicative processing and data
         """
-        # Note: This is to hide the setter behavior cached_property
-        return self.__config
+        config = self.__config
+        self.__receipt = None  # self.__config is cached
+        return config
 
     @cached_property
     def __config(self) -> Configuration:
         if self.__receipt:
-            config = self.__receipt.config
-            self.__receipt = None
-            return config
+            return self.__receipt.config
         else:
             raise ErrorWhileLoadingConfig(
                 "Config reference was lost before `cached_property` cached it."
@@ -89,11 +93,13 @@ class MutableLazyLoadConfiguration(LazyLoadConfiguration, MutableMapping):
         *load_order_location: PathOrStr,
         base_path: str | typ.Sequence[str] | None = None,
         use_env_location: bool = False,
+        env_location_var_name: str = "G_CONFIG_LOCATION",
     ) -> None:
         super().__init__(
             *load_order_location,
             base_path=base_path,
             use_env_location=use_env_location,
+            env_location_var_name=env_location_var_name,
             disable_caching=True,
             mutable_configuration=True,
         )
