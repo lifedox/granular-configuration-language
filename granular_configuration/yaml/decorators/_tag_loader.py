@@ -7,9 +7,11 @@ from importlib.util import resolve_name
 from itertools import chain, filterfalse
 from operator import attrgetter
 from pathlib import Path
+from pprint import pformat
 
 from granular_configuration.exceptions import ErrorWhileLoadingTags
 from granular_configuration.yaml.decorators._base import Tag, TagConstructor
+from granular_configuration.yaml.decorators._tag_tracker import is_not_lazy, is_with_ref, is_without_ref
 
 
 def is_TagConstructor(obj: typ.Any) -> typ.TypeGuard[TagConstructor]:
@@ -84,6 +86,28 @@ class TagSet(typ.Iterable[TagConstructor], typ.Container[str]):
 
     def __repr__(self) -> str:
         return f"TagSet{{{','.join(sorted(self.__state.keys()))}}}"
+
+    def pretty(self, width: int = 120, indent: int = 2) -> str:
+        def get_type(tc: TagConstructor) -> str:
+            attributes: set[str] = set()
+
+            if is_with_ref(tc.constructor):
+                attributes.add("interpolates")
+            elif is_without_ref(tc.constructor):
+                attributes.add("interpolates-reduced")
+
+            if is_not_lazy(tc.constructor):
+                attributes.add("NOT-LAZY")
+
+            return (
+                tc.friendly_type
+                + (f" [{', '.join(attributes)}]" if attributes else "")
+                + f" ({tc.constructor.__module__}.{tc.constructor.__name__})"
+            )
+
+        tags = {tag: get_type(tc) for tag, tc in self.__state.items()}
+
+        return f"""TagSet{{\n {pformat(tags, width=width, indent=indent, sort_dicts=True)[1:-1]}\n}}"""
 
 
 def load_tags(

@@ -7,6 +7,7 @@ from html import unescape
 from granular_configuration._utils import get_environment_variable
 from granular_configuration.exceptions import InterpolationWarning
 from granular_configuration.yaml.classes import Root
+from granular_configuration.yaml.decorators._tag_tracker import track_as_with_ref, track_as_without_ref
 from granular_configuration.yaml.decorators.ref import resolve_json_ref
 
 _P = typ.ParamSpec("_P")
@@ -58,6 +59,7 @@ def interpolate_value_with_ref(
     def lazy_wrapper(value: str, root: Root, *args: _P.args, **kwargs: _P.kwargs) -> _RT:
         return func(interpolate(value, root), root, *args, **kwargs)
 
+    track_as_with_ref(func)
     return lazy_wrapper
 
 
@@ -68,4 +70,5 @@ def interpolate_value_without_ref(
     def lazy_wrapper(value: str, *args: _P.args, **kwargs: _P.kwargs) -> _RT:
         return func(interpolate(value, None), *args, **kwargs)
 
+    track_as_without_ref(func)
     return lazy_wrapper

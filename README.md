@@ -775,6 +775,7 @@ LazyLoadConfiguration(
   - `ParseEnvError` → `ParseEnvParsingError`
   - `ParseEnvEnvironmentVaribleNotFound` → `EnvironmentVaribleNotFound`
   - `JSONPathQueryMatchFailed` → `JSONPathQueryFailed`
+  - `JSONPathMustStartFromRoot` → `RefMustStartFromRoot`
 - Added `Configuration.typed_get`
 - Completely internalized location logic, removing `ConfigurationFiles`, `ConfigurationMultiNamedFiles`. Just use `pathlib.Path` or `str`.
 - Introduced `mutable_configuration` flag, with immutable as default.

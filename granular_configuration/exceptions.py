@@ -50,10 +50,6 @@ class IsNotCallable(ValueError):
     pass
 
 
-class JSONPathMustStartFromRoot(Exception):
-    pass
-
-
 class JSONPathOnlyWorksOnMappings(Exception):
     pass
 
@@ -71,4 +67,8 @@ class ParseEnvParsingError(Exception):
 
 
 class PlaceholderConfigurationError(Exception):
+    pass
+
+
+class RefMustStartFromRoot(Exception):
     pass

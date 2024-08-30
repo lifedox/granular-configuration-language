@@ -85,7 +85,7 @@ class Configuration(typ.Mapping[typ.Any, typ.Any]):
 
         if isinstance(value, Placeholder):
             raise PlaceholderConfigurationError(
-                f'Placeholder `{self.__attribute_name.with_suffix(name)}` was not overwritten. Message: "{value}"'
+                f'!Placeholder at `{self.__attribute_name.with_suffix(name)}` was not overwritten. Message: "{value}"'
             )
         elif isinstance(value, LazyEval):
             try:

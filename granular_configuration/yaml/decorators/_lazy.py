@@ -5,6 +5,7 @@ from functools import wraps
 
 from granular_configuration.yaml.classes import LoadOptions, Root, StateHolder, Tag
 from granular_configuration.yaml.decorators._lazy_eval import LazyEvalBasic, LazyEvalWithRoot
+from granular_configuration.yaml.decorators._tag_tracker import track_as_not_lazy
 
 _RT = typ.TypeVar("_RT")
 _T = typ.TypeVar("_T")
@@ -55,4 +56,5 @@ def as_not_lazy(func: typ.Callable[[_T], _RT]) -> typ.Callable[[Tag, _T, StateHo
     def lazy_wrapper(tag: Tag, value: _T, state: StateHolder) -> _RT:
         return func(value)
 
+    track_as_not_lazy(func)
     return lazy_wrapper

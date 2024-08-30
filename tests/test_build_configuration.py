@@ -30,7 +30,7 @@ def test_build_with_a_placeholder() -> None:
 
     with pytest.raises(
         PlaceholderConfigurationError,
-        match=re.escape('Placeholder `$.b` was not overwritten. Message: "Placeholder over a placeholder"'),
+        match=re.escape('!Placeholder at `$.b` was not overwritten. Message: "Placeholder over a placeholder"'),
     ):
         configuration.b
 

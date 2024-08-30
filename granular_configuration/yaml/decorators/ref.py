@@ -5,10 +5,10 @@ import typing as typ
 import jsonpath
 
 from granular_configuration.exceptions import (
-    JSONPathMustStartFromRoot,
     JSONPathOnlyWorksOnMappings,
     JSONPathQueryFailed,
     JSONPointerQueryFailed,
+    RefMustStartFromRoot,
 )
 from granular_configuration.yaml.classes import LazyEval
 from granular_configuration.yaml.decorators import Root
@@ -66,6 +66,4 @@ def resolve_json_ref(query: str, root: Root) -> typ.Any:
     elif query.startswith("/"):
         return _resolve_pointer(query, root)
     else:
-        raise JSONPathMustStartFromRoot(
-            f"JSON query `{query}` must start with '$' for JSON Path or '/' for JSON Pointer"
-        )
+        raise RefMustStartFromRoot(f"JSON query `{query}` must start with '$' for JSON Path or '/' for JSON Pointer")

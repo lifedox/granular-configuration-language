@@ -1,7 +1,7 @@
 import pytest
 
 from granular_configuration import Configuration
-from granular_configuration.exceptions import JSONPathMustStartFromRoot, JSONPathQueryFailed, JSONPointerQueryFailed
+from granular_configuration.exceptions import JSONPathQueryFailed, JSONPointerQueryFailed, RefMustStartFromRoot
 from granular_configuration.yaml import loads
 
 
@@ -72,5 +72,5 @@ def test_syntax_error_throws_exception() -> None:
 a: !Ref no_data/here
 b: c
 """
-    with pytest.raises(JSONPathMustStartFromRoot):
+    with pytest.raises(RefMustStartFromRoot):
         assert loads(test_data).as_dict() == {}

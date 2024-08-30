@@ -1,4 +1,5 @@
 import abc
+import dataclasses
 import typing as typ
 from functools import wraps
 
@@ -10,12 +11,11 @@ _RT = typ.TypeVar("_RT")
 _T = typ.TypeVar("_T")
 
 
+@dataclasses.dataclass(frozen=True, eq=False, slots=True, repr=False)
 class TagConstructor:
-    __slots__ = ("tag", "constructor")
-
-    def __init__(self, tag: Tag, constructor: typ.Callable[[typ.Type[SafeConstructor], StateHolder], None]) -> None:
-        self.tag: typ.Final = tag
-        self.constructor: typ.Final = constructor
+    tag: Tag
+    friendly_type: str
+    constructor: typ.Callable[[typ.Type[SafeConstructor], StateHolder], None]
 
     def __eq__(self, value: object) -> bool:
         return (isinstance(value, self.__class__) and self.tag == value.tag) or (
@@ -81,4 +81,4 @@ class TagDecoratorBase(typ.Generic[_T], abc.ABC):
 
             constructor.add_constructor(tag, type_handler)
 
-        return TagConstructor(tag, add_handler)
+        return TagConstructor(tag, user_friendly_type, add_handler)
