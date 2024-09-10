@@ -1,5 +1,7 @@
 [TOC]
 
+---
+
 ## Lifecycle
 
 1.  **Import Time**: `LazyLoadConfiguration`s are defined (`CONFIG = LazyLoadConfiguration(...)`).
@@ -31,11 +33,22 @@ When making copies, it is important to note that `LazyEval` do not copy (they re
 
 This means that a deep copy of a `Configuration` can shared state with the original, if any `LazyEval` is present. Using immutable `Configuration` (and `MutableConfiguration`) will prevent needing to make copies. `as_dict()` is also a great way to make a mutable copy.
 
+---
+
 ## YAML Tags
 
-Note: YAML Tags provides are lazy (running when the value is request, not load time) unless noted.
-
-> **Argument** and **Return** use Python primitive type as common reference. Any `dict` is always returned as a `Configuration` (or `MutableConfiguration`). To convert to YAML definitions: `str` is "scalar", `list` is "sequence", `dict` is "mapping", `tuple` is a sized "sequence", and `Any` is any type. Tags in YAML only support "scalar", "sequence", and "mapping"; so, note,`!Tag 1.0` is always a string, despite `1.0` normally being a float.
+- **Argument** and **Return** use Python primitive type as common reference.
+  - To convert to YAML node definitions:
+    - `Any` is any type.
+    - `str` is "scalar"
+    - `list` is "sequence"
+    - `tuple` is a sized "sequence"
+    - `dict` is "mapping"
+      - All "mapping" mapping nodes return as a `Configuration`.
+        - Or `MutableConfiguration`, when `mutable=True`.
+  - Tags in YAML only support "scalar", "sequence", and "mapping".
+    - As such,`!Tag 1.0` is always a string, despite `1.0` normally being a floating point number.
+- YAML Tags provided by this library are lazy (running when the value is request, not load time) unless noted.
 
 ### Summary Table
 
@@ -45,7 +58,7 @@ Note: YAML Tags provides are lazy (running when the value is request, not load t
 | :------------------------------------: | :--------------------------------------------------------------------: | :---------------------------: | :--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------: |
 | [**String<br>Formatter**](#formatters) |               [`!Sub`](#tag-Sub)[ⁱ⁺](#interpolates-full)               |             `str`             | `!Sub ${ENVIRONMENT_VARIABLE}` <br> `!Sub ${ENVIRONMENT_VAR:-default value}` <br> `!Sub ${$.JSON.Path.expression}` <br> `!Sub ${/JSON/Pointer/expression}` <br> `!Sub ${&#x24;&#x7B; Escaped HTML &#x7D;}` |
 |    [**Manipulator**](#manipulators)    |                           [`!Del`](#tag-Del)                           |             `str`             |                                                                                             `!Del key: value `                                                                                             |
-|                                        |                         [`!Merge`](#tag-Merge)                         |         `list[dict \| None]`          |                                                                             `!Merge [{"key1": "value1"}, {"key2": "value2"}]`                                                                              |
+|                                        |                         [`!Merge`](#tag-Merge)                         |     `list[dict \| None]`      |                                                                             `!Merge [{"key1": "value1"}, {"key2": "value2"}]`                                                                              |
 |                                        |                   [`!Placeholder`](#tag-Placeholder)                   |             `str`             |                                                                                       `!Placeholder helpful message`                                                                                       |
 |                                        |               [`!Ref`](#tag-Ref)[ⁱ⁺](#interpolates-full)               |             `str`             |                                                                    `!Ref $.JSON.Path.expression}` <br> `!Ref /JSON/Pointer/expression`                                                                     |
 |         [**Parser**](#parsers)         |                      [`ParseEnv`](#tag-ParseEnv)                       | `str`<br>`\| tuple[str, Any]` |                                                                 `!ParseEnv ENVIRONMENT_VARIABLE` <br> `!ParseEnv ["ENVIRONMENT_VAR", 42]`                                                                  |
@@ -64,7 +77,7 @@ Note: YAML Tags provides are lazy (running when the value is request, not load t
 
 ---
 
-#### Formatters
+### Formatters
 
 - `!Sub` <a id="tag-Sub"></a>
 
@@ -101,7 +114,7 @@ Note: YAML Tags provides are lazy (running when the value is request, not load t
     - Notes:
       - `${...}` is greedy and does not support nesting.
       - `$(...)` and `$[...]` are reserved future for use and will warn with `InterpolationWarning` if used.
-      - JSON Path and JSON Pointer can be used to cause infinite loops and/or a `RecursionError`.
+      - ⚠️ JSON Path and JSON Pointer can be used to cause infinite loops and/or a `RecursionError`.
 
 - `!Env` <a id="tag-Env"></a>
   - Note: [`!Sub`](#tag-Sub) replaces this functionality and offers more options. `!Env` will not be removed but will not see future updates.
@@ -113,17 +126,18 @@ Note: YAML Tags provides are lazy (running when the value is request, not load t
     ```
   - **Returns:** _str_ ‒ string produced by the string format, replacing `{{VARIABLE_NAME}}` with the Environment Variable specified. Optionally, a default value can be specified should the Environment Variable not exist.
 
-#### Manipulators
+### Manipulators
 
 - `!Del` <a id="tag-Del"></a>
   - **Argument:** _str_.
-  - **Usage:** &nbsp; (_Result:_ `{"copy1: "Some Value", "copy2": "Some Value"}`)
+  - **Usage:**
     ```yaml
     !Del hidden: &common_setting Some Value
     copy1: *common_setting
     copy2: *common_setting
     ```
-  - **Action:** Marks the key and value to be removed just after load (technically: as a part of the load). This allows YAML anchors to be defined in the value and used, but by the time the Configuration is merge and built, the key and value are already removed.
+    _Result:_ `{"copy1: "Some Value", "copy2": "Some Value"}`
+  - **Action:** Marks the key and value to be removed just after load (technically: it acts as a part of the load). This allows YAML anchors to be defined in the value and used, but by the time the Configuration is merge and built, the key and value are already removed.
   - Notes:
     - `!Del` will only act when applied to the key of mapped value (`!Del key: value`; not `key: !Del value`). When applied otherwise it does nothing. Using key allows `!Del d: %setting !Func itertools.chain`.
     - `!Del` is one of the few exception to laziness and acts at load time.
@@ -137,29 +151,34 @@ Note: YAML Tags provides are lazy (running when the value is request, not load t
     - !OptionalParseFile relative/path/to/optional/file.yaml
     - setting2: some_overriding_value
     ```
-  - **Returns:** `Configuration` ‒ Merges are sequence of mapping into one Configuration, filtering out any none mapping.
+  - **Returns:** `Configuration` ‒ Merges are sequence of mapping into a single `Configuration`, filtering out any `Configuration`.
   - Notes:
     - When merging, all objects in the merge list are evaluated. As an explicit example, a [`!ParseFile`](#tag-ParseFile) in the merge list is evaluated with the `!Merge`.
     - Tags in the list merge cannot reference what is being merged.
-      - Following is not allowed:
+      - Following is not allowed, because this [`!Ref`](#tag-Ref) acts during the merge:
         ```yaml
         key1: !Merge
           - nested_key: { "settings": "values" }
           - !Ref $.key1.nested_key
         ```
-      - Following is:
+      - Following is allowed, because this [`!Ref`](#tag-Ref) acts after the merge:
         ```yaml
         key1: !Merge
           - nested_key: { "settings": "values" }
           - nested_key2: !Ref $.key1.nested_key
         ```
-    - This merge is equivalent to the merge that occurs at Merge Time.
-      - The following result is the same Configuration
-        - Loading `!Merge [!OptionalParseFile file1.yaml, !OptionalParseFile file2.yaml]`
+    - `!Merge` is equivalent to the merge that occurs at Merge Time.
+      - The following options result is the same Configuration:
         - `LazyLoadConfiguration("file1.yaml", "file2.yaml")`
           - This is the only option that remains lazy.
+        - Loading a file containing:
+          ```yaml
+          !Merge
+          - !OptionalParseFile file1.yaml
+          - !OptionalParseFile file2.yaml
+          ```
         - `merge(LazyLoadConfiguration("file1.yaml"), LazyLoadConfiguration("file2.yaml"))`
-    - The expected use of `!Merge` is to be pair with [`!ParseFile`](#tag-ParseFile), [`!OptionalParseFile`](#tag-OptionalParseFile).
+    - The expected use-case for `!Merge` is to be pair with multiple [`!ParseFile`](#tag-ParseFile) and/or [`!OptionalParseFile`](#tag-OptionalParseFile) tags.
 - `!Placeholder` <a id="tag-Placeholder"></a>
   - **Argument:** _str_.
   - **Usage:**
@@ -184,9 +203,9 @@ Note: YAML Tags provides are lazy (running when the value is request, not load t
     - JSON Pointer is limited by designed to be a single reference.
     - JSON Path can be used to created objects. `$.*.things` returns a sequence of all values from mappings contain the `things` key. This behavior is not restricted, but not recommended.
       - JSON Path was made available first, because cloud services used a restricted version similarly.
-    - `!Ref` can be used to cause infinite loops and/or a `RecursionError`.
+    - ⚠️ `!Ref` can be used to cause infinite loops and/or a `RecursionError`.
 
-#### Parsers
+### Parsers
 
 - `!ParseEnv` <a id="tag-ParseEnv"></a> and `!ParseEnvSafe` <a id="tag-ParseEnvSafe"></a>
   - **Argument:** _str | tuple[str, Any]_
@@ -203,8 +222,8 @@ Note: YAML Tags provides are lazy (running when the value is request, not load t
       - If argument is `tuple`, the second object will be returned.
   - Notes:
     - `!ParseEnvSafe` uses pure YAML loading. `!ParseEnv` uses this library loader.
-    - `!ParseEnv` can be used to cause infinite loops and/or a `RecursionError`.
-      - `!ParseEnv VAR`, where `VAR='!ParseEnv VAR'`, will loop infinitely.
+  - ⚠️ `!ParseEnv` can be used to cause infinite loops and/or a `RecursionError`.
+    - `!ParseEnv VAR`, where `VAR='!ParseEnv VAR'`, will loop infinitely.
 - `!ParseFile` <a id="tag-ParseFile"></a> and `!OptionalParseFile` <a id="tag-OptionalParseFile"></a>
   - **Argument:** _str_
     - _Supports Full Interpolation Syntax_
@@ -216,12 +235,13 @@ Note: YAML Tags provides are lazy (running when the value is request, not load t
   - **Returns:** _Any_ ‒ Loads the specified file.
     - When the file does not exist:
       - `!ParseFile` throws `FileNotFoundError`.
-      - `!OptionalParseFile` return `null`/`None`.
+      - `!OptionalParseFile` return null (`None`).
   - Notes:
+    - `!ParseFile` can be used at the root of the configuration document to act as a file redirect.
     - `!OptionalParseFile` is intended to be used with [`!Merge`](#tag-Merge), where nulls are filtered out.
-    - `!ParseFile` and `!OptionalParseFile` can be used to cause infinite loops and/or a `RecursionError`.
+    - ⚠️ `!ParseFile` and `!OptionalParseFile` can be used to cause infinite loops and/or a `RecursionError`.
 
-#### Typers
+### Typers
 
 - `!Class` <a id="tag-Class"></a>
   - **Argument:** _str_
