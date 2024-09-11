@@ -78,7 +78,7 @@ store: typ.Final[WeakValueDictionary[Locations, SharedConfigurationReference]] =
 def prepare_to_load_configuration(
     *, locations: Locations, base_path: str | typ.Sequence[str] | None, mutable_configuration: bool, disable_cache: bool
 ) -> NoteOfIntentToRead:
-    if disable_cache:
+    if disable_cache or mutable_configuration:
         shared_config_ref = SharedConfigurationReference(_locations=locations, _mutable_config=mutable_configuration)
     elif locations not in store:
         shared_config_ref = SharedConfigurationReference(_locations=locations, _mutable_config=mutable_configuration)

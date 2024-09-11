@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import os
 import typing as typ
 from collections.abc import Mapping, MutableMapping
@@ -35,6 +37,24 @@ class LazyLoadConfiguration(Mapping):
         mutable_configuration: bool = False,
         disable_caching: bool = False,
     ) -> None:
+        """
+        parameters:
+        - `*load_order_location`: file path to configuration file
+        - `base_path`: defines the subsection of the configuration file to use
+            - Can be defined as:
+            - A single key: `base_path="base_path"`
+            - JSON Pointer (strings only): `base_path="/base/path"`
+            - A list of keys: `base_path=("base", "path")`
+        - `use_env_location`: When enabled, if environment variable named by `env_location_var_name`
+            exists, it will be read a comma-delimited list of configuration path that will be appended
+            to `load_order_location` list.
+        - `env_location_var_name`: Used when `use_env_location` is True.
+        - `mutable_configuration`:
+            - When `False`: `Configuration` is used for mappings. `tuple` is used for sequences.
+            - When `True`: `MutableConfiguration` is used for mappings. `list` is used for sequences.
+        - `disable_caching`: When `True` (or `mutable_configuration=True`), caching of
+            "identical immutable configurations" is disabled.
+        """
         self.__receipt: NoteOfIntentToRead | None = prepare_to_load_configuration(
             locations=_read_locations(load_order_location, use_env_location, env_location_var_name),
             base_path=base_path,
@@ -88,6 +108,12 @@ class LazyLoadConfiguration(Mapping):
 
 
 class MutableLazyLoadConfiguration(LazyLoadConfiguration, MutableMapping):
+    """
+    Provides a lazy interface for loading Configuration from file paths on first access.
+
+    Uses: `MutableConfiguration` for mappings and `list` for sequences.
+    """
+
     def __init__(
         self,
         *load_order_location: PathOrStr,
@@ -95,6 +121,19 @@ class MutableLazyLoadConfiguration(LazyLoadConfiguration, MutableMapping):
         use_env_location: bool = False,
         env_location_var_name: str = "G_CONFIG_LOCATION",
     ) -> None:
+        """
+        parameters:
+        - `*load_order_location`: file path to configuration file
+        - `base_path`: defines the subsection of the configuration file to use
+            - Can be defined as:
+            - A single key: `base_path="base_path"`
+            - JSON Pointer (strings only): `base_path="/base/path"`
+            - A list of keys: `base_path=("base", "path")`
+        - `use_env_location`: When enabled, if environment variable named by `env_location_var_name`
+            exists, it will be read a comma-delimited list of configuration path that will be appended
+            to `load_order_location` list.
+        - `env_location_var_name`: Used when `use_env_location` is True.
+        """
         super().__init__(
             *load_order_location,
             base_path=base_path,

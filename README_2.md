@@ -1,37 +1,130 @@
+# `a-granular-configuration`
+
 [TOC]
+
+## Why does this exist?
+
+This library exists to allow your code use YAML as a configuration language for internal and external parties.
+
+Some use cases:
+
+- You are writing a library to help connect to some databases. You want users to easily changes settings and defined databases by name.
+  - Conceptual Example:
+    - Library Code:
+      ```python
+      CONFIG = LazyLoadConfiguration(
+        Path(__file___).parent / "config.yaml",
+        "./database-util-config.yaml",
+        "~/configs/database-util-config.yaml",
+        base_path="database-util",
+        env_location_var_name="ORG_COMMON_CONFIG_LOCATIONS",
+        use_env_location=True,
+      )
+      ```
+    - Library configuration:
+      ```yaml
+      database-util:
+        common_settings:
+          use_decimal: true
+          encryption_type: secure
+        databases: {} # Empty mapping, for users define
+      ```
+    - User application configuration:
+      ```yaml
+      database-util:
+        common_settings:
+          use_decimal: false
+        databases:
+          datebase1:
+            location: http://somewhere
+            user: !Masked ${DB_USERNAME}
+            password: !Masked ${DB_PASSWORD}
+        ```
+- You are deploying an application that has multiple deployment types with specific settings.
+  - Conceptual Example:
+    - Library Code:
+      ```python
+      CONFIG = LazyLoadConfiguration(
+        Path(__file___).parent / "config.yaml",
+        "./database-util-config.yaml",
+        base_path="app",
+      )
+      ```
+    - Base configuration:
+      ```yaml
+      app:
+        log_as: really cool app name
+        log_to: nowhere
+      ```
+    - AWS Lambda deploy:
+      ```yaml
+      app:
+        log_to: std_out
+      ```
+    - Server deploy:
+      ```yaml
+      app:
+        log_to: !Sub file://var/log/${app.log_as}.log
+      ```
+- You are writing a `pytest` plugin that create test data using named fixtures configured by the user.
+  - Conceptual Examples:
+    - Library Code:
+      ```python
+      CONFIG = LazyLoadConfiguration(
+        Path(__file___).parent / "fixture_config.yaml",
+        *Path().rglob("fixture_config.yaml"),
+        base_path="fixture-gen",
+      ).config
+      #
+      for name, spec in CONFIG.fixtures:
+        generate_fixture(name, spec)
+      ```
+    - Library configuration:
+      ```yaml
+      fixture-gen:
+        fixtures: {} # Empty mapping, for users define
+      ```
+    - User application configuration:
+      ```yaml
+      fixture-gen:
+        fixtures:
+          fixture1:
+            api: does something
+      ```
 
 ---
 
 ## Lifecycle
 
-1.  **Import Time**: `LazyLoadConfiguration`s are defined (`CONFIG = LazyLoadConfiguration(...)`).
-    - So long as the next step does not occur, all identical immutable configurations identified and marked for caching.
-      - Moving the next step clears the cache for all identical immutable configurations, meaning meaning if another identical immutable configuration create will be loaded separately.
-2.  **First Fetch**: Configuration is fetched for the first time (through `CONFIG.value`, `CONFIG[value]`, `CONFIG.config`, and such)
-    1. **Load Time**:
-       1. The file system is scanned for specified configuration files.
-       2. Each file is read and parsed.
-    2. **Merge Time**:
-       - Any Tags defined at the root of the file are run (i.e. the file beginning with a tag: `!Parsefile ...` or `!Merge ...`).
-       - The loaded Configurations are merged in-order into one Configuration.
-         - Any files that do not define a Mapping are filtered out.
-         - Mapping are merged recursively. Any other value type overrides.
-           - `{"a": "b": 1}` + `{"a: {"b": {"c": 1}}` ⇒ `{"a: {"b": {"c": 1}}`
-           - `{"a: {"b": {"c": 1}}` + `{"a: {"b": {"c": 2}}` ⇒ `{"a: {"b": {"c": 2}}`
-           - `{"a: {"b": {"c": 2}}` + `{"a: {"b": {"d": 3}}` ⇒ `{"a: {"b": {"c": 2, "d": 3}}`
-           - `{"a: {"b": {"c": 2, "d": 3}}` + `{"a": "b": 1}` ⇒ `{"a": "b": 1}`
-    3. **Build Time**:
-       1. The Base Path is applied.
-       2. The Base Paths for any `LazyLoadConfiguration` shared this identical immutable configuration is applied (exceptions, such as `InvalidBasePathException`, are stored, so they emit for the first fetch of the associated `LazyLoadConfiguration`)
-       3. `LazyLoadConfiguration` no longer holds a reference to the root object. If no tags depends on the root Configuration, it will be free (`!Sub` is an example of a tag that holds a reference to the root Configuration until it is run).
-          - If an exception occurs, the root Configuration is unavoidable caught in the frame.
-3.  **Fetching a Lazy Tag**:
-    1. Upon first get of the `LazyEval` object, the underlying function is called.
-    2. The result replaces the `LazyEval` in the Configuration, so the `LazyEval` run exactly once.
+1. **Import Time**: `LazyLoadConfiguration`'s are defined (`CONFIG = LazyLoadConfiguration(...)`).
+   - So long as the next step does not occur, all identical immutable configurations identified and marked for caching.
+     - Moving the next step clears the cache for all identical immutable configurations, meaning if another identical immutable configuration create will be loaded separately.
+2. **First Fetch**: Configuration is fetched for the first time (through `CONFIG.value`, `CONFIG[value]`, `CONFIG.config`, and such)
+   1. **Load Time**:
+      1. The file system is scanned for specified configuration files.
+      2. Each file is read and parsed.
+   2. **Merge Time**:
+      - Any Tags defined at the root of the file are run (i.e. the file beginning with a tag: `!Parsefile ...` or `!Merge ...`).
+      - The loaded Configurations are merged in-order into one Configuration.
+        - Any files that do not define a Mapping are filtered out.
+        - Mappings are merged recursively. Any non-mapping overrides. Newer values override older values.
+          - `{"a": "b": 1}` + `{"a: {"b": {"c": 1}}` ⇒ `{"a: {"b": {"c": 1}}`
+          - `{"a: {"b": {"c": 1}}` + `{"a: {"b": {"c": 2}}` ⇒ `{"a: {"b": {"c": 2}}`
+          - `{"a: {"b": {"c": 2}}` + `{"a: {"b": {"d": 3}}` ⇒ `{"a: {"b": {"c": 2, "d": 3}}`
+          - `{"a: {"b": {"c": 2, "d": 3}}` + `{"a": "b": 1}` ⇒ `{"a": "b": 1}`
+   3. **Build Time**:
+      1. The Base Path is applied.
+      2. The Base Paths for any `LazyLoadConfiguration` shared this identical immutable configuration is applied.
+         - Exceptions that occur (such as `InvalidBasePathException`) are stored, so they emit for the first fetch of the associated `LazyLoadConfiguration`.
+      3. `LazyLoadConfiguration` no longer holds a reference to the root object. If no tags depend on the root Configuration, it will be free (`!Sub` is an example of a tag that holds a reference to the root Configuration until it is run).
+         - If an exception occurs, the root Configuration is unavoidable caught in the frame.
+3. **Fetching a Lazy Tag**:
+   1. Upon first get of the `LazyEval` object, the underlying function is called.
+   2. The result replaces the `LazyEval` in the Configuration, so the `LazyEval` run exactly once.
 
 When making copies, it is important to note that `LazyEval` do not copy (they return themselves). This is to aid in running exactly once and prevent cycles with the root reference.
 
-This means that a deep copy of a `Configuration` can shared state with the original, if any `LazyEval` is present. Using immutable `Configuration` (and `MutableConfiguration`) will prevent needing to make copies. `as_dict()` is also a great way to make a mutable copy.
+This means that a deep copy of a `Configuration` can share state with the original, if any `LazyEval` is present. Using immutable `Configuration` (and `MutableConfiguration`) will prevent needing to make copies. `as_dict()` is also a great way to make a mutable copy.
 
 ---
 
@@ -54,23 +147,23 @@ This means that a deep copy of a `Configuration` can shared state with the origi
 
 <!--If you are reading this markdown raw, this table is not for you. See the list based documentation.-->
 
-|                Category                |                                  Tag                                   |           Argument            |                                                                                                   Usage                                                                                                    |
-| :------------------------------------: | :--------------------------------------------------------------------: | :---------------------------: | :--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------: |
-| [**String<br>Formatter**](#formatters) |               [`!Sub`](#tag-Sub)[ⁱ⁺](#interpolates-full)               |             `str`             | `!Sub ${ENVIRONMENT_VARIABLE}` <br> `!Sub ${ENVIRONMENT_VAR:-default value}` <br> `!Sub ${$.JSON.Path.expression}` <br> `!Sub ${/JSON/Pointer/expression}` <br> `!Sub ${&#x24;&#x7B; Escaped HTML &#x7D;}` |
-|    [**Manipulator**](#manipulators)    |                           [`!Del`](#tag-Del)                           |             `str`             |                                                                                             `!Del key: value `                                                                                             |
-|                                        |                         [`!Merge`](#tag-Merge)                         |     `list[dict \| None]`      |                                                                             `!Merge [{"key1": "value1"}, {"key2": "value2"}]`                                                                              |
-|                                        |                   [`!Placeholder`](#tag-Placeholder)                   |             `str`             |                                                                                       `!Placeholder helpful message`                                                                                       |
-|                                        |               [`!Ref`](#tag-Ref)[ⁱ⁺](#interpolates-full)               |             `str`             |                                                                    `!Ref $.JSON.Path.expression}` <br> `!Ref /JSON/Pointer/expression`                                                                     |
-|         [**Parser**](#parsers)         |                      [`ParseEnv`](#tag-ParseEnv)                       | `str`<br>`\| tuple[str, Any]` |                                                                 `!ParseEnv ENVIRONMENT_VARIABLE` <br> `!ParseEnv ["ENVIRONMENT_VAR", 42]`                                                                  |
-|                                        |                  [`ParseEnvSafe`](#tag-ParseEnvSafe)                   | `str`<br>`\| tuple[str, Any]` |                                                             `!ParseEnvSafe ENVIRONMENT_VARIABLE` <br> `!ParseEnvSafe ["ENVIRONMENT_VAR", 42]`                                                              |
-|                                        |         [`ParseFile`](#tag-ParseFile)[ⁱ⁺](#interpolates-full)          |             `str`             |                                                                                      `!ParseFile relative/path.yaml `                                                                                      |
-|                                        | [`!OptionalParseFile`](#tag-OptionalParseFile)[ⁱ⁺](#interpolates-full) |             `str`             |                                                                                    `!OptionalParseFile optional.yaml `                                                                                     |
-|          [**Typer**](#typers)          |            [`!Class`](#tag-Class)[ⁱ](#interpolates_reduced)            |             `str`             |                                                                                             `!Class uuid.UUID`                                                                                             |
-|                                        |             [`!Date`](#tag-Date)[ⁱ](#interpolates_reduced)             |             `str`             |                                                                                             `!Date 1988-12-28`                                                                                             |
-|                                        |         [`!DateTime`](#tag-DateTime)[ⁱ](#interpolates_reduced)         |             `str`             |                                                                     `!Date 1988-12-28T23:38:00-0600` <br> `!Date 2019-18-17T16:15:14`                                                                      |
-|                                        |             [`!Func`](#tag-Func)[ⁱ](#interpolates_reduced)             |             `str`             |                                                                                         `!Func functools.reduce `                                                                                          |
-|                                        |             [`!Mask`](#tag-Mask)[ⁱ](#interpolates_reduced)             |             `str`             |                                                                                             `!Mask ${SECRET}`                                                                                              |
-|                                        |             [`!UUID`](#tag-UUID)[ⁱ](#interpolates_reduced)             |             `str`             |                                                                                `!UUID 9d7130a6-192f-41e6-88ce-29f0b765be9e`                                                                                |
+|                 Category                 |                                  Tag                                   |           Argument            |                                                                                                   Usage                                                                                                    |
+| :--------------------------------------: | :--------------------------------------------------------------------: | :---------------------------: | :--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------: |
+| [**String <br> Formatter**](#formatters) |               [`!Sub`](#tag-Sub)[ⁱ⁺](#interpolates-full)               |             `str`             | `!Sub ${ENVIRONMENT_VARIABLE}` <br> `!Sub ${ENVIRONMENT_VAR:-default value}` <br> `!Sub ${$.JSON.Path.expression}` <br> `!Sub ${/JSON/Pointer/expression}` <br> `!Sub ${&#x24;&#x7B; Escaped HTML &#x7D;}` |
+|     [**Manipulator**](#manipulators)     |                           [`!Del`](#tag-Del)                           |             `str`             |                                                                                             `!Del key: value`                                                                                              |
+|                                          |                         [`!Merge`](#tag-Merge)                         |     `list[dict \| None]`      |                                                                             `!Merge [{"key1": "value1"}, {"key2": "value2"}]`                                                                              |
+|                                          |                   [`!Placeholder`](#tag-Placeholder)                   |             `str`             |                                                                                       `!Placeholder helpful message`                                                                                       |
+|                                          |               [`!Ref`](#tag-Ref)[ⁱ⁺](#interpolates-full)               |             `str`             |                                                                    `!Ref $.JSON.Path.expression}` <br> `!Ref /JSON/Pointer/expression`                                                                     |
+|          [**Parser**](#parsers)          |                      [`ParseEnv`](#tag-ParseEnv)                       | `str`<br>`\| tuple[str, Any]` |                                                                 `!ParseEnv ENVIRONMENT_VARIABLE` <br> `!ParseEnv ["ENVIRONMENT_VAR", 42]`                                                                  |
+|                                          |                  [`ParseEnvSafe`](#tag-ParseEnvSafe)                   | `str`<br>`\| tuple[str, Any]` |                                                             `!ParseEnvSafe ENVIRONMENT_VARIABLE` <br> `!ParseEnvSafe ["ENVIRONMENT_VAR", 42]`                                                              |
+|                                          |         [`ParseFile`](#tag-ParseFile)[ⁱ⁺](#interpolates-full)          |             `str`             |                                                                                      `!ParseFile relative/path.yaml`                                                                                       |
+|                                          | [`!OptionalParseFile`](#tag-OptionalParseFile)[ⁱ⁺](#interpolates-full) |             `str`             |                                                                                     `!OptionalParseFile optional.yaml`                                                                                     |
+|           [**Typer**](#typers)           |            [`!Class`](#tag-Class)[ⁱ](#interpolates-reduced)            |             `str`             |                                                                                             `!Class uuid.UUID`                                                                                             |
+|                                          |             [`!Date`](#tag-Date)[ⁱ](#interpolates-reduced)             |             `str`             |                                                                                             `!Date 1988-12-28`                                                                                             |
+|                                          |         [`!DateTime`](#tag-DateTime)[ⁱ](#interpolates-reduced)         |             `str`             |                                                                     `!Date 1988-12-28T23:38:00-0600` <br> `!Date 2019-18-17T16:15:14`                                                                      |
+|                                          |             [`!Func`](#tag-Func)[ⁱ](#interpolates-reduced)             |             `str`             |                                                                                          `!Func functools.reduce`                                                                                          |
+|                                          |             [`!Mask`](#tag-Mask)[ⁱ](#interpolates-reduced)             |             `str`             |                                                                                             `!Mask ${SECRET}`                                                                                              |
+|                                          |             [`!UUID`](#tag-UUID)[ⁱ](#interpolates-reduced)             |             `str`             |                                                                                `!UUID 9d7130a6-192f-41e6-88ce-29f0b765be9e`                                                                                |
 
 <a id="interpolates-full"></a>ⁱ⁺: Supports full interpolation syntax of [`!Sub`](#tag-Sub)
 <a id="interpolates-reduced"></a>ⁱ: Supports reduced interpolation syntax of [`!Sub`](#tag-Sub) without JSON Path and JSON Pointer syntax.
@@ -97,12 +190,12 @@ This means that a deep copy of a `Configuration` can shared state with the origi
       - Raises `EnvironmentVaribleNotFound`, if the variable does not exist.
     - `${ENVIRONMENT_VARIABLE:-default}`: Replaced with the specified Environment Variable or the provided default, if variable does not exist.
       - Note: specifier is `:-`.
-    - `${$.json.path.expression}`: Replaced by the the object in the configuration specified in JSON Path syntax.
+    - `${$.json.path.expression}`: Replaced by the object in the configuration specified in JSON Path syntax.
       - Paths must start at full root of configuration, using `$` as the first character.
       - Results:
         - Referencing only strings is recommended. However, paths that return `Mapping` or `Sequence` will be `repr`-ed. Other objects will be `str`-ed.
         - Paths that do not exist raise `JSONPathQueryFailed`.
-    - `${/json/pointer/expression}`: Replaced by the the object in the configuration specified in JSON Path syntax.
+    - `${/json/pointer/expression}`: Replaced by the object in the configuration specified in JSON Path syntax.
       - Paths must start at full root of configuration, using `/` as the first character.
       - Results:
         - Referencing only strings is recommended. However, paths that return `Mapping` or `Sequence` will be `repr`-ed. Other objects will be `str`-ed.
@@ -137,10 +230,10 @@ This means that a deep copy of a `Configuration` can shared state with the origi
     copy2: *common_setting
     ```
     _Result:_ `{"copy1: "Some Value", "copy2": "Some Value"}`
-  - **Action:** Marks the key and value to be removed just after load (technically: it acts as a part of the load). This allows YAML anchors to be defined in the value and used, but by the time the Configuration is merge and built, the key and value are already removed.
+  - **Action:** Marks the key and value to be removed just after load (technically: it acts as a part of the load). This allows YAML anchors to be defined in the value and used, but by the time the Configuration is merged and built, the key and value are already removed.
   - Notes:
     - `!Del` will only act when applied to the key of mapped value (`!Del key: value`; not `key: !Del value`). When applied otherwise it does nothing. Using key allows `!Del d: %setting !Func itertools.chain`.
-    - `!Del` is one of the few exception to laziness and acts at load time.
+    - `!Del` is one of the few exceptions to laziness and acts at load time.
 - `!Merge` <a id="tag-Merge"></a>
   - **Argument:** _list[Any]_.
   - **Usage:**
@@ -158,13 +251,15 @@ This means that a deep copy of a `Configuration` can shared state with the origi
       - Following is not allowed, because this [`!Ref`](#tag-Ref) acts during the merge:
         ```yaml
         key1: !Merge
-          - nested_key: { "settings": "values" }
+          - nested_key:
+              settings: values
           - !Ref $.key1.nested_key
         ```
       - Following is allowed, because this [`!Ref`](#tag-Ref) acts after the merge:
         ```yaml
         key1: !Merge
-          - nested_key: { "settings": "values" }
+          - nested_key:
+              settings: values
           - nested_key2: !Ref $.key1.nested_key
         ```
     - `!Merge` is equivalent to the merge that occurs at Merge Time.
@@ -178,7 +273,7 @@ This means that a deep copy of a `Configuration` can shared state with the origi
           - !OptionalParseFile file2.yaml
           ```
         - `merge(LazyLoadConfiguration("file1.yaml"), LazyLoadConfiguration("file2.yaml"))`
-    - The expected use-case for `!Merge` is to be pair with multiple [`!ParseFile`](#tag-ParseFile) and/or [`!OptionalParseFile`](#tag-OptionalParseFile) tags.
+    - The expected use-case for `!Merge` is to be paired with multiple [`!ParseFile`](#tag-ParseFile) and/or [`!OptionalParseFile`](#tag-OptionalParseFile) tags.
 - `!Placeholder` <a id="tag-Placeholder"></a>
   - **Argument:** _str_.
   - **Usage:**
@@ -218,7 +313,7 @@ This means that a deep copy of a `Configuration` can shared state with the origi
     ```
   - **Returns:** _Any_ ‒ specified environment variable parsed.
     - When environment variable does not exist:
-      - If argument is `str`, an `EnvironmentVaribleNotFound` error will be thrown.
+      - If argument is `str`, a `EnvironmentVaribleNotFound` error will be thrown.
       - If argument is `tuple`, the second object will be returned.
   - Notes:
     - `!ParseEnvSafe` uses pure YAML loading. `!ParseEnv` uses this library loader.
