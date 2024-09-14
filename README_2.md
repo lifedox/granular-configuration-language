@@ -37,8 +37,8 @@ Some use cases:
         databases:
           datebase1:
             location: http://somewhere
-            user: !Masked ${DB_USERNAME}
-            password: !Masked ${DB_PASSWORD}
+            user: !Mask ${DB_USERNAME}
+            password: !Mask ${DB_PASSWORD}
         ```
 - You are deploying an application that has multiple deployment types with specific settings.
   - Conceptual Example:
@@ -145,7 +145,7 @@ This means that a deep copy of a `Configuration` can share state with the origin
 
 ### Summary Table
 
-<!--If you are reading this markdown raw, this table is not for you. See the list based documentation.-->
+<!--If you are reading this markdown raw with word wrap, this table is not for you. See the list based documentation.-->
 
 |                 Category                 |                                  Tag                                   |           Argument            |                                                                                                   Usage                                                                                                    |
 | :--------------------------------------: | :--------------------------------------------------------------------: | :---------------------------: | :--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------: |
@@ -182,14 +182,19 @@ This means that a deep copy of a `Configuration` can share state with the origin
     with_other_text: !Sub Normal Text + ${ENVIRONMENT_VARIABLE_THAT_EXISTS}
     json_path: !Sub ${$.json.path.expression}
     json_pointer: !Sub ${/json/pointer/expression}
+    $: !Sub ${$}
     "${}": !Sub "${&#x24;&#x7B;&#x7D;}"
     ```
   - **Returns:** _str_ ‒ string produced by the interpolation syntax.
   - Interpolations:
     - `${ENVIRONMENT_VARIABLE}`: Replaced with the specified Environment Variable.
-      - Raises `EnvironmentVaribleNotFound`, if the variable does not exist.
-    - `${ENVIRONMENT_VARIABLE:-default}`: Replaced with the specified Environment Variable or the provided default, if variable does not exist.
+      - If the variable does not exist, raises `EnvironmentVaribleNotFound`
+    - `${ENVIRONMENT_VARIABLE:-default}`: Replaced with the specified Environment Variable.
+      - If variable does not exist, use the text after `:-`.
       - Note: specifier is `:-`.
+    - `${ENVIRONMENT_VARIABLE:+<nested_interpolation_spec>}`: Replaced with the specified Environment Variable.
+      - If variable does not exist, interpolate the text after `:+`.
+      - Note: specifier is `:+`.
     - `${$.json.path.expression}`: Replaced by the object in the configuration specified in JSON Path syntax.
       - Paths must start at full root of configuration, using `$` as the first character.
       - Results:
@@ -200,12 +205,15 @@ This means that a deep copy of a `Configuration` can share state with the origin
       - Results:
         - Referencing only strings is recommended. However, paths that return `Mapping` or `Sequence` will be `repr`-ed. Other objects will be `str`-ed.
         - Paths that do not exist raise `JSONPointerQueryFailed`.
-    - `${&...;}`: Replaced by the results `html.unescape`. This avoids needing escaping rules.
+    - `${$}`: Replaced with `$`.
+      - `!Sub ${$}{}` produces `${}`
+    - `${&...;}`: Replaced by the results `html.unescape`.
       - `!Sub ${&#x24;&#x7B;&#x7D;}` produces `${}`
       - `!Sub ${&#x24;&#40;&#41;}` produces `$()`
       - `!Sub ${&#x24;&#91;&#93;}` produces `$[]`
     - Notes:
       - `${...}` is greedy and does not support nesting.
+      - Modes other than `:-` and `:+` are reserved and throw `InterpolationSyntaxError`. Use `::` to for escaping colons in environment variable names.
       - `$(...)` and `$[...]` are reserved future for use and will warn with `InterpolationWarning` if used.
       - ⚠️ JSON Path and JSON Pointer can be used to cause infinite loops and/or a `RecursionError`.
 

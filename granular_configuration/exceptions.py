@@ -26,6 +26,10 @@ class InterpolationWarning(Warning):
     pass
 
 
+class InterpolationSyntaxError(Exception):
+    pass
+
+
 class IniKeyExistAsANonMapping(Exception):
     pass
 

@@ -37,11 +37,13 @@ class OrderedSet(typ.MutableSet[_T], typ.Reversible[_T], typ.Generic[_T]):
         return reversed(self.__backend)
 
 
-def get_environment_variable(name: str, default: str | None = None) -> str:
-    try:
-        if default is None:
-            return os.environ[name]
-        else:
-            return os.getenv(name, default)
-    except KeyError:
-        raise EnvironmentVaribleNotFound(name) from None
+def get_environment_variable(name: str, default: str | typ.Callable[[], str] | None = None) -> str:
+    name = name.replace("::", ":")
+    if name in os.environ:
+        return os.environ[name]
+    elif default is None:
+        raise EnvironmentVaribleNotFound(name)
+    elif callable(default):
+        return default()
+    else:
+        return default
