@@ -12,7 +12,7 @@ class string_tag(TagDecoratorBase[str]):
     def user_friendly_type(self) -> str:
         return "str"
 
-    def scalar_node_type_check(self, value: str) -> typ.TypeGuard[str]:
+    def scalar_node_type_check(self, value: str) -> typ.TypeGuard[Type]:
         return True
 
 
@@ -40,5 +40,16 @@ class sequence_of_any_tag(TagDecoratorBase[typ.Sequence[typ.Any]]):
     def user_friendly_type(self) -> str:
         return "list[Any]"
 
-    def sequence_node_type_check(self, value: typ.Sequence) -> typ.TypeGuard[typ.Sequence[typ.Any]]:
+    def sequence_node_type_check(self, value: typ.Sequence) -> typ.TypeGuard[Type]:
+        return True
+
+
+class mapping_of_any_tag(TagDecoratorBase[typ.Mapping[typ.Any, typ.Any]]):
+    Type: typ.TypeAlias = typ.Mapping[typ.Any, typ.Any]
+
+    @property
+    def user_friendly_type(self) -> str:
+        return "dict[Any, Any]"
+
+    def mapping_node_type_check(self, value: typ.Mapping) -> typ.TypeGuard[Type]:
         return True

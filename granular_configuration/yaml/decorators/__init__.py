@@ -11,4 +11,9 @@ from granular_configuration.yaml.decorators._lazy import (
     as_lazy_with_root_and_load_options,
     as_not_lazy,
 )
-from granular_configuration.yaml.decorators._type_checking import sequence_of_any_tag, string_or_twople_tag, string_tag
+from granular_configuration.yaml.decorators._type_checking import (
+    mapping_of_any_tag,
+    sequence_of_any_tag,
+    string_or_twople_tag,
+    string_tag,
+)

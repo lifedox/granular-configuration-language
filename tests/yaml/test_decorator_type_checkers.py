@@ -39,3 +39,25 @@ def test_sequence_of_any_tag_does_not_take_scalar() -> None:
 def test_sequence_of_any_tag_does_not_take_mapping() -> None:
     with pytest.raises(ValueError):
         loads("!Merge {}")
+
+
+def test_mapping_of_any_tag_does_not_take_scalar() -> None:
+    with pytest.raises(ValueError):
+        loads("!Dict abc")
+
+
+def test_mapping_of_any_tag_does_not_take_mapping() -> None:
+    with pytest.raises(ValueError):
+        loads("!Dict []")
+
+
+def test_mapping_of_any_tag_takes_mapping() -> None:
+    data = """
+!Dict
+a: 1
+b: 2
+"""
+    value = loads(data)
+
+    assert type(value)
+    assert loads(data) == dict(a=1, b=2)
