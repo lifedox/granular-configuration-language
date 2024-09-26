@@ -8,7 +8,7 @@ import pytest
 
 from granular_configuration import Configuration, MutableConfiguration
 from granular_configuration._s import setter_secret
-from granular_configuration.yaml import Placeholder, loads
+from granular_configuration.yaml import LazyEval, Placeholder, loads
 
 
 def test_private_set_is_protected() -> None:
@@ -224,3 +224,24 @@ e: !Ref $.a
     assert str(test.e._Configuration__attribute_name) == "$.e"
     assert str(test.a.b.c._Configuration__attribute_name) == "$.a.b.c"
     assert str(test.e.b.c._Configuration__attribute_name) == "$.e.b.c"
+
+
+def test_evalute_all_run_all_LazyEval() -> None:
+    test: Configuration = loads(
+        """
+base: data
+test:
+    a: !Ref /base
+    b: !Ref /base
+    c: !Ref /base
+    d: !Ref /base
+"""
+    )
+
+    for _, value in test.test._raw_items():
+        assert isinstance(value, LazyEval)
+
+    test.evaluate_all()
+
+    for _, value in test.test._raw_items():
+        assert not isinstance(value, LazyEval)

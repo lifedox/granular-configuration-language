@@ -165,6 +165,11 @@ class Configuration(typ.Mapping[typ.Any, typ.Any]):
         """
         return (key in self) and not isinstance(self.__data[key], Placeholder)
 
+    def evaluate_all(self) -> None:
+        for value in self.values():
+            if isinstance(value, Configuration):
+                value.evaluate_all()
+
     def as_dict(self) -> dict[typ.Any, typ.Any]:
         """
         Returns this `Configuration` as standard Python `dict`.
