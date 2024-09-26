@@ -2,6 +2,8 @@ import copy
 from datetime import date
 from unittest.mock import Mock, patch
 
+import pytest
+
 from granular_configuration import Configuration
 from granular_configuration.yaml import LazyEval, loads
 
@@ -156,3 +158,12 @@ def test_LazyEval_result_runs_once() -> None:
         assert lazy_eval.result is result
 
         mock.assert_called_once()
+
+
+def test_LazyEval_keys_throw_errors() -> None:
+    with pytest.raises(TypeError, match="keys to mappings"):
+        loads(
+            """
+!Date 20121031: date
+"""
+        )
