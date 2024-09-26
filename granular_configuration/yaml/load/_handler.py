@@ -4,25 +4,12 @@ import typing as typ
 from copy import copy
 from functools import partial
 
-from ruamel.yaml import YAML, MappingNode, SafeConstructor, SequenceNode
+from ruamel.yaml import YAML, SafeConstructor
 from ruamel.yaml.resolver import BaseResolver
 
 from granular_configuration.yaml._tags import handlers
 from granular_configuration.yaml.classes import StateHolder
-
-
-def construct_mapping(cls: typ.Type, constructor: SafeConstructor, node: MappingNode) -> typ.Mapping:
-    node.value = [pair for pair in node.value if pair[0].tag != "!Del"]
-    return cls(constructor.construct_mapping(node, deep=True))
-
-
-def construct_sequence(cls: typ.Type, constructor: SafeConstructor, node: SequenceNode) -> typ.Sequence:
-    value = constructor.construct_sequence(node, deep=True)
-
-    if isinstance(value, cls):
-        return value
-    else:
-        return cls(value)
+from granular_configuration.yaml.load._constructors import construct_mapping, construct_sequence
 
 
 def make_constructor_class(state: StateHolder) -> typ.Type[SafeConstructor]:

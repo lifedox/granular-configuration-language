@@ -56,6 +56,7 @@ def test_mapping_of_any_tag_takes_mapping() -> None:
 !Dict
 a: 1
 b: 2
+!Del c: 3
 """
     value = loads(data)
 

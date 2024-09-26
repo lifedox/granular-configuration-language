@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import typing as typ
 
+from granular_configuration._config import Configuration
 from granular_configuration.yaml.decorators._base import TagDecoratorBase
 
 
@@ -44,8 +45,8 @@ class sequence_of_any_tag(TagDecoratorBase[typ.Sequence[typ.Any]]):
         return True
 
 
-class mapping_of_any_tag(TagDecoratorBase[typ.Mapping[typ.Any, typ.Any]]):
-    Type: typ.TypeAlias = typ.Mapping[typ.Any, typ.Any]
+class mapping_of_any_tag(TagDecoratorBase[Configuration]):
+    Type: typ.TypeAlias = Configuration
 
     @property
     def user_friendly_type(self) -> str:

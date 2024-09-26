@@ -6,9 +6,10 @@ from functools import wraps
 from ruamel.yaml import MappingNode, Node, SafeConstructor, ScalarNode, SequenceNode
 
 from granular_configuration.yaml.classes import StateHolder, Tag
+from granular_configuration.yaml.load._constructors import construct_mapping, construct_sequence
 
 _RT = typ.TypeVar("_RT")
-_T = typ.TypeVar("_T")
+_T = typ.TypeVar("_T", covariant=True)
 
 
 @dataclasses.dataclass(frozen=True, eq=False, slots=True, repr=False)
@@ -80,11 +81,11 @@ class TagDecoratorBase(typ.Generic[_T], abc.ABC):
                     if isinstance(value, str) and scalar_node_type_check(value):
                         return handler(tag, scalar_node_transformer(value), state)
                 elif isinstance(node, SequenceNode):
-                    value = constructor.construct_sequence(node)
+                    value = construct_sequence(state.options.sequence_func, constructor, node)
                     if isinstance(value, typ.Sequence) and sequence_node_type_check(value):
                         return handler(tag, sequence_node_transformers(value), state)
                 elif isinstance(node, MappingNode):
-                    value = constructor.construct_mapping(node)
+                    value = construct_mapping(state.options.obj_pairs_func, constructor, node)
                     if isinstance(value, typ.Mapping) and mapping_node_type_check(value):
                         return handler(tag, mapping_node_transformer(value), state)
                 else:
