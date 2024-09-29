@@ -183,6 +183,7 @@ tests:
     c: !Sub ${a::b:+a::b}
     d: !Sub ${a::b_not:-default}
     e: !Sub ${a::b_not:+a::b}
+    f: !Sub ${a::b_not:+$}
 """
 
     with patch.dict(os.environ, values={"a:b": "a:b"}):
@@ -193,6 +194,7 @@ tests:
             c="a:b",
             d="default",
             e="a:b",
+            f="$",
         )
 
 
@@ -206,3 +208,8 @@ def test_that_single_colon_interpolation_errors() -> None:
     test_data = "!Sub ${:}"
     with patch.dict(os.environ, values={}), pytest.raises(InterpolationSyntaxError, match=re.escape('":None"')):
         loads(test_data)
+
+
+def test_special_static_cases() -> None:
+    assert loads("!Sub $") == "$"
+    assert loads("!Sub ${") == "${"

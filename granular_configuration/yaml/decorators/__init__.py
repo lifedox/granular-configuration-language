@@ -1,9 +1,5 @@
 from granular_configuration.yaml.classes import LoadOptions, Masked, Placeholder, Root
 from granular_configuration.yaml.decorators._base import Tag, TagDecoratorBase
-from granular_configuration.yaml.decorators._interpolate import (
-    interpolate_value_with_ref,
-    interpolate_value_without_ref,
-)
 from granular_configuration.yaml.decorators._lazy import (
     as_lazy,
     as_lazy_with_load_options,
@@ -17,3 +13,4 @@ from granular_configuration.yaml.decorators._type_checking import (
     string_or_twople_tag,
     string_tag,
 )
+from granular_configuration.yaml.decorators.interpolate import interpolate_value_with_ref, interpolate_value_without_ref

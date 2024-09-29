@@ -9,8 +9,8 @@ from html import unescape
 from granular_configuration._utils import get_environment_variable
 from granular_configuration.exceptions import InterpolationSyntaxError, InterpolationWarning
 from granular_configuration.yaml.classes import Root
-from granular_configuration.yaml.decorators._interpolate._env_var_parser import parse_environment_variable_syntax
 from granular_configuration.yaml.decorators._tag_tracker import track_as_with_ref, track_as_without_ref
+from granular_configuration.yaml.decorators.interpolate._env_var_parser import parse_environment_variable_syntax
 from granular_configuration.yaml.decorators.ref import resolve_json_ref
 
 _P = typ.ParamSpec("_P")
@@ -78,6 +78,35 @@ def interpolate(value: str, root: Root) -> str:
     for sub, pat in SUB_PATTERNS:
         value = pat.sub(lambda x: sub(root, **x.groupdict()), value)
     return value
+
+
+# Trying to explain with variable names
+DOLLAR_BUT_NOT_END = r"\$(?!\})"
+SLASH = r"/"
+DOLLAR_OR_SLASH = f"(?:{DOLLAR_BUT_NOT_END}|{SLASH})"
+NESTING = r".+?\:\+"
+NESTING_DOLLAR_OR_SLASH = NESTING + DOLLAR_OR_SLASH
+STARTS_WITH_OR_NESTING_DOLLAR_OR_SLASH = f"(?:{DOLLAR_OR_SLASH}|{NESTING_DOLLAR_OR_SLASH})"
+DOLLAR_BRACKET = r"\$\{"
+WHOLE_THING = DOLLAR_BRACKET + STARTS_WITH_OR_NESTING_DOLLAR_OR_SLASH
+# WHOLE_THING = r"\$\{(?:(?:\$(?!\})|/)|.+?\:\+(?:\$(?!\})|/))"
+
+DOES_REF_CHECK = re.compile(WHOLE_THING)
+
+del (
+    DOLLAR_BUT_NOT_END,
+    SLASH,
+    DOLLAR_OR_SLASH,
+    NESTING,
+    NESTING_DOLLAR_OR_SLASH,
+    STARTS_WITH_OR_NESTING_DOLLAR_OR_SLASH,
+    DOLLAR_BRACKET,
+    WHOLE_THING,
+)
+
+
+def does_ref_check(value: str) -> bool:
+    return bool(DOES_REF_CHECK.search(value))
 
 
 def interpolate_value_with_ref(

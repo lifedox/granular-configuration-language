@@ -4,7 +4,7 @@
 
 ## Why does this exist?
 
-This library exists to allow your code use YAML as a configuration language for internal and external parties.
+This library exists to allow your code use YAML as a configuration language for internal and external parties. With added YAML Tags to allow configuration to be crafted from multiple sources.
 
 Some use cases:
 
@@ -98,7 +98,7 @@ Some use cases:
 
 1. **Import Time**: `LazyLoadConfiguration`'s are defined (`CONFIG = LazyLoadConfiguration(...)`).
    - So long as the next step does not occur, all identical immutable configurations identified and marked for caching.
-     - Moving the next step clears the cache for all identical immutable configurations, meaning if another identical immutable configuration create will be loaded separately.
+     - Loading a configuration clears the cache for all identical immutable configurations, meaning if another identical immutable configuration is created, it will be loaded separately.
 2. **First Fetch**: Configuration is fetched for the first time (through `CONFIG.value`, `CONFIG[value]`, `CONFIG.config`, and such)
    1. **Load Time**:
       1. The file system is scanned for specified configuration files.
@@ -116,7 +116,7 @@ Some use cases:
       1. The Base Path is applied.
       2. The Base Paths for any `LazyLoadConfiguration` shared this identical immutable configuration is applied.
          - Exceptions that occur (such as `InvalidBasePathException`) are stored, so they emit for the first fetch of the associated `LazyLoadConfiguration`.
-      3. `LazyLoadConfiguration` no longer holds a reference to the root object. If no tags depend on the root Configuration, it will be free (`!Sub` is an example of a tag that holds a reference to the root Configuration until it is run).
+      3. `LazyLoadConfiguration` no longer holds a reference to the root object. If no tags depend on the root Configuration, it will be free (`!Ref` is an example of a tag that holds a reference to the root Configuration until it is run).
          - If an exception occurs, the root Configuration is unavoidable caught in the frame.
 3. **Fetching a Lazy Tag**:
    1. Upon first get of the `LazyEval` object, the underlying function is called.
@@ -145,7 +145,7 @@ This means that a deep copy of a `Configuration` can share state with the origin
 
 ### Summary Table
 
-<!--If you are reading this markdown raw with word wrap, this table is not for you. See the list based documentation.-->
+<!--If you are reading this markdown raw with word wrap, this table is not for you. See the list based documentation for an easier read.-->
 
 |                 Category                 |                                  Tag                                   |           Argument            |                                                                                                   Usage                                                                                                    |
 | :--------------------------------------: | :--------------------------------------------------------------------: | :---------------------------: | :--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------: |
@@ -196,12 +196,12 @@ This means that a deep copy of a `Configuration` can share state with the origin
       - If variable does not exist, interpolate the text after `:+`.
       - Note: specifier is `:+`.
     - `${$.json.path.expression}`: Replaced by the object in the configuration specified in JSON Path syntax.
-      - Paths must start at full root of configuration, using `$` as the first character.
+      - Paths must start at full root of the configuration, using `$` as the first character.
       - Results:
         - Referencing only strings is recommended. However, paths that return `Mapping` or `Sequence` will be `repr`-ed. Other objects will be `str`-ed.
         - Paths that do not exist raise `JSONPathQueryFailed`.
     - `${/json/pointer/expression}`: Replaced by the object in the configuration specified in JSON Path syntax.
-      - Paths must start at full root of configuration, using `/` as the first character.
+      - Paths must start at full root of the configuration, using `/` as the first character.
       - Results:
         - Referencing only strings is recommended. However, paths that return `Mapping` or `Sequence` will be `repr`-ed. Other objects will be `str`-ed.
         - Paths that do not exist raise `JSONPointerQueryFailed`.
@@ -212,9 +212,10 @@ This means that a deep copy of a `Configuration` can share state with the origin
       - `!Sub ${&#x24;&#40;&#41;}` produces `$()`
       - `!Sub ${&#x24;&#91;&#93;}` produces `$[]`
     - Notes:
-      - `${...}` is greedy and does not support nesting.
+      - `${...}` is greedy and does not support nesting (i.e. `!Sub ${${}}` sees `${` as the inner expression).
       - Modes other than `:-` and `:+` are reserved and throw `InterpolationSyntaxError`. Use `::` to for escaping colons in environment variable names.
       - `$(...)` and `$[...]` are reserved future for use and will warn with `InterpolationWarning` if used.
+      - `!Sub` checks if there is an JSON Path or JSON Pointer expression before keeping a reference to the root of the configuration.
       - ⚠️ JSON Path and JSON Pointer can be used to cause infinite loops and/or a `RecursionError`.
 
 - `!Env` <a id="tag-Env"></a>
