@@ -214,7 +214,7 @@ This means that a deep copy of a `Configuration` can share state with the origin
     - Notes:
       - `${...}` is greedy and does not support nesting (i.e. `!Sub ${${}}` sees `${` as the inner expression).
       - Modes other than `:-` and `:+` are reserved and throw `InterpolationSyntaxError`. Use `::` to for escaping colons in environment variable names.
-      - `$(...)` and `$[...]` are reserved future for use and will warn with `InterpolationWarning` if used.
+      - `$(...)` is reserved future for use and will warn with `InterpolationWarning` if used.
       - `!Sub` checks if there is an JSON Path or JSON Pointer expression before keeping a reference to the root of the configuration.
       - ⚠️ JSON Path and JSON Pointer can be used to cause infinite loops and/or a `RecursionError`.
 

@@ -91,12 +91,6 @@ def test_round_brackets_produces_a_warning() -> None:
         assert loads(test_data) == "$($.help)"
 
 
-def test_square_brackets_produces_a_warning() -> None:
-    test_data = "!Sub $[$.help]"
-    with pytest.warns(InterpolationWarning, match=re.escape("$[]")):
-        assert loads(test_data) == "$[$.help]"
-
-
 def test_get_dollar_sign_from_dollar_sign() -> None:
     test_data = "!Sub ${$}{VAR}"
     with patch.dict(os.environ, values={}):

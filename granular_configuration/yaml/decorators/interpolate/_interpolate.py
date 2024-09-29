@@ -62,14 +62,8 @@ def round_sub(root: Root, *, contents: str) -> str:
     return "$(" + contents + ")"
 
 
-def square_sub(root: Root, *, contents: str) -> str:
-    warnings.warn("`!Sub $[]` is reserved", InterpolationWarning)
-    return "$[" + contents + "]"
-
-
 SUB_PATTERNS: typ.Final[typ.Sequence[tuple[typ.Callable, typ.Pattern[str]]]] = (
     (round_sub, re.compile(r"(\$\((?P<contents>.*?)\))")),
-    (square_sub, re.compile(r"(\$\[(?P<contents>.*?)\])")),
     (curly_sub, re.compile(r"(\$\{(?P<contents>.*?)\})")),
 )
 
