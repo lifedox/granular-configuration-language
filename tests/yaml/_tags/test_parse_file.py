@@ -2,8 +2,8 @@ from pathlib import Path
 
 import pytest
 
-from granular_configuration import LazyLoadConfiguration
-from granular_configuration.yaml import loads
+from granular_configuration_language import LazyLoadConfiguration
+from granular_configuration_language.yaml import loads
 
 ASSET_DIR = (Path(__file__).parent / "../../assets/" / "merging_and_parsefile").resolve()
 

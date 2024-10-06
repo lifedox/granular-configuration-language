@@ -1,4 +1,4 @@
-from granular_configuration.yaml import Placeholder, loads
+from granular_configuration_language.yaml import Placeholder, loads
 
 
 def test_placeholder_value_and_message() -> None:

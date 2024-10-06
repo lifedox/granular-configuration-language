@@ -3,7 +3,7 @@ from unittest.mock import patch
 
 import pytest
 
-from granular_configuration.yaml import loads
+from granular_configuration_language.yaml import loads
 
 
 def test_string_tag_does_not_take_sequence() -> None:

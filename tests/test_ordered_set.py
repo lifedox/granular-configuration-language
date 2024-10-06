@@ -1,6 +1,6 @@
 from itertools import combinations
 
-from granular_configuration._utils import OrderedSet
+from granular_configuration_language._utils import OrderedSet
 
 
 def test_order_is_maintained() -> None:

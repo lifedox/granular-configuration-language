@@ -1,4 +1,4 @@
-from granular_configuration.base_path import read_base_path
+from granular_configuration_language.base_path import read_base_path
 
 
 def test_string_singular() -> None:

@@ -1,2 +1,2 @@
-include granular_configuration/*.pyi
-include granular_configuration/py.typed
+include granular_configuration_language/*.pyi
+include granular_configuration_language/py.typed

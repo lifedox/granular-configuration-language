@@ -5,9 +5,9 @@ from unittest.mock import AsyncMock, MagicMock, patch
 
 import pytest
 
-from granular_configuration import LazyLoadConfiguration, MutableLazyLoadConfiguration
-from granular_configuration._lazy_load import Locations
-from granular_configuration.exceptions import (
+from granular_configuration_language import LazyLoadConfiguration, MutableLazyLoadConfiguration
+from granular_configuration_language._lazy_load import Locations
+from granular_configuration_language.exceptions import (
     EnvironmentVaribleNotFound,
     ErrorWhileLoadingFileOccurred,
     IniUnsupportedError,
@@ -18,9 +18,9 @@ ASSET_DIR = (Path(__file__).parent / "assets" / "test_lazy_config").resolve()
 
 
 def build_configuration_pach() -> AbstractContextManager[AsyncMock | MagicMock]:
-    from granular_configuration._cache import build_configuration
+    from granular_configuration_language._cache import build_configuration
 
-    return patch("granular_configuration._cache.build_configuration", side_effect=build_configuration)
+    return patch("granular_configuration_language._cache.build_configuration", side_effect=build_configuration)
 
 
 class TestLaziness:

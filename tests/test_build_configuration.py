@@ -3,10 +3,10 @@ from pathlib import Path
 
 import pytest
 
-from granular_configuration import Configuration
-from granular_configuration._build import build_configuration
-from granular_configuration.exceptions import PlaceholderConfigurationError
-from granular_configuration.yaml import Placeholder
+from granular_configuration_language import Configuration
+from granular_configuration_language._build import build_configuration
+from granular_configuration_language.exceptions import PlaceholderConfigurationError
+from granular_configuration_language.yaml import Placeholder
 
 ASSET_DIR = (Path(__file__).parent / "assets" / "test_build_configuration").resolve()
 

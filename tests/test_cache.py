@@ -5,13 +5,13 @@ from weakref import WeakValueDictionary
 
 import pytest
 
-from granular_configuration import LazyLoadConfiguration
-from granular_configuration.exceptions import EnvironmentVaribleNotFound, InvalidBasePathException
+from granular_configuration_language import LazyLoadConfiguration
+from granular_configuration_language.exceptions import EnvironmentVaribleNotFound, InvalidBasePathException
 
 ASSET_DIR = (Path(__file__).parent / "assets" / "test_cache").resolve()
 
 
-@patch("granular_configuration._cache.store", new_callable=WeakValueDictionary)
+@patch("granular_configuration_language._cache.store", new_callable=WeakValueDictionary)
 def test_shared_config(store: WeakValueDictionary) -> None:
     c1 = LazyLoadConfiguration(ASSET_DIR / "simple.yaml")
     c2 = LazyLoadConfiguration(ASSET_DIR / "simple.yaml")
@@ -29,7 +29,7 @@ def test_shared_config(store: WeakValueDictionary) -> None:
     assert c2.config == {"a": 1}
 
 
-@patch("granular_configuration._cache.store", new_callable=WeakValueDictionary)
+@patch("granular_configuration_language._cache.store", new_callable=WeakValueDictionary)
 def test_shared_config_with_good_base_paths(store: WeakValueDictionary) -> None:
     c1 = LazyLoadConfiguration(ASSET_DIR / "1_level.yaml", base_path="a")
     c2 = LazyLoadConfiguration(ASSET_DIR / "1_level.yaml", base_path="c")
@@ -48,7 +48,7 @@ def test_shared_config_with_good_base_paths(store: WeakValueDictionary) -> None:
     assert c2.config == {"d": 2}
 
 
-@patch("granular_configuration._cache.store", new_callable=WeakValueDictionary)
+@patch("granular_configuration_language._cache.store", new_callable=WeakValueDictionary)
 def test_shared_config_with_a_good_and_a_bad_base_path(store: WeakValueDictionary) -> None:
     c1 = LazyLoadConfiguration(ASSET_DIR / "1_level.yaml", base_path="a")
     c2 = LazyLoadConfiguration(ASSET_DIR / "1_level.yaml", base_path="does_not_exist_path")
@@ -67,7 +67,7 @@ def test_shared_config_with_a_good_and_a_bad_base_path(store: WeakValueDictionar
     assert c1.config == {"b": 1}
 
 
-@patch("granular_configuration._cache.store", new_callable=WeakValueDictionary)
+@patch("granular_configuration_language._cache.store", new_callable=WeakValueDictionary)
 def test_shared_config_with_base_base_paths(store: WeakValueDictionary) -> None:
     c1 = LazyLoadConfiguration(ASSET_DIR / "1_level.yaml", base_path="does_not_exist_path1")
     c2 = LazyLoadConfiguration(ASSET_DIR / "1_level.yaml", base_path="does_not_exist_path2")
@@ -85,7 +85,7 @@ def test_shared_config_with_base_base_paths(store: WeakValueDictionary) -> None:
     assert len(store) == 1, repr(dict(store))
 
 
-@patch("granular_configuration._cache.store", new_callable=WeakValueDictionary)
+@patch("granular_configuration_language._cache.store", new_callable=WeakValueDictionary)
 def test_shared_config_when_disable_caching(store: WeakValueDictionary) -> None:
     c1 = LazyLoadConfiguration(ASSET_DIR / "simple.yaml", disable_caching=True)
     c2 = LazyLoadConfiguration(ASSET_DIR / "simple.yaml", disable_caching=True)
@@ -104,7 +104,7 @@ def test_shared_config_when_disable_caching(store: WeakValueDictionary) -> None:
     assert c2.config == {"a": 1}
 
 
-@patch("granular_configuration._cache.store", new_callable=WeakValueDictionary)
+@patch("granular_configuration_language._cache.store", new_callable=WeakValueDictionary)
 def test_shared_config_EnvironmentVaribleNotFound_error(store: WeakValueDictionary) -> None:
     with patch.dict(os.environ, values={}):
         c1 = LazyLoadConfiguration(ASSET_DIR / "env.yaml", base_path="good")

@@ -1,4 +1,4 @@
-from granular_configuration.yaml import loads
+from granular_configuration_language.yaml import loads
 
 
 def test_mapping_of_any_tag_takes_mapping() -> None:

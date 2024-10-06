@@ -1,5 +1,5 @@
-from granular_configuration import Masked
-from granular_configuration.yaml import loads
+from granular_configuration_language import Masked
+from granular_configuration_language.yaml import loads
 
 
 def test_mask() -> None:

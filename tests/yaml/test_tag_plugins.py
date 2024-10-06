@@ -2,9 +2,9 @@ import typing as typ
 
 import pytest
 
-from granular_configuration.exceptions import ErrorWhileLoadingTags
-from granular_configuration.yaml._tags import handlers
-from granular_configuration.yaml.decorators._tag_loader import TagConstructor, TagSet, load_tags
+from granular_configuration_language.exceptions import ErrorWhileLoadingTags
+from granular_configuration_language.yaml._tags import handlers
+from granular_configuration_language.yaml.decorators._tag_loader import TagConstructor, TagSet, load_tags
 
 
 def test_singletonness() -> None:
@@ -41,9 +41,9 @@ def test_pretty() -> None:
         tags.pretty()
         == """\
 TagSet{
-  '!Del': 'str [NOT-LAZY] (granular_configuration.yaml._tags._del.handler)',
-  '!Merge': 'list[Any] (granular_configuration.yaml._tags._merge.handler)',
-  '!Sub': 'str [interpolates] (granular_configuration.yaml._tags._sub.handler)',
-  '!UUID': 'str [interpolates-reduced] (granular_configuration.yaml._tags._uuid.handler)'
+  '!Del': 'str [NOT-LAZY] (granular_configuration_language.yaml._tags._del.handler)',
+  '!Merge': 'list[Any] (granular_configuration_language.yaml._tags._merge.handler)',
+  '!Sub': 'str [interpolates] (granular_configuration_language.yaml._tags._sub.handler)',
+  '!UUID': 'str [interpolates-reduced] (granular_configuration_language.yaml._tags._uuid.handler)'
 }"""
     )

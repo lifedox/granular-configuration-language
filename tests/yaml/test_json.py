@@ -3,7 +3,7 @@ from collections import UserDict, deque
 
 import pytest
 
-from granular_configuration._json import dumps
+from granular_configuration_language._json import dumps
 
 
 def test_general_mapping_can_be_dumped() -> None:

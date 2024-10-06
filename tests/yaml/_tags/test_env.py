@@ -3,8 +3,8 @@ from unittest.mock import patch
 
 import pytest
 
-from granular_configuration.exceptions import EnvironmentVaribleNotFound
-from granular_configuration.yaml import loads
+from granular_configuration_language.exceptions import EnvironmentVaribleNotFound
+from granular_configuration_language.yaml import loads
 
 
 def test_loading_from_environment() -> None:

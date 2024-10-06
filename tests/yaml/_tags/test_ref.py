@@ -1,8 +1,8 @@
 import pytest
 
-from granular_configuration import Configuration
-from granular_configuration.exceptions import JSONPathQueryFailed, JSONPointerQueryFailed, RefMustStartFromRoot
-from granular_configuration.yaml import loads
+from granular_configuration_language import Configuration
+from granular_configuration_language.exceptions import JSONPathQueryFailed, JSONPointerQueryFailed, RefMustStartFromRoot
+from granular_configuration_language.yaml import loads
 
 
 def test_ref__jsonpath() -> None:

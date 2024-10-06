@@ -22,6 +22,6 @@ RUN poetry install --no-root
 # For testing entry-points/plugins, an install is needed
 # Doing it seperating from the --no-rooot install to have Docker cache the virtualenv
 # and then quickly append the dist-info every change
-COPY --chown=granular:granular granular_configuration/ /app/granular_configuration/
+COPY --chown=granular:granular granular_configuration_language/ /app/granular_configuration_language/
 
 RUN poetry install

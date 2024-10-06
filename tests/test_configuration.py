@@ -6,9 +6,9 @@ import typing as typ
 
 import pytest
 
-from granular_configuration import Configuration, MutableConfiguration
-from granular_configuration._s import setter_secret
-from granular_configuration.yaml import LazyEval, Placeholder, loads
+from granular_configuration_language import Configuration, MutableConfiguration
+from granular_configuration_language._s import setter_secret
+from granular_configuration_language.yaml import LazyEval, Placeholder, loads
 
 
 def test_private_set_is_protected() -> None:

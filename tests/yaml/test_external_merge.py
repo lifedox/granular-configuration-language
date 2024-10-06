@@ -1,6 +1,6 @@
 from pathlib import Path
 
-from granular_configuration import LazyLoadConfiguration, merge
+from granular_configuration_language import LazyLoadConfiguration, merge
 
 ASSET_DIR = (Path(__file__).parent / "../assets/" / "merging_and_parsefile").resolve()
 

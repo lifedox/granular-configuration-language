@@ -2,8 +2,8 @@ import os
 from datetime import date, datetime, timedelta, timezone
 from unittest.mock import patch
 
-from granular_configuration._json import dumps
-from granular_configuration.yaml import loads
+from granular_configuration_language._json import dumps
+from granular_configuration_language.yaml import loads
 
 
 def test_date() -> None:

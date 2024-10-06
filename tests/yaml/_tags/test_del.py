@@ -1,4 +1,4 @@
-from granular_configuration.yaml import loads
+from granular_configuration_language.yaml import loads
 
 
 def test_del_removes_key() -> None:

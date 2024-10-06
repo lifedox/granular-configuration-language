@@ -4,15 +4,15 @@ from unittest.mock import patch
 
 import pytest
 
-from granular_configuration import Configuration
-from granular_configuration.exceptions import (
+from granular_configuration_language import Configuration
+from granular_configuration_language.exceptions import (
     EnvironmentVaribleNotFound,
     InterpolationSyntaxError,
     InterpolationWarning,
     JSONPathOnlyWorksOnMappings,
     JSONPathQueryFailed,
 )
-from granular_configuration.yaml import loads
+from granular_configuration_language.yaml import loads
 
 
 def test_loading_env_var() -> None:

@@ -4,8 +4,8 @@ from unittest.mock import Mock, patch
 
 import pytest
 
-from granular_configuration import Configuration
-from granular_configuration.yaml import LazyEval, loads
+from granular_configuration_language import Configuration
+from granular_configuration_language.yaml import LazyEval, loads
 
 
 def test_supported_key_types() -> None:

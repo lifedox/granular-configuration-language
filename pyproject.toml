@@ -3,12 +3,12 @@ requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
 
 [tool.poetry]
-name = "granular-configuration"
+name = "granular-configuration-language"
 version = "2.0.0"
 description = ""
 authors = ["Eric Jensen <lifedox@live.com>"]
 readme = "README.md"
-packages = [{ include = "granular_configuration" }]
+packages = [{ include = "granular_configuration_language" }]
 
 [tool.poetry.dependencies]
 python = "^3.10"
@@ -27,8 +27,8 @@ black = "*"
 isort = "*"
 bandit = "*"
 
-[tool.poetry.plugins.gc20tag]
-"official_extra" = "granular_configuration.yaml._tags.func_and_class"
+[tool.poetry.plugins.granular-configuration-language-20-tag]
+"official_extra" = "granular_configuration_language.yaml._tags.func_and_class"
 
 [tool.black]
 line-length = 120
@@ -56,7 +56,7 @@ use_parentheses = true
 include_trailing_comma = true
 line_length = 120
 skip = []
-known_first_party = ["granular_configuration"]
+known_first_party = ["granular_configuration_language"]
 default_section = "THIRDPARTY"
 sections = ["FUTURE", "STDLIB", "THIRDPARTY", "FIRSTPARTY", "LOCALFOLDER"]
 
@@ -66,7 +66,7 @@ testpaths = ["tests"]
 addopts = '''
   -ra
   --cov-config=pyproject.toml
-  --cov=granular_configuration
+  --cov=granular_configuration_language
   --cov-report term-missing
   --verbose
   --durations 0

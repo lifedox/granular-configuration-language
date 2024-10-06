@@ -5,9 +5,9 @@ from unittest.mock import patch
 
 import pytest
 
-from granular_configuration import Configuration
-from granular_configuration.exceptions import EnvironmentVaribleNotFound, ParseEnvParsingError
-from granular_configuration.yaml import loads
+from granular_configuration_language import Configuration
+from granular_configuration_language.exceptions import EnvironmentVaribleNotFound, ParseEnvParsingError
+from granular_configuration_language.yaml import loads
 
 
 def test_scalar__string() -> None:

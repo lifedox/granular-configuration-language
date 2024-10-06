@@ -2,7 +2,7 @@ import typing as typ
 from itertools import permutations
 from pathlib import Path
 
-from granular_configuration._locations import Locations
+from granular_configuration_language._locations import Locations
 
 ASSET_DIR = (Path(__file__).parent / "assets" / "test_locations").resolve()
 

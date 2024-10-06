@@ -1,10 +1,10 @@
-# `a-granular-configuration`
+# `granular-configuration-language`
 
 [TOC]
 
 ## Why does this exist?
 
-This library exists to allow your code use YAML as a configuration language for internal and external parties. With added YAML Tags to allow configuration to be crafted from multiple sources.
+This library exists to allow your code use YAML as a configuration language for internal and external parties, with added YAML Tags to allow configuration to be crafted from multiple sources.
 
 Some use cases:
 
@@ -64,7 +64,7 @@ Some use cases:
     - Server deploy:
       ```yaml
       app:
-        log_to: !Sub file://var/log/${app.log_as}.log
+        log_to: !Sub file://var/log/${$.app.log_as}.log
       ```
 - You are writing a `pytest` plugin that create test data using named fixtures configured by the user.
   - Conceptual Examples:
