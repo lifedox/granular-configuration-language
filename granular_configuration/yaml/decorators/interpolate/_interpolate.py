@@ -46,7 +46,7 @@ def _get_env_var_string(root: Root, contents: str) -> str:
 
 def curly_sub(root: Root, *, contents: str) -> str:
     if contents == "":
-        raise InterpolationSyntaxError('"${}"" is not a supported environment variable interpolation syntax.')
+        raise InterpolationSyntaxError('Empty expression ("${}" or "${...:+}") is not a supported environment variable interpolation syntax.')
     elif contents == "$":
         return "$"
     elif root and contents.startswith("$") or contents.startswith("/"):
