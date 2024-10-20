@@ -1,7 +1,7 @@
 import typing as typ
 from pathlib import Path
 
-from granular_configuration_language._config import Configuration, MutableConfiguration
+from granular_configuration_language._configuration import Configuration, MutableConfiguration
 from granular_configuration_language.yaml.classes import LazyEval, LazyRoot, LoadOptions, StateHolder
 from granular_configuration_language.yaml.load._handler import load_yaml_string
 

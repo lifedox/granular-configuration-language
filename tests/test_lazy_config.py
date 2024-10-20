@@ -6,7 +6,7 @@ from unittest.mock import AsyncMock, MagicMock, patch
 import pytest
 
 from granular_configuration_language import LazyLoadConfiguration, MutableLazyLoadConfiguration
-from granular_configuration_language._lazy_load import Locations
+from granular_configuration_language._lazy_load_configuration import Locations
 from granular_configuration_language.exceptions import (
     EnvironmentVaribleNotFound,
     ErrorWhileLoadingFileOccurred,

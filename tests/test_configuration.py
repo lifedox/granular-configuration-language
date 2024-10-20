@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import copy
+import gc
 import re
 import typing as typ
 
@@ -224,6 +225,25 @@ e: !Ref $.a
     assert str(test.e._Configuration__attribute_name) == "$.e"
     assert str(test.a.b.c._Configuration__attribute_name) == "$.a.b.c"
     assert str(test.e.b.c._Configuration__attribute_name) == "$.e.b.c"
+
+
+def test_attribute_name_is_weakly_referenced() -> None:
+    test: Configuration = loads(
+        """
+a:
+  b:
+    c:
+      d:
+e: !Ref $.a
+          """
+    )
+
+    new_root = test.a.b.c
+
+    del test
+    gc.collect()
+
+    assert str(new_root._Configuration__attribute_name) == "c"
 
 
 def test_evalute_all_run_all_LazyEval() -> None:

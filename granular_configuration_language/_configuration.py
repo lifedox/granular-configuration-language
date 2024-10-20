@@ -4,8 +4,8 @@ import copy
 import json
 import sys
 import typing as typ
-import weakref
 from itertools import starmap
+from weakref import ReferenceType, ref
 
 from granular_configuration_language._s import setter_secret
 from granular_configuration_language.base_path import BasePathPart
@@ -28,28 +28,38 @@ if sys.version_info >= (3, 11) or typ.TYPE_CHECKING:
 
 
 class AttributeName(typ.Iterable[str]):
-    __slots__ = ("__prev", "__name", "__weakref__")
+    __slots__ = ("__prev", "__explicit_prev", "__name", "__weakref__")
 
-    def __init__(self, prev: AttributeName | typ.Iterable[str], name: typ.Any) -> None:
+    def __init__(
+        self,
+        name: typ.Any,
+        *,
+        prev: ReferenceType[AttributeName] | None = None,
+        explicit_prev: typ.Iterable[str] = tuple(),
+    ) -> None:
         self.__prev = prev
+        self.__explicit_prev = explicit_prev
         self.__name = name
 
     @staticmethod
     def as_root() -> AttributeName:
-        return AttributeName(tuple(), "$")
+        return AttributeName("$", explicit_prev=tuple())
 
     def append_suffix(self, name: typ.Any) -> AttributeName:
-        return AttributeName(weakref.proxy(self), name)
+        return AttributeName(name, prev=ref(self))
 
     def with_suffix(self, name: typ.Any) -> str:
         return ".".join(self._plus_one(name))
 
     def __iter__(self) -> typ.Iterator[str]:
-        yield from self.__prev
+        if self.__prev:
+            yield from self.__prev() or tuple()
+        else:
+            yield from self.__explicit_prev
         yield self.__name if isinstance(self.__name, str) else f"`{repr(self.__name)}`"
 
     def _plus_one(self, last: str) -> typ.Iterator[str]:
-        yield from iter(self)
+        yield from self
         yield last if isinstance(last, str) else f"`{repr(last)}`"
 
     def __str__(self) -> str:

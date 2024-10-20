@@ -7,7 +7,7 @@ from functools import cached_property
 from itertools import chain
 
 from granular_configuration_language._cache import NoteOfIntentToRead, prepare_to_load_configuration
-from granular_configuration_language._config import Configuration, MutableConfiguration
+from granular_configuration_language._configuration import Configuration, MutableConfiguration
 from granular_configuration_language._locations import Locations, PathOrStr
 from granular_configuration_language.exceptions import ErrorWhileLoadingConfig
 
