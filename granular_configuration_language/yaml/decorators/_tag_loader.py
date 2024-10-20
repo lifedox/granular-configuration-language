@@ -5,7 +5,7 @@ from importlib import import_module
 from importlib.metadata import entry_points
 from importlib.util import resolve_name
 from itertools import chain, filterfalse
-from operator import attrgetter
+from operator import attrgetter, itemgetter
 from pathlib import Path
 from pprint import pformat
 
@@ -13,26 +13,27 @@ from granular_configuration_language.exceptions import ErrorWhileLoadingTags
 from granular_configuration_language.yaml.decorators._base import Tag, TagConstructor
 from granular_configuration_language.yaml.decorators._tag_tracker import is_not_lazy, is_with_ref, is_without_ref
 
+ModuleName = typ.NewType("ModuleName", str)
+PluginName = typ.NewType("PluginName", str)
+
 
 def is_TagConstructor(obj: typ.Any) -> typ.TypeGuard[TagConstructor]:
     return isinstance(obj, TagConstructor)
 
 
-def get_tags(module_name: str) -> typ.Iterator[TagConstructor]:
-    module = import_module(module_name)
-    for _, member in inspect.getmembers(module, is_TagConstructor):
-        yield member
+def get_tags_in_module(module_name: ModuleName) -> typ.Iterator[TagConstructor]:
+    return map(itemgetter(1), inspect.getmembers(import_module(module_name), is_TagConstructor))
 
 
-def get_internal_tag_plugins() -> typ.Iterator[str]:
+def get_internal_tag_plugins() -> typ.Iterator[ModuleName]:
     import granular_configuration_language.yaml._tags as tags
 
     tags_package = tags.__package__
     tags_module_path = Path(tags.__file__).parent
-    private_sub_module_regex = r"_[a-zA-Z]*.py"
+    private_sub_module_pattern = r"_[a-zA-Z]*.py"
 
-    def get_abs_name(module_name: str) -> str:
-        return resolve_name("." + module_name, package=tags_package)
+    def get_abs_name(module_name: str) -> ModuleName:
+        return ModuleName(resolve_name("." + module_name, package=tags_package))
 
     return map(
         get_abs_name,
@@ -40,17 +41,17 @@ def get_internal_tag_plugins() -> typ.Iterator[str]:
             None,
             map(
                 inspect.getmodulename,
-                tags_module_path.glob(private_sub_module_regex),
+                tags_module_path.glob(private_sub_module_pattern),
             ),
         ),
     )
 
 
-def get_external_tag_plugins() -> typ.Iterator[tuple[str, str]]:
+def get_external_tag_plugins() -> typ.Iterator[tuple[PluginName, ModuleName]]:
     return map(attrgetter("name", "module"), entry_points(group="granular-configuration-language-20-tag"))
 
 
-def get_all_tag_plugins(*, disable_plugin: typ.Collection[str] = tuple()) -> typ.Iterator[str]:
+def get_all_tag_plugins(*, disable_plugin: typ.AbstractSet[str]) -> typ.Iterator[ModuleName]:
     for module in get_internal_tag_plugins():
         yield module
 
@@ -112,12 +113,12 @@ class TagSet(typ.Iterable[TagConstructor], typ.Container[str]):
 
 def load_tags(
     *,
-    disable_plugin: typ.Collection[str] = tuple(),
-    disable_tag: typ.Collection[Tag | str] = tuple(),
+    disable_plugin: typ.AbstractSet[str] = frozenset(),
+    disable_tag: typ.AbstractSet[Tag | str] = frozenset(),
 ) -> TagSet:
     return TagSet(
         filterfalse(
             disable_tag.__contains__,
-            chain.from_iterable(map(get_tags, get_all_tag_plugins(disable_plugin=disable_plugin))),
+            chain.from_iterable(map(get_tags_in_module, get_all_tag_plugins(disable_plugin=disable_plugin))),
         )
     )

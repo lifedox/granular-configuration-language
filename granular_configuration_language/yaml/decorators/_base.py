@@ -23,6 +23,9 @@ class TagConstructor:
             isinstance(value, str) and self.tag == value
         )
 
+    def __hash__(self) -> int:
+        return hash(self.tag)
+
     def __call__(self, constructor: typ.Type[SafeConstructor], state: StateHolder) -> None:
         return self.constructor(constructor, state)
 

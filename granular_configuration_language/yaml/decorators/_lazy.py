@@ -38,12 +38,12 @@ def as_lazy_with_root(
 
 @typ.overload
 def as_lazy_with_root(
-    *, needs_root_check: typ.Callable[[_T], bool]
+    *, needs_root_condition: typ.Callable[[_T], bool]
 ) -> typ.Callable[[typ.Callable[[_T, Root], _RT]], typ.Callable[[Tag, _T, StateHolder], LazyEval[_RT]]]: ...
 
 
 def as_lazy_with_root(
-    func: typ.Callable[[_T, Root], _RT] | None = None, *, needs_root_check: typ.Callable[[_T], bool] | None = None
+    func: typ.Callable[[_T, Root], _RT] | None = None, *, needs_root_condition: typ.Callable[[_T], bool] | None = None
 ) -> (
     typ.Callable[[Tag, _T, StateHolder], LazyEval[_RT]]
     | typ.Callable[[typ.Callable[[_T, Root], _RT]], typ.Callable[[Tag, _T, StateHolder], LazyEval[_RT]]]
@@ -54,7 +54,7 @@ def as_lazy_with_root(
         @wraps(func)
         def lazy_wrapper(tag: Tag, value: _T, state: StateHolder) -> LazyEval[_RT]:
 
-            if (needs_root_check is None) or needs_root_check(value):
+            if (needs_root_condition is None) or needs_root_condition(value):
                 return LazyEvalWithRoot(tag, state.lazy_root_obj, lambda root: func(value, root))
             else:
                 return LazyEvalBasic(tag, lambda: func(value, None))

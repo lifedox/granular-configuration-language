@@ -23,7 +23,10 @@ def test_func_loads_function() -> None:
 
 def test_class_loads_class() -> None:
     assert loads("!Class granular_configuration_language.Masked") is Masked
-    assert dumps(loads("!Class granular_configuration_language.Masked")) == '"<granular_configuration_language.yaml.classes.Masked>"'
+    assert (
+        dumps(loads("!Class granular_configuration_language.Masked"))
+        == '"<granular_configuration_language.yaml.classes.Masked>"'
+    )
 
 
 def test_loading_something_that_does_not_throw_exception() -> None:

@@ -13,4 +13,7 @@ from granular_configuration_language.yaml.decorators._type_checking import (
     string_or_twople_tag,
     string_tag,
 )
-from granular_configuration_language.yaml.decorators.interpolate import interpolate_value_with_ref, interpolate_value_without_ref
+from granular_configuration_language.yaml.decorators.interpolate import (
+    interpolate_value_with_ref,
+    interpolate_value_without_ref,
+)

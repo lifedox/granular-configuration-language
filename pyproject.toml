@@ -6,7 +6,7 @@ build-backend = "poetry.core.masonry.api"
 name = "granular-configuration-language"
 version = "2.0.0"
 description = ""
-authors = ["Eric Jensen <lifedox@live.com>"]
+authors = ["Eric Jensen <eric.jensen42@gmail.com>"]
 readme = "README.md"
 packages = [{ include = "granular_configuration_language" }]
 
@@ -98,8 +98,8 @@ ignore_missing_imports = true
 no_implicit_optional = true
 strict_equality = true
 warn_redundant_casts = true
-# ↓ Pylance needs help ↓
-warn_unused_ignores = false
+# ↓ If Pylance needs help change to false ↓
+warn_unused_ignores = true
 warn_unused_configs = true
 
 [tool.ruff]

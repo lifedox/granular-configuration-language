@@ -74,14 +74,14 @@ class LazyEval(abc.ABC, typ.Generic[_RT]):
             return result
 
     @cached_property
-    def result(self) -> _RT:
+    def result(self) -> _RT | typ.Any:
         """
         Result of LazyEval, completing any chains
         """
         result = self.__run()
         while isinstance(result, LazyEval):
             result = result.__run()
-        return result  # type: ignore
+        return result
 
     def __repr__(self) -> str:
         return f"<{self.__class__.__name__}: {self.tag}>"
