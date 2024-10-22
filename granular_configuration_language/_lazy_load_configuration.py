@@ -17,7 +17,7 @@ def _read_locations(
     use_env_location: bool,
     env_location_var_name: str,
 ) -> Locations:
-    if use_env_location and (env_location_var_name in os.environ):
+    if (use_env_location or (env_location_var_name != "G_CONFIG_LOCATION")) and (env_location_var_name in os.environ):
         env_locs = os.environ[env_location_var_name].split(",")
         load_order_location = chain(load_order_location, env_locs)
     return Locations(load_order_location)
@@ -49,6 +49,7 @@ class LazyLoadConfiguration(Mapping):
             exists, it will be read a comma-delimited list of configuration path that will be appended
             to `load_order_location` list.
         - `env_location_var_name`: Used when `use_env_location` is True.
+            - Changing from the default value will set `use_env_location` to True
         - `mutable_configuration`:
             - When `False`: `Configuration` is used for mappings. `tuple` is used for sequences.
             - When `True`: `MutableConfiguration` is used for mappings. `list` is used for sequences.
@@ -133,6 +134,7 @@ class MutableLazyLoadConfiguration(LazyLoadConfiguration, MutableMapping):
             exists, it will be read a comma-delimited list of configuration path that will be appended
             to `load_order_location` list.
         - `env_location_var_name`: Used when `use_env_location` is True.
+            - Changing from the default value will set `use_env_location` to True
         """
         super().__init__(
             *load_order_location,

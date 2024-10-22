@@ -1,3 +1,4 @@
+import operator as op
 import os
 from contextlib import AbstractContextManager
 from pathlib import Path
@@ -15,6 +16,10 @@ from granular_configuration_language.exceptions import (
 )
 
 ASSET_DIR = (Path(__file__).parent / "assets" / "test_lazy_config").resolve()
+
+
+def as_env_var_list(*file_names: str) -> str:
+    return ",".join(map(op.methodcaller("as_posix"), map(ASSET_DIR.__truediv__, file_names)))
 
 
 def build_configuration_pach() -> AbstractContextManager[AsyncMock | MagicMock]:
@@ -82,7 +87,7 @@ def test_bad_base_path() -> None:
 
 
 def test_env() -> None:
-    env_path = (ASSET_DIR / "test_env_config.yaml").as_posix()
+    env_path = as_env_var_list("test_env_config.yaml")
 
     with patch.dict(os.environ, values={"G_CONFIG_LOCATION": env_path}):
         config = LazyLoadConfiguration(
@@ -93,10 +98,19 @@ def test_env() -> None:
 
 
 def test_env_list() -> None:
-    env_path = ",".join(((ASSET_DIR / "test_env_config.yaml").as_posix(), ((ASSET_DIR / "mix_config.yaml").as_posix())))
+    env_path = as_env_var_list("test_env_config.yaml", "mix_config.yaml")
 
     with patch.dict(os.environ, values={"G_CONFIG_LOCATION": env_path}):
         config = LazyLoadConfiguration(use_env_location=True)
+        assert config.A.key1 == "value1"
+        assert config.A.key2 == "MyTestValue"
+
+
+def test_changing_env_var_name_enables_env() -> None:
+    env_path = as_env_var_list("test_env_config.yaml", "mix_config.yaml")
+
+    with patch.dict(os.environ, values={"TEST_G_CONFIG_LOCATION": env_path}):
+        config = LazyLoadConfiguration(env_location_var_name="TEST_G_CONFIG_LOCATION")
         assert config.A.key1 == "value1"
         assert config.A.key2 == "MyTestValue"
 
