@@ -39,7 +39,7 @@ Some use cases:
             location: http://somewhere
             user: !Mask ${DB_USERNAME}
             password: !Mask ${DB_PASSWORD}
-        ```
+      ```
 - You are deploying an application that has multiple deployment types with specific settings.
   - Conceptual Example:
     - Library Code:
@@ -91,6 +91,62 @@ Some use cases:
           fixture1:
             api: does something
       ```
+
+---
+
+## Defining a Configuration
+
+Configuration is always defined by constructing a `LazyLoadConfiguration` and providing the paths to possible files. Paths can be strings or `pathlib.Path` objects.
+
+Examples:
+
+- One-off library with three possible sources:
+  ```python
+  CONFIG = LazyLoadConfiguration(
+    Path(__file___).parent / "config.yaml",  # Defines the path 
+    "~/.config/really_cool_library_config.yaml",
+    "./really_cool_library_config.yaml",
+  )
+  ```
+  - Comments:
+    - fdg
+- Library that exists within an ecosystem/framework that shares configuration files:
+  ```python
+  CONFIG = LazyLoadConfiguration(
+    Path(__file___).parent / "config.yaml",
+    "~/.config/really_cool_library_config.yaml",
+    "./really_cool_library_config.yaml",
+    base_path="really_cool_library_config"
+  )
+  ```
+  - Notes:
+    - fdg
+- Library that exists within an ecosystem/framework that shares configuration files:
+  ```python
+  CONFIG = LazyLoadConfiguration(
+    Path(__file___).parent / "config.yaml",
+    "~/.config/really_cool_library_config.yaml",
+    "./really_cool_library_config.yaml",
+    base_path="really_cool_library_config"
+  )
+  ```
+  - Notes:
+    - fdg
+
+
+
+### Class Spec
+
+
+
+
+### Immutable vs. Mutable
+
+Originally `Configuration` sought to be a drop-in replacement for `dict`, so that `json.dumps` would just work. This goal has been given up on, as unmaintainable in version 2.0. With the `MutableMapping` interface of `dict` no longer required and cache adding, it was decided that a mutable configuration was dangerous and immutability should be the default.
+
+As such, `Configuration` and `LazyLoadConfiguration` were changed from `MutableMapping` to `Mapping` and loaded YAML sequences from changed from `list` to `tuple`/`Sequence` by default. Immutability makes them thread-safe, as well.
+
+For compatible mutable configuration support was added explicitly, as `MutableConfiguration` and `MutableLazyLoadConfiguration`. In mutable-mode, YAML sequences are loaded as `list`/`MutableSequence` and caching is disabled. Modifying a `MutableConfiguration` is not thread-safe. Apart from the added methods of `MutableMapping`, `MutableConfiguration` is identical to `Configuration` and `MutableLazyLoadConfiguration` is identical to `LazyLoadConfiguration`. Any documentation on `Configuration` or `LazyLoadConfiguration` applied to their mutable counterparts.
 
 ---
 

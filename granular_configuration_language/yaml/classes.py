@@ -97,11 +97,30 @@ class LazyEval(abc.ABC, typ.Generic[_RT]):
 
 @dataclass(frozen=True, kw_only=True)
 class LoadOptions:
+    """
+    Holds the parameters used when loading the configuration file
+    """
+
     obj_pairs_func: typ.Type[typ.Mapping]
+    """
+    Type being used for YAML mappings
+    """
     sequence_func: typ.Type[typ.Sequence]
+    """
+    Type being used for YAML sequences
+    """
     mutable: bool
+    """
+    Value of the mutable flag
+    """
     file_location: Path | None
+    """
+    Path of the file being loaded
+    """
     relative_to_directory: Path
+    """
+    Path for making relative file paths
+    """
 
 
 @dataclass(frozen=True, kw_only=True)
