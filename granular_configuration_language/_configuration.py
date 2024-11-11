@@ -143,8 +143,10 @@ class Configuration(typ.Mapping[typ.Any, typ.Any]):
 
     def __getattr__(self, name: str) -> typ.Any:
         """
-        Provides potentially cleaner path as an alternative to `__getitem__`.
-        Throws AttributeError instead of KeyError, as compared to `__getitem__` when an attribute is not present.
+        Provides a potentially cleaner path as an alternative to `__getitem__`.
+
+        Throws AttributeError instead of KeyError, as compared to `__getitem__`
+        when an attribute is not present.
 
         Args:
             name (str): Attribute name
@@ -242,7 +244,8 @@ class Configuration(typ.Mapping[typ.Any, typ.Any]):
         on Placeholders.
 
         Args:
-            default (Callable[[Any], Any] | None, optional): Replacement `default` factory. Defaults to None.
+            default (Callable[[Any], Any] | None, optional):
+                Replacement `default` factory. Defaults to None.
             **kwds (Any): Argments to be passed into `json.dumps`
 
         Returns:
@@ -295,7 +298,9 @@ class Configuration(typ.Mapping[typ.Any, typ.Any]):
         Args:
             type (Type[T]): Wanted typed
             key (Any): Key for wanted value
-            predicate (Callable[[Any], TypeGuard[T]]):  Replaces the `isinstance(value, type)` check with a custom method `predicate(value) -> bool`
+            predicate (Callable[[Any], TypeGuard[T]]):
+                Replaces the `isinstance(value, type)` check with a custom
+                method `predicate(value) -> bool`
 
         Raises:
             TypeError: If the real type is not an instance of the expected type
@@ -316,7 +321,9 @@ class Configuration(typ.Mapping[typ.Any, typ.Any]):
             type (Type[T]): Wanted typed
             key (Any): Key for wanted value
             default (T): Provides a default value like `dict.get`
-            predicate (Callable[[Any], TypeGuard[T]]):  Replaces the `isinstance(value, type)` check with a custom method `predicate(value) -> bool`
+            predicate (Callable[[Any], TypeGuard[T]]):
+                Replaces the `isinstance(value, type)` check with a custom
+                method `predicate(value) -> bool`
 
         Raises:
             TypeError: If the real type is not an instance of the expected type
@@ -334,7 +341,9 @@ class Configuration(typ.Mapping[typ.Any, typ.Any]):
             type (Type[T]): Wanted typed
             key (Any): Key for wanted value
             default (T, optional): Provides a default value like `dict.get`
-            predicate (Callable[[Any], TypeGuard[T]], optional):  Replaces the `isinstance(value, type)` check with a custom method `predicate(value) -> bool`
+            predicate (Callable[[Any], TypeGuard[T]], optional):
+                Replaces the `isinstance(value, type)` check with a custom
+                method `predicate(value) -> bool`
 
         Raises:
             TypeError: If the real type is not an instance of the expected type

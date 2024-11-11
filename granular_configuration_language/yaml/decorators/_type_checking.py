@@ -9,6 +9,14 @@ from granular_configuration_language.yaml.decorators._base import TagDecoratorBa
 class string_tag(TagDecoratorBase[str]):
     """
     A decorator factory for Tags that take a YAML string as argument.
+
+    Example:
+    ```python
+    @string_tag(Tag("!Tag"))
+    @as_lazy
+    def tag(value: str) -> Any:
+        ...
+    ```
     """
 
     Type: typ.TypeAlias = str
@@ -27,6 +35,14 @@ class string_tag(TagDecoratorBase[str]):
 class string_or_twople_tag(TagDecoratorBase[str | tuple[str, typ.Any]]):
     """
     A decorator factory for Tags that take a YAML string or tuple of a YAML strings and YAML object as argument.
+
+    Example:
+    ```python
+    @string_or_twople_tag(Tag("!Tag"))
+    @as_lazy
+    def tag(value: string_or_twople_tag.Type) -> Any:
+        ...
+    ```
     """
 
     Type: typ.TypeAlias = str | tuple[str, typ.Any]
@@ -46,7 +62,7 @@ class string_or_twople_tag(TagDecoratorBase[str | tuple[str, typ.Any]]):
 
     def sequence_node_transformer(self, value: typ.Any) -> Type:
         if len(value) == 2:
-            return tuple(value)
+            return value
         else:
             return value[0]
 
@@ -54,6 +70,14 @@ class string_or_twople_tag(TagDecoratorBase[str | tuple[str, typ.Any]]):
 class sequence_of_any_tag(TagDecoratorBase[typ.Sequence[typ.Any]]):
     """
     A decorator factory for Tags that take a YAML sequence as argument.
+
+    Example:
+    ```python
+    @sequence_of_any_tag(Tag("!Tag"))
+    @as_lazy
+    def tag(value: Sequence[Any]) -> Any:
+        ...
+    ```
     """
 
     Type: typ.TypeAlias = typ.Sequence[typ.Any]
@@ -72,6 +96,14 @@ class sequence_of_any_tag(TagDecoratorBase[typ.Sequence[typ.Any]]):
 class mapping_of_any_tag(TagDecoratorBase[Configuration]):
     """
     A decorator factory for Tags that take a YAML mapping as argument.
+
+    Example:
+    ```python
+    @mapping_of_any_tag(Tag("!Tag"))
+    @as_lazy
+    def tag(value: Configuration) -> Any:
+        ...
+    ```
     """
 
     Type: typ.TypeAlias = Configuration

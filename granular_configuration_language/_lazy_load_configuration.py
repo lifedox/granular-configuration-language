@@ -40,26 +40,31 @@ class LazyLoadConfiguration(Mapping):
         """
 
         Args:
-            *load_order_location (Path | str | os.PathLike): File path to configuration file
-            base_path (str | Sequence[str] | None, optional): Defines the subsection of the configuration file to use.
+            *load_order_location (Path | str | os.PathLike):
+                File path to configuration file
+            base_path (str | Sequence[str] | None, optional):
+                Defines the subsection of the configuration file to use.
 
-                                                              Can be defined as&#x3A;
-                                                                - A single key: ``base_path="base_path"``
-                                                                - JSON Pointer (strings only): ``base_path="/base/path"``
-                                                                - A list of keys: ``base_path=("base", "path")``
-            use_env_location (bool, optional): When enabled, if environment variable named by `env_location_var_name`
-                                               exists, it will be read a comma-delimited list of configuration path
-                                               that will be appended to `load_order_location` list.
-            env_location_var_name (str, optional): Defaults to "G_CONFIG_LOCATION". Used when `use_env_location` is True.
-                                                   - Changing from the default value will set `use_env_location` to True.
+                Can be defined as&#x3A;
+                    - A single key: ``base_path="base_path"``
+                    - JSON Pointer (strings only): ``base_path="/base/path"``
+                    - A list of keys: ``base_path=("base", "path")``
+            use_env_location (bool, optional):
+                When enabled, if environment variable named by `env_location_var_name`
+                exists, it will be read a comma-delimited list of configuration path
+                that will be appended to `load_order_location` list.
+            env_location_var_name (str, optional):
+                Defaults to "G_CONFIG_LOCATION". Used when `use_env_location` is True.
+                - Changing from the default value will set `use_env_location` to True.
             mutable_configuration (bool, optional):
-                                                   - When `False`: `Configuration` is used for mappings.
-                                                     `tuple` is used for sequences.
-                                                   - When `True`: `MutableConfiguration` is used for mappings.
-                                                     `list` is used for sequences.
-            disable_caching (bool, optional): When `True`, caching of "identical immutable configurations" is disabled.
+                - When `False`: `Configuration` is used for mappings.
+                    `tuple` is used for sequences.
+                - When `True`: `MutableConfiguration` is used for mappings.
+                    `list` is used for sequences.
+            disable_caching (bool, optional):
+                When `True`, caching of "identical immutable configurations" is disabled.
 
-                                              `mutable_configuration=True` disables caching.
+                `mutable_configuration=True` disables caching.
         """
 
         self.__receipt: NoteOfIntentToRead | None = prepare_to_load_configuration(
@@ -141,18 +146,22 @@ class MutableLazyLoadConfiguration(LazyLoadConfiguration, MutableMapping):
     ) -> None:
         """
         Args:
-            *load_order_location (Path | str | os.PathLike): File path to configuration file
-            base_path (str | Sequence[str] | None, optional): Defines the subsection of the configuration file to use.
+            *load_order_location (Path | str | os.PathLike):
+                File path to configuration file
+            base_path (str | Sequence[str] | None, optional):
+                Defines the subsection of the configuration file to use.
 
-                                                              Can be defined as&#x3A;
-                                                                - A single key: ``base_path="base_path"``
-                                                                - JSON Pointer (strings only): ``base_path="/base/path"``
-                                                                - A list of keys: ``base_path=("base", "path")``
-            use_env_location (bool, optional): When enabled, if environment variable named by `env_location_var_name`
-                                               exists, it will be read a comma-delimited list of configuration path
-                                               that will be appended to `load_order_location` list.
-            env_location_var_name (str, optional): Defaults to "G_CONFIG_LOCATION". Used when `use_env_location` is True.
-                                                   - Changing from the default value will set `use_env_location` to True.
+                Can be defined as&#x3A;
+                    - A single key: ``base_path="base_path"``
+                    - JSON Pointer (strings only): ``base_path="/base/path"``
+                    - A list of keys: ``base_path=("base", "path")``
+            use_env_location (bool, optional):
+                When enabled, if environment variable named by `env_location_var_name`
+                exists, it will be read a comma-delimited list of configuration path
+                that will be appended to `load_order_location` list.
+            env_location_var_name (str, optional):
+                Defaults to "G_CONFIG_LOCATION". Used when `use_env_location` is True.
+                - Changing from the default value will set `use_env_location` to True.
         """
         super().__init__(
             *load_order_location,

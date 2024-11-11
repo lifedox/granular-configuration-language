@@ -17,11 +17,19 @@ def as_lazy(func: typ.Callable[[T], RT]) -> typ.Callable[[Tag, T, StateHolder], 
 
     Only the YAML value is provided to the function being wrapped.
 
+    Examples:
+        ```python
+        @string_tag(Tag("!Tag"))
+        @as_lazy
+        def tag(value: str) -> Any:
+            ...
+        ```
+
     Args:
         func (Callable[[T], RT]): Function being wrapped
 
     Returns:
-        Callable[[Tag, T, StateHolder], LazyEvalBasic[RT]]: Wrapped function
+        (Callable[[Tag, T, StateHolder], LazyEvalBasic[RT]]): Wrapped function
     """
 
     @wraps(func)
@@ -39,6 +47,14 @@ def as_lazy_with_load_options(
 
     - The YAML value is provided to the function being wrapped as the first positional argument.
     - A `LoadOptions` instance is provided as the second positional argument.
+
+    Examples:
+        ```python
+        @string_tag(Tag("!Tag"))
+        @as_lazy_with_load_options
+        def tag(value: str, options: LoadOptions) -> Any:
+            ...
+        ```
 
     Args:
         func (Callable[[T, LoadOptions], RT]): Function being wrapped
@@ -63,6 +79,14 @@ def as_lazy_with_root(func: typ.Callable[[T, Root], RT]) -> typ.Callable[[Tag, T
     - The YAML value is provided to the function being wrapped as the first positional argument.
     - The Configuration root is provided as the second positional argument.
 
+    Examples:
+        ```python
+        @string_tag(Tag("!Tag"))
+        @as_lazy_with_root
+        def tag(value: str, root: Root) -> Any:
+            ...
+        ```
+
     Args:
         func (Callable[[T, Root], RT]): Function being wrapped
 
@@ -84,13 +108,24 @@ def as_lazy_with_root(
 
     In this mode, this function a decorator factory.
 
+    Examples:
+        ```python
+        @string_tag(Tag("!Tag"))
+        @as_lazy_with_root(needs_root_condition=interpolation_needs_ref_condition)
+        @interpolate_value_with_ref
+        def tag(value: str, root: Root) -> Any:
+            ...
+        ```
+
     Args:
-        needs_root_condition (Callable[[T], bool]): Function used to test if the Configuration Root is needed.
-                                                    This function is provided the YAML value.
-                                                    When False, the second positional argument is always None.
+        needs_root_condition (Callable[[T], bool]):
+            Function used to test if the Configuration Root is needed.
+            This function is provided the YAML value.
+            When False, the second positional argument is always None.
 
     Returns:
-        (Callable[[Callable[[T, Root], RT]], Callable[\[Tag, T, StateHolder], LazyEval[RT]]]): Decorator
+        (Callable[[Callable[[T, Root], RT]], Callable[\[Tag, T, StateHolder], LazyEval[RT]]]):
+            Decorator
     """
     ...
 
@@ -130,6 +165,14 @@ def as_lazy_with_root_and_load_options(
     - The Configuration root is provided as the second positional argument.
     - A `LoadOptions` instance is provided as the third positional argument.
 
+    Examples:
+        ```python
+        @string_tag(Tag("!Tag"))
+        @as_lazy_with_root_and_load_options
+        def tag(value: str, root: Root, options: LoadOptions) -> Any:
+            ...
+        ```
+
     Args:
         func (Callable[[T, Root, LoadOptions], RT]): Function being wrapped
 
@@ -148,6 +191,14 @@ def as_lazy_with_root_and_load_options(
 def as_not_lazy(func: typ.Callable[[T], RT]) -> typ.Callable[[Tag, T, StateHolder], RT]:
     """
     Wraps the "Tag" function, but does not make it lazy. The function being wrapped is run at load time.
+
+    Examples:
+        ```python
+        @string_tag(Tag("!Tag"))
+        @as_not_lazy
+        def tag(value: str) -> Any:
+            ...
+        ```
 
     Args:
         func (Callable[[T], RT]): Function being wrapped

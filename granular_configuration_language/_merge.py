@@ -9,6 +9,22 @@ from granular_configuration_language.yaml.load import obj_pairs_func
 def merge(
     configs: typ.Iterable[Configuration | LazyLoadConfiguration | LazyEval | typ.Any], *, mutable: bool = False
 ) -> Configuration:
+    """
+    Merges the provided configurations into a single configuration.
+
+    Filters out non-`Configuration` object. Extracts `Configuration` from `LazyEval` and `LazyLoadConfiguration`
+
+    Args:
+        configs (Iterable[Configuration  |  LazyLoadConfiguration  |  LazyEval  |  Any]):
+            Configurations to be merged
+        mutable (bool, optional):
+            If `True`, `MutableConfiguration` is used, else `Configuration` is used.
+           _description_. Defaults to False.
+
+    Returns:
+        Configuration: Merged Configuration. Empty if nothing was mergable.
+    """
+
     def configuration_only(
         configs: typ.Iterable[Configuration | LazyLoadConfiguration | LazyEval | typ.Any],
     ) -> typ.Iterator[Configuration]:

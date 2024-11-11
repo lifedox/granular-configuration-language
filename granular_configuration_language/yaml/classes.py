@@ -11,19 +11,42 @@ _RT = typ.TypeVar("_RT")
 
 RootType = typ.NewType("RootType", typ.Mapping)
 Root = RootType | None
+"""
+Type used by type checking to identify the configuration root.
+"""
+
 Tag = typ.NewType("Tag", str)
+"""
+`NewType` used to type tag strings.
+"""
 
 
 class Masked(str):
+    """
+    Used to keep secrets from printing to screen when running tests.
+
+    Does not alter text or prevent `print` from display the string value.
+
+    Inherits for `str`. Replaces the `__repr__` with the constant "'<****>'".
+
+    Used by `!Mask` tag
+    """
+
     def __repr__(self) -> str:
         return "'<****>'"
 
 
 class Placeholder:
+    """
+    Representation of `!Placeholder` tag.
+
+    Holds the `!Placeholder` message.
+    """
+
     __slot__ = ("message",)
 
     def __init__(self, message: str) -> None:
-        self.message = message
+        self.message: typ.Final = message
 
     def __str__(self) -> str:
         return str(self.message)

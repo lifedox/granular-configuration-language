@@ -24,13 +24,22 @@ def json_default(value: typ.Any) -> typ.Any:
 
     Explicitly:
     - `granular_configuration_language.Configuration` as `dict`
-    - `!UUID` -- `uuid.UUID` as hyphenated hex string
-    - `!Date` -- `datetime.date` as `isoformat`
-    - `!DateTime` -- `datetime.datetime` as `isoformat`
-    - `!Func` -- callable as `f"<{func.__module__}.{func.__name__}>"`
-    - `!Class` -- class as `f"<{class.__module__}.{class.__name__}>"`
+    - `!UUID`/`uuid.UUID` as hyphenated hex string
+    - `!Date`/`datetime.date` as `isoformat`
+    - `!DateTime`/`datetime.datetime` as `isoformat`
+    - `!Func`/`Callable` as `f"<{func.__module__}.{func.__name__}>"`
+    - `!Class`/`class` as `f"<{class.__module__}.{class.__name__}>"`
 
-    For niceness, `Mapping` and non-`str` `Sequence` are converted to `dict` and `tuple`
+    For niceness, `Mapping` and non-`str` `Sequence` instances are converted to `dict` and `tuple`
+
+    Args:
+        value (Any): Value being converted
+
+    Raises:
+        TypeError: When an incompatible is provided, as required by `JSONEncoder`
+
+    Returns:
+        Any: `json.dump` compatible object
     """
 
     if isinstance(value, Configuration):

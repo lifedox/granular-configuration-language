@@ -15,8 +15,8 @@ from granular_configuration_language.yaml.decorators.interpolate._env_var_parser
 )
 from granular_configuration_language.yaml.decorators.ref import resolve_json_ref
 
-_P = typ.ParamSpec("_P")
-_RT = typ.TypeVar("_RT")
+P = typ.ParamSpec("P")
+RT = typ.TypeVar("RT")
 
 
 def _get_ref_string(root: Root, contents: str) -> str:
@@ -108,10 +108,41 @@ def interpolation_needs_ref_condition(value: str) -> bool:
 
 
 def interpolate_value_with_ref(
-    func: typ.Callable[typ.Concatenate[str, Root, _P], _RT]
-) -> typ.Callable[typ.Concatenate[str, Root, _P], _RT]:
+    func: typ.Callable[typ.Concatenate[str, Root, P], RT]
+) -> typ.Callable[typ.Concatenate[str, Root, P], RT]:
+    """
+    Replaces the YAML string value with the interpolated value before calling the tag function
+
+    "with_ref" does full interpolation, supporting references (e.g. `${$.value}` and `${/value}`).
+
+    - First positional argument must a `str`.
+    - Second positional must be `Root` type, even if you do not used it.
+
+    Examples:
+
+    ```python
+    @string_tag(Tag("!Tag"))
+    @as_lazy_with_root
+    @interpolate_value_with_ref
+    def tag(value: str, root: Root) -> Any:
+        ...
+
+    @string_tag(Tag("!Tag"))
+    @as_lazy_with_root_and_load_options
+    @interpolate_value_with_ref
+    def tag_with_options(value: str, root: Root, options: LoadOptions) -> Any:
+        ...
+    ```
+
+    Args:
+        func (Callable[Concatenate[str, Root, P], RT]): Function to be wrapped
+
+    Returns:
+        (Callable[Concatenate[str, Root, P], RT]): Wrapped Function
+    """
+
     @wraps(func)
-    def lazy_wrapper(value: str, root: Root, *args: _P.args, **kwargs: _P.kwargs) -> _RT:
+    def lazy_wrapper(value: str, root: Root, *args: P.args, **kwargs: P.kwargs) -> RT:
         return func(interpolate(value, root), root, *args, **kwargs)
 
     track_as_with_ref(func)
@@ -119,10 +150,39 @@ def interpolate_value_with_ref(
 
 
 def interpolate_value_without_ref(
-    func: typ.Callable[typ.Concatenate[str, _P], _RT]
-) -> typ.Callable[typ.Concatenate[str, _P], _RT]:
+    func: typ.Callable[typ.Concatenate[str, P], RT]
+) -> typ.Callable[typ.Concatenate[str, P], RT]:
+    """
+    Replaces the YAML string value with the interpolated value before calling the tag function
+
+    "without_ref" does a limited interpolation that does not support references (e.g. `${$.value}` and `${/value}`)
+
+    - First positional argument must a `str`.
+
+    Examples:
+        ```python
+        @string_tag(Tag("!Tag"))
+        @as_lazy
+        @interpolate_value_with_ref
+        def tag(value: str) -> Any:
+            ...
+
+        @string_tag(Tag("!Tag"))
+        @as_lazy_with_load_options
+        @interpolate_value_with_ref
+        def tag_with_options(value: str, options: LoadOptions) -> Any:
+            ...
+        ```
+
+    Args:
+        func (Callable[Concatenate[str, P], RT]): Function to be wrapped
+
+    Returns:
+        (Callable[Concatenate[str, P], RT]): Wrapped Function
+    """
+
     @wraps(func)
-    def lazy_wrapper(value: str, *args: _P.args, **kwargs: _P.kwargs) -> _RT:
+    def lazy_wrapper(value: str, *args: P.args, **kwargs: P.kwargs) -> RT:
         return func(interpolate(value, None), *args, **kwargs)
 
     track_as_without_ref(func)
