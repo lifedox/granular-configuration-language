@@ -97,11 +97,7 @@ class Configuration(typ.Mapping[typ.Any, typ.Any]):
             else:
                 raise KeyError(repr(name)) from None
 
-        if isinstance(value, Placeholder):
-            raise PlaceholderConfigurationError(
-                f'!Placeholder at `{self.__attribute_name.with_suffix(name)}` was not overwritten. Message: "{value}"'
-            )
-        elif isinstance(value, LazyEval):
+        if isinstance(value, LazyEval):
             try:
                 value = value.result
                 self._private_set(name, value, setter_secret)
@@ -109,6 +105,11 @@ class Configuration(typ.Mapping[typ.Any, typ.Any]):
                 raise RecursionError(
                     f"{value.tag} at `{self.__attribute_name.with_suffix(name)}` caused a recursion error. Please check your configuration for a self-referencing loop."
                 ) from None
+
+        if isinstance(value, Placeholder):
+            raise PlaceholderConfigurationError(
+                f'!Placeholder at `{self.__attribute_name.with_suffix(name)}` was not overwritten. Message: "{value}"'
+            )
 
         if isinstance(value, Configuration):
             value.__attribute_name = self.__attribute_name.append_suffix(name)

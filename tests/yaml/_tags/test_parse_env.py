@@ -10,6 +10,11 @@ from granular_configuration_language.exceptions import EnvironmentVaribleNotFoun
 from granular_configuration_language.yaml import loads
 
 
+def test_scalar_and_singleton_seq_are_the_same() -> None:
+    with patch.dict(os.environ, values={"unreal_env_variable": "test me"}):
+        assert loads("!ParseEnv unreal_env_variable") == loads('!ParseEnv ["unreal_env_variable"]')
+
+
 def test_scalar__string() -> None:
     with patch.dict(os.environ, values={"unreal_env_variable": "test me"}):
         assert loads("!ParseEnv unreal_env_variable") == "test me"

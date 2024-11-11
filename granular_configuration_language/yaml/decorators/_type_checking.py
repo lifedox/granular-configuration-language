@@ -42,10 +42,13 @@ class string_or_twople_tag(TagDecoratorBase[str | tuple[str, typ.Any]]):
         return True
 
     def sequence_node_type_check(self, value: typ.Sequence) -> typ.TypeGuard[tuple[str, typ.Any]]:
-        return (len(value) == 2) and isinstance(value[0], str)
+        return (1 <= len(value) <= 2) and isinstance(value[0], str)
 
     def sequence_node_transformer(self, value: typ.Any) -> Type:
-        return tuple(value)
+        if len(value) == 2:
+            return tuple(value)
+        else:
+            return value[0]
 
 
 class sequence_of_any_tag(TagDecoratorBase[typ.Sequence[typ.Any]]):

@@ -348,6 +348,7 @@ This means that a deep copy of a `Configuration` can share state with the origin
   - **Action:** `!Placeholder` marks a value as needing to be overridden. If the `!Placeholder` is still present when the value is fetched, a `PlaceholderConfigurationError` is thrown. The exception message includes the attribute name and provided message (e.g. `` !Placeholder at `$.setting1` was not overwritten. Message: "message to user" ``)
   - Note:
     - The `Placeholder` object is created at Load Time. The exception is thrown at Fetch.
+    - `PlaceholdPlaceholderConfigurationErrorer` is thrown by the `Configuration` class. `!Placeholder` as a scalar or sequence will just return a `Placeholder` instance.
 - `!Ref` <a id="tag-Ref"></a>
   - **Argument:** _str_.
     - _Supports Full Interpolation Syntax_

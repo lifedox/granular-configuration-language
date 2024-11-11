@@ -16,19 +16,22 @@ def test_string_tag_does_not_take_mapping() -> None:
         loads("!Mask {}")
 
 
-def test_string_or_twople_tag_only_takes_two() -> None:
+def test_string_or_twople_tag_only_takes_two_or_one() -> None:
     with patch.dict(os.environ, values={}):
         with pytest.raises(ValueError):
             loads("""!ParseEnv ["a", "b", "c"]""")
-
-        with pytest.raises(ValueError):
-            loads("""!ParseEnv ["a"]""")
 
 
 def test_string_or_twople_tag_does_not_take_mapping() -> None:
     with patch.dict(os.environ, values={}):
         with pytest.raises(ValueError):
             loads('!ParseEnv {"unreal_env_vari": 1}')
+
+
+def test_string_or_twople_tag_dooes_not_take_an_empty_sequence() -> None:
+    with patch.dict(os.environ, values={}):
+        with pytest.raises(ValueError):
+            loads("""!ParseEnv []""")
 
 
 def test_sequence_of_any_tag_does_not_take_scalar() -> None:

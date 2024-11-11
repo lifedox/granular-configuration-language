@@ -9,4 +9,4 @@ from granular_configuration_language._merge import merge  # isort:skip  depends 
 
 # Auto ordered
 from granular_configuration_language._json import json_default
-from granular_configuration_language.yaml import Masked
+from granular_configuration_language.yaml import Masked, Placeholder
