@@ -141,27 +141,6 @@ class Configuration(typ.Mapping[typ.Any, typ.Any]):
     # Required behavior overrides
     #################################################################
 
-    def __getattr__(self, name: str) -> typ.Any:
-        """
-        Provides a potentially cleaner path as an alternative to `__getitem__`.
-
-        Throws AttributeError instead of KeyError, as compared to `__getitem__`
-        when an attribute is not present.
-
-        Args:
-            name (str): Attribute name
-
-        Raises:
-            AttributeError: When an attribute is not present.
-
-        Returns:
-            Any: Value
-        """
-        if name not in self:
-            raise AttributeError(f"Request attribute `{self.__attribute_name.with_suffix(name)}` does not exist")
-
-        return self[name]
-
     def __repr__(self) -> str:
         return repr(self.__data)
 
@@ -194,6 +173,27 @@ class Configuration(typ.Mapping[typ.Any, typ.Any]):
     #################################################################
     # Public interface methods
     #################################################################
+
+    def __getattr__(self, name: str) -> typ.Any:
+        """
+        Provides a potentially cleaner path as an alternative to `__getitem__`.
+
+        Throws AttributeError instead of KeyError, as compared to `__getitem__`
+        when an attribute is not present.
+
+        Args:
+            name (str): Attribute name
+
+        Raises:
+            AttributeError: When an attribute is not present.
+
+        Returns:
+            Any: Value
+        """
+        if name not in self:
+            raise AttributeError(f"Request attribute `{self.__attribute_name.with_suffix(name)}` does not exist")
+
+        return self[name]
 
     def exists(self, key: typ.Any) -> bool:
         """

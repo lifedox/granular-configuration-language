@@ -1,5 +1,7 @@
 # `granular-configuration-language`
 
+> README is in-progress.
+
 [TOC]
 
 ## Why does this exist?
@@ -103,7 +105,7 @@ Examples:
 - One-off library with three possible sources:
   ```python
   CONFIG = LazyLoadConfiguration(
-    Path(__file___).parent / "config.yaml",  # Defines the path 
+    Path(__file___).parent / "config.yaml",  # Defines the path
     "~/.config/really_cool_library_config.yaml",
     "./really_cool_library_config.yaml",
   )
@@ -133,12 +135,9 @@ Examples:
   - Notes:
     - fdg
 
-
-
 ### Class Spec
 
-
-
+> Working on sphinx generation
 
 ### Immutable vs. Mutable
 
