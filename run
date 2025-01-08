@@ -95,11 +95,17 @@ test312() {
     docker_service=test312
     _run_cmd poetry run ./run _tests "$@"
 }
+usage+=("  $0 tests - Run tests in Python 3.13 Docker")
+test313() {
+    docker_service=test312
+    _run_cmd poetry run ./run _tests "$@"
+}
 usage+=("  $0 tests - Run tests in docker on all environments")
 test_all() {
     test310 "$@"
     test311 "$@"
     test312 "$@"
+    test313 "$@"
 }
 
 usage+=("  $0 lint - Runs linting (black, isort, mypy) checks; non-zero exit status on failure")

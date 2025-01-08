@@ -30,3 +30,9 @@ services:
       <<: *build
       args:
         PYTHON_VERSION: "3.12"
+  test313:
+    <<: *base
+    build:
+      <<: *build
+      args:
+        PYTHON_VERSION: "3.13"

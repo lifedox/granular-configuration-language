@@ -16,7 +16,7 @@ python-jsonpath = "*"
 "ruamel.yaml" = ">=0.18"
 python-dateutil = { version = "*", python = "<3.11" }
 
-[tool.poetry.dev-dependencies]
+[tool.poetry.group.dev.dependencies]
 ipdb = "*"
 types-python-dateutil = { version = "*", python = "<3.11" }
 pytest = "*"
