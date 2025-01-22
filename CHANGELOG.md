@@ -2,7 +2,7 @@
 
 ## 2.0.0
 
-⚠️ **Breaking Changes** ⚠️
+### ⚠️ Breaking Changes ⚠️
 
 - YAML Version 1.2 is the default supported version.
   - Reason: Switched from `PyYAML` to `ruamel.yaml`, because `PyYAML` is very dead.
@@ -29,7 +29,7 @@
   - `set_config`/`get_config` pattern
   - INI support
   - Configuration patching
-  - Removed `ConfigurationFiles` and `ConfigurationMultiNamedFiles` classes for defining configuration locations.
+  - `ConfigurationFiles` and `ConfigurationMultiNamedFiles` classes have been removed. `LazyLoadConfiguration` only supports paths (e.g. `pathlib.Path` and  `str`).
     - Mitigation: Just use `pathlib.Path` or `str` directly.
 - Renamed Exceptions:
   - `ParseEnvError` → `ParseEnvParsingError`
@@ -37,7 +37,7 @@
   - `JSONPathQueryMatchFailed` → `JSONPathQueryFailed`
   - `JSONPathMustStartFromRoot` → `RefMustStartFromRoot`
 
-**Changed**
+### Changed <!-- markdownlint-disable MD024 -->
 
 - Switched from `PyYAML` to `ruamel.yaml`
   - Note: `PyYAML` is very dead
@@ -59,9 +59,9 @@
   - `ParseEnvEnvironmentVaribleNotFound` → `EnvironmentVaribleNotFound`
   - `JSONPathQueryMatchFailed` → `JSONPathQueryFailed`
   - `JSONPathMustStartFromRoot` → `RefMustStartFromRoot`
-- `LazyEval.run()` usage replaced with `LazyEval.result`
+- (_internal detail_) `LazyEval.run()` usage replaced with `LazyEval.result`
 
-**Added**
+### Added
 
 - Add JSON Pointer support where JSON Path is supported.
 - Added the following tags:
@@ -78,12 +78,12 @@
   - When immutable, `tuple` is used instead of `list`
 - Added: JSON Pointer for base_path
 
-**Fixed**
+### Fixed
 
-- Fixed `LazyEval` making copies of `Root`
-  - Note: Copying with `LazyEval` still links copies unexpectedly. Now, it is just always connected to the original root (immutability is default now).
+- (_internal detail_) Fixed `LazyEval` making copies of `Root`
+  - Note: Copying with `LazyEval` still links copies unexpectedly. Now, it is just always connected to the original root (immutability is default now, so only copy immutable configurations).
 
-**Removed**
+### Removed
 
 - Removed `set_config` pattern
 - Removed INI support
@@ -91,19 +91,19 @@
 
 ## 1.8.0
 
-**Changes**
+### Changed <!-- markdownlint-disable MD024 -->
 
 - Adds `!Sub` Tag
 
 ## 1.5.0
 
-**Changes**
+### Changed <!-- markdownlint-disable MD024 -->
 
 - Adds `!ParseEnv` Tag
 
 ## 1.4.0
 
-**Changes**
+### Changed <!-- markdownlint-disable MD024 -->
 
 - Adds `InvalidBasePathException` as an exception that can be thrown during the load phase of `LazyLoadConfiguration`.
   - This subclasses `KeyError` maintaining compatibility with the state before this exception.
@@ -111,13 +111,13 @@
 
 ## 1.3.1
 
-**Changes**
+### Changed <!-- markdownlint-disable MD024 -->
 
 - Adds clear_config
 
 ## 1.3
 
-**Changes**
+### Changed <!-- markdownlint-disable MD024 -->
 
 - Adds string path support to `LazyLoadConfiguration`
 - Adds `set_config`/`get_config` pattern
@@ -125,13 +125,13 @@
 
 ## 1.2
 
-**Changes**
+### Changed <!-- markdownlint-disable MD024 -->
 
 - Adding INI support
 
 ## 1.1
 
-**Changes**
+### Changed <!-- markdownlint-disable MD024 -->
 
 - Adds `!Placeholder` Tag
 - Makes tags evaluate lazily (i.e. at first use)
