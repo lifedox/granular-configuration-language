@@ -17,15 +17,21 @@ python-jsonpath = "*"
 python-dateutil = { version = "*", python = "<3.11" }
 
 [tool.poetry.group.dev.dependencies]
-ipdb = "*"
+# Types
 types-python-dateutil = { version = "*", python = "<3.11" }
+# Testing
 pytest = "*"
 pytest-cov = "*"
+# Linting
 flake8 = "*"
 mypy = "*"
 black = "*"
 isort = "*"
 bandit = "*"
+# Doc gen
+sphinx = "*"
+sphinx_rtd_theme = "*"
+myst-parser = "*"
 
 [tool.poetry.plugins.granular-configuration-language-20-tag]
 "official_extra" = "granular_configuration_language.yaml._tags.func_and_class"

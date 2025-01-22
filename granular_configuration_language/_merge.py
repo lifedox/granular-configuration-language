@@ -12,17 +12,14 @@ def merge(
     """
     Merges the provided configurations into a single configuration.
 
-    Filters out non-`Configuration` object. Extracts `Configuration` from `LazyEval` and `LazyLoadConfiguration`
+    Filters out non-:py:class:`.Configuration` object. Extracts :py:class:`.Configuration` from :py:class:`.LazyEval` and :py:class:`.LazyLoadConfiguration`
 
-    Args:
-        configs (Iterable[Configuration  |  LazyLoadConfiguration  |  LazyEval  |  Any]):
-            Configurations to be merged
-        mutable (bool, optional):
-            If `True`, `MutableConfiguration` is used, else `Configuration` is used.
-           _description_. Defaults to False.
-
-    Returns:
-        Configuration: Merged Configuration. Empty if nothing was mergable.
+    :param configs: Configurations to be merged
+    :type configs: ~collections.abc.Iterable[Configuration | LazyLoadConfiguration | LazyEval | ~typing.Any]
+    :param mutable: If :code:`True`, :py:class:`.MutableConfiguration` is used, else :py:class:`.Configuration` is used.  Defaults to :code:`False`.
+    :type mutable: bool, optional
+    :return: Merged configuration. Empty if nothing was mergable.
+    :rtype: Configuration
     """
 
     def configuration_only(

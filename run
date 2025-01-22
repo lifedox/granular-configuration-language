@@ -194,6 +194,18 @@ _package() {
     _run_cmd poetry build
 }
 
+
+usage+=("  $0 docgen - Generates sphinx documentation site")
+docgen() {
+    _run_cmd poetry run ./run _docgen "$@"
+}
+_docgen() {
+    _logit 'Running docgen'
+    sphinx-build -M html . new-docs
+}
+
+
+
 cmd="$1"
 
 # If there was a command, then shift so $@ is the args

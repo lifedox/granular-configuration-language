@@ -18,28 +18,32 @@ def get_name(value: typ.Callable) -> str:
 
 def json_default(value: typ.Any) -> typ.Any:
     """
-    A factory function to be used by the `json.dump` family of functions.
+    A factory function to be used by the :py:func:`json.dump` family of functions.
 
     Provides serialization for types produced by this library's Tags.
 
     Explicitly:
-    - `granular_configuration_language.Configuration` as `dict`
-    - `!UUID`/`uuid.UUID` as hyphenated hex string
-    - `!Date`/`datetime.date` as `isoformat`
-    - `!DateTime`/`datetime.datetime` as `isoformat`
-    - `!Func`/`Callable` as `f"<{func.__module__}.{func.__name__}>"`
-    - `!Class`/`class` as `f"<{class.__module__}.{class.__name__}>"`
 
-    For niceness, `Mapping` and non-`str` `Sequence` instances are converted to `dict` and `tuple`
+    * :py:class:`~.Configuration` as :py:class:`dict`
 
-    Args:
-        value (Any): Value being converted
+    * :code:`!UUID`/:py:class:`uuid.UUID` as hyphenated hex string
 
-    Raises:
-        TypeError: When an incompatible is provided, as required by `JSONEncoder`
+    * :code:`!Date`/:py:class:`datetime.date` as :py:meth:`datetime.date.isoformat`
 
-    Returns:
-        Any: `json.dump` compatible object
+    * :code:`!DateTime`/:py:class:`datetime.datetime` as :py:meth:`datetime.datetime.isoformat`
+
+    * :code:`!Func`/:py:class:`Callable` as :code:`f"<{func.__module__}.{func.__name__}>"`
+
+    * :code:`!Class`/:code:`class` as :code:`f"<{class.__module__}.{class.__name__}>"`
+
+    * For niceness, :py:class:`~collections.abc.Mapping` and non-:class:`str`
+      :py:class:`~collections.abc.Sequence` instances are converted to :py:class:`dict` and :py:class:`tuple`
+
+    :param value: Value being converted
+    :type value: ~typing.Any
+    :raises TypeError: When an incompatible is provided, as required by :py:class:`~json.JSONEncoder`
+    :return: :py:func:`json.dump` compatible object
+    :rtype: Any
     """
 
     if isinstance(value, Configuration):
