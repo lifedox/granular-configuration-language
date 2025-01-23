@@ -67,7 +67,7 @@ class TagDecoratorBase(typ.Generic[T], abc.ABC):
     override :py:meth:`scalar_node_transformer`, :py:meth:`scalar_node_transformer`, or
     :py:meth:`mapping_node_transformer`, as needed.
 
-    The transformer call if the associated node type check passes, just before
+    The transformer is called if the associated node type check passes, just before
     the value is passed to tag function.
     """
 
@@ -191,7 +191,7 @@ class TagDecoratorBase(typ.Generic[T], abc.ABC):
 
     def __call__(self, handler: typ.Callable[[Tag, T, StateHolder], RT]) -> TagConstructor:
         """
-        Takes the wrapped tag function as wraps for configuration loading.
+        Takes the wrapped tag function and further wraps it for configuration loading.
 
         Parameters:
             handler (~collections.abc.Callable[[Tag, T, StateHolder], RT]): Wrapped Tag Function

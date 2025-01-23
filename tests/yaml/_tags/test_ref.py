@@ -1,7 +1,12 @@
 import pytest
 
 from granular_configuration_language import Configuration
-from granular_configuration_language.exceptions import JSONPathQueryFailed, JSONPointerQueryFailed, RefMustStartFromRoot
+from granular_configuration_language.exceptions import (
+    JSONPathOnlyWorksOnMappings,
+    JSONPathQueryFailed,
+    JSONPointerQueryFailed,
+    RefMustStartFromRoot,
+)
 from granular_configuration_language.yaml import loads
 
 
@@ -74,3 +79,11 @@ b: c
 """
     with pytest.raises(RefMustStartFromRoot):
         assert loads(test_data).as_dict() == {}
+
+
+def test_scalar_ref_throws_exception() -> None:
+    test_data = """
+!Ref $.no_data.here
+"""
+    with pytest.raises(JSONPathOnlyWorksOnMappings):
+        loads(test_data)

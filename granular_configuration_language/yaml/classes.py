@@ -10,14 +10,20 @@ from threading import RLock
 RT = typ.TypeVar("RT")
 
 RootType = typ.NewType("RootType", typ.Mapping)
+"""
+Type used to type the configuration root.
+
+Aliases :py:class:`~collections.abc.Mapping` as root has to be a mapping for it to be used.
+"""
+
 Root = RootType | None
 """
-Type used by type checking to identify the configuration root.
+Type used by type checking to identify the configuration root if it exists.
 """
 
 Tag = typ.NewType("Tag", str)
 """
-`NewType` used to type tag strings.
+:py:class:`~typing.NewType` used to type tag strings.
 """
 
 
@@ -73,6 +79,10 @@ class LazyRoot:
 
 
 class LazyEval(abc.ABC, typ.Generic[RT]):
+    """
+    Base class for handling the output of a Tag that needs to be run just-in-time.
+    """
+
     def __init__(self, tag: Tag) -> None:
         self.tag = tag
         self.done = False
@@ -99,7 +109,7 @@ class LazyEval(abc.ABC, typ.Generic[RT]):
     @cached_property
     def result(self) -> RT | typ.Any:
         """
-        Result of LazyEval, completing any chains
+        Result of the lazy evaluation, completing any chains
         """
         result = self.__run()
         while isinstance(result, LazyEval):
