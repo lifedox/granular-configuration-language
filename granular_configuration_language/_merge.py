@@ -16,7 +16,7 @@ def merge(
 
     :param configs: Configurations to be merged
     :type configs: ~collections.abc.Iterable[Configuration | LazyLoadConfiguration | LazyEval | ~typing.Any]
-    :param mutable: If :code:`True`, :py:class:`.MutableConfiguration` is used, else :py:class:`.Configuration` is used.  Defaults to :code:`False`.
+    :param mutable: If :py:data:`True`, :py:class:`.MutableConfiguration` is used, else :py:class:`.Configuration` is used.  Defaults to :py:data:`False`.
     :type mutable: bool, optional
     :return: Merged configuration. Empty if nothing was mergable.
     :rtype: Configuration

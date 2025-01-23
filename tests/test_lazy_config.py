@@ -47,7 +47,7 @@ class TestLaziness:
         with (build_configuration_pach() as bc_mock,):
             files = [ASSET_DIR / "test_env_config.yaml"]
 
-            config = LazyLoadConfiguration(*files, mutable_configuration=True)
+            config = MutableLazyLoadConfiguration(*files)
 
             bc_mock.assert_not_called()
 

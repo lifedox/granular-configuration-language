@@ -32,7 +32,6 @@ bandit = "*"
 sphinx = "*"
 sphinx_rtd_theme = "*"
 myst-parser = "*"
-
 [tool.poetry.plugins.granular-configuration-language-20-tag]
 "official_extra" = "granular_configuration_language.yaml._tags.func_and_class"
 

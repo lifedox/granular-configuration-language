@@ -52,19 +52,19 @@ class LazyLoadConfiguration(Mapping):
         :type use_env_location: bool, optional
         :param env_location_var_name:
             Defaults to :code:`"G_CONFIG_LOCATION"`.
-            Used when :code:`use_env_location` is :code:`True`.
+            Used when :code:`use_env_location` is :py:data:`True`.
 
-            > Changing from the default value will set :code:`use_env_location` to :code:`True`.
+            > Changing from the default value will set :code:`use_env_location` to :py:data:`True`.
         :type env_location_var_name: str, optional
-        :param disable_caching: When `True`, caching of "identical immutable configurations" is disabled.
+        :param disable_caching: When :py:data:`True`, caching of "identical immutable configurations" is disabled.
         :type disable_caching: bool, optional
         :examples:
             .. code:: python
 
                 # Base Path Examples
-                LazyLoadConfiguration(..., base_path="base_path")  # Single Key
-                LazyLoadConfiguration(..., base_path="/base/path")  # JSON Pointer (strings only)
-                LazyLoadConfiguration(..., base_path=("base", "path"))  # List of keys
+                LazyLoadConfiguration(..., base_path="base_path")      # Single Key
+                LazyLoadConfiguration(..., base_path="/base/path")     # JSON Pointer (strings only)
+                LazyLoadConfiguration(..., base_path=("base", "path")) # List of keys
         """
 
         self.__receipt: NoteOfIntentToRead | None = prepare_to_load_configuration(
@@ -133,7 +133,7 @@ class MutableLazyLoadConfiguration(LazyLoadConfiguration, MutableMapping):
     """
     Provides a lazy interface for loading Configuration from file paths on first access.
 
-    Uses: ::py:class:`.MutableConfiguration` for mappings and :py:class:`list` for sequences.
+    Uses: :py:class:`.MutableConfiguration` for mappings and :py:class:`list` for sequences.
     """
 
     def __init__(
@@ -158,9 +158,9 @@ class MutableLazyLoadConfiguration(LazyLoadConfiguration, MutableMapping):
         :type use_env_location: bool, optional
         :param env_location_var_name:
             Defaults to :code:`"G_CONFIG_LOCATION"`.
-            Used when :code:`use_env_location` is :code:`True`.
+            Used when :code:`use_env_location` is :py:data:`True`.
 
-            > Changing from the default value will set :code:`use_env_location` to :code:`True`.
+            > Changing from the default value will set :code:`use_env_location` to :py:data:`True`.
         :type env_location_var_name: str, optional
         :examples:
             .. code:: python

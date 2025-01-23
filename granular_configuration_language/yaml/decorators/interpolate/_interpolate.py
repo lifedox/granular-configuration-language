@@ -113,32 +113,29 @@ def interpolate_value_with_ref(
     """
     Replaces the YAML string value with the interpolated value before calling the tag function
 
-    "with_ref" does full interpolation, supporting references (e.g. `${$.value}` and `${/value}`).
+    "with_ref" does full interpolation, supporting references (e.g. :code:`${$.value}` and :code:`${/value}`).
 
-    - First positional argument must a `str`.
-    - Second positional must be `Root` type, even if you do not used it.
+    :note:
+        - First positional argument must a :py:class:`str`.
+        - Second positional must be :py:class:`Root` type, even if you do not use it.
+    :example:
+        .. code:: python
 
-    Examples:
+            @string_tag(Tag("!Tag"))
+            @as_lazy_with_root
+            @interpolate_value_with_ref
+            def tag(value: str, root: Root) -> Any:
+                ...
 
-    ```python
-    @string_tag(Tag("!Tag"))
-    @as_lazy_with_root
-    @interpolate_value_with_ref
-    def tag(value: str, root: Root) -> Any:
-        ...
-
-    @string_tag(Tag("!Tag"))
-    @as_lazy_with_root_and_load_options
-    @interpolate_value_with_ref
-    def tag_with_options(value: str, root: Root, options: LoadOptions) -> Any:
-        ...
-    ```
-
-    Args:
-        func (Callable[Concatenate[str, Root, P], RT]): Function to be wrapped
-
-    Returns:
-        (Callable[Concatenate[str, Root, P], RT]): Wrapped Function
+            @string_tag(Tag("!Tag"))
+            @as_lazy_with_root_and_load_options
+            @interpolate_value_with_ref
+            def tag_with_options(value: str, root: Root, options: LoadOptions) -> Any:
+                ...
+    :param func: Function to be wrapped
+    :type func: ~collections.abc.Callable[~typing.Concatenate[str, P], RT]
+    :return: Wrapped Function
+    :rtype:   ~collections.abc.Callable[~typing.Concatenate[str, P], RT]
     """
 
     @wraps(func)
@@ -155,30 +152,28 @@ def interpolate_value_without_ref(
     """
     Replaces the YAML string value with the interpolated value before calling the tag function
 
-    "without_ref" does a limited interpolation that does not support references (e.g. `${$.value}` and `${/value}`)
+    "without_ref" does a limited interpolation that does not support references (e.g. :code:`${$.value}` and :code:`${/value}`)
 
-    - First positional argument must a `str`.
+    :note:
+        - First positional argument must a :py:class:`str`.
+    :example:
+        .. code:: python
 
-    Examples:
-        ```python
-        @string_tag(Tag("!Tag"))
-        @as_lazy
-        @interpolate_value_with_ref
-        def tag(value: str) -> Any:
-            ...
+            @string_tag(Tag("!Tag"))
+            @as_lazy
+            @interpolate_value_with_ref
+            def tag(value: str) -> Any:
+                ...
 
-        @string_tag(Tag("!Tag"))
-        @as_lazy_with_load_options
-        @interpolate_value_with_ref
-        def tag_with_options(value: str, options: LoadOptions) -> Any:
-            ...
-        ```
-
-    Args:
-        func (Callable[Concatenate[str, P], RT]): Function to be wrapped
-
-    Returns:
-        (Callable[Concatenate[str, P], RT]): Wrapped Function
+            @string_tag(Tag("!Tag"))
+            @as_lazy_with_load_options
+            @interpolate_value_with_ref
+            def tag_with_options(value: str, options: LoadOptions) -> Any:
+                ...
+    :param func: Function to be wrapped
+    :type func: ~collections.abc.Callable[~typing.Concatenate[str, P], RT]
+    :return: Wrapped Function
+    :rtype:   ~collections.abc.Callable[~typing.Concatenate[str, P], RT]
     """
 
     @wraps(func)

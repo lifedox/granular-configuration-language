@@ -68,7 +68,7 @@ class AttributeName(typ.Iterable[str]):
 
 class Configuration(typ.Mapping[typ.Any, typ.Any]):
     """
-    This class represents an immutable mapping of the configuration.
+    This class represents an immutable :py:class:`~collections.abc.Mapping` of configuration.
     """
 
     def __init__(self, *arg: typ.Mapping | typ.Iterable[tuple[typ.Any, typ.Any]], **kwargs: typ.Any) -> None:
@@ -126,14 +126,14 @@ class Configuration(typ.Mapping[typ.Any, typ.Any]):
 
     def get(self, key: typ.Any, default: typ.Any = None) -> typ.Any:
         """
-        Return the value for key if key is in the :class:`Configuration`, else default.
+        Return the value for key if key is in the :py:class:`Configuration`, else default.
 
-        Args:
-            key (Any): Key being fetched
-            default (Any, optional): Default value. Defaults to None.
+        Parameters:
+            key (~typing.Any): Key being fetched
+            default (~typing.Any, optional): Default value. Defaults to :py:data:`None`.
 
         Returns:
-            Any: Value
+            ~typing.Any: Value
         """
         return self[key] if self.exists(key) else default
 
@@ -176,19 +176,21 @@ class Configuration(typ.Mapping[typ.Any, typ.Any]):
 
     def __getattr__(self, name: str) -> typ.Any:
         """
-        Provides a potentially cleaner path as an alternative to `__getitem__`.
+        Provides a potentially cleaner path as an alternative to :py:meth:`~object.__getitem__`.
 
-        Throws AttributeError instead of KeyError, as compared to `__getitem__`
+        Throws :py:exc:`AttributeError` instead of :py:exc:`KeyError`, as compared to :py:meth:`~object.__getitem__`
         when an attribute is not present.
 
-        Args:
-            name (str): Attribute name
+        :example:
+            .. code:: python
 
-        Raises:
-            AttributeError: When an attribute is not present.
-
-        Returns:
-            Any: Value
+                config.a.b.c          # Using `__getattr__`
+                config["a"]["b"]["c"] # Using `__getitem__`
+        :param name: Attribute name
+        :type name: str
+        :return: Fetched value
+        :rtype:  ~typing.Any
+        :raises AttributeError: When an attribute is not present.
         """
         if name not in self:
             raise AttributeError(f"Request attribute `{self.__attribute_name.with_suffix(name)}` does not exist")
@@ -197,19 +199,19 @@ class Configuration(typ.Mapping[typ.Any, typ.Any]):
 
     def exists(self, key: typ.Any) -> bool:
         """
-        Checks that a key exists and is not a :class:`Placeholder`
+        Checks that a key exists and is not a :py:class:`Placeholder`
 
-        Args:
-            key (Any): key to be checked
+        Parameters:
+            key (~typing.Any): key to be checked
 
         Returns:
-            bool: Returns True if the key exists and is not a :class:`Placeholder`
+            bool: Returns :py:data:`True` if the key exists and is not a :py:class:`Placeholder`
         """
         return (key in self) and not isinstance(self.__data[key], Placeholder)
 
     def evaluate_all(self) -> None:
         """
-        Evaluates all lazy tag functions and throws an exception on Placeholders
+        Evaluates all lazy tag functions and throws an exception on :py:class:`Placeholder` instances
         """
 
         for value in self.values():
@@ -218,14 +220,12 @@ class Configuration(typ.Mapping[typ.Any, typ.Any]):
 
     def as_dict(self) -> dict[typ.Any, typ.Any]:
         """
-        Returns this :class:`Configuration` as standard Python :class:`dict`.
+        Returns this :py:class:`Configuration` as standard Python :py:class:`dict`.
         Nested :class:`Configuration` objects will also be converted.
 
-        > Note: This will evaluated all lazy tag functions and throw an exception
-        on :class:`Placeholder` objects.
-
-        Returns:
-            dict: The shallow :class:`dict` copy.
+        :return: A shallow :py:class:`dict` copy
+        :rtype: dict
+        :note: This will evaluate all lazy tag functions and throw an exception on :py:class:`Placeholder` objects.
         """
         return dict(
             starmap(
@@ -235,121 +235,56 @@ class Configuration(typ.Mapping[typ.Any, typ.Any]):
         )
 
     def as_json_string(self, *, default: typ.Callable[[typ.Any], typ.Any] | None = None, **kwds: typ.Any) -> str:
-        """
-        Returns this `Configuration` as a JSON string, using standard `json`
+        r"""
+        Returns this :py:class:`Configuration` as a JSON string, using standard :py:mod:`json`
         library and (as default) the default factory provided by this library
-        (`granular_configuration_language.json_default`).
+        (:py:func:`granular_configuration_language.json_default`).
 
-        > Note: This will evaluated all lazy tag functions and throw an exception
-        on Placeholders.
-
-        Args:
-            default (Callable[[Any], Any] | None, optional):
-                Replacement `default` factory. Defaults to None.
-            **kwds (Any): Argments to be passed into `json.dumps`
-
-        Returns:
-            str: JSON-format string
+        :param default: Replacement :code:`default` factory. Defaults to :py:func:`~granular_configuration_language.json_default`.
+        :type default: \~typing.Callable[[\~typing.Any], \~typing.Any] | None, optional
+        :param \*\*kwds: Argments to be passed into :py:func:`json.dumps`
+        :type \*\*kwds: str
+        :return: JSON-format string
+        :rtype: str
+        :note: This will evaluate all lazy tag functions and throw an exception on :py:class:`Placeholder` objects.
         """
         from granular_configuration_language import json_default
 
         return json.dumps(self, default=default or json_default, **kwds)
 
     @typ.overload
-    def typed_get(self, type: typ.Type[T], key: typ.Any) -> T:
-        """
-        Provides a typed-checked `get` option
-
-        Args:
-            type (Type[T]): Wanted typed
-            key (Any): Key for wanted value
-
-        Raises:
-            TypeError: If the real type is not an instance of the expected type
-
-        Returns:
-            T: Value stored under the key
-        """
-        ...
+    def typed_get(self, type: typ.Type[T], key: typ.Any) -> T: ...
 
     @typ.overload
-    def typed_get(self, type: typ.Type[T], key: typ.Any, *, default: T) -> T:
-        """
-        Provides a typed-checked `get` option
-
-        Args:
-            type (Type[T]): Wanted typed
-            key (Any): Key for wanted value
-            default (T): Provides a default value like `dict.get`
-
-        Raises:
-            TypeError: If the real type is not an instance of the expected type
-
-        Returns:
-            T: Value stored under the key
-        """
-        ...
+    def typed_get(self, type: typ.Type[T], key: typ.Any, *, default: T) -> T: ...
 
     @typ.overload
-    def typed_get(self, type: typ.Type[T], key: typ.Any, *, predicate: typ.Callable[[typ.Any], typ.TypeGuard[T]]) -> T:
-        """
-        Provides a typed-checked `get` option
-
-        Args:
-            type (Type[T]): Wanted typed
-            key (Any): Key for wanted value
-            predicate (Callable[[Any], TypeGuard[T]]):
-                Replaces the `isinstance(value, type)` check with a custom
-                method `predicate(value) -> bool`
-
-        Raises:
-            TypeError: If the real type is not an instance of the expected type
-
-        Returns:
-            T: Value stored under the key
-        """
-        ...
+    def typed_get(
+        self, type: typ.Type[T], key: typ.Any, *, predicate: typ.Callable[[typ.Any], typ.TypeGuard[T]]
+    ) -> T: ...
 
     @typ.overload
     def typed_get(
         self, type: typ.Type[T], key: typ.Any, *, default: T, predicate: typ.Callable[[typ.Any], typ.TypeGuard[T]]
-    ) -> T:
-        """
-        Provides a typed-checked `get` option
-
-        Args:
-            type (Type[T]): Wanted typed
-            key (Any): Key for wanted value
-            default (T): Provides a default value like `dict.get`
-            predicate (Callable[[Any], TypeGuard[T]]):
-                Replaces the `isinstance(value, type)` check with a custom
-                method `predicate(value) -> bool`
-
-        Raises:
-            TypeError: If the real type is not an instance of the expected type
-
-        Returns:
-            T: Value stored under the key
-        """
-        ...
+    ) -> T: ...
 
     def typed_get(self, type: typ.Type[T], key: typ.Any, **kwds: Unpack[Kwords_typed_get[T]]) -> T:
-        """
-        Provides a typed-checked `get` option
+        r"""
+        Provides a typed-checked :code:`get` option
 
-        Args:
-            type (Type[T]): Wanted typed
-            key (Any): Key for wanted value
-            default (T, optional): Provides a default value like `dict.get`
-            predicate (Callable[[Any], TypeGuard[T]], optional):
-                Replaces the `isinstance(value, type)` check with a custom
-                method `predicate(value) -> bool`
-
-        Raises:
-            TypeError: If the real type is not an instance of the expected type
+        Parameters:
+            type (~typing.Type[T]): Wanted typed
+            key (~typing.Any): Key for wanted value
+            default (T, optional): Provides a default value like :py:meth:`dict.get`
+            predicate (\~typing.Callable[[~typing.Any], ~typing.TypeGuard[T]], optional):
+                Replaces the :code:`isinstance(value, type)` check with a custom
+                method :code:`predicate(value) -> bool`
 
         Returns:
             T: Value stored under the key
+
+        Raises:
+            TypeError: If the real type is not an instance of the expected type
         """
 
         try:
@@ -368,7 +303,7 @@ class Configuration(typ.Mapping[typ.Any, typ.Any]):
 
 class MutableConfiguration(typ.MutableMapping[typ.Any, typ.Any], Configuration):
     """
-    This class represents an mutable mapping of the configuration. Inherits from `Configuration`
+    This class represents an :py:class:`~collections.abc.MutableMapping` of the configuration. Inherits from :py:class:`Configuration`
     """
 
     # Remember `Configuration.__data` is really `Configuration._Configuration__data`

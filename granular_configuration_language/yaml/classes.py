@@ -7,7 +7,7 @@ from functools import cached_property
 from pathlib import Path
 from threading import RLock
 
-_RT = typ.TypeVar("_RT")
+RT = typ.TypeVar("RT")
 
 RootType = typ.NewType("RootType", typ.Mapping)
 Root = RootType | None
@@ -25,11 +25,11 @@ class Masked(str):
     """
     Used to keep secrets from printing to screen when running tests.
 
-    Does not alter text or prevent `print` from display the string value.
+    Does not alter text or prevent :py:func:`print` from display the string value.
 
     Inherits for :py:class:`str`. Replaces the :py:meth:`~object.__repr__` with the constant :code:`"'<****>'"`.
 
-    Used by `!Mask` tag
+    Used by :code:`!Mask` tag
     """
 
     def __repr__(self) -> str:
@@ -72,20 +72,20 @@ class LazyRoot:
         return lazy_root
 
 
-class LazyEval(abc.ABC, typ.Generic[_RT]):
+class LazyEval(abc.ABC, typ.Generic[RT]):
     def __init__(self, tag: Tag) -> None:
         self.tag = tag
         self.done = False
         self.__lock = RLock()
 
     @abc.abstractmethod
-    def _run(self) -> _RT: ...
+    def _run(self) -> RT: ...
 
     @cached_property
-    def __result(self) -> _RT:
+    def __result(self) -> RT:
         return self._run()
 
-    def __run(self) -> _RT:
+    def __run(self) -> RT:
         if self.done:
             return self.__result
         else:
@@ -97,7 +97,7 @@ class LazyEval(abc.ABC, typ.Generic[_RT]):
             return result
 
     @cached_property
-    def result(self) -> _RT | typ.Any:
+    def result(self) -> RT | typ.Any:
         """
         Result of LazyEval, completing any chains
         """

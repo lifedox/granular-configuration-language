@@ -15,7 +15,6 @@ author = "Eric Jensen (lifedox@live.com)"
 
 
 extensions = [
-    # "sphinx.ext.autosummary",
     "myst_parser",
     "sphinx.ext.autodoc",
     "sphinx.ext.doctest",
@@ -43,16 +42,11 @@ napoleon_use_param = True
 napoleon_use_rtype = True
 
 
-templates_path = ["_templates"]
 exclude_patterns = ["_build", "Thumbs.db", ".DS_Store", "doc_gen", "README_old.md"]
 
 
-# -- Options for HTML output -------------------------------------------------
-# https://www.sphinx-doc.org/en/master/usage/configuration.html#options-for-html-output
-
 html_theme = "sphinx_rtd_theme"
-
-
-# Example configuration for intersphinx: refer to the Python standard library.
 intersphinx_mapping = {"python": ("https://docs.python.org/3", None)}
 suppress_warnings = ["myst.xref_missing"]
+
+autodoc_type_aliases = {"Root": "Root"}

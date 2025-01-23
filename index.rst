@@ -1,34 +1,12 @@
 granular-configuration-language documentation
 =============================================
 
-.. .. automodule:: granular_configuration_language
-..     :members:
-
-
-
 .. toctree::
-   :maxdepth: 2
    :caption: Contents:
+   :maxdepth: 1
 
    README.md
    CHANGELOG.md
-..   source/modules
-
-
-
-.. .. autosummary::
-..    :recursive:
-
-..    granular_configuration_language
-
-Code
-=============================================
-
-
-.. automodule:: granular_configuration_language
-   :imported-members:
-   :members:
-   :show-inheritance:
-
+   doc-spec/spec.rst
 
 

@@ -37,34 +37,35 @@ class TagDecoratorBase(typ.Generic[T], abc.ABC):
     """
     Base class for Tag Decorator factories.
 
-    You must implement the `user_friendly_type` property and define the generic type.
+    You must implement the :py:attr:`user_friendly_type` property and define the generic type.
 
     Example:
-    ```
-    class string_tag(TagDecoratorBase[str]):
-        Type: typ.TypeAlias = str
 
-        @property
-        def user_friendly_type(self) -> str:
-            return "str"
-    ```
+    .. code:: python
 
-    You must override at least one of `scalar_node_type_check`,
-    `sequence_node_type_check`,or `mapping_node_type_check`.
+        class string_tag(TagDecoratorBase[str]):
+            Type: typing.TypeAlias = str
 
-    - For `scalar_node_type_check` to be called the YAML has already be tested
-      to be a `str`.
-    - For `sequence_node_type_check` to be called the YAML has already be
-      tested to be a Sequence.
-    - For `mapping_node_type_check` to be called the YAML has already be tested
-      to be a Mapping.
+            @property
+            def user_friendly_type(self) -> str:
+                return "str"
 
-    If these are enough, then you may just return `True` in the override method.
-    Otherwise, implement the override as a TypeGuard.
+    You must override at least one of :py:meth:`scalar_node_type_check`,
+    :py:meth:`sequence_node_type_check`,or :py:meth:`mapping_node_type_check`.
+
+    - For :py:meth:`scalar_node_type_check` to be called the YAML has already be tested
+      to be a :py:class:`str`.
+    - For :py:meth:`sequence_node_type_check` to be called the YAML has already be
+      tested to be a :py:class:`~collections.abc.Sequence`.
+    - For :py:meth:`mapping_node_type_check` to be called the YAML has already be tested
+      to be a :py:class:`~collections.abc.Mapping`.
+
+    If these are enough, then you may just return :py:data:`True` in the override method.
+    Otherwise, implement the override as a :py:data:`~typing.TypeGuard`.
 
     If the value needs to be altered before being passed to Tag functions,
-    override `scalar_node_transformer`, `scalar_node_transformer`, or
-    `mapping_node_transformer`, as needed.
+    override :py:meth:`scalar_node_transformer`, :py:meth:`scalar_node_transformer`, or
+    :py:meth:`mapping_node_transformer`, as needed.
 
     The transformer call if the associated node type check passes, just before
     the value is passed to tag function.
@@ -79,47 +80,50 @@ class TagDecoratorBase(typ.Generic[T], abc.ABC):
     @abc.abstractmethod
     def user_friendly_type(self) -> str:
         """
-        User friendly type version of the type expected by Tag Decorator.
+        User-friendly of the type expected by Tag Decorator.
 
-        Use Python types for consistent communication.
+        Note:
+            - Use Python types for consistent communication.
+            - This is used when generating exception messages.
 
-        This is used when generating exception messages.
+        :return: User-friendly string
+        :rtype:   str
         """
         ...
 
     def scalar_node_type_check(self, value: str) -> typ.TypeGuard[T]:
         """
-        Defaults to `False`. Override to enable Scalar Node support.
+        Defaults to :py:data:`False`. Override to enable Scalar Node support.
 
-        Args:
+        Parameters:
             value (str): YAML value
 
         Returns:
-            TypeGuard[T]: Return `True`, if `value` is supported.
+            ~typing.TypeGuard[T]: Return :py:data:`True`, if :code:`value` is supported.
         """
         return False
 
     def sequence_node_type_check(self, value: typ.Sequence) -> typ.TypeGuard[T]:
         """
-        Defaults to `False`. Override to enable Sequence Node support.
+        Defaults to :py:data:`False`. Override to enable Sequence Node support.
 
-        Args:
-            value (Sequence): YAML value
+        Parameters:
+            value (~collections.abc.Sequence): YAML value
 
         Returns:
-            TypeGuard[T]: Return `True`, if `value` is supported.
+            ~typing.TypeGuard[T]: Return :py:data:`True`, if :code:`value` is supported.
         """
         return False
 
     def mapping_node_type_check(self, value: typ.Mapping) -> typ.TypeGuard[T]:
         """
-        Defaults to `False`. Override to enable Mapping Node support.
+        Defaults to :py:data:`False`. Override to enable Mapping Node support.
 
-        Args:
-            value (Mapping): YAML value
+        Parameters:
+            value (~collections.abc.Mapping): YAML value
 
         Returns:
-            TypeGuard[T]: Return `True`, if `value` is supported.
+            ~typing.TypeGuard[T]: Return :py:data:`True`, if :code:`value` is supported.
         """
         return False
 
@@ -129,25 +133,24 @@ class TagDecoratorBase(typ.Generic[T], abc.ABC):
         Override if the value needs to be altered before being passed
         to Tag functions.
 
-        Only called if `scalar_node_type_check` return `True`.
+        Only called if :py:meth:`scalar_node_type_check` return :py:data:`True`.
 
-        Examples:
+        As an example, a float tag could be supported by:
 
-        A float tag could be supported by:
-        ```
-        def scalar_node_type_check(self, value: Any) -> TypeGuard[float]:
-            try:
-                float(value)
-                return True
-            except ValueError:
-                return False
+        .. code:: python
 
-        def scalar_node_transformer(self, value: Any) -> float:
-            return float(value)
-        ```
+            def scalar_node_type_check(self, value: Any) -> TypeGuard[float]:
+                try:
+                    float(value)
+                    return True
+                except ValueError:
+                    return False
 
-        Args:
-            value (Any): YAML value
+            def scalar_node_transformer(self, value: Any) -> float:
+                return float(value)
+
+        Parameters:
+            value (~typing.Any): YAML value
 
         Returns:
             T: Transformed value
@@ -160,10 +163,10 @@ class TagDecoratorBase(typ.Generic[T], abc.ABC):
         Override if the value needs to be altered before being passed
         to Tag functions.
 
-        Only called if `sequence_node_type_check` return `True`.
+        Only called if :py:meth:`sequence_node_type_check` return :py:data:`True`.
 
-        Args:
-            value (Any): YAML value
+        Parameters:
+            value (~typing.Any): YAML value
 
         Returns:
             T: Transformed value
@@ -176,10 +179,10 @@ class TagDecoratorBase(typ.Generic[T], abc.ABC):
         Override if the value needs to be altered before being passed
         to Tag functions.
 
-        Only called if `mapping_node_type_check` return `True`.
+        Only called if :py:meth:`mapping_node_type_check` return :py:data:`True`.
 
-        Args:
-            value (Any): YAML value
+        Parameters:
+            value (~typing.Any): YAML value
 
         Returns:
             T: Transformed value
@@ -190,8 +193,8 @@ class TagDecoratorBase(typ.Generic[T], abc.ABC):
         """
         Takes the wrapped tag function as wraps for configuration loading.
 
-        Args:
-            handler (Callable[[Tag, T, StateHolder], RT]): Wrapped Tag Function
+        Parameters:
+            handler (~collections.abc.Callable[[Tag, T, StateHolder], RT]): Wrapped Tag Function
 
         Returns:
             TagConstructor: Tag Function ready to be used when loading configuration

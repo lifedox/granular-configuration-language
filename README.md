@@ -1,8 +1,6 @@
-# `granular-configuration-language`
+# Getting Started
 
 > README is in-progress.
-
-[TOC]
 
 ## Why does this exist?
 
@@ -467,4 +465,4 @@ This means that a deep copy of a `Configuration` can share state with the origin
     ```yaml
     id: !UUID 9d7130a6-192f-41e6-88ce-29f0b765be9e
     ```
-  - **Returns:** `UUID` ‒ the string as a python `uuid.UUID`
+  - **Returns:** `UUID` ‒ the string as a python {py:class}`uuid.UUID`,

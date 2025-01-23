@@ -28,22 +28,22 @@ def json_default(value: typ.Any) -> typ.Any:
 
     * :code:`!UUID`/:py:class:`uuid.UUID` as hyphenated hex string
 
-    * :code:`!Date`/:py:class:`datetime.date` as :py:meth:`datetime.date.isoformat`
+    * :code:`!Date`/:py:class:`datetime.date` as :py:meth:`~datetime.date.isoformat`
 
-    * :code:`!DateTime`/:py:class:`datetime.datetime` as :py:meth:`datetime.datetime.isoformat`
+    * :code:`!DateTime`/:py:class:`datetime.datetime` as :py:meth:`~datetime.datetime.isoformat`
 
-    * :code:`!Func`/:py:class:`Callable` as :code:`f"<{func.__module__}.{func.__name__}>"`
+    * :code:`!Func`/:py:class:`~collections.abc.Callable` as :code:`f"<{func.__module__}.{func.__name__}>"`
 
-    * :code:`!Class`/:code:`class` as :code:`f"<{class.__module__}.{class.__name__}>"`
+    * :code:`!Class`/:py:data:`class` as :code:`f"<{class.__module__}.{class.__name__}>"`
 
     * For niceness, :py:class:`~collections.abc.Mapping` and non-:class:`str`
       :py:class:`~collections.abc.Sequence` instances are converted to :py:class:`dict` and :py:class:`tuple`
 
     :param value: Value being converted
     :type value: ~typing.Any
-    :raises TypeError: When an incompatible is provided, as required by :py:class:`~json.JSONEncoder`
     :return: :py:func:`json.dump` compatible object
     :rtype: Any
+    :raises TypeError: When an incompatible is provided, as required by :py:class:`~json.JSONEncoder`
     """
 
     if isinstance(value, Configuration):

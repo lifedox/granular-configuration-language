@@ -1,4 +1,4 @@
-from granular_configuration_language.yaml.classes import LoadOptions, Masked, Placeholder, Root
+from granular_configuration_language.yaml.classes import LoadOptions, Root
 from granular_configuration_language.yaml.decorators._base import Tag, TagDecoratorBase
 from granular_configuration_language.yaml.decorators._lazy import (
     as_lazy,
