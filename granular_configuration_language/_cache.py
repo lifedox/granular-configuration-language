@@ -8,10 +8,10 @@ from functools import cached_property, reduce
 from threading import Lock
 from weakref import WeakValueDictionary
 
+from granular_configuration_language._base_path import BasePath, read_base_path
 from granular_configuration_language._build import build_configuration
 from granular_configuration_language._configuration import Configuration
 from granular_configuration_language._locations import Locations
-from granular_configuration_language.base_path import BasePath, read_base_path
 
 
 @dataclasses.dataclass(frozen=False, eq=False, kw_only=True)

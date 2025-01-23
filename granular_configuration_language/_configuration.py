@@ -7,8 +7,8 @@ import typing as typ
 from itertools import starmap
 from weakref import ReferenceType, ref
 
+from granular_configuration_language._base_path import BasePathPart
 from granular_configuration_language._s import setter_secret
-from granular_configuration_language.base_path import BasePathPart
 from granular_configuration_language.exceptions import InvalidBasePathException, PlaceholderConfigurationError
 from granular_configuration_language.yaml import LazyEval, Placeholder
 
