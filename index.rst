@@ -5,6 +5,6 @@ granular-configuration-language documentation
     :caption: Contents:
     :maxdepth: 1
 
-    README.md
+    Getting Started <README.md>
     CHANGELOG.md
     doc-spec/spec.rst

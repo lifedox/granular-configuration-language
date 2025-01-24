@@ -186,8 +186,7 @@ class Configuration(typ.Mapping[typ.Any, typ.Any]):
 
                 config.a.b.c          # Using `__getattr__`
                 config["a"]["b"]["c"] # Using `__getitem__`
-        :param name: Attribute name
-        :type name: str
+        :param str name: Attribute name
         :return: Fetched value
         :rtype:  ~typing.Any
         :raises AttributeError: When an attribute is not present.
@@ -240,10 +239,8 @@ class Configuration(typ.Mapping[typ.Any, typ.Any]):
         library and (as default) the default factory provided by this library
         (:py:func:`granular_configuration_language.json_default`).
 
-        :param default: Replacement ``default`` factory. Defaults to :py:func:`~granular_configuration_language.json_default`.
-        :type default: \~typing.Callable[[\~typing.Any], \~typing.Any] | None, optional
-        :param \*\*kwds: Argments to be passed into :py:func:`json.dumps`
-        :type \*\*kwds: str
+        :param \~typing.Callable[[\~typing.Any], \~typing.Any] | None, optional default: Replacement ``default`` factory. Defaults to :py:func:`~granular_configuration_language.json_default`.
+        :param ~typing.Any \*\*kwds: Arguments to be passed into :py:func:`json.dumps`
         :return: JSON-format string
         :rtype: str
         :note: This will evaluate all lazy tag functions and throw an exception on :py:class:`Placeholder` objects.

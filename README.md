@@ -1,4 +1,4 @@
-# Getting Started
+# `granular-configuration-language`
 
 > README is in-progress.
 
