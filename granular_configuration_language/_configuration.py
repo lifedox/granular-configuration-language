@@ -240,7 +240,7 @@ class Configuration(typ.Mapping[typ.Any, typ.Any]):
         library and (as default) the default factory provided by this library
         (:py:func:`granular_configuration_language.json_default`).
 
-        :param default: Replacement :code:`default` factory. Defaults to :py:func:`~granular_configuration_language.json_default`.
+        :param default: Replacement ``default`` factory. Defaults to :py:func:`~granular_configuration_language.json_default`.
         :type default: \~typing.Callable[[\~typing.Any], \~typing.Any] | None, optional
         :param \*\*kwds: Argments to be passed into :py:func:`json.dumps`
         :type \*\*kwds: str
@@ -270,15 +270,15 @@ class Configuration(typ.Mapping[typ.Any, typ.Any]):
 
     def typed_get(self, type: typ.Type[T], key: typ.Any, **kwds: Unpack[Kwords_typed_get[T]]) -> T:
         r"""
-        Provides a typed-checked :code:`get` option
+        Provides a typed-checked :py:meth:`get` option
 
         Parameters:
             type (~typing.Type[T]): Wanted typed
             key (~typing.Any): Key for wanted value
             default (T, optional): Provides a default value like :py:meth:`dict.get`
             predicate (\~typing.Callable[[~typing.Any], ~typing.TypeGuard[T]], optional):
-                Replaces the :code:`isinstance(value, type)` check with a custom
-                method :code:`predicate(value) -> bool`
+                Replaces the ``isinstance(value, type)`` check with a custom
+                method ``predicate(value: Any) -> bool``
 
         Returns:
             T: Value stored under the key

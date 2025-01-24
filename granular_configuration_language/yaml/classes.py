@@ -31,9 +31,9 @@ class Masked(str):
     """
     Used to keep secrets from printing to screen when running tests.
 
-    Inherits for :py:class:`str`. Replaces the :py:meth:`~object.__repr__` with the constant :code:`"'<****>'"`.
+    Inherits for :py:class:`str`. Replaces the :py:meth:`~object.__repr__` with the constant ``"'<****>'"``.
 
-    Used by :code:`!Mask` tag
+    Used by ``!Mask`` tag
 
     Note:
         Does not alter text or prevent :py:func:`print` from display the string value.
@@ -45,9 +45,9 @@ class Masked(str):
 
 class Placeholder:
     """
-    Representation of :code:`!Placeholder` tag.
+    Representation of ``!Placeholder`` tag.
 
-    Holds the :code:`!Placeholder` message.
+    Holds the ``!Placeholder`` message.
     """
 
     __slot__ = ("message",)
