@@ -9,17 +9,19 @@ from granular_configuration_language.yaml.load import obj_pairs_func
 def merge(
     configs: typ.Iterable[Configuration | LazyLoadConfiguration | LazyEval | typ.Any], *, mutable: bool = False
 ) -> Configuration:
-    """
-    Merges the provided configurations into a single configuration.
+    """Merges the provided configurations into a single configuration.
 
-    Filters out non-:py:class:`.Configuration` object. Extracts :py:class:`.Configuration` from :py:class:`.LazyEval` and :py:class:`.LazyLoadConfiguration`
+    Filters out non-:py:class:`.Configuration` object. Extracts :py:class:`.Configuration` from :py:class:`.LazyEval`
+    and :py:class:`.LazyLoadConfiguration`
 
-    :param configs: Configurations to be merged
-    :type configs: ~collections.abc.Iterable[Configuration | LazyLoadConfiguration | LazyEval | ~typing.Any]
-    :param mutable: If :py:data:`True`, :py:class:`.MutableConfiguration` is used, else :py:class:`.Configuration` is used.  Defaults to :py:data:`False`.
-    :type mutable: bool, optional
-    :return: Merged configuration. Empty if nothing was mergable.
+    :param ~collections.abc.Iterable[Configuration | LazyLoadConfiguration | LazyEval | ~typing.Any] configs: Configurations
+        to be merged
+    :param bool, optional mutable: If :py:data:`True`, :py:class:`.MutableConfiguration` is used, else
+        :py:class:`.Configuration` is used. Defaults to :py:data:`False`.
+
+    :returns: Merged configuration. Empty if nothing was mergable.
     :rtype: Configuration
+
     """
 
     def configuration_only(

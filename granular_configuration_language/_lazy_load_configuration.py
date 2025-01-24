@@ -24,9 +24,7 @@ def _read_locations(
 
 
 class LazyLoadConfiguration(Mapping):
-    """
-    Provides a lazy interface for loading Configuration from file paths on first access.
-    """
+    """Provides a lazy interface for loading Configuration from file paths on first access."""
 
     def __init__(
         self,
@@ -37,34 +35,22 @@ class LazyLoadConfiguration(Mapping):
         disable_caching: bool = False,
         **kwargs: typ.Any,
     ) -> None:
-        """
-        :param load_order_location: File path to configuration file
-        :type load_order_location: ~pathlib.Path | str | os.PathLike
-        :param base_path:
-            Defines the subsection of the configuration file to use.
-            Can be provided as a single key, JSON Pointer of strings, or
-            list of keys. See Examples.
-        :type base_path: str | ~collections.abc.Sequence[str] | None, optional
-        :param use_env_location:
-            When enabled, if environment variable named by :code:`env_location_var_name`
-            exists, it will be read a comma-delimited list of configuration path
-            that will be appended to :code:`load_order_location` list.
-        :type use_env_location: bool, optional
-        :param env_location_var_name:
-            Defaults to :code:`"G_CONFIG_LOCATION"`.
-            Used when :code:`use_env_location` is :py:data:`True`.
+        """:param ~pathlib.Path | str | os.PathLike load_order_location: File path to configuration file
+        :param str | ~collections.abc.Sequence[str] | None, optional base_path: Defines the subsection of the configuration file to use. Can be provided as a single key, JSON Pointer of strings, or list of keys. See Examples.
+        :param bool, optional use_env_location: When enabled, if environment variable named by ``env_location_var_name`` exists, it will be read a comma-delimited list of configuration path that will be appended to ``load_order_location`` list.
+        :param str, optional env_location_var_name: Defaults to ``"G_CONFIG_LOCATION"``. Used when ``use_env_location`` is :py:data:`True`.
 
-            > Changing from the default value will set :code:`use_env_location` to :py:data:`True`.
-        :type env_location_var_name: str, optional
-        :param disable_caching: When :py:data:`True`, caching of "identical immutable configurations" is disabled.
-        :type disable_caching: bool, optional
+            > Changing from the default value will set ``use_env_location`` to :py:data:`True`.
+        :param bool, optional disable_caching: When :py:data:`True`, caching of "identical immutable configurations" is disabled.
+
         :examples:
-            .. code:: python
+            .. code-block:: python
 
                 # Base Path Examples
-                LazyLoadConfiguration(..., base_path="base_path")      # Single Key
-                LazyLoadConfiguration(..., base_path="/base/path")     # JSON Pointer (strings only)
-                LazyLoadConfiguration(..., base_path=("base", "path")) # List of keys
+                LazyLoadConfiguration(..., base_path="base_path")  # Single Key
+                LazyLoadConfiguration(..., base_path="/base/path")  # JSON Pointer (strings only)
+                LazyLoadConfiguration(..., base_path=("base", "path"))  # List of keys
+
         """
 
         self.__receipt: NoteOfIntentToRead | None = prepare_to_load_configuration(
@@ -75,28 +61,28 @@ class LazyLoadConfiguration(Mapping):
         )
 
     def __getattr__(self, name: str) -> typ.Any:
-        """
-        Loads (if not loaded) and fetches from the underlying `Configuration` object
+        """Loads (if not loaded) and fetches from the underlying `Configuration` object
+
+        :param str name: Attribute name
+
+        :returns: Result
+        :rtype: ~typing.Any
 
         :note: This also exposes the methods of :py:class:`Configuration` (except dunders).
-        :param name: Attribute name
-        :type name: str
-        :return: Result
-        :rtype: ~typing.Any
+
         """
         return getattr(self.config, name)
 
     @property
     def config(self) -> Configuration:
-        """
-        Load and fetch the configuration.
-        Configuration is cached for subsequent calls.
+        """Load and fetch the configuration. Configuration is cached for subsequent calls.
 
-        :return: Defined configuration
+        :returns: Defined configuration
         :rtype: Configuration
-        :note:
-            Loading the configuration is thread-safe and locks while the
-            configuration is loaded to prevent duplicative processing and data
+
+        :note: Loading the configuration is thread-safe and locks while the configuration is loaded to prevent
+            duplicative processing and data
+
         """
         config = self.__config
         self.__receipt = None  # self.__config is cached
@@ -112,9 +98,7 @@ class LazyLoadConfiguration(Mapping):
             )  # pragma: no cover
 
     def load_configuration(self) -> None:
-        """
-        Force load the configuration.
-        """
+        """Force load the configuration."""
         # load_configuration existed prior to config, being a cached_property.
         # Now that logic is in the cached_property, so this legacy/clear code just calls the property
         self.config
@@ -130,10 +114,10 @@ class LazyLoadConfiguration(Mapping):
 
 
 class MutableLazyLoadConfiguration(LazyLoadConfiguration, MutableMapping):
-    """
-    Provides a lazy interface for loading Configuration from file paths on first access.
+    """Provides a lazy interface for loading Configuration from file paths on first access.
 
     Uses: :py:class:`.MutableConfiguration` for mappings and :py:class:`list` for sequences.
+
     """
 
     def __init__(
@@ -143,32 +127,21 @@ class MutableLazyLoadConfiguration(LazyLoadConfiguration, MutableMapping):
         use_env_location: bool = False,
         env_location_var_name: str = "G_CONFIG_LOCATION",
     ) -> None:
-        """
-        :param load_order_location: File path to configuration file
-        :type load_order_location: ~pathlib.Path | str | os.PathLike
-        :param base_path:
-            Defines the subsection of the configuration file to use.
-            Can be provided as a single key, JSON Pointer of strings, or
-            list of keys. See Examples.
-        :type base_path: str | ~collections.abc.Sequence[str] | None, optional
-        :param use_env_location:
-            When enabled, if environment variable named by :code:`env_location_var_name`
-            exists, it will be read a comma-delimited list of configuration path
-            that will be appended to :code:`load_order_location` list.
-        :type use_env_location: bool, optional
-        :param env_location_var_name:
-            Defaults to :code:`"G_CONFIG_LOCATION"`.
-            Used when :code:`use_env_location` is :py:data:`True`.
+        """:param ~pathlib.Path | str | os.PathLike load_order_location: File path to configuration file
+        :param str | ~collections.abc.Sequence[str] | None, optional base_path: Defines the subsection of the configuration file to use. Can be provided as a single key, JSON Pointer of strings, or list of keys. See Examples.
+        :param bool, optional use_env_location: When enabled, if environment variable named by ``env_location_var_name`` exists, it will be read a comma-delimited list of configuration path that will be appended to ``load_order_location`` list.
+        :param str, optional env_location_var_name: Defaults to ``"G_CONFIG_LOCATION"``. Used when ``use_env_location`` is :py:data:`True`.
 
-            > Changing from the default value will set :code:`use_env_location` to :py:data:`True`.
-        :type env_location_var_name: str, optional
+            > Changing from the default value will set ``use_env_location`` to :py:data:`True`.
+
         :examples:
-            .. code:: python
+            .. code-block:: python
 
                 # Base Path Examples
                 MutableLazyLoadConfiguration(..., base_path="base_path")  # Single Key
                 MutableLazyLoadConfiguration(..., base_path="/base/path")  # JSON Pointer (strings only)
                 MutableLazyLoadConfiguration(..., base_path=("base", "path"))  # List of keys
+
         """
         super().__init__(
             *load_order_location,
@@ -181,12 +154,14 @@ class MutableLazyLoadConfiguration(LazyLoadConfiguration, MutableMapping):
 
     @property
     def config(self) -> MutableConfiguration:
-        """
-        Load and fetch the configuration. Configuration is cached for subsequent calls.
+        """Load and fetch the configuration. Configuration is cached for subsequent calls.
 
-        :return: Defined configuration
+        :returns: Defined configuration
         :rtype: MutableConfiguration
-        :note: Loading the configuration is thread-safe and locks while the configuration is loaded to prevent duplicative processing and data
+
+        :note: Loading the configuration is thread-safe and locks while the configuration is loaded to prevent
+            duplicative processing and data
+
         """
         return typ.cast(MutableConfiguration, super().config)
 

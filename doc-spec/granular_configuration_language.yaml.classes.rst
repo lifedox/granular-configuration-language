@@ -1,9 +1,7 @@
-:code:`granular_configuration_language.yaml.classes`
-====================================================
+``granular_configuration_language.yaml.classes``
+================================================
 
 .. automodule:: granular_configuration_language.yaml.classes
-   :members:
-   :show-inheritance:
-   :member-order: groupwise
-
-
+    :members:
+    :show-inheritance:
+    :member-order: groupwise

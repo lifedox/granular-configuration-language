@@ -17,33 +17,28 @@ def get_name(value: typ.Callable) -> str:
 
 
 def json_default(value: typ.Any) -> typ.Any:
-    """
-    A factory function to be used by the :py:func:`json.dump` family of functions.
+    """A factory function to be used by the :py:func:`json.dump` family of functions.
 
     Provides serialization for types produced by this library's Tags.
 
     Explicitly:
 
-    * :py:class:`~.Configuration` as :py:class:`dict`
+    - :py:class:`~.Configuration` as :py:class:`dict`
+    - ``!UUID``/:py:class:`uuid.UUID` as hyphenated hex string
+    - ``!Date``/:py:class:`datetime.date` as :py:meth:`~datetime.date.isoformat`
+    - ``!DateTime``/:py:class:`datetime.datetime` as :py:meth:`~datetime.datetime.isoformat`
+    - ``!Func``/:py:class:`~collections.abc.Callable` as ``f"<{func.__module__}.{func.__name__}>"``
+    - ``!Class``/:py:data:`class` as ``f"<{class.__module__}.{class.__name__}>"``
+    - For niceness, :py:class:`~collections.abc.Mapping` and non-:class:`str` :py:class:`~collections.abc.Sequence`
+      instances are converted to :py:class:`dict` and :py:class:`tuple`
 
-    * :code:`!UUID`/:py:class:`uuid.UUID` as hyphenated hex string
+    :param ~typing.Any value: Value being converted
 
-    * :code:`!Date`/:py:class:`datetime.date` as :py:meth:`~datetime.date.isoformat`
-
-    * :code:`!DateTime`/:py:class:`datetime.datetime` as :py:meth:`~datetime.datetime.isoformat`
-
-    * :code:`!Func`/:py:class:`~collections.abc.Callable` as :code:`f"<{func.__module__}.{func.__name__}>"`
-
-    * :code:`!Class`/:py:data:`class` as :code:`f"<{class.__module__}.{class.__name__}>"`
-
-    * For niceness, :py:class:`~collections.abc.Mapping` and non-:class:`str`
-      :py:class:`~collections.abc.Sequence` instances are converted to :py:class:`dict` and :py:class:`tuple`
-
-    :param value: Value being converted
-    :type value: ~typing.Any
-    :return: :py:func:`json.dump` compatible object
+    :returns: :py:func:`json.dump` compatible object
     :rtype: Any
+
     :raises TypeError: When an incompatible is provided, as required by :py:class:`~json.JSONEncoder`
+
     """
 
     if isinstance(value, Configuration):
