@@ -13,12 +13,11 @@ Some use cases:
     - Library Code:
       ```python
       CONFIG = LazyLoadConfiguration(
-        Path(__file___).parent / "config.yaml",
-        "./database-util-config.yaml",
-        "~/configs/database-util-config.yaml",
-        base_path="database-util",
-        env_location_var_name="ORG_COMMON_CONFIG_LOCATIONS",
-        use_env_location=True,
+          Path(__file___).parent / "config.yaml",
+          "./database-util-config.yaml",
+          "~/configs/database-util-config.yaml",
+          base_path="database-util",
+          env_location_var_name="ORG_COMMON_CONFIG_LOCATIONS",
       )
       ```
     - Library configuration:
@@ -45,9 +44,9 @@ Some use cases:
     - Library Code:
       ```python
       CONFIG = LazyLoadConfiguration(
-        Path(__file___).parent / "config.yaml",
-        "./database-util-config.yaml",
-        base_path="app",
+          Path(__file___).parent / "config.yaml",
+          "./database-util-config.yaml",
+          base_path="app",
       )
       ```
     - Base configuration:
@@ -71,13 +70,13 @@ Some use cases:
     - Library Code:
       ```python
       CONFIG = LazyLoadConfiguration(
-        Path(__file___).parent / "fixture_config.yaml",
-        *Path().rglob("fixture_config.yaml"),
-        base_path="fixture-gen",
+          Path(__file___).parent / "fixture_config.yaml",
+          *Path().rglob("fixture_config.yaml"),
+          base_path="fixture-gen",
       ).config
       #
       for name, spec in CONFIG.fixtures:
-        generate_fixture(name, spec)
+          generate_fixture(name, spec)
       ```
     - Library configuration:
       ```yaml
@@ -103,39 +102,62 @@ Examples:
 - One-off library with three possible sources:
   ```python
   CONFIG = LazyLoadConfiguration(
-    Path(__file___).parent / "config.yaml",  # Defines the path
-    "~/.config/really_cool_library_config.yaml",
-    "./really_cool_library_config.yaml",
+      Path(__file___).parent / "config.yaml",
+      "~/.config/really_cool_library_config.yaml",
+      "./really_cool_library_config.yaml",
   )
   ```
   - Comments:
-    - fdg
+    - `Path(__file___).parent` creates a file relative directory. Using this ensures that the embedded configuration (the one shipped with this library) is correctly reference within site-package.
+      - ⚠️ Don't forget to add the embedded config to package data.
+    - `~/.config/` is useful when you have settings that developers may want to on their machines.
+      - For example, plain text logs while debugging and JSON logs for deploys.
+    - `./` is useful for application deployment-specific settings.
+      - For example, say we have an application deploying to a Lambda package and a container service. With a current working directory option, Lambda specific settings and the container specific settings are single file addition to common deploy package.
 - Library that exists within an ecosystem/framework that shares configuration files:
   ```python
   CONFIG = LazyLoadConfiguration(
+      Path(__file___).parent / "config.yaml",
+      "~/.config/really_cool_library_config.yaml",
+      "./really_cool_library_config.yaml",
+      "~/.config/common_framework_config.yaml",
+      "./common_framework_config.yaml",
+      base_path="really_cool_library"
+  )
+  ```
+  - Comments:
+    - Once 
+-  configuration files:
+  ```python
+  CONFIG = LazyLoadConfiguration(
     Path(__file___).parent / "config.yaml",
-    "~/.config/really_cool_library_config.yaml",
-    "./really_cool_library_config.yaml",
-    base_path="really_cool_library_config"
+    "~/.config/common_framework_config.yaml",
+    "./common_framework_config.yaml",
+    base_path="really_cool_library"
+    env_location_var_name="ORG_COMMON_CONFIG_LOCATIONS",
   )
   ```
   - Notes:
     - fdg
-- Library that exists within an ecosystem/framework that shares configuration files:
+- Internal-only ecosystem/framework that only uses shared configuration files:
   ```python
   CONFIG = LazyLoadConfiguration(
-    Path(__file___).parent / "config.yaml",
-    "~/.config/really_cool_library_config.yaml",
-    "./really_cool_library_config.yaml",
-    base_path="really_cool_library_config"
+      Path(__file___).parent / "config.yaml",
+      base_path="really_cool_library"
+      env_location_var_name="ORG_COMMON_CONFIG_LOCATIONS",
   )
   ```
   - Notes:
     - fdg
-
-### Class Spec
-
-> Working on sphinx generation
+- configuration files:
+  ```python
+  CONFIG = LazyLoadConfiguration(
+      Path(__file___).parent / "fixture_config.yaml",
+      *Path().rglob("fixture_config.yaml"),
+      base_path="fixture-gen",
+  ```
+  - Notes:
+    - fdg
 
 ### Immutable vs. Mutable
 

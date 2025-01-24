@@ -14,7 +14,8 @@ class string_tag(TagDecoratorBase[str]):
 
             @string_tag(Tag("!Tag"))
             @as_lazy
-            def tag(value: str) -> Any: ...
+            def tag(value: str) -> Any:
+                ...
 
     """
 
@@ -39,7 +40,8 @@ class string_or_twople_tag(TagDecoratorBase[str | tuple[str, typ.Any]]):
 
             @string_or_twople_tag(Tag("!Tag"))
             @as_lazy
-            def tag(value: string_or_twople_tag.Type) -> Any: ...
+            def tag(value: string_or_twople_tag.Type) -> Any:
+                ...
 
     """
 
@@ -75,7 +77,8 @@ class sequence_of_any_tag(TagDecoratorBase[typ.Sequence[typ.Any]]):
 
             @sequence_of_any_tag(Tag("!Tag"))
             @as_lazy
-            def tag(value: Sequence[Any]) -> Any: ...
+            def tag(value: Sequence[Any]) -> Any:
+                ...
 
     """
 
@@ -100,7 +103,8 @@ class mapping_of_any_tag(TagDecoratorBase[Configuration]):
 
             @mapping_of_any_tag(Tag("!Tag"))
             @as_lazy
-            def tag(value: Configuration) -> Any: ...
+            def tag(value: Configuration) -> Any:
+                ...
 
     """
 

@@ -14,17 +14,19 @@ author = "Eric Jensen (lifedox@live.com)"
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#general-configuration
 
 
+exclude_patterns = ["_build", "Thumbs.db", ".DS_Store", "doc_gen", "README_old.md"]
 extensions = [
+    "sphinx_rtd_dark_mode",
     "myst_parser",
     "sphinx.ext.autodoc",
-    "sphinx.ext.doctest",
+    # "sphinx.ext.doctest",
     "sphinx.ext.intersphinx",
-    "sphinx.ext.todo",
-    "sphinx.ext.coverage",
-    "sphinx.ext.mathjax",
-    "sphinx.ext.ifconfig",
+    # "sphinx.ext.todo",
+    # "sphinx.ext.coverage",
+    # "sphinx.ext.mathjax",
+    # "sphinx.ext.ifconfig",
     "sphinx.ext.viewcode",
-    "sphinx.ext.githubpages",
+    # "sphinx.ext.githubpages",
     "sphinx.ext.napoleon",
 ]
 
@@ -41,11 +43,15 @@ napoleon_use_ivar = True
 napoleon_use_param = True
 napoleon_use_rtype = True
 
-
-exclude_patterns = ["_build", "Thumbs.db", ".DS_Store", "doc_gen", "README_old.md"]
-
-
 html_theme = "sphinx_rtd_theme"
+html_theme_options = {
+    "navigation_depth": -1,
+}
+html_css_files = [
+    "custom.css",
+]
+html_static_path = ["doc-spec/_static"]
+
 intersphinx_mapping = {"python": ("https://docs.python.org/3", None)}
 suppress_warnings = ["myst.xref_missing"]
 

@@ -25,7 +25,8 @@ def as_lazy(func: typ.Callable[[T], RT]) -> typ.Callable[[Tag, T, StateHolder], 
 
             @string_tag(Tag("!Tag"))
             @as_lazy
-            def tag(value: str) -> Any: ...
+            def tag(value: str) -> Any:
+                ...
     """
 
     @wraps(func)

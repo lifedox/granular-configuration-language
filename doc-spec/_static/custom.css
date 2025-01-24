@@ -1,0 +1,39 @@
+.wy-menu-vertical {
+  overflow-x: auto;
+}
+
+.wy-side-scroll {
+  width: fit-content;
+}
+
+/* Copied from https://github.com/readthedocs/sphinx_rtd_theme/issues/899 */
+
+/* first part of signature 
+i.e. `content_filter.` in the Python example
+*/
+html[data-theme="dark"].writer-html5
+  .rst-content
+  dl[class]:not(.option-list):not(.field-list):not(.footnote):not(
+    .citation
+  ):not(.glossary):not(.simple)
+  > dt
+  > .sig-prename {
+  color: orange;
+}
+
+/* second part of signature 
+i.e. `Filter.` in the Python example
+*/
+html[data-theme="dark"].writer-html5
+  .rst-content
+  section
+  dl[class]:not(.option-list):not(.field-list):not(.footnote):not(
+    .citation
+  ):not(.glossary):not(.simple)
+  > dt:first-child
+  > .sig-prename
+  + .descname {
+  /*only select descnames that have a prename in front. Avoids selecting function signature
+  descnames */
+  color: orange;
+}
