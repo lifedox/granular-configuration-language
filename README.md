@@ -455,7 +455,7 @@ This means that a deep copy of a `Configuration` can share state with the origin
     ```
   - **Returns:** `Masked` ‒ the string as a `Masked`
   - Notes:
-    - `Masked` inherits from `str`, overwriting the `__repr__` to always be `"'<****>'"`.
+    - {py:class}`.Masked` inherits from `str`, overwriting the `__repr__` to always be `"'<****>'"`.
     - `Masked` objects are created at Load Time.
     - Some libraries (such as `requests`) explicitly only support `str` and not subclasses of `str`. In those cases, you can `str(masked_value)` to get back the pure `str`.
 - `!UUID` <a id="tag-UUID"></a>

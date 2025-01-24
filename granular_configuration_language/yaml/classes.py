@@ -23,7 +23,7 @@ Type used by type checking to identify the configuration root if it exists.
 
 Tag = typ.NewType("Tag", str)
 """
-:py:class:`~typing.NewType` used to type tag strings.
+:py:class:`~typing.NewType` used to type tag strings. Must begin with ``!``
 """
 
 
@@ -31,11 +31,12 @@ class Masked(str):
     """
     Used to keep secrets from printing to screen when running tests.
 
-    Does not alter text or prevent :py:func:`print` from display the string value.
-
     Inherits for :py:class:`str`. Replaces the :py:meth:`~object.__repr__` with the constant :code:`"'<****>'"`.
 
     Used by :code:`!Mask` tag
+
+    Note:
+        Does not alter text or prevent :py:func:`print` from display the string value.
     """
 
     def __repr__(self) -> str:
