@@ -1,9 +1,26 @@
+/* Enables a scollbar when menu items are wider than planned */
+/* It works */
+
 .wy-menu-vertical {
   overflow-x: auto;
 }
 
 .wy-side-scroll {
   width: fit-content;
+}
+
+/* Ensure unplanned scollbars are dark */
+html[data-theme="dark"] {
+  color-scheme: dark;
+}
+
+/* Tweak function color for code-base to be less pure blue */
+html[data-theme="dark"] .highlight .nf {
+  color: #07f;
+}
+/* Tweak class color for code-base to be less pure blue */
+html[data-theme="dark"] .highlight .nc {
+  color: #07f;
 }
 
 /* Copied from https://github.com/readthedocs/sphinx_rtd_theme/issues/899 */
@@ -18,7 +35,7 @@ html[data-theme="dark"].writer-html5
   ):not(.glossary):not(.simple)
   > dt
   > .sig-prename {
-  color: orange;
+  color: #bfbfbf;
 }
 
 /* second part of signature 
@@ -35,5 +52,33 @@ html[data-theme="dark"].writer-html5
   + .descname {
   /*only select descnames that have a prename in front. Avoids selecting function signature
   descnames */
-  color: orange;
+  color: #bfbfbf;
+}
+
+/* My own */
+html[data-theme="dark"].writer-html5
+  .rst-content
+  dl[class]:not(.option-list):not(.field-list):not(.footnote):not(
+    .citation
+  ):not(.glossary):not(.simple)
+  dl:not(.option-list):not(.field-list):not(.footnote):not(.citation):not(
+    .glossary
+  ):not(.simple)
+  > dt {
+  background: #0b0b0b;
+}
+
+html[data-theme="dark"].writer-html5
+  .rst-content
+  dl[class]:not(.option-list):not(.field-list):not(.footnote):not(
+    .citation
+  ):not(.glossary):not(.simple)
+  .descname,
+html[data-theme="dark"].writer-html5
+  .rst-content
+  dl[class]:not(.option-list):not(.field-list):not(.footnote):not(
+    .citation
+  ):not(.glossary):not(.simple)
+  .sig-name {
+  color: #bfbfbf;
 }
