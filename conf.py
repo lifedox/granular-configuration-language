@@ -51,8 +51,10 @@ html_css_files = [
     "custom.css",
 ]
 html_static_path = ["doc-spec/_static"]
+default_dark_mode = False
 
 intersphinx_mapping = {"python": ("https://docs.python.org/3", None)}
 suppress_warnings = ["myst.xref_missing"]
 
 autodoc_type_aliases = {"Root": "Root"}
+myst_heading_anchors = 7

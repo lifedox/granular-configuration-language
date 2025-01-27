@@ -6,5 +6,6 @@ granular-configuration-language documentation
     :maxdepth: 1
 
     Getting Started <README.md>
-    CHANGELOG.md
+    doc-spec/yaml.md
     doc-spec/spec.rst
+    CHANGELOG.md

@@ -1,0 +1,317 @@
+# YAML Tags
+
+- **Argument** and **Return** use Python primitive type as common reference.
+  - To convert to YAML node definitions:
+    - {py:data}`~typing.Any` is any type.
+    - {py:class}`str` is "scalar"
+    - {py:class}`list` is "sequence"
+    - {py:class}`tuple` is a sized "sequence"
+    - {py:class}`dict` is "mapping"
+      - All "mapping" mapping nodes return as a {py:class}`.Configuration`.
+        - Or {py:class}`.MutableConfiguration`, when `mutable=True`.
+  - Tags in YAML only support "scalar", "sequence", and "mapping".
+    - As such,`!Tag 1.0` is always a string, despite `1.0` normally being a floating point number.
+- YAML Tags provided by this library are lazy (running when the value is request, not load time) unless noted.
+
+## Summary Table
+
+<!--If you are reading this markdown raw with word wrap, this table is not for you. See the list based documentation for an easier read.-->
+
+|                 Category                 |                                      Tag                                      |                Argument                 |                                                                                                   Usage                                                                                                    |
+| :--------------------------------------: | :---------------------------------------------------------------------------: | :-------------------------------------: | :--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------: |
+| [**String <br> Formatter**](#formatters) |                    [`!Sub`](#sub)[ⁱ⁺](#interpolates-full)                     |             {py:class}`str`             | `!Sub ${ENVIRONMENT_VARIABLE}` <br> `!Sub ${ENVIRONMENT_VAR:-default value}` <br> `!Sub ${$.JSON.Path.expression}` <br> `!Sub ${/JSON/Pointer/expression}` <br> `!Sub ${&#x24;&#x7B; Escaped HTML &#x7D;}` |
+|     [**Manipulator**](#manipulators)     |                                [`!Del`](#del)                                 |             {py:class}`str`             |                                                                                             `!Del key: value`                                                                                              |
+|                                          |                              [`!Merge`](#merge)                               |          `list[dict \| None]`           |                                                                             `!Merge [{"key1": "value1"}, {"key2": "value2"}]`                                                                              |
+|                                          |                        [`!Placeholder`](#placeholder)                         |             {py:class}`str`             |                                                                                       `!Placeholder helpful message`                                                                                       |
+|                                          |                    [`!Ref`](#ref)[ⁱ⁺](#interpolates-full)                     |             {py:class}`str`             |                                                                    `!Ref $.JSON.Path.expression}` <br> `!Ref /JSON/Pointer/expression`                                                                     |
+|          [**Parser**](#parsers)          |                    [`!ParseEnv`](#parseenv--parseenvsafe)                     | {py:class}`str`<br>`\| tuple[str, Any]` |                                                                 `!ParseEnv ENVIRONMENT_VARIABLE` <br> `!ParseEnv ["ENVIRONMENT_VAR", 42]`                                                                  |
+|                                          |                  [`!ParseEnvSafe`](#parseenv--parseenvsafe)                   | {py:class}`str`<br>`\| tuple[str, Any]` |                                                             `!ParseEnvSafe ENVIRONMENT_VARIABLE` <br> `!ParseEnvSafe ["ENVIRONMENT_VAR", 42]`                                                              |
+|                                          |     [`!ParseFile`](#parsefile--optionalparsefile)[ⁱ⁺](#interpolates-full)     |             {py:class}`str`             |                                                                                      `!ParseFile relative/path.yaml`                                                                                       |
+|                                          | [`!OptionalParseFile`](#parsefile--optionalparsefile)[ⁱ⁺](#interpolates-full) |             {py:class}`str`             |                                                                                     `!OptionalParseFile optional.yaml`                                                                                     |
+|           [**Typer**](#typers)           |                 [`!Class`](#class)[ⁱ](#interpolates-reduced)                  |             {py:class}`str`             |                                                                                             `!Class uuid.UUID`                                                                                             |
+|                                          |                  [`!Date`](#date)[ⁱ](#interpolates-reduced)                   |             {py:class}`str`             |                                                                                             `!Date 1988-12-28`                                                                                             |
+|                                          |              [`!DateTime`](#datetime)[ⁱ](#interpolates-reduced)               |             {py:class}`str`             |                                                                     `!Date 1988-12-28T23:38:00-0600` <br> `!Date 2019-18-17T16:15:14`                                                                      |
+|                                          |                  [`!Func`](#func)[ⁱ](#interpolates-reduced)                   |             {py:class}`str`             |                                                                                          `!Func functools.reduce`                                                                                          |
+|                                          |                  [`!Mask`](#mask)[ⁱ](#interpolates-reduced)                   |             {py:class}`str`             |                                                                                             `!Mask ${SECRET}`                                                                                              |
+|                                          |                  [`!UUID`](#uuid)[ⁱ](#interpolates-reduced)                   |             {py:class}`str`             |                                                                                `!UUID 9d7130a6-192f-41e6-88ce-29f0b765be9e`                                                                                |
+
+<a id="interpolates-full"></a>ⁱ⁺: Supports full interpolation syntax of [`!Sub`](#sub).
+<br> <!--Looks good in GitHub-->
+<a id="interpolates-reduced"></a>ⁱ: Supports reduced interpolation syntax of [`!Sub`](#sub) without JSON Path and JSON Pointer syntax.
+
+---
+
+## Formatters
+
+### `!Sub`
+
+- **Argument:** _str_
+- **Usage:**
+  ```yaml
+  environment_variable: !Sub ${ENVIRONMENT_VARIABLE_THAT_EXISTS}
+  with_a_default: !Sub ${ENVIRONMENT_VARIABLE_MIGHT_NOT_EXIST:-some default value}
+  with_other_text: !Sub Normal Text + ${ENVIRONMENT_VARIABLE_THAT_EXISTS}
+  json_path: !Sub ${$.json.path.expression}
+  json_pointer: !Sub ${/json/pointer/expression}
+  $: !Sub ${$}
+  "${}": !Sub "${&#x24;&#x7B;&#x7D;}"
+  ```
+- **Returns:** {py:class}`str` ‒ string produced by the interpolation syntax.
+- Interpolations:
+  - `${ENVIRONMENT_VARIABLE}`: Replaced with the specified Environment Variable.
+    - If the variable does not exist, raises {py:class}`.EnvironmentVaribleNotFound`
+  - `${ENVIRONMENT_VARIABLE:-default}`: Replaced with the specified Environment Variable.
+    - If variable does not exist, use the text after `:-`.
+    - Note: specifier is `:-`.
+  - `${ENVIRONMENT_VARIABLE:+<nested_interpolation_spec>}`: Replaced with the specified Environment Variable.
+    - If variable does not exist, interpolate the text after `:+`.
+    - Note: specifier is `:+`.
+  - `${$.json.path.expression}`: Replaced by the object in the configuration specified in JSON Path syntax.
+    - Paths must start at full root of the configuration, using `$` as the first character.
+    - Results:
+      - Referencing only strings is recommended. However, paths that return {py:class}`~collections.abc.Mapping` or {py:class}`~collections.abc.Sequence` will be {py:func}`repr`-ed. Other objects will be {py:class}`str`-ed.
+      - Paths that do not exist raise {py:class}`.JSONPathQueryFailed`.
+  - `${/json/pointer/expression}`: Replaced by the object in the configuration specified in JSON Path syntax.
+    - Paths must start at full root of the configuration, using `/` as the first character.
+    - Results:
+      - Referencing only strings is recommended. However, paths that return {py:class}`~collections.abc.Mapping` or {py:class}`~collections.abc.Sequence` will be {py:func}`repr`-ed. Other objects will be {py:class}`str`-ed.
+      - Paths that do not exist raise {py:class}`.JSONPointerQueryFailed`.
+  - `${$}`: Replaced with `$`.
+    - `!Sub ${$}{}` produces `${}`
+  - `${&...;}`: Replaced by the results {py:func}`html.unescape`.
+    - `!Sub ${&#x24;&#x7B;&#x7D;}` produces `${}`
+    - `!Sub ${&#x24;&#40;&#41;}` produces `$()`
+    - `!Sub ${&#x24;&#91;&#93;}` produces `$[]`
+  - Notes:
+    - `${...}` is greedy and does not support nesting (i.e. `!Sub ${${}}` sees `${` as the inner expression).
+    - Modes other than `:-` and `:+` are reserved and throw {py:class}`.InterpolationSyntaxError`. Use `::` to for escaping colons in environment variable names.
+    - `$(...)` is reserved future for use and will warn with {py:class}`.InterpolationWarning` if used.
+    - `!Sub` checks if there is an JSON Path or JSON Pointer expression before keeping a reference to the root of the configuration.
+    - ⚠️ JSON Path and JSON Pointer can be used to cause infinite loops and/or a {py:class}`RecursionError`.
+
+### `!Env`
+
+- **Argument:** _str_.
+- **Usage:**
+  ```yaml
+  environment_variable: !Env "{{ENVIRONMENT_VARIABLE_THAT_EXISTS}}"
+  with_a_default: !Env "{{ENVIRONMENT_VARIABLE_MIGHT_NOT_EXIST:some default value}}"
+  ```
+- **Returns:** {py:class}`str` ‒ string produced by the string format, replacing `{{VARIABLE_NAME}}` with the Environment Variable specified. Optionally, a default value can be specified should the Environment Variable not exist.
+
+```{admonition} Deprecated
+[`!Sub`](#sub) replaces this functionality and offers more options. `!Env` will not be removed but will not see future updates.
+```
+
+&nbsp;
+
+## Manipulators
+
+### `!Del`
+
+- **Argument:** _str_.
+- **Usage:**
+  ```yaml
+  !Del hidden: &common_setting Some Value
+  copy1: *common_setting
+  copy2: *common_setting
+  ```
+  _Result:_ `{"copy1: "Some Value", "copy2": "Some Value"}`
+- **Action:** Marks the key and value to be removed just after load (technically: it acts as a part of the load). This allows YAML anchors to be defined in the value and used, but by the time the Configuration is merged and built, the key and value are already removed.
+- Notes:
+  - `!Del` will only act when applied to the key of mapped value (`!Del key: value`; not `key: !Del value`). When applied otherwise it does nothing. Using key allows `!Del d: %setting !Func itertools.chain`.
+  - `!Del` is one of the few exceptions to laziness and acts at load time.
+
+### `!Merge`
+
+- **Argument:** _list[Any]_.
+- **Usage:**
+  ```yaml
+  !Merge
+  - setting1: some_default_value
+  - !ParseFile relative/path/to/file.yaml
+  - !OptionalParseFile relative/path/to/optional/file.yaml
+  - setting2: some_overriding_value
+  ```
+- **Returns:** {py:class}`.Configuration` ‒ Merges are sequence of mapping into a single {py:class}`.Configuration`, filtering out any {py:class}`.Configuration`.
+- Notes:
+  - When merging, all objects in the merge list are evaluated. As an explicit example, a [`!ParseFile`](#parsefile)in the merge list is evaluated with the `!Merge`.
+  - Tags in the list merge cannot reference what is being merged.
+    - Following is not allowed, because this [`!Ref`](#ref)acts during the merge:
+      ```yaml
+      key1: !Merge
+        - nested_key:
+            settings: values
+        - !Ref $.key1.nested_key
+      ```
+    - Following is allowed, because this [`!Ref`](#ref)acts after the merge:
+      ```yaml
+      key1: !Merge
+        - nested_key:
+            settings: values
+        - nested_key2: !Ref $.key1.nested_key
+      ```
+  - `!Merge` is equivalent to the merge that occurs at Merge Time.
+    - The following options result is the same Configuration:
+      - `LazyLoadConfiguration("file1.yaml", "file2.yaml")`
+        - This is the only option that remains lazy.
+      - Loading a file containing:
+        ```yaml
+        !Merge
+        - !OptionalParseFile file1.yaml
+        - !OptionalParseFile file2.yaml
+        ```
+      - `merge(LazyLoadConfiguration("file1.yaml"), LazyLoadConfiguration("file2.yaml"))`
+        - see {py:func}`.merge` for full signature.
+  - The expected use-case for `!Merge` is to be paired with multiple [`!ParseFile`](#parsefile)and/or [`!OptionalParseFile`](#optionalparsefile) tags.
+
+### `!Placeholder`
+
+- **Argument:** _str_.
+- **Usage:**
+  ```yaml
+  setting1: !Placeholder message to user
+  ```
+- **Action:** `!Placeholder` marks a value as needing to be overridden. If the `!Placeholder` is still present when the value is fetched, a {py:class}`.PlaceholderConfigurationError` is thrown. The exception message includes the attribute name and provided message (e.g. `` !Placeholder at `$.setting1` was not overwritten. Message: "message to user" ``)
+- Note:
+  - The {py:class}`.Placeholder` object is created at Load Time. The exception is thrown at Fetch.
+  - {py:class}`.PlaceholderConfigurationError` is thrown by the {py:class}`.Configuration` class. `!Placeholder` as a scalar or sequence will just return a {py:class}`.Placeholder` instance.
+
+### `!Ref`
+
+- **Argument:** _str_.
+  - _Supports Full Interpolation Syntax_
+- **Usage:**
+  ```yaml
+  json_path: !Ref $.json.path.expression
+  json_pointer: !Ref /json/pointer/expression
+  ```
+- **Returns:** {py:data}`~typing.Any` ‒ Object referenced in absolute JSON Path or JSON Pointer syntax.
+- Notes:
+  - Must begin with either `$` for JSON Path or `/` for JSON Pointer. Otherwise, a `RefMustStartFromRoot` exception is thrown.
+  - `!Ref` underlies [`!Sub`](#sub) reference syntax. `!Ref` returns the object. Whereas [`!Sub`](#sub) stringifies the objects.
+  - JSON Pointer is limited by designed to be a single reference.
+  - JSON Path can be used to created objects. `$.*.things` returns a sequence of all values from mappings contain the `things` key. This behavior is not restricted, but not recommended.
+    - JSON Path was made available first, because cloud services used a restricted version similarly.
+  - ⚠️ `!Ref` can be used to cause infinite loops and/or a {py:class}`RecursionError`.
+
+&nbsp;
+
+## Parsers
+
+### `!ParseEnv` | `ParseEnvSafe`
+
+- **Argument:** _str | tuple[str, Any]_
+- **Usage:**
+  ```yaml
+  environment_variable_must_exist: !ParseEnv ENVIRONMENT_VARIABLE
+  environment_variable_may_exist: !ParseEnv
+    - ENVIRONMENT_VARIABLE
+    - <YAML object>
+  ```
+- **Returns:** {py:data}`~typing.Any` ‒ specified environment variable parsed.
+  - When environment variable does not exist:
+    - If argument is {py:class}`str`, a {py:class}`.EnvironmentVaribleNotFound` error will be thrown.
+    - If argument is {py:class}`tuple`, the second object will be returned.
+- Notes:
+  - `!ParseEnvSafe` uses pure YAML loading. `!ParseEnv` uses this library loader.
+- ⚠️ `!ParseEnv` can be used to cause infinite loops and/or a {py:class}`RecursionError`.
+  - `!ParseEnv VAR`, where `VAR='!ParseEnv VAR'`, will loop infinitely.
+
+### `!ParseFile` | `!OptionalParseFile`
+
+- **Argument:** _str_
+  - _Supports Full Interpolation Syntax_
+- **Usage:**
+  ```yaml
+  file_must_exist: !ParseFile relative/path/to/file.yaml
+  file_may_exist: !ParseFile relative/path/to/optional/file.yaml
+  ```
+- **Returns:** {py:data}`~typing.Any` ‒ Loads the specified file.
+  - When the file does not exist:
+    - `!ParseFile` throws {py:class}`FileNotFoundError`.
+    - `!OptionalParseFile` return null ({py:data}`None`).
+- Notes:
+  - `!ParseFile` can be used at the root of the configuration document to act as a file redirect.
+  - `!OptionalParseFile` is intended to be used with [`!Merge`](#merge), where nulls are filtered out.
+  - ⚠️ `!ParseFile` and `!OptionalParseFile` can be used to cause infinite loops and/or a {py:class}`RecursionError`.
+
+&nbsp;
+
+## Typers
+
+### `!Class`
+
+- **Argument:** _str_
+- **Usage:**
+  ```yaml
+  class_type: !Class uuid.UUID
+  ```
+- **Returns:** {py:class}`type` ‒ Imports and returns the specified the class
+- Notes:
+  - The current working directory is added prior to importing.
+  - Returned object pass {py:func}`inspect.isclass` test.
+
+### `!Date`
+
+- **Argument:** _str_
+  - _Supports Reduced Interpolation Syntax_
+- **Usage:**
+  ```yaml
+  date: !Date 1988-12-28
+  ```
+- **Returns:** {py:class}`~datetime.date` ‒ Returns the string parsed as ISO 8601 in a python {py:class}`datetime.date`.
+- Notes:
+  - For Python 3.11+, {py:meth}`date.fromisoformat() <datetime.date.fromisoformat>` is used.
+  - For Python 3.10, `dateutil.parser.parse(value, yearfirst=True, dayfirst=False).date()` is used.
+
+### `!DateTime`
+
+- **Argument:** _str_
+  - _Supports Reduced Interpolation Syntax_
+- **Usage:**
+  ```yaml
+  with_timezone: !DateTime "2012-10-31T13:12:09-0600"
+  without_timezone: !DateTime "2012-10-31T13:12:09"
+  ```
+- **Returns:** {py:class}`~datetime.datetime` ‒ Returns the string parsed as ISO 8601 in a python {py:class}`datetime.datetime`.
+- Notes:
+  - For Python 3.11+, {py:meth}`datetime.fromisoformat() <datetime.datetime.fromisoformat>` is used.
+  - For Python 3.10, `dateutil.parser.parse(value, yearfirst=True, dayfirst=False)` is used.
+
+### `!Func`
+
+- **Argument:** _str_
+  - _Supports Reduced Interpolation Syntax_
+- **Usage:**
+  ```yaml
+  function: !Func functool.reduce
+  ```
+- **Returns:** {py:class}`~collections.abc.Callable` ‒ Imports and returns the specified the function
+- Notes:
+  - The current working directory is added prior to importing.
+  - Returned object pass {py:func}`callable` test.
+
+### `!Mask`
+
+- **Argument:** _str_
+  - _Supports Reduced Interpolation Syntax_
+- **Usage:**
+  ```yaml
+  function: !Mask ${SECRET}
+  ```
+- **Returns:** {py:class}`.Masked` ‒ the string as a {py:class}`.Masked`
+- Notes:
+  - {py:class}`.Masked` inherits from {py:class}`str`, overwriting the {py:meth}`~object.__repr__` to always be `"'<****>'"`.
+  - {py:class}`.Masked` objects are created at Load Time.
+  - Some libraries (such as [`requests`]([https://requests.readthedocs.io/en/latest/)) explicitly only support {py:class}`str` and not subclasses of {py:class}`str`. In those cases, you can `str(masked_value)` to get back the pure {py:class}`str`.
+
+### `!UUID`
+
+- **Argument:** _str_
+  - _Supports Reduced Interpolation Syntax_
+- **Usage:**
+  ```yaml
+  id: !UUID 9d7130a6-192f-41e6-88ce-29f0b765be9e
+  ```
+- **Returns:** {py:class}`~uuid.UUID` ‒ the string as a python {py:class}`uuid.UUID`,
