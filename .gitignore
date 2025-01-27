@@ -7,7 +7,8 @@ results/
 Pipfile.lock
 _main.py
 
-new-docs
+new-docs/
+docs/
 
 #####################################
 # Generate from gitignore.io

@@ -1,0 +1,35 @@
+name: documentation
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: pipx install poetry
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: poetry install
+      - run: poetry run ./run _docgen
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: docs/html
+          retentions-days: 1
+
+  deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.docs-deploy.outputs.page_url }}
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+      - uses: actions/deploy-pages@v4
+    permissions:
+      pages: write
+      id-token: write

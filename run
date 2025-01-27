@@ -201,7 +201,7 @@ docgen() {
 }
 _docgen() {
     _logit 'Running docgen'
-    sphinx-build -M html . new-docs
+    sphinx-build -M html . docs
 }
 
 
