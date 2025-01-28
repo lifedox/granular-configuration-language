@@ -14,7 +14,7 @@
     - Both `jsonpath-rw` and `python-jsonpath` cannot be installed. `jsonpath-rw` controls `jsonpath_rw` and `jsonpath` modules (despite not explicitly needing the latter). `python-jsonpath` also controls `jsonpath`, but looses in `jsonpath-rw`.
       - `ImportError` occur on the `jsonpath` modules when both are installed.
 - `Configuration` no longer fakes being a subclass of `dict`.
-  - It remains a `MutableMapping`.
+  - It remains a `Mapping`.
   - `dict` inheritance was done for compatible with `json.dumps` and other library that only support the primitive `dict`, instead of `Mapping`. However, faking the inheritance has always been sketchy and `json.dumps` has failed in rare occurrences.
   - Mitigation: Used one of the following methods:
     - `json.dumps(config.as_dict())`

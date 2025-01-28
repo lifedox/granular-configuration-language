@@ -82,11 +82,13 @@ CONFIG = LazyLoadConfiguration(
 CONFIG = LazyLoadConfiguration(
     *Path(__file___).parent.glob("*.yaml"),
     base_path="fixture-gen",
+)
 # Recursive
 CONFIG = LazyLoadConfiguration(
     Path(__file___).parent / "fixture_config.yaml",
     *Path().rglob("fixture_config.yaml"),
     base_path="fixture-gen",
+)
 ```
 
 - Comments:
@@ -94,3 +96,15 @@ CONFIG = LazyLoadConfiguration(
     - For example, your configuration has three types of things with twenty options per type. Having a file per type can make development easier and not having name specified can make it easier to add a fourth type.
   - Recursive: Sometimes it is useful to search current working directory for configuration.
     - For example, your library can generate fixtures for [`pytest`](https://docs.pytest.org/en/stable/). This enables to have fixtures declarations in the same directory as the test cases that use them.
+
+---
+
+## Writing your configuration
+
+TODO
+
+---
+
+## Using your configuration
+
+TODO

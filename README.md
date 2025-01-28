@@ -6,7 +6,7 @@ Full documentation at [link](https://lifedox.github.io/granular-configuration-la
 
 ## Why does this exist?
 
-This library exists to allow your code use YAML as a configuration language for internal and external parties, with added YAML Tags to allow configuration to be crafted from multiple sources.
+This library exists to allow your code use YAML as a configuration language for internal and external parties, with added [YAML Tags](https://lifedox.github.io/granular-configuration-language/doc-spec/yaml.html) to allow configuration to be crafted from multiple sources.
 
 Some use cases:
 
