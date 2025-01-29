@@ -5,6 +5,7 @@ from functools import wraps
 
 from ruamel.yaml import MappingNode, Node, SafeConstructor, ScalarNode, SequenceNode
 
+from granular_configuration_language.exceptions import ErrorWhileLoadingTags
 from granular_configuration_language.yaml.classes import StateHolder, Tag
 from granular_configuration_language.yaml.load._constructors import construct_mapping, construct_sequence
 
@@ -72,6 +73,9 @@ class TagDecoratorBase(typ.Generic[T], abc.ABC):
 
     def __init__(self, tag: Tag) -> None:
         self.tag: typ.Final = tag
+
+        if not tag.startswith("!"):
+            raise ErrorWhileLoadingTags(f"Tag `{tag}` error: All tags must begin with `!`.")
 
     @property
     @abc.abstractmethod

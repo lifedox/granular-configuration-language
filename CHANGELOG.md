@@ -29,7 +29,7 @@
   - `set_config`/`get_config` pattern
   - INI support
   - Configuration patching
-  - `ConfigurationFiles` and `ConfigurationMultiNamedFiles` classes have been removed. `LazyLoadConfiguration` only supports paths (e.g. `pathlib.Path` and  `str`).
+  - `ConfigurationFiles` and `ConfigurationMultiNamedFiles` classes have been removed. `LazyLoadConfiguration` only supports paths (e.g. `pathlib.Path` and `str`).
     - Mitigation: Just use `pathlib.Path` or `str` directly.
 - Renamed Exceptions:
   - `ParseEnvError` → `ParseEnvParsingError`
@@ -77,6 +77,8 @@
   - `MutableLazyLoadConfiguration` has been added to extend back the `MutableMapping` interface and remove needing to cast to `MutableConfiguration`
   - When immutable, `tuple` is used instead of `list`
 - Added: JSON Pointer for base_path
+- Added Plugin support for adding external Tags
+- Added `G_CONFIG_DISABLE_PLUGINS` and `G_CONFIG_DISABLE_TAGS` as supported environment variables to disable select tags.
 
 ### Fixed
 

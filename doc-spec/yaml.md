@@ -113,6 +113,8 @@ with_a_default: !Env "{{ENVIRONMENT_VARIABLE_MIGHT_NOT_EXIST:some default value}
 [`!Sub`](#sub) replaces this functionality and offers more options. `!Env` will not be removed but will not see future updates.
 ```
 
+---
+
 &nbsp;
 
 ## Manipulators
@@ -221,6 +223,8 @@ json_pointer: !Ref /json/pointer/expression
 `!Ref` can be used to cause infinite loops and/or a {py:class}`RecursionError`.
 ```
 
+---
+
 &nbsp;
 
 ## Parsers
@@ -232,6 +236,7 @@ environment_variable_must_exist: !ParseEnv ENVIRONMENT_VARIABLE
 environment_variable_may_exist: !ParseEnv
   - ENVIRONMENT_VARIABLE
   - <YAML object>
+single_line_example: !ParseEnv [ENV_VAR, false]
 ```
 
 - **Argument:** _str | tuple[str, Any]_
@@ -270,6 +275,8 @@ file_may_exist: !ParseFile relative/path/to/optional/file.yaml
 :class: caution
 `!ParseFile` and `!OptionalParseFile` can be used to cause infinite loops and/or a {py:class}`RecursionError`.
 ```
+
+---
 
 &nbsp;
 

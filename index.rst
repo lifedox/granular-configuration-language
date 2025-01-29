@@ -10,4 +10,5 @@ granular-configuration-language documentation
     doc-spec/conceptions.md
     doc-spec/yaml.md
     doc-spec/spec.rst
+    doc-spec/plugins.md
     CHANGELOG.md

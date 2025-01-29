@@ -3,7 +3,9 @@ from unittest.mock import patch
 
 import pytest
 
+from granular_configuration_language.exceptions import ErrorWhileLoadingTags
 from granular_configuration_language.yaml import loads
+from granular_configuration_language.yaml.decorators import Tag, string_tag
 
 
 def test_string_tag_does_not_take_sequence() -> None:
@@ -52,3 +54,8 @@ def test_mapping_of_any_tag_does_not_take_scalar() -> None:
 def test_mapping_of_any_tag_does_not_take_mapping() -> None:
     with pytest.raises(ValueError):
         loads("!Dict []")
+
+
+def test_tag_not_starting_with_bang_errors() -> None:
+    with pytest.raises(ErrorWhileLoadingTags):
+        string_tag(Tag("Test"))
