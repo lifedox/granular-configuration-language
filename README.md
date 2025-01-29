@@ -2,7 +2,7 @@
 
 > README is in-progress.
 
-Full documentation at [link](https://lifedox.github.io/granular-configuration-language/index.html)
+Full documentation at [link](https://lifedox.github.io/granular-configuration-language)
 
 ## Why does this exist?
 

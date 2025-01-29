@@ -1,4 +1,5 @@
 import inspect
+import os
 import typing as typ
 from collections import OrderedDict
 from importlib import import_module
@@ -113,12 +114,15 @@ class TagSet(typ.Iterable[TagConstructor], typ.Container[str]):
 
 def load_tags(
     *,
-    disable_plugin: typ.AbstractSet[str] = frozenset(),
-    disable_tag: typ.AbstractSet[Tag | str] = frozenset(),
+    disable_plugins: typ.AbstractSet[str] = frozenset(),
+    disable_tags: typ.AbstractSet[Tag | str] = frozenset(),
 ) -> TagSet:
+    disable_plugins |= frozenset(filter(None, map(str.strip, os.getenv("G_CONFIG_DISABLE_PLUGINS", "").split(","))))
+    disable_tags |= frozenset(filter(None, map(str.strip, os.getenv("G_CONFIG_DISABLE_TAGS", "").split(","))))
+
     return TagSet(
         filterfalse(
-            disable_tag.__contains__,
-            chain.from_iterable(map(get_tags_in_module, get_all_tag_plugins(disable_plugin=disable_plugin))),
+            disable_tags.__contains__,
+            chain.from_iterable(map(get_tags_in_module, get_all_tag_plugins(disable_plugin=disable_plugins))),
         )
     )
