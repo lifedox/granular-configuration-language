@@ -28,7 +28,7 @@ def json_default(value: typ.Any) -> typ.Any:
     - ``!Date``/:py:class:`datetime.date` as :py:meth:`~datetime.date.isoformat`
     - ``!DateTime``/:py:class:`datetime.datetime` as :py:meth:`~datetime.datetime.isoformat`
     - ``!Func``/:py:class:`~collections.abc.Callable` as ``f"<{func.__module__}.{func.__name__}>"``
-    - ``!Class``/{py:class}`type` as ``f"<{class.__module__}.{class.__name__}>"``
+    - ``!Class``/:py:class:`type` as ``f"<{class.__module__}.{class.__name__}>"``
     - For niceness, :py:class:`~collections.abc.Mapping` and non-:class:`str` :py:class:`~collections.abc.Sequence`
       instances are converted to :py:class:`dict` and :py:class:`tuple`
 
