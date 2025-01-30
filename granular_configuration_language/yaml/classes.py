@@ -7,23 +7,34 @@ from functools import cached_property
 from pathlib import Path
 from threading import RLock
 
+P = typ.ParamSpec("P")
+"""
+ParamSpec("P")
+"""
+T = typ.TypeVar("T")
+"""
+TypeVar("T")
+"""
 RT = typ.TypeVar("RT")
+"""
+TypeVar("RT")
+"""
 
 RootType = typ.NewType("RootType", typ.Mapping)
 """
-Type used to type the configuration root.
+:py:class:`~typing.NewType` used to type the configuration root.
 
 Aliases :py:class:`~collections.abc.Mapping` as root has to be a mapping for it to be used.
 """
 
 Root = RootType | None
 """
-Type used by type checking to identify the configuration root if it exists.
+:py:data:`~typing.TypeAlias` used by type checking to identify the configuration root if it exists.
 """
 
 Tag = typ.NewType("Tag", str)
 """
-:py:class:`~typing.NewType` used to type tag strings. Must begin with ``!``
+:py:class:`~typing.NewType` used to type tag strings. Must begin with ``!``.
 """
 
 

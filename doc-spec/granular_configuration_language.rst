@@ -12,6 +12,11 @@
     :show-inheritance:
     :member-order: groupwise
     :inherited-members:
+    :exclude-members: typed_get
+
+    .. py:method:: typed_get
+
+        See :py:meth:`granular_configuration_language.Configuration.typed_get`
 
 .. autoclass:: granular_configuration_language.LazyLoadConfiguration
     :members:

@@ -8,15 +8,12 @@ from html import unescape
 
 from granular_configuration_language._utils import get_environment_variable
 from granular_configuration_language.exceptions import InterpolationSyntaxError, InterpolationWarning
-from granular_configuration_language.yaml.classes import Root
+from granular_configuration_language.yaml.classes import RT, P, Root
 from granular_configuration_language.yaml.decorators._tag_tracker import track_as_with_ref, track_as_without_ref
 from granular_configuration_language.yaml.decorators.interpolate._env_var_parser import (
     parse_environment_variable_syntax,
 )
 from granular_configuration_language.yaml.decorators.ref import resolve_json_ref
-
-P = typ.ParamSpec("P")
-RT = typ.TypeVar("RT")
 
 
 def _get_ref_string(root: Root, contents: str) -> str:
@@ -108,19 +105,19 @@ def interpolation_needs_ref_condition(value: str) -> bool:
 
 
 def interpolate_value_with_ref(
-    func: typ.Callable[typ.Concatenate[str, Root, P], RT]
+    func: typ.Callable[typ.Concatenate[str, Root, P], RT],
 ) -> typ.Callable[typ.Concatenate[str, Root, P], RT]:
     """Replaces the YAML string value with the interpolated value before calling the tag function
 
     "with_ref" does full interpolation, supporting references (e.g. ``${$.value}`` and ``${/value}``).
 
-    :param ~collections.abc.Callable[~typing.Concatenate[str, P], RT] func: Function to be wrapped
+    :param ~collections.abc.Callable[~typing.Concatenate[str, ~granular_configuration_language.yaml.classes.Root, P], RT] func: Function to be wrapped
 
     :returns: Wrapped Function
-    :rtype: ~collections.abc.Callable[~typing.Concatenate[str, P], RT]
+    :rtype: ~collections.abc.Callable[~typing.Concatenate[str, ~granular_configuration_language.yaml.classes.Root, P], RT]
 
     :note: - First positional argument must a :py:class:`str`.
-        - Second positional must be :py:class:`Root` type, even if you do not use it.
+        - Second positional must be :py:type:`~granular_configuration_language.yaml.classes.Root` type, even if you do not use it.
     :example:
         .. code-block:: python
 
@@ -146,7 +143,7 @@ def interpolate_value_with_ref(
 
 
 def interpolate_value_without_ref(
-    func: typ.Callable[typ.Concatenate[str, P], RT]
+    func: typ.Callable[typ.Concatenate[str, P], RT],
 ) -> typ.Callable[typ.Concatenate[str, P], RT]:
     """Replaces the YAML string value with the interpolated value before calling the tag function
 

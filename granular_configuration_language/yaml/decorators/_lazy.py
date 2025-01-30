@@ -3,12 +3,9 @@ from __future__ import annotations
 import typing as typ
 from functools import wraps
 
-from granular_configuration_language.yaml.classes import LazyEval, LoadOptions, Root, StateHolder, Tag
+from granular_configuration_language.yaml.classes import RT, LazyEval, LoadOptions, Root, StateHolder, T, Tag
 from granular_configuration_language.yaml.decorators._lazy_eval import LazyEvalBasic, LazyEvalWithRoot
 from granular_configuration_language.yaml.decorators._tag_tracker import track_as_not_lazy
-
-RT = typ.TypeVar("RT")
-T = typ.TypeVar("T")
 
 
 def as_lazy(func: typ.Callable[[T], RT]) -> typ.Callable[[Tag, T, StateHolder], LazyEval[RT]]:
@@ -37,7 +34,7 @@ def as_lazy(func: typ.Callable[[T], RT]) -> typ.Callable[[Tag, T, StateHolder], 
 
 
 def as_lazy_with_load_options(
-    func: typ.Callable[[T, LoadOptions], RT]
+    func: typ.Callable[[T, LoadOptions], RT],
 ) -> typ.Callable[[Tag, T, StateHolder], LazyEval[RT]]:
     """Wraps the "Tag" function in a :py:class:`~.LazyEval`, so that the function being wrapped is run just-in-time.
 
@@ -47,7 +44,7 @@ def as_lazy_with_load_options(
     :rtype: ~collections.abc.Callable[[Tag, T, StateHolder], LazyEval[RT]]
 
     :note: - First Positional Argument: YAML value
-        - Second Positional Argument: A :py:class:`LoadOptions` instance
+        - Second Positional Argument: A :py:class:`.LoadOptions` instance
     :example:
         .. code-block:: python
 
@@ -127,18 +124,18 @@ def as_lazy_with_root(
 
 
 def as_lazy_with_root_and_load_options(
-    func: typ.Callable[[T, Root, LoadOptions], RT]
+    func: typ.Callable[[T, Root, LoadOptions], RT],
 ) -> typ.Callable[[Tag, T, StateHolder], LazyEval[RT]]:
     """Wraps the "Tag" function in a :py:class:`~.LazyEval`, so that the function being wrapped is run just-in-time.
 
-    :param ~collections.abc.Callable[[T, Root, LoadOptions], RT] func: Function to be wrapped
+    :param ~collections.abc.Callable[[T, ~granular_configuration_language.yaml.classes.Root, LoadOptions], RT] func: Function to be wrapped
 
     :returns: Wrapped Function
     :rtype: ~collections.abc.Callable[[Tag, T, StateHolder], LazyEval[RT]]
 
     :note: - First Positional Argument: YAML value
-        - Second Positional Argument: Configuration root, as type :py:class:`Root`
-        - Third Positional Argument: A :py:class:`LoadOptions` instance
+        - Second Positional Argument: Configuration root, as type :py:type:`~granular_configuration_language.yaml.classes.Root`
+        - Third Positional Argument: A :py:class:`.LoadOptions` instance
     :example:
         .. code-block:: python
 

@@ -10,15 +10,13 @@ from weakref import ReferenceType, ref
 from granular_configuration_language._base_path import BasePathPart
 from granular_configuration_language._s import setter_secret
 from granular_configuration_language.exceptions import InvalidBasePathException, PlaceholderConfigurationError
-from granular_configuration_language.yaml import LazyEval, Placeholder
+from granular_configuration_language.yaml.classes import LazyEval, Placeholder, T
 
 if sys.version_info >= (3, 11):
     from typing import Generic, TypedDict, Unpack
 elif typ.TYPE_CHECKING:
     from typing_extensions import Generic, TypedDict, Unpack
 
-
-T = typ.TypeVar("T")
 
 if sys.version_info >= (3, 11) or typ.TYPE_CHECKING:
 
@@ -198,19 +196,19 @@ class Configuration(typ.Mapping[typ.Any, typ.Any]):
 
     def exists(self, key: typ.Any) -> bool:
         """
-        Checks that a key exists and is not a :py:class:`Placeholder`
+        Checks that a key exists and is not a :py:class:`~.Placeholder`
 
         Parameters:
             key (~typing.Any): key to be checked
 
         Returns:
-            bool: Returns :py:data:`True` if the key exists and is not a :py:class:`Placeholder`
+            bool: Returns :py:data:`True` if the key exists and is not a :py:class:`~.Placeholder`
         """
         return (key in self) and not isinstance(self.__data[key], Placeholder)
 
     def evaluate_all(self) -> None:
         """
-        Evaluates all lazy tag functions and throws an exception on :py:class:`Placeholder` instances
+        Evaluates all lazy tag functions and throws an exception on :py:class:`~.Placeholder` instances
         """
 
         for value in self.values():
@@ -224,7 +222,7 @@ class Configuration(typ.Mapping[typ.Any, typ.Any]):
 
         :return: A shallow :py:class:`dict` copy
         :rtype: dict
-        :note: This will evaluate all lazy tag functions and throw an exception on :py:class:`Placeholder` objects.
+        :note: This will evaluate all lazy tag functions and throw an exception on :py:class:`~.Placeholder` objects.
         """
         return dict(
             starmap(
@@ -243,7 +241,7 @@ class Configuration(typ.Mapping[typ.Any, typ.Any]):
         :param ~typing.Any \*\*kwds: Arguments to be passed into :py:func:`json.dumps`
         :return: JSON-format string
         :rtype: str
-        :note: This will evaluate all lazy tag functions and throw an exception on :py:class:`Placeholder` objects.
+        :note: This will evaluate all lazy tag functions and throw an exception on :py:class:`~.Placeholder` objects.
         """
         from granular_configuration_language import json_default
 

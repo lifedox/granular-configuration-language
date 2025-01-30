@@ -57,7 +57,7 @@ def handler(value: str) -> Masked:  # Function Signature
   1. `value` - This is the value loaded from YAML, after its passes through the {py:class}`.TagDecoratorBase`.
      - Its type is determined by the [Tag Type Decorator](#tag-type-decorator) you use.
      - `value` will always be a single variable no matter its type or union of types. It will never be processed with `*` or `**`.
-  2. {py:data}`.Root` - This is a reference to the root of final merged configuration.
+  2. {py:class}`.Root` - This is a reference to the root of final merged configuration.
      - It is used by [`!Ref`](yaml.md#ref) and [`!Sub`](yaml.md#sub) to support JSON Path and JSON Pointer querying the final configuration.
   3. {py:class}`.LoadOptions` - This a frozen {py:func}`dataclass <dataclasses.dataclass>` instance that contains the options used while loading the configuration file.
      - It is used [`!ParseFile`](yaml.md#parsefile--optionalparsefile) and [`!ParseEnv`](yaml.md#parseenv--parseenvsafe), so the delayed parsing uses the same options.
@@ -99,7 +99,7 @@ def handler(value: str) -> Masked:  # Function Signature
 - Options:
   - {py:func}`.interpolate_value_without_ref` - Does not include JSON Path or JSON Pointer syntax.
   - {py:func}`.interpolate_value_with_ref` - Includes full interpolation syntax.
-    - Requires {py:data}`.Root` as a parameter, even if you don't use it in the Tag Logic.
+    - Requires {py:class}`.Root` as a parameter, even if you don't use it in the Tag Logic.
 
 ---
 

@@ -18,7 +18,7 @@ python-dateutil = { version = "*", python = "<3.11" }
 
 [tool.poetry.group.dev.dependencies]
 # Types
-types-python-dateutil = { version = "*", python = "<3.11" }
+types-python-dateutil = "*" # mypy wants to even if >3.10
 # Testing
 pytest = "*"
 pytest-cov = "*"

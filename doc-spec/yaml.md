@@ -153,7 +153,7 @@ user: *user_id
 
 - **Argument:** _list[Any]_.
 - **Returns:** {py:class}`.Configuration` ‒ Merges are sequence of mapping into a single {py:class}`.Configuration`, filtering out any not {py:class}`.Configuration`.
-  - When merging with {py:class}`MutableLazyLoadConfiguration` or `mutable=True`, the return type is {py:class}`.MutableConfiguration`.
+  - When merging with {py:class}`.MutableLazyLoadConfiguration` or `mutable=True`, the return type is {py:class}`.MutableConfiguration`.
 - Notes:
   - When merging, all objects in the merge list are evaluated. As an explicit example, a [`!ParseFile`](#parsefile--optionalparsefile)in the merge list is evaluated with the `!Merge`.
   - Tags in the list merge cannot reference what is being merged.

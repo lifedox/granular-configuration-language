@@ -6,15 +6,16 @@ from functools import wraps
 from ruamel.yaml import MappingNode, Node, SafeConstructor, ScalarNode, SequenceNode
 
 from granular_configuration_language.exceptions import ErrorWhileLoadingTags
-from granular_configuration_language.yaml.classes import StateHolder, Tag
+from granular_configuration_language.yaml.classes import RT, StateHolder, T, Tag
 from granular_configuration_language.yaml.load._constructors import construct_mapping, construct_sequence
-
-RT = typ.TypeVar("RT")
-T = typ.TypeVar("T", covariant=True)
 
 
 @dataclasses.dataclass(frozen=True, eq=False, slots=True, repr=False)
 class TagConstructor:
+    """
+    Links the YAML Constructor to the Tag Logic
+    """
+
     tag: Tag
     friendly_type: str
     constructor: typ.Callable[[typ.Type[SafeConstructor], StateHolder], None]
@@ -186,15 +187,13 @@ class TagDecoratorBase(typ.Generic[T], abc.ABC):
         return value
 
     def __call__(self, handler: typ.Callable[[Tag, T, StateHolder], RT]) -> TagConstructor:
-        """Takes the wrapped tag function and further wraps it for configuration loading.
-
-        Parameters:
-            handler (~collections.abc.Callable[[Tag, T, StateHolder], RT]): Wrapped Tag Function
-
-        Returns:
-            TagConstructor: Tag Function ready to be used when loading configuration
-
-        """
+        # """Takes the wrapped tag function and further wraps it for configuration loading.
+        # :param (~collections.abc.Callable[[Tag, T, StateHolder], RT]) handler: Wrapped Tag Function
+        # :return: Tag Function ready to be used when loading configuration
+        # :rtype: TagConstructor
+        # :meta private:
+        # """
+        # autodoc refuses to exclude `__call__`, even though this is not a part of the public interface
 
         # Don't capture self in the function generation
         tag = self.tag
