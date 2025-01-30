@@ -1,14 +1,14 @@
 from pathlib import Path
 
-from granular_configuration_language import LazyLoadConfiguration, merge
+from granular_configuration_language import merge
 
 ASSET_DIR = (Path(__file__).parent / "../assets/" / "merging_and_parsefile").resolve()
 
 
 def test_merging_LazyLoadConfiguration() -> None:
     configs = (
-        LazyLoadConfiguration(ASSET_DIR / "parsefile1.yaml"),
-        LazyLoadConfiguration(ASSET_DIR / "merge_root.yaml"),
+        (ASSET_DIR / "parsefile1.yaml"),
+        (ASSET_DIR / "merge_root.yaml"),
     )
     assert merge(configs).as_dict() == {
         "base": {"a": "from parsefile2.yaml", "b": "From parsefile1.yaml"},

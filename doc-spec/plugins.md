@@ -72,7 +72,7 @@ def handler(value: str) -> Masked:  # Function Signature
   - {py:class}`.string_tag` - `str`
   - {py:class}`.string_or_twople_tag` - `str | tuple[str, typing.Any]`
   - {py:class}`.sequence_of_any_tag` - `collections.abc.Sequence[typing.Any]`
-  - {py:class}`.mapping_of_any_tag` - `Configuration`
+  - {py:class}`.mapping_of_any_tag` - `Configuration[typing.Any, typing.Any]`
 
 ### Laziness Decorator
 

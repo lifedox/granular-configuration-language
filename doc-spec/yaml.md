@@ -181,7 +181,7 @@ user: *user_id
         - !OptionalParseFile file1.yaml
         - !OptionalParseFile file2.yaml
         ```
-      - `merge(LazyLoadConfiguration("file1.yaml"), LazyLoadConfiguration("file2.yaml"))`
+      - `merge("file1.yaml", "file2.yaml")`
         - see {py:func}`.merge` for full signature.
   - The expected use-case for `!Merge` is to be paired with multiple [`!ParseFile`](#parsefile--optionalparsefile)and/or [`!OptionalParseFile`](#parsefile--optionalparsefile) tags.
 

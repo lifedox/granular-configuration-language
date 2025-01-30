@@ -7,7 +7,7 @@ granular-configuration-language documentation
 
     Introduction <README.md>
     doc-spec/getting_started.md
-    doc-spec/conceptions.md
+    doc-spec/concepts.md
     doc-spec/yaml.md
     doc-spec/spec.rst
     doc-spec/plugins.md

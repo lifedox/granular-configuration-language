@@ -1,4 +1,4 @@
-# Conceptions
+# Concepts
 
 ## Immutable vs. Mutable
 
@@ -41,3 +41,129 @@ For compatibility, mutable configuration support was added explicitly, as {py:cl
 When making copies, it is important to note that {py:class}`.LazyEval` do not copy (they return themselves). This is to aid in running exactly once and prevent cycles with the root reference.
 
 This means that a deep copy of a {py:class}`.Configuration` can share state with the original, if any {py:class}`.LazyEval` is present. Using immutable {py:class}`.Configuration` (and {py:class}`.MutableConfiguration`) will prevent needing to make copies. {py:meth}`~.Configuration.as_dict()` is also a great way to make a mutable copy.
+
+---
+
+## Merging
+
+Merging is the heart of this library. With it, you gain the ability to have settings defined in multiple possible locations and the ability to override settings based on a consistent pattern.
+
+Merging is explicitly exposed through {py:class}`.LazyLoadConfiguration`, [`!Merge`](yaml.md#merge), and {py:func}`.merge`.
+
+### Describing Priority
+
+#### As a sentence
+
+> Mappings are merged, and everything else is replaces, with last-in winning.
+
+#### As a table with code:
+
+| From <br> `First-in.yaml` | From <br> `Next-in.yaml` | Outcome                             |
+| :-----------------------: | :----------------------: | ----------------------------------- |
+|          Scalar           |            \*            | Next-in **replaces** First-in       |
+|         Sequence          |            \*            | Next-in **replaces** First-in       |
+|          Mapping          |          Scalar          | Next-in **replaces** First-in       |
+|          Mapping          |         Sequence         | Next-in **replaces** First-in       |
+|          Mapping          |         Mapping          | Next-in is **merged** into First-in |
+
+Code:
+
+```python
+CONFIG = LazyLoadConfiguration("First-in.yaml", "Next-in.yaml")
+CONFIG = merge("First-in.yaml", "Next-in.yaml")
+CONFIG = LazyLoadConfiguration("merge.yaml")
+```
+
+where `merge.yaml`:
+
+```yaml
+!Merge
+- !ParseFile First-in.yaml
+- !ParseFile Next-in.yaml
+```
+
+#### As Explicit Examples
+
+````{list-table}
+:header-rows: 1
+:align: center
+
+* - First-in
+  - \+
+  - Next-in
+  - ⇒
+  - Result
+* - ```yaml
+    a:
+      b: 1
+    ```
+  - \+
+  - ```yaml
+    a:
+      b:
+        c: 1
+    ```
+  - ⇒
+  - ```yaml
+    a:
+      b:
+        c: 1
+    ```
+* - ```yaml
+    a:
+      b:
+        c: 1
+    ```
+  - \+
+  - ```yaml
+    a:
+      b:
+        c: 2
+    ```
+  - ⇒
+  - ```yaml
+    a:
+      b:
+        c: 2
+    ```
+* - ```yaml
+    a:
+      b:
+        c: 2
+    ```
+  - \+
+  - ```yaml
+    a:
+      b:
+        d: 3
+    ```
+  - ⇒
+  - ```yaml
+    a:
+      b:
+        c: 2
+        d: 3
+    ```
+* - ```yaml
+    a:
+      b:
+        c: 2
+        d: 3
+    ```
+  - \+
+  - ```yaml
+    a:
+      b: 1
+    ```
+  - ⇒
+  - ```yaml
+    a:
+      b: 1
+    ```
+````
+
+---
+
+## JSON Path/Pointer & Root
+
+TODO

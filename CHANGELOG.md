@@ -79,6 +79,7 @@
 - Added: JSON Pointer for base_path
 - Added Plugin support for adding external Tags
 - Added `G_CONFIG_DISABLE_PLUGINS` and `G_CONFIG_DISABLE_TAGS` as supported environment variables to disable select tags.
+- Added `merge` to enable multistep configuration loading.
 
 ### Fixed
 
