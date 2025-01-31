@@ -1,12 +1,22 @@
 {
-  "extends": ["config:base", ":enablePreCommit"],
-  "recreateClosed": true,
+  "extends": [
+    "config:recommended",
+    ":enablePreCommit"
+  ],
+  "recreateWhen": "always",
   "rangeStrategy": "update-lockfile",
-  "enabledManagers": ["poetry"],
+  "enabledManagers": [
+    "poetry"
+  ],
   "lockFileMaintenance": {
     "enabled": true,
     "automerge": true,
-    "schedule": ["before 4am on monday"]
+    "schedule": [
+      "before 4am on monday"
+    ]
   },
-  "labels": ["dependencies", "RenovateBot"]
+  "labels": [
+    "dependencies",
+    "RenovateBot"
+  ]
 }
