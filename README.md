@@ -1,5 +1,7 @@
 # `granular-configuration-language`
 
+[![Coverage badge](https://raw.githubusercontent.com/lifedox/granular-configuration-language/python-coverage-comment-action-data/badge.svg)](https://htmlpreview.github.io/?https://github.com/lifedox/granular-configuration-language/blob/python-coverage-comment-action-data/htmlcov/index.html) ![Testing workflow](https://github.com/lifedox/granular-configuration-language/actions/workflows/testing.yaml/badge.svg?event=push) ![codeql workflow](https://github.com/lifedox/granular-configuration-language/actions/workflows/codeql-analysis.yaml/badge.svg?event=push)
+
 > ⚠️ **This library is meant for trusted configuration files only.** ⚠️
 
 > README is in-progress.
