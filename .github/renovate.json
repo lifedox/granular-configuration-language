@@ -2,7 +2,7 @@
   "extends": ["config:base", ":enablePreCommit"],
   "recreateClosed": true,
   "rangeStrategy": "update-lockfile",
-  "enabledManagers": ["python"],
+  "enabledManagers": ["poetry"],
   "lockFileMaintenance": {
     "enabled": true,
     "automerge": true,

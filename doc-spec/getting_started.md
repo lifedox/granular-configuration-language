@@ -101,7 +101,14 @@ CONFIG = LazyLoadConfiguration(
 
 ## Writing your configuration
 
-TODO
+Things to bear in mind when writing your configuration:
+
+- Setting names should be compatible Python attribute names.
+- 
+
+
+
+Take a look at the [YAML Tags](yaml.md)
 
 ---
 
