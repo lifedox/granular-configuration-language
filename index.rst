@@ -3,7 +3,7 @@ granular-configuration-language documentation
 
 .. toctree::
     :caption: Contents:
-    :maxdepth: 1
+    :maxdepth: 2
 
     Introduction <README.md>
     doc-spec/getting_started.md

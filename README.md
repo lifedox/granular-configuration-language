@@ -1,5 +1,7 @@
 # `granular-configuration-language`
 
+> ⚠️ **This library is meant for trusted configuration files only.** ⚠️
+
 > README is in-progress.
 
 Full documentation at [link](https://lifedox.github.io/granular-configuration-language)
@@ -92,3 +94,11 @@ Some use cases:
           fixture1:
             api: does something
       ```
+
+## Why the long name?
+
+- It's "granular" because you can specify settings across multiple files at a fine granularity for overriding values.
+- It is meant for trusted "configuration" files.
+- Including "language" make it clear that this is not the source of configuration.
+  - A valid piece of feedback was that it sounded like it was the source for configuration, not the processing of generic configuration files.
+  - "Format" sounded weirder than "language".

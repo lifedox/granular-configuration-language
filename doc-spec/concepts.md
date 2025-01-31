@@ -74,9 +74,8 @@ CONFIG = merge("First-in.yaml", "Next-in.yaml")
 CONFIG = LazyLoadConfiguration("merge.yaml")
 ```
 
-where `merge.yaml`:
-
 ```yaml
+# merge.yaml
 !Merge
 - !ParseFile First-in.yaml
 - !ParseFile Next-in.yaml

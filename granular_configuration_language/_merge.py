@@ -16,7 +16,7 @@ def merge(
 
     - Filters out non-:py:class:`.Configuration` objects.
     - Extracts :py:class:`.Configuration` from :py:class:`.LazyEval` and :py:class:`.LazyLoadConfiguration`.
-    - Any :py:class`os.PathLike` objects are loaded via individual :py:class:`.LazyLoadConfiguration` instances.
+    - Any :py:class:`os.PathLike` objects are loaded via individual :py:class:`.LazyLoadConfiguration` instances.
 
     .. caution ::
         Don't use ``merge`` as a replacement for :py:class:`.LazyLoadConfiguration`. It is less efficient.
