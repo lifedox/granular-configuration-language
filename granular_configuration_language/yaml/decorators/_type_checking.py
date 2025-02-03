@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import collections.abc as tabc
 import typing as typ
 
 from granular_configuration_language._configuration import Configuration
@@ -57,7 +58,7 @@ class string_or_twople_tag(TagDecoratorBase[str | tuple[str, typ.Any]]):
         """"""  # Make undocumented
         return True
 
-    def sequence_node_type_check(self, value: typ.Sequence) -> typ.TypeGuard[tuple[str, typ.Any]]:
+    def sequence_node_type_check(self, value: tabc.Sequence) -> typ.TypeGuard[tuple[str, typ.Any]]:
         """"""  # Make undocumented
         return (1 <= len(value) <= 2) and isinstance(value[0], str)
 
@@ -69,7 +70,7 @@ class string_or_twople_tag(TagDecoratorBase[str | tuple[str, typ.Any]]):
             return value[0]
 
 
-class sequence_of_any_tag(TagDecoratorBase[typ.Sequence[typ.Any]]):
+class sequence_of_any_tag(TagDecoratorBase[tabc.Sequence[typ.Any]]):
     """A decorator factory for Tags that take a YAML sequence as argument.
 
     :example:
@@ -82,7 +83,7 @@ class sequence_of_any_tag(TagDecoratorBase[typ.Sequence[typ.Any]]):
 
     """
 
-    Type: typ.TypeAlias = typ.Sequence[typ.Any]
+    Type: typ.TypeAlias = tabc.Sequence[typ.Any]
     """TypeAlias for this Tag factory"""
 
     @property
@@ -90,7 +91,7 @@ class sequence_of_any_tag(TagDecoratorBase[typ.Sequence[typ.Any]]):
         """"""  # Make undocumented
         return "list[Any]"
 
-    def sequence_node_type_check(self, value: typ.Sequence) -> typ.TypeGuard[Type]:
+    def sequence_node_type_check(self, value: tabc.Sequence) -> typ.TypeGuard[Type]:
         """"""  # Make undocumented
         return True
 
@@ -116,6 +117,6 @@ class mapping_of_any_tag(TagDecoratorBase[Configuration]):
         """"""  # Make undocumented
         return "dict[Any, Any]"
 
-    def mapping_node_type_check(self, value: typ.Mapping) -> typ.TypeGuard[Type]:
+    def mapping_node_type_check(self, value: tabc.Mapping) -> typ.TypeGuard[Type]:
         """"""  # Make undocumented
         return True

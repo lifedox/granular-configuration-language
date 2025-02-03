@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import collections.abc as tabc
 import copy
 import json
 import sys
@@ -22,10 +23,10 @@ if sys.version_info >= (3, 11) or typ.TYPE_CHECKING:
 
     class Kwords_typed_get(Generic[T], TypedDict, total=False):
         default: T
-        predicate: typ.Callable[[typ.Any], typ.TypeGuard[T]]
+        predicate: tabc.Callable[[typ.Any], typ.TypeGuard[T]]
 
 
-class AttributeName(typ.Iterable[str]):
+class AttributeName(tabc.Iterable[str]):
     __slots__ = ("__prev", "__explicit_prev", "__name", "__weakref__")
 
     def __init__(
@@ -33,7 +34,7 @@ class AttributeName(typ.Iterable[str]):
         name: typ.Any,
         *,
         prev: ReferenceType[AttributeName] | None = None,
-        explicit_prev: typ.Iterable[str] = tuple(),
+        explicit_prev: tabc.Iterable[str] = tuple(),
     ) -> None:
         self.__prev = prev
         self.__explicit_prev = explicit_prev
@@ -49,14 +50,14 @@ class AttributeName(typ.Iterable[str]):
     def with_suffix(self, name: typ.Any) -> str:
         return ".".join(self._plus_one(name))
 
-    def __iter__(self) -> typ.Iterator[str]:
+    def __iter__(self) -> tabc.Iterator[str]:
         if self.__prev:
             yield from self.__prev() or tuple()
         else:
             yield from self.__explicit_prev
         yield self.__name if isinstance(self.__name, str) else f"`{repr(self.__name)}`"
 
-    def _plus_one(self, last: str) -> typ.Iterator[str]:
+    def _plus_one(self, last: str) -> tabc.Iterator[str]:
         yield from self
         yield last if isinstance(last, str) else f"`{repr(last)}`"
 
@@ -64,12 +65,12 @@ class AttributeName(typ.Iterable[str]):
         return ".".join(self)
 
 
-class Configuration(typ.Mapping[typ.Any, typ.Any]):
+class Configuration(tabc.Mapping[typ.Any, typ.Any]):
     """
     This class represents an immutable :py:class:`~collections.abc.Mapping` of configuration.
     """
 
-    def __init__(self, *arg: typ.Mapping | typ.Iterable[tuple[typ.Any, typ.Any]], **kwargs: typ.Any) -> None:
+    def __init__(self, *arg: tabc.Mapping | tabc.Iterable[tuple[typ.Any, typ.Any]], **kwargs: typ.Any) -> None:
         self.__data: dict[typ.Any, typ.Any] = dict(*arg, **kwargs)
         self.__attribute_name = AttributeName.as_root()
 
@@ -77,7 +78,7 @@ class Configuration(typ.Mapping[typ.Any, typ.Any]):
     # Required for Mapping
     #################################################################
 
-    def __iter__(self) -> typ.Iterator:
+    def __iter__(self) -> tabc.Iterator:
         return iter(self.__data)
 
     def __len__(self) -> int:
@@ -165,7 +166,7 @@ class Configuration(typ.Mapping[typ.Any, typ.Any]):
         else:
             raise TypeError("`_private_set` is private and not for external use")
 
-    def _raw_items(self) -> typ.Iterator[tuple[typ.Any, typ.Any]]:
+    def _raw_items(self) -> tabc.Iterator[tuple[typ.Any, typ.Any]]:
         return map(lambda key: (key, self.__data[key]), self)
 
     #################################################################
@@ -231,13 +232,13 @@ class Configuration(typ.Mapping[typ.Any, typ.Any]):
             )
         )
 
-    def as_json_string(self, *, default: typ.Callable[[typ.Any], typ.Any] | None = None, **kwds: typ.Any) -> str:
+    def as_json_string(self, *, default: tabc.Callable[[typ.Any], typ.Any] | None = None, **kwds: typ.Any) -> str:
         r"""
         Returns this :py:class:`Configuration` as a JSON string, using standard :py:mod:`json`
         library and (as default) the default factory provided by this library
         (:py:func:`granular_configuration_language.json_default`).
 
-        :param \~typing.Callable[[\~typing.Any], \~typing.Any] | None, optional default: Replacement ``default`` factory. Defaults to :py:func:`~granular_configuration_language.json_default`.
+        :param \~typing.Callable[[\~typing.Any], \~typing.Any], optional default: Replacement ``default`` factory. Defaults to :py:func:`~granular_configuration_language.json_default`.
         :param ~typing.Any \*\*kwds: Arguments to be passed into :py:func:`json.dumps`
         :return: JSON-format string
         :rtype: str
@@ -255,12 +256,12 @@ class Configuration(typ.Mapping[typ.Any, typ.Any]):
 
     @typ.overload
     def typed_get(
-        self, type: typ.Type[T], key: typ.Any, *, predicate: typ.Callable[[typ.Any], typ.TypeGuard[T]]
+        self, type: typ.Type[T], key: typ.Any, *, predicate: tabc.Callable[[typ.Any], typ.TypeGuard[T]]
     ) -> T: ...
 
     @typ.overload
     def typed_get(
-        self, type: typ.Type[T], key: typ.Any, *, default: T, predicate: typ.Callable[[typ.Any], typ.TypeGuard[T]]
+        self, type: typ.Type[T], key: typ.Any, *, default: T, predicate: tabc.Callable[[typ.Any], typ.TypeGuard[T]]
     ) -> T: ...
 
     def typed_get(self, type: typ.Type[T], key: typ.Any, **kwds: Unpack[Kwords_typed_get[T]]) -> T:
@@ -296,7 +297,7 @@ class Configuration(typ.Mapping[typ.Any, typ.Any]):
             raise TypeError(f"Incorrect type. Got: `{repr(value)}`. Wanted: `{repr(type)}`")
 
 
-class MutableConfiguration(typ.MutableMapping[typ.Any, typ.Any], Configuration):
+class MutableConfiguration(tabc.MutableMapping[typ.Any, typ.Any], Configuration):
     """
     This class represents an :py:class:`~collections.abc.MutableMapping` of the configuration. Inherits from :py:class:`Configuration`
     """

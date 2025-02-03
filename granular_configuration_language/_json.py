@@ -1,3 +1,4 @@
+import collections.abc as tabc
 import inspect
 import json
 import typing as typ
@@ -9,7 +10,7 @@ from uuid import UUID
 from granular_configuration_language import Configuration
 
 
-def get_name(value: typ.Callable) -> str:
+def get_name(value: tabc.Callable) -> str:
     try:
         return f"<{value.__module__}.{value.__name__}>"
     except Exception:  # pragma: no cover

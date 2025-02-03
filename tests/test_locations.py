@@ -1,4 +1,4 @@
-import typing as typ
+import collections.abc as tabc
 from itertools import permutations
 from pathlib import Path
 
@@ -20,7 +20,7 @@ def test_assets_are_as_expect() -> None:
 
 def test_no_file() -> None:
     test = (ASSET_DIR / "no_file.yaml",)
-    expected: typ.Sequence[Path] = tuple()
+    expected: tabc.Sequence[Path] = tuple()
     hash(Locations(test))
     assert tuple(Locations(test)) == expected
 

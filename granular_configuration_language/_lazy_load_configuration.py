@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import collections.abc as tabc
 import os
 import typing as typ
 from collections.abc import Mapping, MutableMapping
@@ -13,7 +14,7 @@ from granular_configuration_language.exceptions import ErrorWhileLoadingConfig
 
 
 def _read_locations(
-    load_order_location: typ.Iterable[PathOrStr],
+    load_order_location: tabc.Iterable[PathOrStr],
     use_env_location: bool,
     env_location_var_name: str,
 ) -> Locations:
@@ -29,7 +30,7 @@ class LazyLoadConfiguration(Mapping):
     def __init__(
         self,
         *load_order_location: PathOrStr,
-        base_path: str | typ.Sequence[str] | None = None,
+        base_path: str | tabc.Sequence[str] | None = None,
         use_env_location: bool = False,
         env_location_var_name: str = "G_CONFIG_LOCATION",
         disable_caching: bool = False,
@@ -77,9 +78,6 @@ class LazyLoadConfiguration(Mapping):
     def config(self) -> Configuration:
         """Load and fetch the configuration. Configuration is cached for subsequent calls.
 
-        :returns: Defined configuration
-        :rtype: Configuration
-
         :note: Loading the configuration is thread-safe and locks while the configuration is loaded to prevent
             duplicative processing and data
 
@@ -106,7 +104,7 @@ class LazyLoadConfiguration(Mapping):
     def __getitem__(self, key: typ.Any) -> typ.Any:
         return self.config[key]
 
-    def __iter__(self) -> typ.Iterator[typ.Any]:
+    def __iter__(self) -> tabc.Iterator[typ.Any]:
         return iter(self.config)
 
     def __len__(self) -> int:
@@ -123,7 +121,7 @@ class MutableLazyLoadConfiguration(LazyLoadConfiguration, MutableMapping):
     def __init__(
         self,
         *load_order_location: PathOrStr,
-        base_path: str | typ.Sequence[str] | None = None,
+        base_path: str | tabc.Sequence[str] | None = None,
         use_env_location: bool = False,
         env_location_var_name: str = "G_CONFIG_LOCATION",
     ) -> None:
@@ -155,9 +153,6 @@ class MutableLazyLoadConfiguration(LazyLoadConfiguration, MutableMapping):
     @property
     def config(self) -> MutableConfiguration:
         """Load and fetch the configuration. Configuration is cached for subsequent calls.
-
-        :returns: Defined configuration
-        :rtype: MutableConfiguration
 
         :note: Loading the configuration is thread-safe and locks while the configuration is loaded to prevent
             duplicative processing and data

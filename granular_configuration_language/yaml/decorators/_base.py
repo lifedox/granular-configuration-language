@@ -1,4 +1,5 @@
 import abc
+import collections.abc as tabc
 import dataclasses
 import typing as typ
 from functools import wraps
@@ -18,7 +19,7 @@ class TagConstructor:
 
     tag: Tag
     friendly_type: str
-    constructor: typ.Callable[[typ.Type[SafeConstructor], StateHolder], None]
+    constructor: tabc.Callable[[typ.Type[SafeConstructor], StateHolder], None]
 
     def __eq__(self, value: object) -> bool:
         return (isinstance(value, self.__class__) and self.tag == value.tag) or (
@@ -105,7 +106,7 @@ class TagDecoratorBase(typ.Generic[T], abc.ABC):
         """
         return False
 
-    def sequence_node_type_check(self, value: typ.Sequence) -> typ.TypeGuard[T]:
+    def sequence_node_type_check(self, value: tabc.Sequence) -> typ.TypeGuard[T]:
         """Defaults to :py:data:`False`. Override to enable Sequence Node support.
 
         Parameters:
@@ -117,7 +118,7 @@ class TagDecoratorBase(typ.Generic[T], abc.ABC):
         """
         return False
 
-    def mapping_node_type_check(self, value: typ.Mapping) -> typ.TypeGuard[T]:
+    def mapping_node_type_check(self, value: tabc.Mapping) -> typ.TypeGuard[T]:
         """Defaults to :py:data:`False`. Override to enable Mapping Node support.
 
         Parameters:
@@ -186,7 +187,7 @@ class TagDecoratorBase(typ.Generic[T], abc.ABC):
         """
         return value
 
-    def __call__(self, handler: typ.Callable[[Tag, T, StateHolder], RT]) -> TagConstructor:
+    def __call__(self, handler: tabc.Callable[[Tag, T, StateHolder], RT]) -> TagConstructor:
         # """Takes the wrapped tag function and further wraps it for configuration loading.
         # :param (~collections.abc.Callable[[Tag, T, StateHolder], RT]) handler: Wrapped Tag Function
         # :return: Tag Function ready to be used when loading configuration
@@ -218,11 +219,11 @@ class TagDecoratorBase(typ.Generic[T], abc.ABC):
                         return handler(tag, scalar_node_transformer(value), state)
                 elif isinstance(node, SequenceNode):
                     value = construct_sequence(state.options.sequence_func, constructor, node)
-                    if isinstance(value, typ.Sequence) and sequence_node_type_check(value):
+                    if isinstance(value, tabc.Sequence) and sequence_node_type_check(value):
                         return handler(tag, sequence_node_transformers(value), state)
                 elif isinstance(node, MappingNode):
                     value = construct_mapping(state.options.obj_pairs_func, constructor, node)
-                    if isinstance(value, typ.Mapping) and mapping_node_type_check(value):
+                    if isinstance(value, tabc.Mapping) and mapping_node_type_check(value):
                         return handler(tag, mapping_node_transformer(value), state)
                 else:
                     pass  # pragma: no cover

@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import collections.abc as tabc
 import re
 import typing as typ
 import warnings
@@ -20,7 +21,7 @@ def _get_ref_string(root: Root, contents: str) -> str:
     value = resolve_json_ref(contents, root)
     if isinstance(value, str):
         return value
-    elif isinstance(value, (typ.Mapping, typ.Sequence)):
+    elif isinstance(value, (tabc.Mapping, tabc.Sequence)):
         return repr(value)
     else:
         return str(value)
@@ -63,7 +64,7 @@ def round_sub(root: Root, *, contents: str) -> str:
     return "$(" + contents + ")"
 
 
-SUB_PATTERNS: typ.Final[typ.Sequence[tuple[typ.Callable, typ.Pattern[str]]]] = (
+SUB_PATTERNS: typ.Final[tabc.Sequence[tuple[tabc.Callable, typ.Pattern[str]]]] = (
     (round_sub, re.compile(r"(\$\((?P<contents>.*?)\))")),
     (curly_sub, re.compile(r"(\$\{(?P<contents>.*?)\})")),
 )
@@ -105,8 +106,8 @@ def interpolation_needs_ref_condition(value: str) -> bool:
 
 
 def interpolate_value_with_ref(
-    func: typ.Callable[typ.Concatenate[str, Root, P], RT],
-) -> typ.Callable[typ.Concatenate[str, Root, P], RT]:
+    func: tabc.Callable[typ.Concatenate[str, Root, P], RT],
+) -> tabc.Callable[typ.Concatenate[str, Root, P], RT]:
     """Replaces the YAML string value with the interpolated value before calling the tag function
 
     "with_ref" does full interpolation, supporting references (e.g. ``${$.value}`` and ``${/value}``).
@@ -143,8 +144,8 @@ def interpolate_value_with_ref(
 
 
 def interpolate_value_without_ref(
-    func: typ.Callable[typ.Concatenate[str, P], RT],
-) -> typ.Callable[typ.Concatenate[str, P], RT]:
+    func: tabc.Callable[typ.Concatenate[str, P], RT],
+) -> tabc.Callable[typ.Concatenate[str, P], RT]:
     """Replaces the YAML string value with the interpolated value before calling the tag function
 
     "without_ref" does a limited interpolation that does not support references (e.g. ``${$.value}`` and ``${/value}``)

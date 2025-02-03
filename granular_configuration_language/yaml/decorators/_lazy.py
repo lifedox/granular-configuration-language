@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import collections.abc as tabc
 import typing as typ
 from functools import wraps
 
@@ -8,7 +9,7 @@ from granular_configuration_language.yaml.decorators._lazy_eval import LazyEvalB
 from granular_configuration_language.yaml.decorators._tag_tracker import track_as_not_lazy
 
 
-def as_lazy(func: typ.Callable[[T], RT]) -> typ.Callable[[Tag, T, StateHolder], LazyEval[RT]]:
+def as_lazy(func: tabc.Callable[[T], RT]) -> tabc.Callable[[Tag, T, StateHolder], LazyEval[RT]]:
     """Wraps the "Tag" function in a :py:class:`~.LazyEval`, so that the function being wrapped is run just-in-time.
 
     :param ~collections.abc.Callable[[T], RT] func: Function to be wrapped
@@ -34,8 +35,8 @@ def as_lazy(func: typ.Callable[[T], RT]) -> typ.Callable[[Tag, T, StateHolder], 
 
 
 def as_lazy_with_load_options(
-    func: typ.Callable[[T, LoadOptions], RT],
-) -> typ.Callable[[Tag, T, StateHolder], LazyEval[RT]]:
+    func: tabc.Callable[[T, LoadOptions], RT],
+) -> tabc.Callable[[Tag, T, StateHolder], LazyEval[RT]]:
     """Wraps the "Tag" function in a :py:class:`~.LazyEval`, so that the function being wrapped is run just-in-time.
 
     :param ~collections.abc.Callable[[T, LoadOptions], RT] func: Function to be wrapped
@@ -63,20 +64,20 @@ def as_lazy_with_load_options(
 
 
 @typ.overload
-def as_lazy_with_root(func: typ.Callable[[T, Root], RT]) -> typ.Callable[[Tag, T, StateHolder], LazyEval[RT]]: ...
+def as_lazy_with_root(func: tabc.Callable[[T, Root], RT]) -> tabc.Callable[[Tag, T, StateHolder], LazyEval[RT]]: ...
 
 
 @typ.overload
 def as_lazy_with_root(
-    *, needs_root_condition: typ.Callable[[T], bool]
-) -> typ.Callable[[typ.Callable[[T, Root], RT]], typ.Callable[[Tag, T, StateHolder], LazyEval[RT]]]: ...
+    *, needs_root_condition: tabc.Callable[[T], bool]
+) -> tabc.Callable[[tabc.Callable[[T, Root], RT]], tabc.Callable[[Tag, T, StateHolder], LazyEval[RT]]]: ...
 
 
 def as_lazy_with_root(
-    func: typ.Callable[[T, Root], RT] | None = None, *, needs_root_condition: typ.Callable[[T], bool] | None = None
+    func: tabc.Callable[[T, Root], RT] | None = None, *, needs_root_condition: tabc.Callable[[T], bool] | None = None
 ) -> (
-    typ.Callable[[Tag, T, StateHolder], LazyEval[RT]]
-    | typ.Callable[[typ.Callable[[T, Root], RT]], typ.Callable[[Tag, T, StateHolder], LazyEval[RT]]]
+    tabc.Callable[[Tag, T, StateHolder], LazyEval[RT]]
+    | tabc.Callable[[tabc.Callable[[T, Root], RT]], tabc.Callable[[Tag, T, StateHolder], LazyEval[RT]]]
 ):
     r"""Wraps the "Tag" function in a :py:class:`~.LazyEval`, so that the function being wrapped is run just-in-time.
 
@@ -105,7 +106,7 @@ def as_lazy_with_root(
                 ...
     """
 
-    def decorator_generator(func: typ.Callable[[T, Root], RT]) -> typ.Callable[[Tag, T, StateHolder], LazyEval[RT]]:
+    def decorator_generator(func: tabc.Callable[[T, Root], RT]) -> tabc.Callable[[Tag, T, StateHolder], LazyEval[RT]]:
 
         @wraps(func)
         def lazy_wrapper(tag: Tag, value: T, state: StateHolder) -> LazyEval[RT]:
@@ -124,8 +125,8 @@ def as_lazy_with_root(
 
 
 def as_lazy_with_root_and_load_options(
-    func: typ.Callable[[T, Root, LoadOptions], RT],
-) -> typ.Callable[[Tag, T, StateHolder], LazyEval[RT]]:
+    func: tabc.Callable[[T, Root, LoadOptions], RT],
+) -> tabc.Callable[[Tag, T, StateHolder], LazyEval[RT]]:
     """Wraps the "Tag" function in a :py:class:`~.LazyEval`, so that the function being wrapped is run just-in-time.
 
     :param ~collections.abc.Callable[[T, ~granular_configuration_language.yaml.classes.Root, LoadOptions], RT] func: Function to be wrapped
@@ -153,7 +154,7 @@ def as_lazy_with_root_and_load_options(
     return lazy_wrapper
 
 
-def as_not_lazy(func: typ.Callable[[T], RT]) -> typ.Callable[[Tag, T, StateHolder], RT]:
+def as_not_lazy(func: tabc.Callable[[T], RT]) -> tabc.Callable[[Tag, T, StateHolder], RT]:
     """Wraps the "Tag" function, but does not make it lazy. The function being wrapped is run at load time.
 
     :param ~collections.abc.Callable[[T], RT] func: Function to be wrapped

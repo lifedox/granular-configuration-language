@@ -1,8 +1,8 @@
+import collections.abc as tabc
 import importlib
 import inspect
 import os
 import sys
-import typing as typ
 
 from granular_configuration_language.exceptions import DoesNotExist, IsNotAClass, IsNotCallable
 from granular_configuration_language.yaml.decorators import Tag, as_lazy, interpolate_value_without_ref, string_tag
@@ -14,11 +14,11 @@ def add_cwd_to_path() -> None:
         sys.path.insert(0, cwd)
 
 
-def get_func(func_path: str) -> typ.Callable:
+def get_func(func_path: str) -> tabc.Callable:
     add_cwd_to_path()
     mod_name, func_name = func_path.rsplit(".", 1)
     try:
-        func: typ.Callable = getattr(importlib.import_module(mod_name), func_name)
+        func: tabc.Callable = getattr(importlib.import_module(mod_name), func_name)
         return func
     except (ImportError, AttributeError):
         raise DoesNotExist(f"Could not load {func_path}")
@@ -27,7 +27,7 @@ def get_func(func_path: str) -> typ.Callable:
 @string_tag(Tag("!Class"))
 @as_lazy
 @interpolate_value_without_ref
-def class_handler(value: str) -> typ.Callable:
+def class_handler(value: str) -> tabc.Callable:
     class_type = get_func(value)
     if inspect.isclass(class_type):
         return class_type
@@ -38,7 +38,7 @@ def class_handler(value: str) -> typ.Callable:
 @string_tag(Tag("!Func"))
 @as_lazy
 @interpolate_value_without_ref
-def func_handler(value: str) -> typ.Callable:
+def func_handler(value: str) -> tabc.Callable:
     func = get_func(value)
     if callable(func):
         return func

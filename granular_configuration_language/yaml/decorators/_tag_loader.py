@@ -1,3 +1,4 @@
+import collections.abc as tabc
 import inspect
 import os
 import typing as typ
@@ -22,11 +23,11 @@ def is_TagConstructor(obj: typ.Any) -> typ.TypeGuard[TagConstructor]:
     return isinstance(obj, TagConstructor)
 
 
-def get_tags_in_module(module_name: ModuleName) -> typ.Iterator[TagConstructor]:
+def get_tags_in_module(module_name: ModuleName) -> tabc.Iterator[TagConstructor]:
     return map(itemgetter(1), inspect.getmembers(import_module(module_name), is_TagConstructor))
 
 
-def get_internal_tag_plugins() -> typ.Iterator[ModuleName]:
+def get_internal_tag_plugins() -> tabc.Iterator[ModuleName]:
     import granular_configuration_language.yaml._tags as tags
 
     tags_package = tags.__package__
@@ -48,11 +49,11 @@ def get_internal_tag_plugins() -> typ.Iterator[ModuleName]:
     )
 
 
-def get_external_tag_plugins() -> typ.Iterator[tuple[PluginName, ModuleName]]:
+def get_external_tag_plugins() -> tabc.Iterator[tuple[PluginName, ModuleName]]:
     return map(attrgetter("name", "module"), entry_points(group="granular-configuration-language-20-tag"))
 
 
-def get_all_tag_plugins(*, disable_plugin: typ.AbstractSet[str]) -> typ.Iterator[ModuleName]:
+def get_all_tag_plugins(*, disable_plugin: typ.AbstractSet[str]) -> tabc.Iterator[ModuleName]:
     for module in get_internal_tag_plugins():
         yield module
 
@@ -61,8 +62,8 @@ def get_all_tag_plugins(*, disable_plugin: typ.AbstractSet[str]) -> typ.Iterator
             yield module
 
 
-class TagSet(typ.Iterable[TagConstructor], typ.Container[str]):
-    def __init__(self, tags: typ.Iterable[TagConstructor]) -> None:
+class TagSet(tabc.Iterable[TagConstructor], typ.Container[str]):
+    def __init__(self, tags: tabc.Iterable[TagConstructor]) -> None:
         self.__state: OrderedDict[Tag, TagConstructor] = OrderedDict()
 
         for tc in tags:
@@ -77,7 +78,7 @@ class TagSet(typ.Iterable[TagConstructor], typ.Container[str]):
     def __contains__(self, x: typ.Any) -> bool:
         return x in self.__state
 
-    def __iter__(self) -> typ.Iterator[TagConstructor]:
+    def __iter__(self) -> tabc.Iterator[TagConstructor]:
         return iter(self.__state.values())
 
     def has_tags(self, *tags: Tag | str) -> bool:

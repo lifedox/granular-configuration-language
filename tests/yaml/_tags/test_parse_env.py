@@ -1,5 +1,5 @@
+import collections.abc as tabc
 import os
-import typing as typ
 from itertools import product
 from unittest.mock import patch
 
@@ -148,7 +148,7 @@ def test_safe_sequence__int() -> None:
         assert isinstance(loads("!ParseEnvSafe [unreal_env_variable, null]"), int)
 
 
-def product_pylance_helper(*iterable: typ.Iterable[bool]) -> typ.Iterator[typ.Iterable[bool]]:
+def product_pylance_helper(*iterable: tabc.Iterable[bool]) -> tabc.Iterator[tabc.Iterable[bool]]:
     return product(*iterable)
 
 

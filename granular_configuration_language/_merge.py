@@ -1,3 +1,4 @@
+import collections.abc as tabc
 import typing as typ
 from os import PathLike
 
@@ -8,7 +9,7 @@ from granular_configuration_language.yaml.load import obj_pairs_func
 
 
 def merge(
-    configs: typ.Iterable[Configuration | LazyLoadConfiguration | LazyEval | PathLike | typ.Any],
+    configs: tabc.Iterable[Configuration | LazyLoadConfiguration | LazyEval | PathLike | typ.Any],
     *,
     mutable: bool = False,
 ) -> Configuration:
@@ -32,8 +33,8 @@ def merge(
     """
 
     def configuration_only(
-        configs: typ.Iterable[Configuration | LazyLoadConfiguration | LazyEval | PathLike | typ.Any],
-    ) -> typ.Iterator[Configuration]:
+        configs: tabc.Iterable[Configuration | LazyLoadConfiguration | LazyEval | PathLike | typ.Any],
+    ) -> tabc.Iterator[Configuration]:
         for config in configs:
             if isinstance(config, LazyEval):
                 config = config.result

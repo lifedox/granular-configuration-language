@@ -1,5 +1,5 @@
+import collections.abc as tabc
 import os
-import typing as typ
 from unittest.mock import patch
 
 import pytest
@@ -67,7 +67,7 @@ def test_trying_to_override_a_tag_errors() -> None:
 def test_pretty() -> None:
     select = ("!Del", "!UUID", "!Merge", "!Sub")
 
-    def subset(tags: typ.Iterable[TagConstructor]) -> typ.Iterator[TagConstructor]:
+    def subset(tags: tabc.Iterable[TagConstructor]) -> tabc.Iterator[TagConstructor]:
         for tag in tags:
             if tag.tag in select:
                 yield tag

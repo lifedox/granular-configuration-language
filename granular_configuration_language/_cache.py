@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import collections.abc as tabc
 import dataclasses
 import operator as op
 import typing as typ
@@ -76,7 +77,11 @@ store: typ.Final[WeakValueDictionary[Locations, SharedConfigurationReference]] =
 
 
 def prepare_to_load_configuration(
-    *, locations: Locations, base_path: str | typ.Sequence[str] | None, mutable_configuration: bool, disable_cache: bool
+    *,
+    locations: Locations,
+    base_path: str | tabc.Sequence[str] | None,
+    mutable_configuration: bool,
+    disable_cache: bool,
 ) -> NoteOfIntentToRead:
     if disable_cache or mutable_configuration:
         shared_config_ref = SharedConfigurationReference(_locations=locations, _mutable_config=mutable_configuration)

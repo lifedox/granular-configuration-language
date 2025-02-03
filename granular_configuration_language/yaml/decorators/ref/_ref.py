@@ -1,3 +1,4 @@
+import collections.abc as tabc
 import operator as op
 import re
 import typing as typ
@@ -16,7 +17,7 @@ from granular_configuration_language.yaml.decorators import Root
 SUB_PATTERN: typ.Pattern[str] = re.compile(r"(\$\{(?P<contents>.*?)\})")
 
 
-def _resolve_pointer(query: str, root: typ.Mapping) -> typ.Any:
+def _resolve_pointer(query: str, root: tabc.Mapping) -> typ.Any:
     try:
         not_found = object()
 
@@ -35,7 +36,7 @@ def _resolve_pointer(query: str, root: typ.Mapping) -> typ.Any:
         ) from None
 
 
-def _resolve_path(query: str, root: typ.Mapping) -> typ.Any:
+def _resolve_path(query: str, root: tabc.Mapping) -> typ.Any:
     try:
         result = list(map(op.attrgetter("value"), jsonpath.finditer(query, root)))
 
@@ -59,7 +60,7 @@ def resolve_json_ref(query: str, root: Root) -> typ.Any:
         raise RecursionError(
             f"JSON Query `{query}` attempted recursion. Please check your configuration for a self-referencing loop."
         )
-    elif not isinstance(root, typ.Mapping):
+    elif not isinstance(root, tabc.Mapping):
         raise JSONPathOnlyWorksOnMappings(f"JSONPath `{query}` was tried on `{repr(root)}`")
     elif query.startswith("$"):
         return _resolve_path(query, root)

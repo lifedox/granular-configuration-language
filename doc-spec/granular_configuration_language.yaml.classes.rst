@@ -17,12 +17,12 @@
 
 .. autoclass:: granular_configuration_language.yaml.classes.RootType
 
-Typing Variables
-----------------
+Internal Typing Variables
+-------------------------
 
 .. py:class:: P
 
-    ParamSpec(“P”)
+    alias of ParamSpec("P")
 
 .. autoclass:: RT
 

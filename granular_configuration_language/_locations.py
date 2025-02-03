@@ -1,3 +1,4 @@
+import collections.abc as tabc
 import operator as op
 import os
 import typing as typ
@@ -26,7 +27,7 @@ def path_repr(path: Path) -> str:  # pragma: no cover
     return str(path.relative_to(Path.cwd()))
 
 
-class BaseLocation(typ.Iterable[Path], typ.Hashable):
+class BaseLocation(tabc.Iterable[Path], typ.Hashable):
     pass
 
 
@@ -36,7 +37,7 @@ class PrioritizedLocations(BaseLocation):
     def __init__(self, paths: tuple[Path, ...]) -> None:
         self.paths: typ.Final = paths
 
-    def __iter__(self) -> typ.Iterator[Path]:
+    def __iter__(self) -> tabc.Iterator[Path]:
         return islice(filter(op.methodcaller("is_file"), self.paths), 1)
 
     def __eq__(self, value: object) -> bool:
@@ -59,7 +60,7 @@ class Location(BaseLocation):
     def __init__(self, path: Path) -> None:
         self.path: typ.Final = path
 
-    def __iter__(self) -> typ.Iterator[Path]:
+    def __iter__(self) -> tabc.Iterator[Path]:
         if self.path.is_file():
             yield self.path
 
@@ -77,7 +78,7 @@ class Location(BaseLocation):
         return f"<Location={path_repr(self.path)}>"
 
 
-SUFFIX_CONFIG: typ.Final[dict[str, typ.Sequence[str]]] = {
+SUFFIX_CONFIG: typ.Final[dict[str, tabc.Sequence[str]]] = {
     ".*": (".yaml", ".yml"),
     ".y*": (".yaml", ".yml"),
     ".yml": (".yaml", ".yml"),
@@ -93,12 +94,12 @@ def _convert_to_location(path: Path) -> BaseLocation:
 
 
 class Locations(BaseLocation):
-    def __init__(self, locations: typ.Iterable[PathOrStr]) -> None:
+    def __init__(self, locations: tabc.Iterable[PathOrStr]) -> None:
         self.locations: typ.Final = tuple(
             map(_convert_to_location, map(_resolve_path, map(_convert_to_path, locations)))
         )
 
-    def __iter__(self) -> typ.Iterator[Path]:
+    def __iter__(self) -> tabc.Iterator[Path]:
         return iter(OrderedSet(chain.from_iterable(self.locations)))
 
     def __bool__(self) -> bool:

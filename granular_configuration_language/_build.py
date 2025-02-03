@@ -1,3 +1,4 @@
+import collections.abc as tabc
 import typing as typ
 from functools import partial
 from pathlib import Path
@@ -27,17 +28,17 @@ def _merge_into_base(configuration_type: typ.Type[_C], base_dict: _C, from_dict:
         base_dict._private_set(key, value, setter_secret)
 
 
-def _merge(configuration_type: typ.Type[_C], base_config: _C, configs: typ.Iterable[_C]) -> _C:
+def _merge(configuration_type: typ.Type[_C], base_config: _C, configs: tabc.Iterable[_C]) -> _C:
     consume(map(partial(_merge_into_base, configuration_type, base_config), configs))
     return base_config
 
 
 def _load_configs_from_locations(
-    configuration_type: typ.Type[_C], locations: typ.Iterable[Path], lazy_root: LazyRoot, mutable: bool
-) -> typ.Iterator[_C]:
+    configuration_type: typ.Type[_C], locations: tabc.Iterable[Path], lazy_root: LazyRoot, mutable: bool
+) -> tabc.Iterator[_C]:
     def configuration_only(
-        configs: typ.Iterable[_C | typ.Any],
-    ) -> typ.Iterator[_C]:
+        configs: tabc.Iterable[_C | typ.Any],
+    ) -> tabc.Iterator[_C]:
         for config in configs:
             if isinstance(config, configuration_type):
                 yield config
@@ -46,7 +47,7 @@ def _load_configs_from_locations(
     return configuration_only(map(_load_file, locations))
 
 
-def build_configuration(locations: typ.Iterable[Path], mutable: bool) -> Configuration:
+def build_configuration(locations: tabc.Iterable[Path], mutable: bool) -> Configuration:
     configuration_type = obj_pairs_func(mutable)
     base_config = configuration_type()
     lazy_root = LazyRoot.with_root(base_config)

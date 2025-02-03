@@ -1,4 +1,4 @@
-import typing as typ
+import collections.abc as tabc
 
 
 class BasePathPart(str):
@@ -9,7 +9,7 @@ class BasePath(tuple[BasePathPart]):
     pass
 
 
-def read_base_path(base_path: str | typ.Sequence[str] | None) -> BasePath:
+def read_base_path(base_path: str | tabc.Sequence[str] | None) -> BasePath:
     if isinstance(base_path, str):
         if base_path.startswith("/"):
             return BasePath(map(BasePathPart, filter(None, base_path.split("/"))))

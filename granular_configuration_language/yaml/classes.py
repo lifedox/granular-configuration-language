@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import abc
+import collections.abc as tabc
 import typing as typ
 from dataclasses import dataclass
 from functools import cached_property
@@ -8,23 +9,14 @@ from pathlib import Path
 from threading import RLock
 
 P = typ.ParamSpec("P")
-"""
-ParamSpec("P")
-"""
 T = typ.TypeVar("T")
-"""
-TypeVar("T")
-"""
 RT = typ.TypeVar("RT")
-"""
-TypeVar("RT")
-"""
 
-RootType = typ.NewType("RootType", typ.Mapping)
+RootType = typ.NewType("RootType", tabc.Mapping)
 """
 :py:class:`~typing.NewType` used to type the configuration root.
 
-Aliases :py:class:`~collections.abc.Mapping` as root has to be a mapping for it to be used.
+Aliases :py:class:`~collections.abc.Mapping` as root has to be a mapping for it to be used and no Tag should mutate it.
 """
 
 Root = RootType | None
@@ -71,6 +63,10 @@ class Placeholder:
 
 
 class LazyRoot:
+    """
+    Allows the Root reference to be defined outside loading. (Since it cannot be defined during Loading)
+    """
+
     __slots__ = "__root"
 
     def __init__(self) -> None:
@@ -81,10 +77,13 @@ class LazyRoot:
 
     @property
     def root(self) -> Root:
+        """
+        Fetch the Root.
+        """
         return self.__root
 
     @staticmethod
-    def with_root(root: typ.Mapping | Root) -> "LazyRoot":
+    def with_root(root: tabc.Mapping | Root) -> "LazyRoot":
         lazy_root = LazyRoot()
         lazy_root._set_root(root)
         return lazy_root
@@ -101,7 +100,15 @@ class LazyEval(abc.ABC, typ.Generic[RT]):
         self.__lock = RLock()
 
     @abc.abstractmethod
-    def _run(self) -> RT: ...
+    def _run(self) -> RT:
+        """
+        Run the Tag Logic.
+
+        :return: Result of the lazy evaluation
+        :rtype: RT
+        :Note: Caching does not occur within this method
+        """
+        ...
 
     @cached_property
     def __result(self) -> RT:
@@ -121,7 +128,7 @@ class LazyEval(abc.ABC, typ.Generic[RT]):
     @cached_property
     def result(self) -> RT | typ.Any:
         """
-        Result of the lazy evaluation, completing any chains
+        Result of the lazy evaluation, completing any chains. (Cached)
         """
         result = self.__run()
         while isinstance(result, LazyEval):
@@ -143,14 +150,16 @@ class LazyEval(abc.ABC, typ.Generic[RT]):
 @dataclass(frozen=True, kw_only=True)
 class LoadOptions:
     """
-    Holds the parameters used when loading the configuration file
+    Type: frozen :py:func:`dataclass <dataclasses.dataclass>`
+
+    Holds the parameters used when loading the configuration file.
     """
 
-    obj_pairs_func: typ.Type[typ.Mapping]
+    obj_pairs_func: typ.Type[tabc.Mapping]
     """
     Type being used for YAML mappings
     """
-    sequence_func: typ.Type[typ.Sequence]
+    sequence_func: typ.Type[tabc.Sequence]
     """
     Type being used for YAML sequences
     """
@@ -170,5 +179,17 @@ class LoadOptions:
 
 @dataclass(frozen=True, kw_only=True)
 class StateHolder:
+    """
+    Type: frozen :py:func:`dataclass <dataclasses.dataclass>`
+
+    Used to pass state define while Loading configuration files into Tags.
+    """
+
     options: LoadOptions
+    """
+    Options from Loading
+    """
     lazy_root_obj: LazyRoot
+    """
+    Shared reference to the final root configuration
+    """

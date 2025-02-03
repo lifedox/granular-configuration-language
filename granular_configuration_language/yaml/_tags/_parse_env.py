@@ -1,3 +1,4 @@
+import collections.abc as tabc
 import os
 import typing as typ
 from functools import partial
@@ -14,7 +15,7 @@ from granular_configuration_language.yaml.decorators import (
 )
 
 
-def parse_env(load: typ.Callable[[str], typ.Any], env_var: str, *default: typ.Any) -> typ.Any:
+def parse_env(load: tabc.Callable[[str], typ.Any], env_var: str, *default: typ.Any) -> typ.Any:
     env_missing = env_var not in os.environ
 
     if env_missing and (len(default) > 0):
@@ -41,7 +42,7 @@ def load_safe(value: str) -> typ.Any:
     return YAML(typ="safe").load(value)
 
 
-def parse_input(load: typ.Callable[[str], typ.Any], value: string_or_twople_tag.Type) -> typ.Any:
+def parse_input(load: tabc.Callable[[str], typ.Any], value: string_or_twople_tag.Type) -> typ.Any:
     if isinstance(value, str):
         return parse_env(load, value)
     else:
