@@ -120,8 +120,10 @@ def handler(value: str) -> Masked:  # Function Signature
 
 - A minor plugin change (e.g. `21`) would represent an added feature that requires a structural change but a change to the primary code.
   - Minor compatibility version deprecates any previous compatibility version (e.g. `20`).
-- A major  plugin change (e.g. `30`) would represent a break change to plugin, potentially requiring complete.
+    - Both `20` and `21` would be supported, with `20` using a compatibilty layer.
+- A major plugin change (e.g. `30`) would represent a breaking change to plugin, potentially requiring complete.
   - Major compatibility version deprecates previous compatibility versions (e.g. `20` and `21`).
+    - If the library does not major version, then `20`, `21`, `30` would be all be supported, with compatibility layers for `20` and `21`
 - A major version bump to this library may or may not introduce a new plugin compatible.
   - It would remove any deprecated versions
   - If there is no change to plugin compatibility, then only a non-zero minor would introduce to new major version.

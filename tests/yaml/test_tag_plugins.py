@@ -74,13 +74,50 @@ def test_pretty() -> None:
 
     tags = TagSet(subset(handlers))
 
+    print(tags.pretty())
+    print("---")
+    print(tags.pretty(as_json=True))
+
     assert (
         tags.pretty()
         == """\
 TagSet{
-  '!Del': 'str [NOT-LAZY] (granular_configuration_language.yaml._tags._del.handler)',
-  '!Merge': 'list[Any] (granular_configuration_language.yaml._tags._merge.handler)',
-  '!Sub': 'str [interpolates] (granular_configuration_language.yaml._tags._sub.handler)',
-  '!UUID': 'str [interpolates-reduced] (granular_configuration_language.yaml._tags._uuid.handler)'
+  '!Del': "str [NOT-LAZY] (granular_configuration_language.yaml._tags._del.handler) `<class 'str'>`",
+  '!Merge': 'list[Any] (granular_configuration_language.yaml._tags._merge.handler) `Configuration`',
+  '!Sub': "str [interpolates] (granular_configuration_language.yaml._tags._sub.handler) `<class 'str'>`",
+  '!UUID': 'str [interpolates-reduced] (granular_configuration_language.yaml._tags._uuid.handler) `<class '
+           "'uuid.UUID'>`"
+}"""
+    )
+    assert (
+        tags.pretty(as_json=True)
+        == """\
+TagSet{
+  "!Del": {
+    "input": "str",
+    "notes": [
+      "NOT-LAZY"
+    ],
+    "output": "<class 'str'>"
+  },
+  "!Merge": {
+    "input": "list[Any]",
+    "notes": [],
+    "output": "'Configuration'"
+  },
+  "!Sub": {
+    "input": "str",
+    "notes": [
+      "interpolates"
+    ],
+    "output": "<class 'str'>"
+  },
+  "!UUID": {
+    "input": "str",
+    "notes": [
+      "interpolates-reduced"
+    ],
+    "output": "<class 'uuid.UUID'>"
+  }
 }"""
     )

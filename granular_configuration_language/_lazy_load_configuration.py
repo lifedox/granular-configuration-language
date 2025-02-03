@@ -57,7 +57,7 @@ class LazyLoadConfiguration(Mapping):
     :note:
         - The Environment Variable is read as a comma-delimited list of configuration path that will be appended to ``load_order_location`` list.
         - Setting the Environment Variable is always optional.
-        - Setting ``use_env_location`` to :py:data:`True` is only required, if you don't change ``env_location_var_name`` from its default value of ``G_CONFIG_LOCATION``.
+        - Setting ``use_env_location`` to :py:data:`True` is only required if you don't change ``env_location_var_name`` from its default value of ``G_CONFIG_LOCATION``.
     """
 
     def __init__(
@@ -161,7 +161,7 @@ class MutableLazyLoadConfiguration(LazyLoadConfiguration, MutableMapping):
     :note:
         - The Environment Variable is read as a comma-delimited list of configuration path that will be appended to ``load_order_location`` list.
         - Setting the Environment Variable is always optional.
-        - Setting ``use_env_location`` to :py:data:`True` is only required, if you don't change ``env_location_var_name`` from its default value of ``G_CONFIG_LOCATION``.
+        - Setting ``use_env_location`` to :py:data:`True` is only required if you don't change ``env_location_var_name`` from its default value of ``G_CONFIG_LOCATION``.
     """
 
     def __init__(

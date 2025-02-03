@@ -1,5 +1,6 @@
 import collections.abc as tabc
 import inspect
+import json
 import os
 import typing as typ
 from collections import OrderedDict
@@ -90,27 +91,54 @@ class TagSet(tabc.Iterable[TagConstructor], typ.Container[str]):
     def __repr__(self) -> str:
         return f"TagSet{{{','.join(sorted(self.__state.keys()))}}}"
 
-    def pretty(self, width: int = 120, indent: int = 2) -> str:
-        def get_type(tc: TagConstructor) -> str:
-            attributes: set[str] = set()
+    def pretty(self, as_json: bool = False, width: int = 120, indent: int = 2) -> str:
+        if as_json:
 
-            if is_with_ref(tc.constructor):
-                attributes.add("interpolates")
-            elif is_without_ref(tc.constructor):
-                attributes.add("interpolates-reduced")
+            def get_type(tc: TagConstructor) -> typ.Any:
+                attributes: list[str] = list()
 
-            if is_not_lazy(tc.constructor):
-                attributes.add("NOT-LAZY")
+                if is_with_ref(tc.constructor):
+                    attributes.append("interpolates")
+                elif is_without_ref(tc.constructor):
+                    attributes.append("interpolates-reduced")
 
-            return (
-                tc.friendly_type
-                + (f" [{', '.join(attributes)}]" if attributes else "")
-                + f" ({tc.constructor.__module__}.{tc.constructor.__name__})"
-            )
+                if is_not_lazy(tc.constructor):
+                    attributes.append("NOT-LAZY")
+
+                return dict(
+                    input=tc.friendly_type,
+                    output=repr(inspect.signature(tc.constructor).return_annotation),
+                    notes=attributes,
+                )
+
+        else:
+
+            def get_type(tc: TagConstructor) -> typ.Any:
+                attributes: set[str] = set()
+
+                if is_with_ref(tc.constructor):
+                    attributes.add("interpolates")
+                elif is_without_ref(tc.constructor):
+                    attributes.add("interpolates-reduced")
+
+                if is_not_lazy(tc.constructor):
+                    attributes.add("NOT-LAZY")
+
+                return (
+                    tc.friendly_type
+                    + (f" [{', '.join(attributes)}]" if attributes else "")
+                    + f" ({tc.constructor.__module__}.{tc.constructor.__name__})"
+                    + f" `{inspect.signature(tc.constructor).return_annotation}`"
+                )
 
         tags = {tag: get_type(tc) for tag, tc in self.__state.items()}
 
-        return f"""TagSet{{\n {pformat(tags, width=width, indent=indent, sort_dicts=True)[1:-1]}\n}}"""
+        if as_json:
+            body = json.dumps(tags, indent=indent, sort_keys=True)[3:-2]
+        else:
+            body = pformat(tags, width=width, indent=indent, sort_dicts=True)[1:-1]
+
+        return f"""TagSet{{\n {body}\n}}"""
 
 
 def load_tags(

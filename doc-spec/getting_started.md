@@ -111,7 +111,7 @@ setting1: value
 setting2:
   sub_setting1: value
 example_of_codes:
-  # This becomes Configuration[int, str]
+  # This becomes Mapping[int, str]
   200: Success
   404: Not Found
 ```
@@ -119,6 +119,7 @@ example_of_codes:
 **Things to bear in mind when writing your configuration:**
 
 - Take a look at the [YAML Tags](yaml.md) for options.
+  - Use [`!PlaceHolder](yaml.md#placeholder) to specify values the user need to provide.
 - Setting names should be compatible Python attribute names.
   - This lets you use {py:meth}`~.LazyLoadConfiguration.__getattr__`.
 - Use subsection to organize settings.
