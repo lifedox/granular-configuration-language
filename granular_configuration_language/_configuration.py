@@ -70,6 +70,18 @@ class Configuration(tabc.Mapping[typ.Any, typ.Any]):
     This class represents an immutable :py:class:`~collections.abc.Mapping` of configuration.
     """
 
+    @typ.overload
+    def __init__(self) -> None: ...
+
+    @typ.overload
+    def __init__(self, mapping: tabc.Mapping[typ.Any, typ.Any]) -> None: ...
+
+    @typ.overload
+    def __init__(self, iterable: tabc.Iterable[tuple[typ.Any, typ.Any]]) -> None: ...
+
+    @typ.overload
+    def __init__(self, **kwargs: typ.Any) -> None: ...
+
     def __init__(self, *arg: tabc.Mapping | tabc.Iterable[tuple[typ.Any, typ.Any]], **kwargs: typ.Any) -> None:
         self.__data: dict[typ.Any, typ.Any] = dict(*arg, **kwargs)
         self.__attribute_name = AttributeName.as_root()

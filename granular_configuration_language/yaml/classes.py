@@ -94,9 +94,14 @@ class LazyEval(abc.ABC, typ.Generic[RT]):
     Base class for handling the output of a Tag that needs to be run just-in-time.
     """
 
+    tag: typ.Final[Tag]
+    """
+    Tag that created this instance
+    """
+
     def __init__(self, tag: Tag) -> None:
         self.tag = tag
-        self.done = False
+        self.__done = False
         self.__lock = RLock()
 
     @abc.abstractmethod
@@ -115,12 +120,12 @@ class LazyEval(abc.ABC, typ.Generic[RT]):
         return self._run()
 
     def __run(self) -> RT:
-        if self.done:
+        if self.__done:
             return self.__result
         else:
             with self.__lock:
                 result = self.__result
-                self.done = True
+                self.__done = True
 
             del self.__lock
             return result

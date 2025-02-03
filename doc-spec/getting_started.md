@@ -18,6 +18,7 @@ CONFIG = LazyLoadConfiguration(
 
 - Comments:
   - `Path(__file___).parent /` creates a file relative directory. Using this ensures that the embedded configuration (the one shipped with this library) is correctly reference within site-package.
+    - This example shows the common pattern of having a `config.py` (or `config` with `_config.py`) and then have config file (`config.yaml`) live next to it.
     - ⚠️ Don't forget to add the embedded config to package data.
   - `~/.config/` is useful when you have settings that developers may want to on their machines.
     - For example, plain text logs while debugging and JSON logs for deploys.
@@ -70,9 +71,9 @@ CONFIG = LazyLoadConfiguration(
 
 - Comments:
   - This case has been seen enough in the past that the caching of configurations was added for this option.
-  - This case requires not having a library-specific configuration.
+  - This case requires not having a embedded configuration.
     - Which means, defaults are defined programmatically, which means configuration is split between Python and YAML code, which is additional context switching and file search (one `config.yaml` vs. many `.py` files with one called `config.py`).
-  - Use of [Pydantic](https://docs.pydantic.dev/latest/) is recommended for configuration validation and defaulting.
+  - Use of [Pydantic](https://docs.pydantic.dev/latest/) is recommended for configuration validation and, if using, for defaulting.
     - Use a [cached](https://docs.python.org/3/library/functools.html#functools.cache) function to do Pydantic check, so the configuration stays cached during import time. Otherwise, each Pydantic check will flush the cache.
 
 ### Pulling configuration using wildcards
@@ -92,7 +93,7 @@ CONFIG = LazyLoadConfiguration(
 ```
 
 - Comments:
-  - Flat: Sometimes it is useful separate subsections of a configuration into multiple files within the library-specific configuration.
+  - Flat: Sometimes it is useful separate subsections of a configuration into multiple files within the embedded configuration.
     - For example, your configuration has three types of things with twenty options per type. Having a file per type can make development easier and not having name specified can make it easier to add a fourth type.
   - Recursive: Sometimes it is useful to search current working directory for configuration.
     - For example, your library can generate fixtures for [`pytest`](https://docs.pytest.org/en/stable/). This enables to have fixtures declarations in the same directory as the test cases that use them.
@@ -101,14 +102,33 @@ CONFIG = LazyLoadConfiguration(
 
 ## Writing your configuration
 
-Things to bear in mind when writing your configuration:
+You are only limited by YAML syntax.
 
+**Example:**
+
+```yaml
+setting1: value
+setting2:
+  sub_setting1: value
+example_of_codes:
+  # This becomes Configuration[int, str]
+  200: Success
+  404: Not Found
+```
+
+**Things to bear in mind when writing your configuration:**
+
+- Take a look at the [YAML Tags](yaml.md) for options.
 - Setting names should be compatible Python attribute names.
-- 
-
-
-
-Take a look at the [YAML Tags](yaml.md)
+  - This lets you use {py:meth}`~.LazyLoadConfiguration.__getattr__`.
+- Use subsection to organize settings.
+- Avoid you using non-string lookup keys.
+  - `status_message_lookup: Mapping[int, str] = CONFIG.example_of_codes` is probably clearer than `success_message: str = CONFIG.example_of_codes[200]`
+- A {py:class}`base_path <.LazyLoadConfiguration>` can be useful for making configuration identifiable by contents and for enabling the library to join a shared configuration without requiring a breaking change.
+- Don't be afraid to comment your configuration when desired.
+  - You may want your documentation to just point at your embedded configuration file.
+- `key: ` specifies a value of {py:data}`None`. <!-- markdownlint-disable MD038 -->
+  - Use `key: []` for an empty sequence or `key: {}` for an empty mapping.
 
 ---
 

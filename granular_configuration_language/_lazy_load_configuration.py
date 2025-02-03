@@ -25,7 +25,40 @@ def _read_locations(
 
 
 class LazyLoadConfiguration(Mapping):
-    """Provides a lazy interface for loading Configuration from file paths on first access."""
+    r"""
+    Provides a lazy interface for loading Configuration from file paths on first access.
+
+    You can optionally enable pull locations from an environment variable.
+
+    :param ~pathlib.Path | str | os.PathLike load_order_location:
+            File path to configuration file
+    :param str | ~collections.abc.Sequence[str], optional base_path:
+        Defines the subsection of the configuration file to use. See Examples for usage options.
+    :param bool, optional use_env_location:
+        Enabled to use the default environment variable location.
+    :param str, optional env_location_var_name:
+        Specify what environment variable to check for additional file paths.
+    :param bool, optional disable_caching: When :py:data:`True`, caching of "identical immutable configurations" is disabled.
+
+    :examples:
+        .. code-block:: python
+
+            # Base Path Examples
+            LazyLoadConfiguration(..., base_path="base_path")  # Single Key
+            LazyLoadConfiguration(..., base_path="/base/path")  # JSON Pointer (strings only)
+            LazyLoadConfiguration(..., base_path=("base", "path"))  # List of keys
+
+            # Use Environment Variable: "CONFIG_LOC"
+            LazyLoadConfiguration(..., env_location_var_name="CONFIG_LOC")
+
+            # Use default Environment Variable: "G_CONFIG_LOCATION"
+            LazyLoadConfiguration(..., use_env_location=True)
+
+    :note:
+        - The Environment Variable is read as a comma-delimited list of configuration path that will be appended to ``load_order_location`` list.
+        - Setting the Environment Variable is always optional.
+        - Setting ``use_env_location`` to :py:data:`True` is only required, if you don't change ``env_location_var_name`` from its default value of ``G_CONFIG_LOCATION``.
+    """
 
     def __init__(
         self,
@@ -36,23 +69,6 @@ class LazyLoadConfiguration(Mapping):
         disable_caching: bool = False,
         **kwargs: typ.Any,
     ) -> None:
-        """:param ~pathlib.Path | str | os.PathLike load_order_location: File path to configuration file
-        :param str | ~collections.abc.Sequence[str] | None, optional base_path: Defines the subsection of the configuration file to use. Can be provided as a single key, JSON Pointer of strings, or list of keys. See Examples.
-        :param bool, optional use_env_location: When enabled, if environment variable named by ``env_location_var_name`` exists, it will be read a comma-delimited list of configuration path that will be appended to ``load_order_location`` list.
-        :param str, optional env_location_var_name: Defaults to ``"G_CONFIG_LOCATION"``. Used when ``use_env_location`` is :py:data:`True`.
-
-            > Changing from the default value will set ``use_env_location`` to :py:data:`True`.
-        :param bool, optional disable_caching: When :py:data:`True`, caching of "identical immutable configurations" is disabled.
-
-        :examples:
-            .. code-block:: python
-
-                # Base Path Examples
-                LazyLoadConfiguration(..., base_path="base_path")  # Single Key
-                LazyLoadConfiguration(..., base_path="/base/path")  # JSON Pointer (strings only)
-                LazyLoadConfiguration(..., base_path=("base", "path"))  # List of keys
-
-        """
 
         self.__receipt: NoteOfIntentToRead | None = prepare_to_load_configuration(
             locations=_read_locations(load_order_location, use_env_location, env_location_var_name),
@@ -112,10 +128,40 @@ class LazyLoadConfiguration(Mapping):
 
 
 class MutableLazyLoadConfiguration(LazyLoadConfiguration, MutableMapping):
-    """Provides a lazy interface for loading Configuration from file paths on first access.
+    r"""
+    Provides a lazy interface for loading Configuration from file paths on first access.
 
-    Uses: :py:class:`.MutableConfiguration` for mappings and :py:class:`list` for sequences.
+    :py:class:`.MutableLazyLoadConfiguration` uses: :py:class:`.MutableConfiguration` for mappings and :py:class:`list` for sequences.
 
+    You can optionally enable pull locations from an environment variable.
+
+    :param ~pathlib.Path | str | os.PathLike load_order_location:
+            File path to configuration file
+    :param str | ~collections.abc.Sequence[str], optional base_path:
+        Defines the subsection of the configuration file to use. See Examples for usage options.
+    :param bool, optional use_env_location:
+        Enabled to use the default environment variable location. (O)
+    :param str, optional env_location_var_name:
+        Specify what environment variable to check for additional file paths.
+
+    :examples:
+        .. code-block:: python
+
+            # Base Path Examples
+            MutableLazyLoadConfiguration(..., base_path="base_path")  # Single Key
+            MutableLazyLoadConfiguration(..., base_path="/base/path")  # JSON Pointer (strings only)
+            MutableLazyLoadConfiguration(..., base_path=("base", "path"))  # List of keys
+
+            # Use Environment Variable: "CONFIG_LOC"
+            MutableLazyLoadConfiguration(..., env_location_var_name="CONFIG_LOC")
+
+            # Use default Environment Variable: "G_CONFIG_LOCATION"
+            MutableLazyLoadConfiguration(..., use_env_location=True)
+
+    :note:
+        - The Environment Variable is read as a comma-delimited list of configuration path that will be appended to ``load_order_location`` list.
+        - Setting the Environment Variable is always optional.
+        - Setting ``use_env_location`` to :py:data:`True` is only required, if you don't change ``env_location_var_name`` from its default value of ``G_CONFIG_LOCATION``.
     """
 
     def __init__(
@@ -125,22 +171,6 @@ class MutableLazyLoadConfiguration(LazyLoadConfiguration, MutableMapping):
         use_env_location: bool = False,
         env_location_var_name: str = "G_CONFIG_LOCATION",
     ) -> None:
-        """:param ~pathlib.Path | str | os.PathLike load_order_location: File path to configuration file
-        :param str | ~collections.abc.Sequence[str] | None, optional base_path: Defines the subsection of the configuration file to use. Can be provided as a single key, JSON Pointer of strings, or list of keys. See Examples.
-        :param bool, optional use_env_location: When enabled, if environment variable named by ``env_location_var_name`` exists, it will be read a comma-delimited list of configuration path that will be appended to ``load_order_location`` list.
-        :param str, optional env_location_var_name: Defaults to ``"G_CONFIG_LOCATION"``. Used when ``use_env_location`` is :py:data:`True`.
-
-            > Changing from the default value will set ``use_env_location`` to :py:data:`True`.
-
-        :examples:
-            .. code-block:: python
-
-                # Base Path Examples
-                MutableLazyLoadConfiguration(..., base_path="base_path")  # Single Key
-                MutableLazyLoadConfiguration(..., base_path="/base/path")  # JSON Pointer (strings only)
-                MutableLazyLoadConfiguration(..., base_path=("base", "path"))  # List of keys
-
-        """
         super().__init__(
             *load_order_location,
             base_path=base_path,

@@ -6,17 +6,17 @@ from granular_configuration_language.yaml.classes import RT, LazyEval, LazyRoot,
 class LazyEvalBasic(LazyEval[RT]):
     def __init__(self, tag: Tag, value: tabc.Callable[[], RT]) -> None:
         super().__init__(tag)
-        self.value: tabc.Callable[..., RT] = value
+        self.__value = value
 
     def _run(self) -> RT:
-        return self.value()
+        return self.__value()
 
 
 class LazyEvalWithRoot(LazyEval[RT]):
     def __init__(self, tag: Tag, root: LazyRoot, value: tabc.Callable[[Root], RT]) -> None:
         super().__init__(tag)
-        self.value: tabc.Callable[..., RT] = value
-        self.root = root
+        self.__value = value
+        self.__lazy_root = root
 
     def _run(self) -> RT:
-        return self.value(self.root.root)
+        return self.__value(self.__lazy_root.root)
