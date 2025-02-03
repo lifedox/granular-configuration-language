@@ -33,11 +33,11 @@
 | granular\_configuration\_language/yaml/\_tags/\_sub.py                              |        7 |        0 |        0 |        0 |     100% |           |
 | granular\_configuration\_language/yaml/\_tags/\_uuid.py                             |        7 |        0 |        0 |        0 |     100% |           |
 | granular\_configuration\_language/yaml/\_tags/func\_and\_class.py                   |       33 |        0 |        4 |        0 |     100% |           |
-| granular\_configuration\_language/yaml/classes.py                                   |       82 |        0 |        4 |        0 |     100% |           |
+| granular\_configuration\_language/yaml/classes.py                                   |       84 |        0 |        4 |        0 |     100% |           |
 | granular\_configuration\_language/yaml/decorators/\_\_init\_\_.py                   |        5 |        0 |        0 |        0 |     100% |           |
 | granular\_configuration\_language/yaml/decorators/\_base.py                         |       66 |        0 |       12 |        0 |     100% |           |
 | granular\_configuration\_language/yaml/decorators/\_lazy.py                         |       41 |        0 |        4 |        0 |     100% |           |
-| granular\_configuration\_language/yaml/decorators/\_lazy\_eval.py                   |       13 |        0 |        0 |        0 |     100% |           |
+| granular\_configuration\_language/yaml/decorators/\_lazy\_eval.py                   |       15 |        0 |        0 |        0 |     100% |           |
 | granular\_configuration\_language/yaml/decorators/\_tag\_loader.py                  |       69 |        0 |       16 |        0 |     100% |           |
 | granular\_configuration\_language/yaml/decorators/\_tag\_tracker.py                 |       18 |        0 |        0 |        0 |     100% |           |
 | granular\_configuration\_language/yaml/decorators/\_type\_checking.py               |       43 |        0 |        2 |        0 |     100% |           |
@@ -50,7 +50,7 @@
 | granular\_configuration\_language/yaml/load/\_constructors.py                       |       16 |        0 |        6 |        0 |     100% |           |
 | granular\_configuration\_language/yaml/load/\_external.py                           |       17 |        0 |        4 |        0 |     100% |           |
 | granular\_configuration\_language/yaml/load/\_handler.py                            |       23 |        0 |        4 |        0 |     100% |           |
-|                                                                           **TOTAL** | **1212** |    **0** |  **198** |    **0** | **100%** |           |
+|                                                                           **TOTAL** | **1216** |    **0** |  **198** |    **0** | **100%** |           |
 
 
 ## Setup coverage badge
