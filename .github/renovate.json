@@ -18,5 +18,21 @@
   "labels": [
     "dependencies",
     "RenovateBot"
+  ],
+  "packageRules": [
+    {
+      "automerge": true,
+      "description": "Python: Pin dev-dependencies",
+      "matchLanguages": ["python"],
+      "matchDepTypes": "dev-dependencies",
+      "rangeStrategy": "pin"
+    },
+    {
+      "automerge": true,
+      "description": "Python: Let dependencies ranges stay, but update lockfile",
+      "matchLanguages": ["python"],
+      "matchDepTypes": "dependencies",
+      "rangeStrategy": "update-lockfile"
+    }
   ]
 }
