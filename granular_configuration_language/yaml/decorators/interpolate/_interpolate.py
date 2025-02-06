@@ -136,7 +136,7 @@ def interpolate_value_with_ref(
     """
 
     @wraps(func)
-    def lazy_wrapper(value: str, root: Root, *args: P.args, **kwargs: P.kwargs) -> RT:
+    def lazy_wrapper(value: str, root: Root, /, *args: P.args, **kwargs: P.kwargs) -> RT:
         return func(interpolate(value, root), root, *args, **kwargs)
 
     track_as_with_ref(func)
@@ -175,7 +175,7 @@ def interpolate_value_without_ref(
     """
 
     @wraps(func)
-    def lazy_wrapper(value: str, *args: P.args, **kwargs: P.kwargs) -> RT:
+    def lazy_wrapper(value: str, /, *args: P.args, **kwargs: P.kwargs) -> RT:
         return func(interpolate(value, None), *args, **kwargs)
 
     track_as_without_ref(func)

@@ -72,15 +72,18 @@ class AttributeName(tabc.Iterable[str]):
         return ".".join(self)
 
 
-@dataclass_transform(frozen_default=True, eq_default=True)
+@dataclass_transform(frozen_default=True, eq_default=True, kw_only_default=True)
 class Configuration(tabc.Mapping[typ.Any, typ.Any]):
-    """
+    r"""
     This class represents an immutable :py:class:`~collections.abc.Mapping` of
     configuration.
 
-    You can create type annotation subclasses of :py:class:`Configuration` to
-    enable type checking and code completion and then cast to those subclasses
-    via :py:meth:`Configuration.as_typed`.
+    You can create type annotated subclasses of :py:class:`Configuration` to
+    enable type checking and code completion, as if your subclass was a
+    :py:func:`dataclass <dataclasses.dataclass>` [#f1]_.
+
+    With you typed class, you can cast a general :py:class:`.Configuration` to
+    your subclass via :py:meth:`Configuration.as_typed`.
 
     .. code-block:: python
 
@@ -90,7 +93,6 @@ class Configuration(tabc.Mapping[typ.Any, typ.Any]):
         class Config(Configuration):
             a: int
             b: SubConfig
-            config: str
 
 
         config = ... # A Configuration instance
@@ -106,8 +108,13 @@ class Configuration(tabc.Mapping[typ.Any, typ.Any]):
 
     .. note::
 
-        You should use :py:meth:`LazyLoadConfiguration.as_typed` to load as a typed Configuration.
+        You should use :py:meth:`LazyLoadConfiguration.as_typed` to load as a
+        typed :py:class:`.Configuration`.
 
+    .. [#f1]
+
+        See :py:func:`~typing.dataclass_transform` → "on base class" for
+        implementation details
     """
 
     @typ.overload
@@ -348,31 +355,16 @@ class Configuration(tabc.Mapping[typ.Any, typ.Any]):
         else:
             raise TypeError(f"Incorrect type. Got: `{repr(value)}`. Wanted: `{repr(type)}`")
 
-    if sys.version_info >= (3, 11):
+    def as_typed(self, typed_base: type[C]) -> C:
+        """
+        Cast this :py:class:`Configuration` instance into subclass of :py:class:`Configuration` with typed annotated attribute
 
-        def as_typed(self, typed_base: typ.Type[C]) -> C:
-            """
-            Cast this :py:class:`Configuration` instance into subclass of :py:class:`Configuration` with typed annotated attribute
-
-            :param ~typing.Type[C] typed_base: Subclass of :py:class:`Configuration` to assume
-            :return: This instance
-            :rtype: C
-            :note: No real-time typing check occurs.
-            """
-            return typ.cast(typed_base, self)
-
-    else:
-
-        def as_typed(self, typed_base: typ.Type[C]) -> C:
-            """
-            Cast this :py:class:`Configuration` instance into subclass of :py:class:`Configuration` with typed annotated attribute
-
-            :param ~typing.Type[C] typed_base: Subclass of :py:class:`Configuration` to assume
-            :return: This instance
-            :rtype: C
-            :note: No real-time typing check occurs.
-            """
-            return self  # type: ignore
+        :param ~typing.Type[C] typed_base: Subclass of :py:class:`Configuration` to assume
+        :return: This instance
+        :rtype: C
+        :note: No runtime typing check occurs.
+        """
+        return typ.cast(C, self)
 
 
 class MutableConfiguration(tabc.MutableMapping[typ.Any, typ.Any], Configuration):

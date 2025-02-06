@@ -3,7 +3,6 @@ from __future__ import annotations
 import collections.abc as tabc
 import copy
 import os
-import sys
 import typing as typ
 from collections.abc import Mapping, MutableMapping
 from functools import cached_property
@@ -27,6 +26,17 @@ def _read_locations(
 
 
 class SafeConfigurationProxy(Mapping):
+    """
+    Wraps a :py:class:`.LazyLoadConfiguration` instance to proxy all method and
+    attribute calls to its :py:class:`.Configuration` instance.
+
+    :param LazyLoadConfiguration llc:
+        :py:class:`.LazyLoadConfiguration` instance to be wrapped
+    :note:
+        Wrapping :py:class:`.LazyLoadConfiguration` maintains all laziness build
+        into :py:class:`.LazyLoadConfiguration`.
+    """
+
     __slots__ = ("__llc",)
 
     def __init__(self, llc: LazyLoadConfiguration) -> None:
@@ -90,6 +100,9 @@ class LazyLoadConfiguration(Mapping):
 
             # Use default Environment Variable: "G_CONFIG_LOCATION"
             LazyLoadConfiguration(..., use_env_location=True)
+
+            # With a typed `Configuration`
+            LazyLoadConfiguration( ... ).as_typed(TypedConfig)
 
     :note:
         - The Environment Variable is read as a comma-delimited list of configuration path that will be appended to ``load_order_location`` list.
@@ -163,46 +176,26 @@ class LazyLoadConfiguration(Mapping):
     def __len__(self) -> int:
         return len(self.config)
 
-    if sys.version_info >= (3, 11):
+    def as_typed(self, typed_base: typ.Type[C]) -> C:
+        """
+        Create a proxy that is cast to provide :py:class:`Configuration` subclass with typed annotated attribute.
 
-        def as_typed(self, typed_base: typ.Type[C]) -> C:
-            """
-            Create a proxy that is cast to provide :py:class:`Configuration` subclass with typed annotated attribute.
+        This proxy ensures laziness is preserved and is fully compatible with :py:class:`Configuration`.
 
-            This proxy ensures laziness is preserved and is fully compatible with :py:class:`Configuration`.
+        .. admonition:: Use as
+            :class: hint
 
-            .. admonition:: Use as
-                :class: hint
-
-                .. code-block:: python
-
-                        CONFIG = LazyLoadConfiguration("config.yaml").as_typed(Config)
-
-
-            :param ~typing.Type[C] typed_base: Subclass of :py:class:`Configuration` to assume
-            :return: A typed lazy :py:class:`Configuration` proxy
-            :rtype: C
-            :note: No real-time typing check occurs.
-            """
-            return typ.cast(typed_base, SafeConfigurationProxy(self))
-
-    else:
-
-        def as_typed(self, typed_base: typ.Type[C]) -> C:
-            """
-            Create a proxy that is cast :py:class:`Configuration` with typed annotated attribute.
-
-            This proxy ensures laziness is preserved and is fully compatible with :py:class:`Configuration`.
-            :param ~typing.Type[C] typed_base: Subclass of :py:class:`Configuration` to assume
-            :return: A typed lazy :py:class:`Configuration` proxy
-            :rtype: C
-            :example:
-                .. code-block:: python
+            .. code-block:: python
 
                     CONFIG = LazyLoadConfiguration("config.yaml").as_typed(Config)
-            :note: No real-time typing check occurs.
-            """
-            return SafeConfigurationProxy(self)  # type: ignore
+
+
+        :param ~typing.Type[C] typed_base: Subclass of :py:class:`Configuration` to assume
+        :return: :py:class:`.SafeConfigurationProxy` instance that has been cast to the provided type.
+        :rtype: C
+        :note: No runtime typing check occurs.
+        """
+        return typ.cast(C, SafeConfigurationProxy(self))
 
 
 class MutableLazyLoadConfiguration(LazyLoadConfiguration, MutableMapping):

@@ -117,8 +117,14 @@ _lint() {
     poetry run isort --check .
     _logit Running black check
     poetry run black --check .
-    _logit Running mypy
-    poetry run mypy .
+    _logit Running mypy --python-version 3.13
+    poetry run mypy --python-version 3.13 .
+    _logit Running mypy --python-version 3.12
+    poetry run mypy --python-version 3.12 .
+    _logit Running mypy --python-version 3.11
+    poetry run mypy --python-version 3.11 .
+    _logit Running mypy --python-version 3.10
+    poetry run mypy --python-version 3.10 .
     _logit Running flake8
     poetry run flake8 .
     _logit Running bandit

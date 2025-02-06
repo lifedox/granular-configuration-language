@@ -62,3 +62,11 @@ def test_proxy_acts_mapping() -> None:
         assert key2 in config
 
     assert len(config) == len(config)
+
+
+def test_construction() -> None:
+    typed = Config(a=101, b=SubConfig(c="test me"), config="test me")
+
+    assert typed.a == 101
+    assert typed.b.c == "test me"
+    assert typed["a"] == 101

@@ -8,7 +8,7 @@ from functools import partial, update_wrapper
 from uuid import UUID
 
 from granular_configuration_language import Configuration, LazyLoadConfiguration
-from granular_configuration_language._lazy_load_configuration import SafeConfigurationProxy
+from granular_configuration_language.proxy import SafeConfigurationProxy
 
 
 def get_name(value: tabc.Callable) -> str:

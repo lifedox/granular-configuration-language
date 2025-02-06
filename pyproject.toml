@@ -88,7 +88,6 @@ relative_files = true
 exclude_also = [
   "def __repr__",
   "if __name__ == .__main__.:",
-  "if sys.version_info",
   "(?:if|else).*TYPE_CHECKING",
   "class .*?\\(.*?,?Protocol,?.*?\\):",
   "@(abc\\.)?abstractmethod",
@@ -97,7 +96,7 @@ exclude_also = [
 ]
 
 [tool.mypy]
-python_version = "3.10"
+python_version = "3.13"
 check_untyped_defs = true
 disallow_subclassing_any = true
 disallow_untyped_defs = true
@@ -106,6 +105,7 @@ ignore_missing_imports = true
 no_implicit_optional = true
 strict_equality = true
 warn_redundant_casts = true
+extra_checks = true
 # ↓ If Pylance needs help change to false ↓
 warn_unused_ignores = true
 warn_unused_configs = true
@@ -124,7 +124,6 @@ ignore = [
 [tool.ruff.lint.per-file-ignores]
 "__init__.py" = ["F401"]
 "test_*.py" = ["F841"]
-"test_ini_handler.py" = ["F601"]
 
 [tool.bandit]
 exclude_dirs = ["tests"]
