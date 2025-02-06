@@ -8,9 +8,9 @@
 | granular\_configuration\_language/\_base\_path.py                                   |       13 |        0 |        6 |        0 |     100% |           |
 | granular\_configuration\_language/\_build.py                                        |       39 |        0 |       12 |        0 |     100% |           |
 | granular\_configuration\_language/\_cache.py                                        |       65 |        0 |       12 |        0 |     100% |           |
-| granular\_configuration\_language/\_configuration.py                                |      126 |        0 |       22 |        0 |     100% |           |
+| granular\_configuration\_language/\_configuration.py                                |      128 |        0 |       22 |        0 |     100% |           |
 | granular\_configuration\_language/\_json.py                                         |       36 |        0 |       20 |        0 |     100% |           |
-| granular\_configuration\_language/\_lazy\_load\_configuration.py                    |       72 |        0 |        2 |        0 |     100% |           |
+| granular\_configuration\_language/\_lazy\_load\_configuration.py                    |       71 |        0 |        2 |        0 |     100% |           |
 | granular\_configuration\_language/\_load.py                                         |       16 |        0 |        2 |        0 |     100% |           |
 | granular\_configuration\_language/\_locations.py                                    |       63 |        0 |        6 |        0 |     100% |           |
 | granular\_configuration\_language/\_merge.py                                        |       26 |        0 |       14 |        0 |     100% |           |
@@ -18,9 +18,10 @@
 | granular\_configuration\_language/\_utils.py                                        |       35 |        0 |        8 |        0 |     100% |           |
 | granular\_configuration\_language/available\_tags.py                                |        0 |        0 |        0 |        0 |     100% |           |
 | granular\_configuration\_language/exceptions.py                                     |       40 |        0 |        0 |        0 |     100% |           |
+| granular\_configuration\_language/proxy.py                                          |        1 |        0 |        0 |        0 |     100% |           |
 | granular\_configuration\_language/yaml/\_\_init\_\_.py                              |        3 |        0 |        0 |        0 |     100% |           |
 | granular\_configuration\_language/yaml/\_tags/\_\_init\_\_.py                       |        3 |        0 |        0 |        0 |     100% |           |
-| granular\_configuration\_language/yaml/\_tags/\_date.py                             |       15 |        0 |        0 |        0 |     100% |           |
+| granular\_configuration\_language/yaml/\_tags/\_date.py                             |       21 |        0 |        2 |        0 |     100% |           |
 | granular\_configuration\_language/yaml/\_tags/\_del.py                              |        5 |        0 |        0 |        0 |     100% |           |
 | granular\_configuration\_language/yaml/\_tags/\_dict.py                             |        7 |        0 |        0 |        0 |     100% |           |
 | granular\_configuration\_language/yaml/\_tags/\_env.py                              |       11 |        0 |        0 |        0 |     100% |           |
@@ -50,7 +51,7 @@
 | granular\_configuration\_language/yaml/load/\_constructors.py                       |       16 |        0 |        6 |        0 |     100% |           |
 | granular\_configuration\_language/yaml/load/\_external.py                           |       17 |        0 |        4 |        0 |     100% |           |
 | granular\_configuration\_language/yaml/load/\_handler.py                            |       23 |        0 |        4 |        0 |     100% |           |
-|                                                                           **TOTAL** | **1266** |    **0** |  **214** |    **0** | **100%** |           |
+|                                                                           **TOTAL** | **1274** |    **0** |  **216** |    **0** | **100%** |           |
 
 
 ## Setup coverage badge
