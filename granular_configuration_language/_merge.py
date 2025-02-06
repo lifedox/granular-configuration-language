@@ -4,6 +4,7 @@ from os import PathLike
 
 from granular_configuration_language import Configuration, LazyLoadConfiguration, MutableLazyLoadConfiguration
 from granular_configuration_language._build import _merge
+from granular_configuration_language._lazy_load_configuration import SafeConfigurationProxy
 from granular_configuration_language.yaml import LazyEval
 from granular_configuration_language.yaml.load import obj_pairs_func
 
@@ -41,6 +42,8 @@ def merge(
 
             if isinstance(config, Configuration):
                 yield config
+            elif isinstance(config, SafeConfigurationProxy):
+                yield config.copy()
             elif isinstance(config, LazyLoadConfiguration):
                 yield config.config
             elif isinstance(config, PathLike):

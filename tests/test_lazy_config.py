@@ -6,7 +6,7 @@ from unittest.mock import AsyncMock, MagicMock, patch
 
 import pytest
 
-from granular_configuration_language import LazyLoadConfiguration, MutableLazyLoadConfiguration
+from granular_configuration_language import Configuration, LazyLoadConfiguration, MutableLazyLoadConfiguration
 from granular_configuration_language._lazy_load_configuration import Locations
 from granular_configuration_language.exceptions import (
     EnvironmentVaribleNotFound,
@@ -35,6 +35,19 @@ class TestLaziness:
             files = [ASSET_DIR / "test_env_config.yaml"]
 
             config = LazyLoadConfiguration(*files)
+
+            bc_mock.assert_not_called()
+
+            assert config.A.key1 == "value2"
+            assert config.A.key2 == "MyTestValue"
+
+            bc_mock.assert_called_once_with(Locations(files), False)
+
+    def test_class_as_typed(self) -> None:
+        with (build_configuration_pach() as bc_mock,):
+            files = [ASSET_DIR / "test_env_config.yaml"]
+
+            config = LazyLoadConfiguration(*files).as_typed(Configuration)
 
             bc_mock.assert_not_called()
 

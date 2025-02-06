@@ -1,14 +1,16 @@
 from __future__ import annotations
 
 import collections.abc as tabc
+import copy
 import os
+import sys
 import typing as typ
 from collections.abc import Mapping, MutableMapping
 from functools import cached_property
 from itertools import chain
 
 from granular_configuration_language._cache import NoteOfIntentToRead, prepare_to_load_configuration
-from granular_configuration_language._configuration import Configuration, MutableConfiguration
+from granular_configuration_language._configuration import C, Configuration, MutableConfiguration
 from granular_configuration_language._locations import Locations, PathOrStr
 from granular_configuration_language.exceptions import ErrorWhileLoadingConfig
 
@@ -24,11 +26,46 @@ def _read_locations(
     return Locations(load_order_location)
 
 
+class SafeConfigurationProxy(Mapping):
+    __slots__ = ("__llc",)
+
+    def __init__(self, llc: LazyLoadConfiguration) -> None:
+        self.__llc = llc
+
+    def __getattr__(self, name: str) -> typ.Any:
+        return getattr(self.__llc.config, name)
+
+    def __getitem__(self, key: typ.Any) -> typ.Any:
+        return self.__llc.config[key]
+
+    def __iter__(self) -> tabc.Iterator[typ.Any]:
+        return iter(self.__llc.config)
+
+    def __len__(self) -> int:
+        return len(self.__llc.config)
+
+    def __contains__(self, key: typ.Any) -> bool:
+        return key in self.__llc.config
+
+    def __deepcopy__(self, memo: dict[int, typ.Any]) -> Configuration:
+        return copy.deepcopy(self.__llc.config, memo=memo)
+
+    def __copy__(self) -> Configuration:
+        return copy.copy(self.__llc.config)
+
+    copy = __copy__
+
+    def __repr__(self) -> str:
+        return repr(self.__llc.config)
+
+
 class LazyLoadConfiguration(Mapping):
     r"""
     Provides a lazy interface for loading Configuration from file paths on first access.
 
     You can optionally enable pull locations from an environment variable.
+
+    See :py:meth:`LazyLoadConfiguration.as_typed` for type annotated usage.
 
     :param ~pathlib.Path | str | os.PathLike load_order_location:
             File path to configuration file
@@ -126,6 +163,47 @@ class LazyLoadConfiguration(Mapping):
     def __len__(self) -> int:
         return len(self.config)
 
+    if sys.version_info >= (3, 11):
+
+        def as_typed(self, typed_base: typ.Type[C]) -> C:
+            """
+            Create a proxy that is cast to provide :py:class:`Configuration` subclass with typed annotated attribute.
+
+            This proxy ensures laziness is preserved and is fully compatible with :py:class:`Configuration`.
+
+            .. admonition:: Use as
+                :class: hint
+
+                .. code-block:: python
+
+                        CONFIG = LazyLoadConfiguration("config.yaml").as_typed(Config)
+
+
+            :param ~typing.Type[C] typed_base: Subclass of :py:class:`Configuration` to assume
+            :return: A typed lazy :py:class:`Configuration` proxy
+            :rtype: C
+            :note: No real-time typing check occurs.
+            """
+            return typ.cast(typed_base, SafeConfigurationProxy(self))
+
+    else:
+
+        def as_typed(self, typed_base: typ.Type[C]) -> C:
+            """
+            Create a proxy that is cast :py:class:`Configuration` with typed annotated attribute.
+
+            This proxy ensures laziness is preserved and is fully compatible with :py:class:`Configuration`.
+            :param ~typing.Type[C] typed_base: Subclass of :py:class:`Configuration` to assume
+            :return: A typed lazy :py:class:`Configuration` proxy
+            :rtype: C
+            :example:
+                .. code-block:: python
+
+                    CONFIG = LazyLoadConfiguration("config.yaml").as_typed(Config)
+            :note: No real-time typing check occurs.
+            """
+            return SafeConfigurationProxy(self)  # type: ignore
+
 
 class MutableLazyLoadConfiguration(LazyLoadConfiguration, MutableMapping):
     r"""
@@ -195,3 +273,12 @@ class MutableLazyLoadConfiguration(LazyLoadConfiguration, MutableMapping):
 
     def __setitem__(self, key: typ.Any, value: typ.Any) -> None:
         self.config[key] = value
+
+    def as_typed(self, typed_base: type[C]) -> typ.NoReturn:
+        """
+        :py:meth:`as_typed` is not supported for :py:class:`MutableLazyLoadConfiguration`.
+        Use :py:class:`LazyLoadConfiguration`.
+        """
+        raise NotImplementedError(
+            "`as_typed` is not supported for `MutableLazyLoadConfiguration`. Use `LazyLoadConfiguration`."
+        )

@@ -11,15 +11,22 @@ from weakref import ReferenceType, ref
 from granular_configuration_language._base_path import BasePathPart
 from granular_configuration_language._s import setter_secret
 from granular_configuration_language.exceptions import InvalidBasePathException, PlaceholderConfigurationError
-from granular_configuration_language.yaml.classes import LazyEval, Placeholder, T
+from granular_configuration_language.yaml.classes import RT, LazyEval, P, Placeholder, T
 
 if sys.version_info >= (3, 11):
-    from typing import Generic, TypedDict, Unpack
+    from typing import Generic, TypedDict, Unpack, dataclass_transform
 elif typ.TYPE_CHECKING:
-    from typing_extensions import Generic, TypedDict, Unpack
+    from typing_extensions import Generic, TypedDict, Unpack, dataclass_transform
+else:  # not TYPE_CHECKING
+
+    def dataclass_transform(**kwargs: typ.Any) -> typ.Callable[[typ.Callable[P, RT]], typ.Callable[P, RT]]:
+        def identity(func: typ.Callable[P, RT]) -> typ.Callable[P, RT]:
+            return func
+
+        return identity
 
 
-if sys.version_info >= (3, 11) or typ.TYPE_CHECKING:
+if typ.TYPE_CHECKING:
 
     class Kwords_typed_get(Generic[T], TypedDict, total=False):
         default: T
@@ -65,9 +72,42 @@ class AttributeName(tabc.Iterable[str]):
         return ".".join(self)
 
 
+@dataclass_transform(frozen_default=True, eq_default=True)
 class Configuration(tabc.Mapping[typ.Any, typ.Any]):
     """
-    This class represents an immutable :py:class:`~collections.abc.Mapping` of configuration.
+    This class represents an immutable :py:class:`~collections.abc.Mapping` of
+    configuration.
+
+    You can create type annotation subclasses of :py:class:`Configuration` to
+    enable type checking and code completion and then cast to those subclasses
+    via :py:meth:`Configuration.as_typed`.
+
+    .. code-block:: python
+
+        class SubConfig(Configuration):
+            c: str
+
+        class Config(Configuration):
+            a: int
+            b: SubConfig
+            config: str
+
+
+        config = ... # A Configuration instance
+        typed = config.as_typed(Config)
+
+        assert typed.a == 101
+        assert typed.b.c == "test me"
+        assert typed["a"] == 101
+
+        # Or loading with LazyLoadConfiguration
+
+        typed = LazyLoadConfiguration("config.yaml").as_typed(Config)
+
+    .. note::
+
+        You should use :py:meth:`LazyLoadConfiguration.as_typed` to load as a typed Configuration.
+
     """
 
     @typ.overload
@@ -193,7 +233,7 @@ class Configuration(tabc.Mapping[typ.Any, typ.Any]):
         when an attribute is not present.
 
         :example:
-            .. code:: python
+            .. code-block:: python
 
                 config.a.b.c          # Using `__getattr__`
                 config["a"]["b"]["c"] # Using `__getitem__`
@@ -308,11 +348,43 @@ class Configuration(tabc.Mapping[typ.Any, typ.Any]):
         else:
             raise TypeError(f"Incorrect type. Got: `{repr(value)}`. Wanted: `{repr(type)}`")
 
+    if sys.version_info >= (3, 11):
+
+        def as_typed(self, typed_base: typ.Type[C]) -> C:
+            """
+            Cast this :py:class:`Configuration` instance into subclass of :py:class:`Configuration` with typed annotated attribute
+
+            :param ~typing.Type[C] typed_base: Subclass of :py:class:`Configuration` to assume
+            :return: This instance
+            :rtype: C
+            :note: No real-time typing check occurs.
+            """
+            return typ.cast(typed_base, self)
+
+    else:
+
+        def as_typed(self, typed_base: typ.Type[C]) -> C:
+            """
+            Cast this :py:class:`Configuration` instance into subclass of :py:class:`Configuration` with typed annotated attribute
+
+            :param ~typing.Type[C] typed_base: Subclass of :py:class:`Configuration` to assume
+            :return: This instance
+            :rtype: C
+            :note: No real-time typing check occurs.
+            """
+            return self  # type: ignore
+
 
 class MutableConfiguration(tabc.MutableMapping[typ.Any, typ.Any], Configuration):
     """
     This class represents an :py:class:`~collections.abc.MutableMapping` of the configuration. Inherits from :py:class:`Configuration`
     """
+
+    if typ.TYPE_CHECKING:
+        # For Pylance. Until 3.10 is removed
+
+        def __init__(self, *arg: tabc.Mapping | tabc.Iterable[tuple[typ.Any, typ.Any]], **kwargs: typ.Any) -> None:
+            super().__init__(*arg, **kwargs)
 
     # Remember `Configuration.__data` is really `Configuration._Configuration__data`
     # Type checkers do ignore this fact, because this is something to be avoided.
@@ -338,3 +410,6 @@ class MutableConfiguration(tabc.MutableMapping[typ.Any, typ.Any], Configuration)
         return other
 
     copy = __copy__
+
+
+C = typ.TypeVar("C", bound=Configuration)

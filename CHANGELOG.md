@@ -80,6 +80,8 @@
 - Added Plugin support for adding external Tags
 - Added `G_CONFIG_DISABLE_PLUGINS` and `G_CONFIG_DISABLE_TAGS` as supported environment variables to disable select tags.
 - Added `merge` to enable multistep configuration loading.
+- `Configuration` using `typing.dataclass_transform` to support typed attributes.
+  - `Configuration.as_typed` and `LazyLoadConfiguration.as_typed` added enable typing.
 
 ### Fixed
 

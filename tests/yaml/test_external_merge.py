@@ -24,6 +24,19 @@ def test_merging_LazyLoadConfiguration() -> None:
     }
 
 
+def test_merging_SafeConfigurationProxy() -> None:
+    configs = (
+        LazyLoadConfiguration(ASSET_DIR / "parsefile1.yaml").as_typed(Configuration),
+        LazyLoadConfiguration(ASSET_DIR / "merge_root.yaml"),
+    )
+    assert merge(configs).as_dict() == {
+        "base": {"a": "from parsefile2.yaml", "b": "From parsefile1.yaml"},
+        "data": "From parsefile1.yaml",
+        "from": "merge",
+        "reach_in": "From parsefile1.yaml",
+    }
+
+
 def test_merging_paths_immutably() -> None:
     configs = (
         (ASSET_DIR / "parsefile1.yaml"),
