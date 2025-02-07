@@ -43,4 +43,4 @@ def func_handler(value: str) -> tabc.Callable:
     if callable(func):
         return func
     else:
-        raise IsNotCallable(f"Functions loaded by !Func must be callable: `{value}` is not callble")
+        raise IsNotCallable(f"Functions loaded by !Func must be callable: `{value}` is not callable")

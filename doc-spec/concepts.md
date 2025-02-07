@@ -165,6 +165,75 @@ CONFIG = LazyLoadConfiguration("merge.yaml")
 
 ---
 
-## JSON Path/Pointer & Root
+## JSON Path/Pointer, `!Ref`, & Root
 
-TODO
+[`!Ref`](yaml.md#ref) and [`!Sub`](yaml.md#sub) have the concept of querying other sections of your configuration for values. This was added as a request to make for deployment configuration simpler.
+
+Cases discussed included:
+
+- Using `env_location_var_name` from {py:class}`.LazyLoadConfiguration`, you would define an environment-specific files that and using the environment variable to select the associated file and a common config would pull strings from environment config to reduce copy-and-paste related problem.
+
+  ```yaml
+  # config.yaml
+  common_base_path:
+    settings:
+      setting1: !Sub ${$.common_base_path.lookup.environment.name} is cool
+  ```
+
+  ```yaml
+  # dev.yaml
+  common_base_path:
+    lookup:
+      environment:
+        name: dev
+  ```
+
+  ```yaml
+  # test.yaml
+  common_base_path:
+    lookup:
+      environment:
+        name: test
+  ```
+
+  ```python
+  # Getting the deployed setting
+  LazyLoadConfiguration(
+      "config.yaml",
+      base_path="/common_base_path/settings",
+      env_location_var_name="CONFIG_LOCATION"
+  ).config.setting1
+  ```
+
+- Using `!Ref` to select environment settings from a mapping of environment.
+
+  ```yaml
+  # config.yaml
+  common_base_path:
+    all_setting:
+      dev:
+        setting1: dev is cool
+      test:
+        setting1: test is cooler
+    settings: !Ref /common_base_path/all_setting/${ENVIRONMENT_NAME}
+  ```
+
+  ```python
+  # Getting the deployed setting
+  LazyLoadConfiguration(
+      "config.yaml",
+      base_path="/common_base_path/settings"
+  ).config.setting1
+  ```
+
+In order to not create a doubly-linked structure or lose `base_path` ability to dereference settings that are fenced out, it was decided to use root-orient syntax.
+
+**"Root"** refers the configuration output after the Merge Time step, **before** `base_path` is applied. Within your configuration, you must explicitly include your `base_path` when querying.
+
+JSON Path was selected as the syntax for being an open standard (and familiarity). JSON Pointer was added when `python-jsonpath` was selected as the JSON Path implementation, because it is ready supported. JSON Pointer is the more correct choice, as it can only be a reference.
+
+> Note: If you explore the code or need to [add a custom tag](plugins.md#adding-custom-tags), {py:class}`.Root` and {py:class}`.RootType` represent Root as a type. {py:class}`.LazyRoot` is used during Build Time to allow the delayed reference of Root after it has been created.
+
+<!-- markdownlint-disable MD012 -->
+
+> Memory Note: `base_path` will remove a reference count toward Root, but any Tag needing Root will hold a reference until evaluated. [`!Sub`](yaml.md#sub) checks if it needs Root before holding a reference.
