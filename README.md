@@ -8,7 +8,7 @@
 | granular\_configuration\_language/\_base\_path.py                                   |       13 |        0 |        6 |        0 |     100% |           |
 | granular\_configuration\_language/\_build.py                                        |       39 |        0 |       12 |        0 |     100% |           |
 | granular\_configuration\_language/\_cache.py                                        |       65 |        0 |       12 |        0 |     100% |           |
-| granular\_configuration\_language/\_configuration.py                                |      128 |        0 |       22 |        0 |     100% |           |
+| granular\_configuration\_language/\_configuration.py                                |      132 |        0 |       22 |        0 |     100% |           |
 | granular\_configuration\_language/\_json.py                                         |       36 |        0 |       20 |        0 |     100% |           |
 | granular\_configuration\_language/\_lazy\_load\_configuration.py                    |       71 |        0 |        2 |        0 |     100% |           |
 | granular\_configuration\_language/\_load.py                                         |       16 |        0 |        2 |        0 |     100% |           |
@@ -51,7 +51,7 @@
 | granular\_configuration\_language/yaml/load/\_constructors.py                       |       16 |        0 |        6 |        0 |     100% |           |
 | granular\_configuration\_language/yaml/load/\_external.py                           |       17 |        0 |        4 |        0 |     100% |           |
 | granular\_configuration\_language/yaml/load/\_handler.py                            |       23 |        0 |        4 |        0 |     100% |           |
-|                                                                           **TOTAL** | **1274** |    **0** |  **216** |    **0** | **100%** |           |
+|                                                                           **TOTAL** | **1278** |    **0** |  **216** |    **0** | **100%** |           |
 
 
 ## Setup coverage badge
