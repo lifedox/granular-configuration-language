@@ -9,6 +9,8 @@ Examples:
 ### One-off library with three possible sources
 
 ```python
+from granular_configuration_language import Configuration, LazyLoadConfiguration
+
 CONFIG = LazyLoadConfiguration(
     Path(__file___).parent / "config.yaml",
     "~/.config/really_cool_library_config.yaml",
@@ -28,6 +30,8 @@ CONFIG = LazyLoadConfiguration(
 ### Library that shares configuration files with other libraries
 
 ```python
+from granular_configuration_language import Configuration, LazyLoadConfiguration
+
 CONFIG = LazyLoadConfiguration(
     Path(__file___).parent / "config.yaml",
     "~/.config/really_cool_library_config.yaml",
@@ -47,6 +51,8 @@ CONFIG = LazyLoadConfiguration(
 ### Library or application where the environment decides configuration files
 
 ```python
+from granular_configuration_language import Configuration, LazyLoadConfiguration
+
 CONFIG = LazyLoadConfiguration(
     Path(__file___).parent / "config.yaml",
     "~/.config/common_framework_config.yaml",
@@ -63,6 +69,8 @@ CONFIG = LazyLoadConfiguration(
 ### Framework that only uses shared configuration files and does schema validation
 
 ```python
+from granular_configuration_language import Configuration, LazyLoadConfiguration
+
 CONFIG = LazyLoadConfiguration(
     base_path="really_cool_library",
     env_location_var_name="ORG_COMMON_CONFIG_LOCATIONS",
@@ -71,7 +79,7 @@ CONFIG = LazyLoadConfiguration(
 
 - Comments:
   - This case has been seen enough in the past that the caching of configurations was added for this option.
-  - This case requires not having a embedded configuration.
+  - This case requires not having an embedded configuration.
     - Which means, defaults are defined programmatically, which means configuration is split between Python and YAML code, which is additional context switching and file search (one `config.yaml` vs. many `.py` files with one called `config.py`).
   - Use of [Pydantic](https://docs.pydantic.dev/latest/) is recommended for configuration validation and, if using, for defaulting.
     - Use a [cached](https://docs.python.org/3/library/functools.html#functools.cache) function to do Pydantic check, so the configuration stays cached during import time. Otherwise, each Pydantic check will flush the cache.
@@ -79,6 +87,8 @@ CONFIG = LazyLoadConfiguration(
 ### Pulling configuration using wildcards
 
 ```python
+from granular_configuration_language import Configuration, LazyLoadConfiguration
+
 # Flat
 CONFIG = LazyLoadConfiguration(
     *Path(__file___).parent.glob("*.yaml"),
@@ -107,13 +117,14 @@ You are only limited by YAML syntax.
 **Example:**
 
 ```yaml
-setting1: value
-setting2:
-  sub_setting1: value
-example_of_codes:
-  # This becomes Mapping[int, str]
-  200: Success
-  404: Not Found
+example_config:  # Example Base Path
+  setting1: value
+  setting2:
+    sub_setting1: value
+  example_of_codes:
+    # This becomes Mapping[int, str]
+    200: Success
+    404: Not Found
 ```
 
 **Things to bear in mind when writing your configuration:**
@@ -130,6 +141,32 @@ example_of_codes:
   - You may want your documentation to just point at your embedded configuration file.
 - `key: ` specifies a value of {py:data}`None`. <!-- markdownlint-disable MD038 -->
   - Use `key: []` for an empty sequence or `key: {}` for an empty mapping.
+
+### Type annotating your configuration
+
+If you want code completion and typing checking, you can define using {py:class}`.Configuration` like a {py:func}`dataclass <dataclasses.dataclass>` and {py:meth}`.LazyLoadConfiguration.as_typed` to apply your subclass.
+
+```python
+from collections.abc import Mapping
+from granular_configuration_language import Configuration, LazyLoadConfiguration
+
+class Setting2Config(Configuration):
+    sub_setting1: str
+
+class Config(Configuration):
+    setting1: string
+    setting2: Setting2Config
+    example_of_codes: Mapping[int, str]
+
+CONFIG = LazyLoadConfiguration(
+  Path(__file___).parent / "config.yaml",
+  base_path="example_config"
+).as_typed(Config)
+```
+
+```{note}
+This does not apply any runtime checks, just enables static code analysis.
+```
 
 ---
 

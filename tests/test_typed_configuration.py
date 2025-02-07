@@ -2,6 +2,7 @@ import copy
 from pathlib import Path
 
 from granular_configuration_language import Configuration, LazyLoadConfiguration
+from granular_configuration_language.proxy import SafeConfigurationProxy
 from granular_configuration_language.yaml import loads
 
 ASSET_DIR = (Path(__file__).parent / "assets" / "test_typed_configuration").resolve()
@@ -48,9 +49,10 @@ def test_with_LazyLoadConfiguration() -> None:
 def test_proxy_copies_Configuration() -> None:
     config = LazyLoadConfiguration(ASSET_DIR / "config.yaml").as_typed(Config)
 
-    assert not isinstance(config, Configuration)
     assert isinstance(copy.copy(config), Configuration)
     assert isinstance(copy.deepcopy(config), Configuration)
+    assert not isinstance(config, Configuration)
+    assert isinstance(config, SafeConfigurationProxy)
 
 
 def test_proxy_acts_mapping() -> None:

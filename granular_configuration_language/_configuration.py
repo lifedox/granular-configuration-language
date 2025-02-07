@@ -17,7 +17,7 @@ if sys.version_info >= (3, 11):
     from typing import Generic, TypedDict, Unpack, dataclass_transform
 elif typ.TYPE_CHECKING:
     from typing_extensions import Generic, TypedDict, Unpack, dataclass_transform
-else:  # not TYPE_CHECKING
+else:
 
     def dataclass_transform(**kwargs: typ.Any) -> typ.Callable[[typ.Callable[P, RT]], typ.Callable[P, RT]]:
         def identity(func: typ.Callable[P, RT]) -> typ.Callable[P, RT]:

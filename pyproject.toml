@@ -78,6 +78,7 @@ addopts = '''
   --verbose
   --durations 0
   --durations-min .035
+  --color yes
 '''
 
 [tool.coverage.run]
