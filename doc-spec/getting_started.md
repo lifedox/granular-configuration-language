@@ -117,7 +117,7 @@ You are only limited by YAML syntax and your needs.
 ### Example
 
 ```yaml
-example_config:  # Example Base Path
+example_config: # Example Base Path
   setting1: value
   setting2:
     sub_setting1: value
@@ -172,4 +172,40 @@ This does not apply any runtime checks, just enables static code analysis.
 
 ## Using your configuration
 
-TODO
+You can fetch settings using {py:meth}`~.Configuration.__getattr__` or if you [Type annotate your configuration](#type-annotating-your-configuration):
+
+```python
+CONFIG.setting1
+CONFIG.setting2.sub_setting1
+CONFIG.example_of_codes
+```
+
+You can fetch settings using {py:meth}`~object.__getitem__`:
+
+```python
+CONFIG["setting1"]
+CONFIG["setting2"]["sub_setting1"]
+CONFIG["example_of_codes"]
+```
+
+Doing a runtime type check (using {py:meth}`~.Configuration.typed_get`):
+
+```python
+CONFIG.config.typed_get(str, "setting1")
+CONFIG.config.typed_get(Configuration, "setting2").typed_get(str, "sub_setting1")
+CONFIG.config.typed_get(Mapping[int, str], "example_of_codes")
+```
+
+If you need your settings as a {py:class}`dict` (using {py:meth}`~.Configuration.as_dict`):
+
+```python
+CONFIG.config.setting2.as_dict()
+```
+
+As JSON, using {py:mod}`json` (using ({py:meth}`~.Configuration.as_json_string`)):
+
+```python
+CONFIG.config.as_json_string()
+```
+
+Full specification at {py:class}`.Configuration` and {py:class}`.LazyLoadConfiguration`

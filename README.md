@@ -4,9 +4,7 @@
 
 > ⚠️ **This library is meant for trusted configuration files only.** ⚠️
 
-> README is in-progress.
-
-Full documentation at [link](https://lifedox.github.io/granular-configuration-language)
+Get started or read more at the [documentation site](https://lifedox.github.io/granular-configuration-language/doc-spec/getting_started.html).
 
 ## Why does this exist?
 
