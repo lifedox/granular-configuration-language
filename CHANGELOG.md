@@ -25,6 +25,7 @@
   - Mitigation: Use `MutableLazyLoadConfiguration` in-place of `LazyLoadConfiguration`.
     - This uses `MutableConfiguration` instead of `Configuration` and `list` for sequences.
     - `MutableConfiguration` is a subclass of `Configuration` and `MutableLazyLoadConfiguration` is a subclass of `LazyLoadConfiguration`, so any `isinstance` check can remain as they were.
+    - If you need to dynamically set settings at runtime, `LazyLoadConfiguration` now provides `inject_before` and `inject_after` as immutable way of handling this case.
 - Depreciated Features removed:
   - `set_config`/`get_config` pattern
   - INI support
@@ -36,6 +37,7 @@
   - `ParseEnvEnvironmentVaribleNotFound` → `EnvironmentVaribleNotFound`
   - `JSONPathQueryMatchFailed` → `JSONPathQueryFailed`
   - `JSONPathMustStartFromRoot` → `RefMustStartFromRoot`
+- Previously, YAML Mappings could not override non-Mappings. This has been changed to be more consistent with merge outcomes being "to merge" or "to replace".
 
 ### Changed <!-- markdownlint-disable MD024 -->
 
@@ -54,6 +56,7 @@
   - It remains a `MutableMapping`.
   - `dict` inheritance was done for compatible with `json.dumps` and other library that only support the primitive `dict`, instead of `Mapping`. However, faking the inheritance has always been sketchy and `json.dumps` has failed in rare occurrences.
   - `json_default` is behavior to enable `json.dump` support.
+- Previously, YAML Mappings could not override non-Mappings. This has been changed to be more consistent with merge outcomes being "to merge" or "to replace".
 - Renamed Exceptions:
   - `ParseEnvError` → `ParseEnvParsingError`
   - `ParseEnvEnvironmentVaribleNotFound` → `EnvironmentVaribleNotFound`
@@ -76,6 +79,7 @@
   - `LazyLoadConfiguration` no longer provides a `MutableMapping` interface, just `Mapping`
   - `MutableLazyLoadConfiguration` has been added to extend back the `MutableMapping` interface and remove needing to cast to `MutableConfiguration`
   - When immutable, `tuple` is used instead of `list`
+  - `LazyLoadConfiguration` now provides `inject_before` and `inject_after` as immutable way of dynamically setting settings at runtime.
 - Added: JSON Pointer for base_path
 - Added Plugin support for adding external Tags
 - Added `G_CONFIG_DISABLE_PLUGINS` and `G_CONFIG_DISABLE_TAGS` as supported environment variables to disable select tags.

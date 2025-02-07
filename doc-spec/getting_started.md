@@ -112,9 +112,9 @@ CONFIG = LazyLoadConfiguration(
 
 ## Writing your configuration
 
-You are only limited by YAML syntax.
+You are only limited by YAML syntax and your needs.
 
-**Example:**
+### Example
 
 ```yaml
 example_config:  # Example Base Path
@@ -127,7 +127,7 @@ example_config:  # Example Base Path
     404: Not Found
 ```
 
-**Things to bear in mind when writing your configuration:**
+### Things to bear in mind
 
 - Take a look at the [YAML Tags](yaml.md) for options.
   - Use [`!PlaceHolder](yaml.md#placeholder) to specify values the user need to provide.

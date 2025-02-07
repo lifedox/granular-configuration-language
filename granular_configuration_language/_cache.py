@@ -19,6 +19,8 @@ from granular_configuration_language._locations import Locations
 class SharedConfigurationReference:
     _locations: Locations
     _mutable_config: bool
+    _inject_before: Configuration | None = None
+    _inject_after: Configuration | None = None
     __lock: Lock | None = dataclasses.field(repr=False, compare=False, init=False, default_factory=Lock)
     __notes: deque[NoteOfIntentToRead] = dataclasses.field(repr=False, compare=False, init=False, default_factory=deque)
 
@@ -43,7 +45,9 @@ class SharedConfigurationReference:
 
     @cached_property
     def __config(self) -> Configuration:
-        return build_configuration(self._locations, self._mutable_config)
+        return build_configuration(
+            self._locations, self._mutable_config, inject_after=self._inject_after, inject_before=self._inject_before
+        )
 
 
 @dataclasses.dataclass(frozen=False, eq=False, kw_only=True)
@@ -82,9 +86,16 @@ def prepare_to_load_configuration(
     base_path: str | tabc.Sequence[str] | None,
     mutable_configuration: bool,
     disable_cache: bool,
+    inject_before: Configuration | None,
+    inject_after: Configuration | None,
 ) -> NoteOfIntentToRead:
-    if disable_cache or mutable_configuration:
-        shared_config_ref = SharedConfigurationReference(_locations=locations, _mutable_config=mutable_configuration)
+    if disable_cache or mutable_configuration or inject_after or inject_before:
+        shared_config_ref = SharedConfigurationReference(
+            _locations=locations,
+            _mutable_config=mutable_configuration,
+            _inject_after=inject_after,
+            _inject_before=inject_before,
+        )
     elif locations not in store:
         shared_config_ref = SharedConfigurationReference(_locations=locations, _mutable_config=mutable_configuration)
         store[locations] = shared_config_ref

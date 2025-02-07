@@ -1,6 +1,4 @@
 A:
   key1: value1
-  key2:
-    deep_key: !Placeholder unseen
 D:
   null: 1

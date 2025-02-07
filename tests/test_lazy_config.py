@@ -1,3 +1,4 @@
+import collections.abc as tabc
 import operator as op
 import os
 from contextlib import AbstractContextManager
@@ -28,46 +29,30 @@ def build_configuration_pach() -> AbstractContextManager[AsyncMock | MagicMock]:
     return patch("granular_configuration_language._cache.build_configuration", side_effect=build_configuration)
 
 
-class TestLaziness:
+@pytest.mark.parametrize(
+    "creator,mutable",
+    (
+        (lambda files: LazyLoadConfiguration(*files), False),
+        (lambda files: LazyLoadConfiguration(*files).as_typed(Configuration), False),
+        (lambda files: MutableLazyLoadConfiguration(*files), True),
+    ),
+    ids=("class", "proxy", "mutable_class"),
+)
+def test_laziness(
+    creator: tabc.Callable[[tabc.Iterable[Path]], LazyLoadConfiguration | Configuration],
+    mutable: bool,
+) -> None:
+    with (build_configuration_pach() as bc_mock,):
+        files = [ASSET_DIR / "test_env_config.yaml"]
 
-    def test_class(self) -> None:
-        with (build_configuration_pach() as bc_mock,):
-            files = [ASSET_DIR / "test_env_config.yaml"]
+        config = creator(files)
 
-            config = LazyLoadConfiguration(*files)
+        bc_mock.assert_not_called()
 
-            bc_mock.assert_not_called()
+        assert config.A.key1 == "value2"
+        assert config.A.key2 == "MyTestValue"
 
-            assert config.A.key1 == "value2"
-            assert config.A.key2 == "MyTestValue"
-
-            bc_mock.assert_called_once_with(Locations(files), False)
-
-    def test_class_as_typed(self) -> None:
-        with (build_configuration_pach() as bc_mock,):
-            files = [ASSET_DIR / "test_env_config.yaml"]
-
-            config = LazyLoadConfiguration(*files).as_typed(Configuration)
-
-            bc_mock.assert_not_called()
-
-            assert config.A.key1 == "value2"
-            assert config.A.key2 == "MyTestValue"
-
-            bc_mock.assert_called_once_with(Locations(files), False)
-
-    def test_class_mutable(self) -> None:
-        with (build_configuration_pach() as bc_mock,):
-            files = [ASSET_DIR / "test_env_config.yaml"]
-
-            config = MutableLazyLoadConfiguration(*files)
-
-            bc_mock.assert_not_called()
-
-            assert config.A.key1 == "value2"
-            assert config.A.key2 == "MyTestValue"
-
-            bc_mock.assert_called_once_with(Locations(files), True)
+        bc_mock.assert_called_once_with(Locations(files), mutable, inject_before=None, inject_after=None)
 
 
 def test_with_base_path() -> None:

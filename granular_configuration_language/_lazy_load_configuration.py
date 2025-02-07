@@ -85,7 +85,12 @@ class LazyLoadConfiguration(Mapping):
         Enabled to use the default environment variable location.
     :param str, optional env_location_var_name:
         Specify what environment variable to check for additional file paths.
-    :param bool, optional disable_caching: When :py:data:`True`, caching of "identical immutable configurations" is disabled.
+    :param Configuration, optional inject_before:
+        Inject a runtime :py:class:`.Configuration` instance as if it were the first load file.
+    :param Configuration, optional inject_after:
+        Inject a runtime :py:class:`.Configuration` instance as if it were the last load file.
+    :param bool, optional disable_caching:
+        When :py:data:`True`, caching of "identical immutable configurations" is disabled.
 
     :examples:
         .. code-block:: python
@@ -108,6 +113,14 @@ class LazyLoadConfiguration(Mapping):
         - The Environment Variable is read as a comma-delimited list of configuration path that will be appended to ``load_order_location`` list.
         - Setting the Environment Variable is always optional.
         - Setting ``use_env_location`` to :py:data:`True` is only required if you don't change ``env_location_var_name`` from its default value of ``G_CONFIG_LOCATION``.
+        - ``inject_before`` and ``inject_after`` allow you to introduce dynamic settings into you configuration.
+
+          - These injections must use :py:class:`.Configuration` for all mappings. Otherwise, they will be treated as a normal value and not merged.
+          - This is only available for :py:class:`.LazyLoadConfiguration`, as :py:class:`.MutableLazyLoadConfiguration` doesn't required this.
+          - Examples:
+
+            - You might want to have a setting the is the current date. ``CONFIG.today``
+            - You want to provide substitution options via ``!Sub``.  ``!Sub ${$.VALUE_DYNAMICALLY_SET_BY_LIBRARY}``
     """
 
     def __init__(
@@ -116,6 +129,8 @@ class LazyLoadConfiguration(Mapping):
         base_path: str | tabc.Sequence[str] | None = None,
         use_env_location: bool = False,
         env_location_var_name: str = "G_CONFIG_LOCATION",
+        inject_before: Configuration | None = None,
+        inject_after: Configuration | None = None,
         disable_caching: bool = False,
         **kwargs: typ.Any,
     ) -> None:
@@ -124,6 +139,8 @@ class LazyLoadConfiguration(Mapping):
             locations=_read_locations(load_order_location, use_env_location, env_location_var_name),
             base_path=base_path,
             mutable_configuration=kwargs.get("_mutable_configuration", False),
+            inject_before=inject_before,
+            inject_after=inject_after,
             disable_cache=disable_caching,
         )
 
@@ -247,6 +264,8 @@ class MutableLazyLoadConfiguration(LazyLoadConfiguration, MutableMapping):
             base_path=base_path,
             use_env_location=use_env_location,
             env_location_var_name=env_location_var_name,
+            inject_before=None,
+            inject_after=None,
             disable_caching=True,
             _mutable_configuration=True,
         )

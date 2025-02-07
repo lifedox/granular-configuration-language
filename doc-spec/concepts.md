@@ -54,14 +54,16 @@ Merging is explicitly exposed through {py:class}`.LazyLoadConfiguration`, [`!Mer
 
 #### As a sentence
 
-> Mappings are merged, and everything else is replaces, with last-in winning.
+> Mappings are merged, and everything else is replaced, with last-in winning.
 
-#### As a table with code:
+#### As a table with code
 
 | From <br> `First-in.yaml` | From <br> `Next-in.yaml` | Outcome                             |
 | :-----------------------: | :----------------------: | ----------------------------------- |
+|           Value           |            \*            | Next-in **replaces** First-in       |
 |          Scalar           |            \*            | Next-in **replaces** First-in       |
 |         Sequence          |            \*            | Next-in **replaces** First-in       |
+|          Mapping          |          Value           | Next-in **replaces** First-in       |
 |          Mapping          |          Scalar          | Next-in **replaces** First-in       |
 |          Mapping          |         Sequence         | Next-in **replaces** First-in       |
 |          Mapping          |         Mapping          | Next-in is **merged** into First-in |
