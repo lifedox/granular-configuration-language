@@ -1,10 +1,20 @@
-# `granular-configuration-language`
+# `granular-configuration-language` – A General Purpose Configuration Utility Library
 
 [![Coverage badge](https://raw.githubusercontent.com/lifedox/granular-configuration-language/python-coverage-comment-action-data/badge.svg)](https://github.com/lifedox/granular-configuration-language/tree/python-coverage-comment-action-data) ![Testing workflow](https://github.com/lifedox/granular-configuration-language/actions/workflows/testing.yaml/badge.svg?event=push) ![codeql workflow](https://github.com/lifedox/granular-configuration-language/actions/workflows/codeql-analysis.yaml/badge.svg?event=push)
 
 > ⚠️ **This library is meant for trusted configuration files.** ⚠️
 
-Get started or read more at the [documentation site](https://lifedox.github.io/granular-configuration-language/doc-spec/getting_started.html).
+## Get started
+
+Go to [Documentation](https://lifedox.github.io/granular-configuration-language/doc-spec/getting_started.html).
+
+## How to install
+
+From [PyPi](https://pypi.org/project/granular-configuration-language/):
+
+```shell
+pip install granular-configuration-language
+```
 
 ## Why does this exist?
 

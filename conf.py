@@ -8,8 +8,8 @@ from __future__ import annotations
 # -- Project information -----------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#project-information
 project = "granular-configuration-language"
-copyright = "2025, Eric Jensen (lifedox@live.com)"
-author = "Eric Jensen (lifedox@live.com)"
+copyright = "2025, Eric Jensen (eric.jensen42@gmail.com)"
+author = "Eric Jensen (eric.jensen42@gmail.com)"
 
 # -- General configuration ---------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#general-configuration
