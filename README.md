@@ -16,6 +16,7 @@ Some use cases:
   - Conceptual Example:
     - Library Code:
       ```python
+      # database_util/config/config.py
       CONFIG = LazyLoadConfiguration(
           Path(__file___).parent / "config.yaml",
           "./database-util-config.yaml",
@@ -26,6 +27,7 @@ Some use cases:
       ```
     - Library configuration:
       ```yaml
+      # database_util/config/config.yaml
       database-util:
         common_settings:
           use_decimal: true
@@ -34,6 +36,7 @@ Some use cases:
       ```
     - User application configuration:
       ```yaml
+      # ~/configs/database-util-config.yaml
       database-util:
         common_settings:
           use_decimal: false
@@ -47,6 +50,7 @@ Some use cases:
   - Conceptual Example:
     - Library Code:
       ```python
+      # app/config/config.py
       CONFIG = LazyLoadConfiguration(
           Path(__file___).parent / "config.yaml",
           "./database-util-config.yaml",
@@ -55,17 +59,20 @@ Some use cases:
       ```
     - Base configuration:
       ```yaml
+      # app/config/config.yaml
       app:
         log_as: really cool app name
         log_to: nowhere
       ```
     - AWS Lambda deploy:
       ```yaml
+      # ./database-util-config.yaml
       app:
         log_to: std_out
       ```
     - Server deploy:
       ```yaml
+      # ./database-util-config.yaml
       app:
         log_to: !Sub file://var/log/${$.app.log_as}.log
       ```
@@ -73,6 +80,7 @@ Some use cases:
   - Conceptual Examples:
     - Library Code:
       ```python
+      # fixture_gen/config/config.py
       CONFIG = LazyLoadConfiguration(
           Path(__file___).parent / "fixture_config.yaml",
           *Path().rglob("fixture_config.yaml"),
@@ -84,11 +92,13 @@ Some use cases:
       ```
     - Library configuration:
       ```yaml
+      # fixture_gen/config/fixture_config.yaml
       fixture-gen:
         fixtures: {} # Empty mapping, for users define
       ```
     - User application configuration:
       ```yaml
+      # fixture_config.yaml
       fixture-gen:
         fixtures:
           fixture1:

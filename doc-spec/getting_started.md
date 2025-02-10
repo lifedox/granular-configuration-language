@@ -130,7 +130,7 @@ example_config: # Example Base Path
 ### Things to bear in mind
 
 - Take a look at the [YAML Tags](yaml.md) for options.
-  - Use [`!PlaceHolder](yaml.md#placeholder) to specify values the user need to provide.
+  - Use [`!PlaceHolder`](yaml.md#placeholder) to specify values the user need to provide.
 - Setting names should be compatible Python attribute names.
   - This lets you use {py:meth}`~.LazyLoadConfiguration.__getattr__`.
 - Use subsection to organize settings.
