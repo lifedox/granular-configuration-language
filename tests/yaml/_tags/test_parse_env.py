@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import collections.abc as tabc
 import os
 from itertools import product

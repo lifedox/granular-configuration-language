@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from granular_configuration_language.yaml.decorators import Tag, as_not_lazy, string_tag
 
 

@@ -3,9 +3,10 @@
 # For the full list of built-in configuration values, see the documentation:
 # https://www.sphinx-doc.org/en/master/usage/configuration.html
 
+from __future__ import annotations
+
 # -- Project information -----------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#project-information
-
 project = "granular-configuration-language"
 copyright = "2025, Eric Jensen (lifedox@live.com)"
 author = "Eric Jensen (lifedox@live.com)"

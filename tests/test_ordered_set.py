@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from itertools import combinations
 
 from granular_configuration_language._utils import OrderedSet

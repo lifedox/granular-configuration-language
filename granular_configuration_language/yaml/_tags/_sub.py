@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from granular_configuration_language.yaml.decorators import (
     Root,
     Tag,

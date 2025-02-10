@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import collections.abc as tabc
 from itertools import permutations
 from pathlib import Path

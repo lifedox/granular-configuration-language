@@ -1,24 +1,40 @@
 [build-system]
-requires = ["poetry-core"]
+requires = ["poetry-core>=1.0.0"]
 build-backend = "poetry.core.masonry.api"
 
 [tool.poetry]
+classifiers = [
+  "Natural Language :: English",
+  "Operating System :: OS Independent",
+  "Topic :: Utilities",
+  "Typing :: Typed",
+]
+packages = [{ include = "granular_configuration_language" }]
+requires-poetry = ">=2.0"
+
+[project.urls]
+homepage = "https://lifedox.github.io/granular-configuration-language/README.html"
+repository = "https://github.com/lifedox/granular-configuration-language"
+documentation = "https://lifedox.github.io/granular-configuration-language/README.html"
+
+[project]
 name = "granular-configuration-language"
 version = "2.0.0"
-description = ""
-authors = ["Eric Jensen <eric.jensen42@gmail.com>"]
+description = "Configuration Utility Library that enables YAML-based configuration to be merged together "
+license = { text = "MIT" }
+authors = [{ name = "Eric Jensen", email = "eric.jensen42@gmail.com" }]
 readme = "README.md"
-packages = [{ include = "granular_configuration_language" }]
-
-[tool.poetry.dependencies]
-python = "^3.10"
-python-jsonpath = "*"
-"ruamel.yaml" = ">=0.18"
-python-dateutil = { version = "*", python = "<3.11" }
+dynamic = ["classifiers"]
+requires-python = ">=3.10"
+dependencies = [
+  "python-jsonpath",
+  "ruamel.yaml>=0.18",
+  "python-dateutil ; python_version < '3.11'"
+]
 
 [tool.poetry.group.dev.dependencies]
 # Types
-types-python-dateutil = "*" # mypy wants to even if >3.10
+types-python-dateutil = "*" # mypy wants it even if >3.10
 # Testing
 pytest = "*"
 pytest-cov = "*"
@@ -34,7 +50,7 @@ sphinx_rtd_theme = "*"
 sphinx-rtd-dark-mode = "*"
 myst-parser = "*"
 
-[tool.poetry.plugins.granular-configuration-language-20-tag]
+[project.entry-points."granular_configuration_language_20_tag"]
 "official_extra" = "granular_configuration_language.yaml._tags.func_and_class"
 
 [tool.black]
@@ -62,10 +78,8 @@ force_grid_wrap = 0
 use_parentheses = true
 include_trailing_comma = true
 line_length = 120
-skip = []
 known_first_party = ["granular_configuration_language"]
-default_section = "THIRDPARTY"
-sections = ["FUTURE", "STDLIB", "THIRDPARTY", "FIRSTPARTY", "LOCALFOLDER"]
+add_imports = "from __future__ import annotations"
 
 [tool.pytest.ini_options]
 minversion = "6.0"
@@ -121,10 +135,16 @@ ignore = [
   "E731", # lambda are one line functions
   "E203", # Let black rule
 ]
+unfixable = [
+  "ERA", # do not autoremove commented out code
+]
 
 [tool.ruff.lint.per-file-ignores]
 "__init__.py" = ["F401"]
 "test_*.py" = ["F841"]
+
+[tool.ruff.lint.flake8-tidy-imports]
+ban-relative-imports = "all"
 
 [tool.bandit]
 exclude_dirs = ["tests"]

@@ -1,4 +1,6 @@
 # Note: Tag specific json dump tests are with the individual tag tests
+from __future__ import annotations
+
 from collections import UserDict, deque
 from pathlib import Path
 

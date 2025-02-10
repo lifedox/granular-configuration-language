@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import collections.abc as tabc
 import inspect
 import json
@@ -51,7 +53,7 @@ def get_internal_tag_plugins() -> tabc.Iterator[ModuleName]:
 
 
 def get_external_tag_plugins() -> tabc.Iterator[tuple[PluginName, ModuleName]]:
-    return map(attrgetter("name", "module"), entry_points(group="granular-configuration-language-20-tag"))
+    return map(attrgetter("name", "module"), entry_points(group="granular_configuration_language_20_tag"))
 
 
 def get_all_tag_plugins(*, disable_plugin: typ.AbstractSet[str]) -> tabc.Iterator[ModuleName]:

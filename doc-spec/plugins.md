@@ -6,14 +6,14 @@ If you need tags that are not included and have external dependencies, you add t
 
 ## Configuring you plugin library
 
-This library using the `granular-configuration-language-20-tag` group.
+This library using the `granular_configuration_language_20_tag` group.
 
 ### Using Poetry
 
 Example `pyproject.toml` entry:
 
 ```toml
-[tool.poetry.plugins.granular-configuration-language-20-tag]
+[project.entry-points."granular_configuration_language_20_tag"]
 "official_extra" = "granular_configuration_language.yaml._tags.func_and_class"
 ```
 
@@ -116,7 +116,7 @@ def handler(value: str) -> Masked:  # Function Signature
 ```{admonition} Notice of Future Intent
 :class: note
 
-`20` in `granular-configuration-language-20-tag` represents 2.0 tag plugin compatibility, and not directly connected to library version. Additional groups will added only if there is feature change to plugin support.
+`20` in `granular_configuration_language_20_tag` represents 2.0 tag plugin compatibility, and not directly connected to library version. Additional groups will added only if there is feature change to plugin support.
 
 - A minor plugin change (e.g. `21`) would represent an added feature that requires a structural change but a change to the primary code.
   - Minor compatibility version deprecates any previous compatibility version (e.g. `20`).

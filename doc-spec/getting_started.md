@@ -144,7 +144,7 @@ example_config: # Example Base Path
 
 ### Type annotating your configuration
 
-If you want code completion and typing checking, you can define using {py:class}`.Configuration` like a {py:func}`dataclass <dataclasses.dataclass>` and {py:meth}`.LazyLoadConfiguration.as_typed` to apply your subclass.
+If you want code completion and typing checking, you can use {py:class}`.Configuration` like a {py:func}`dataclass <dataclasses.dataclass>` and {py:meth}`.LazyLoadConfiguration.as_typed` to apply your subclass.
 
 ```python
 from collections.abc import Mapping

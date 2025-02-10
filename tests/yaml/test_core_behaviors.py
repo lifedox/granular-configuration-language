@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import copy
 from datetime import date
 from unittest.mock import Mock, patch

@@ -2,7 +2,7 @@
 
 [![Coverage badge](https://raw.githubusercontent.com/lifedox/granular-configuration-language/python-coverage-comment-action-data/badge.svg)](https://github.com/lifedox/granular-configuration-language/tree/python-coverage-comment-action-data) ![Testing workflow](https://github.com/lifedox/granular-configuration-language/actions/workflows/testing.yaml/badge.svg?event=push) ![codeql workflow](https://github.com/lifedox/granular-configuration-language/actions/workflows/codeql-analysis.yaml/badge.svg?event=push)
 
-> ⚠️ **This library is meant for trusted configuration files only.** ⚠️
+> ⚠️ **This library is meant for trusted configuration files.** ⚠️
 
 Get started or read more at the [documentation site](https://lifedox.github.io/granular-configuration-language/doc-spec/getting_started.html).
 

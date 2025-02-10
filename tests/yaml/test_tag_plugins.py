@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import collections.abc as tabc
 import os
 from unittest.mock import patch
@@ -82,11 +84,10 @@ def test_pretty() -> None:
         tags.pretty()
         == """\
 TagSet{
-  '!Del': "str [NOT-LAZY] (granular_configuration_language.yaml._tags._del.handler) `<class 'str'>`",
+  '!Del': 'str [NOT-LAZY] (granular_configuration_language.yaml._tags._del.handler) `str`',
   '!Merge': 'list[Any] (granular_configuration_language.yaml._tags._merge.handler) `Configuration`',
-  '!Sub': "str [interpolates] (granular_configuration_language.yaml._tags._sub.handler) `<class 'str'>`",
-  '!UUID': 'str [interpolates-reduced] (granular_configuration_language.yaml._tags._uuid.handler) `<class '
-           "'uuid.UUID'>`"
+  '!Sub': 'str [interpolates] (granular_configuration_language.yaml._tags._sub.handler) `str`',
+  '!UUID': 'str [interpolates-reduced] (granular_configuration_language.yaml._tags._uuid.handler) `UUID`'
 }"""
     )
     assert (
@@ -98,7 +99,7 @@ TagSet{
     "notes": [
       "NOT-LAZY"
     ],
-    "output": "<class 'str'>"
+    "output": "'str'"
   },
   "!Merge": {
     "input": "list[Any]",
@@ -110,14 +111,14 @@ TagSet{
     "notes": [
       "interpolates"
     ],
-    "output": "<class 'str'>"
+    "output": "'str'"
   },
   "!UUID": {
     "input": "str",
     "notes": [
       "interpolates-reduced"
     ],
-    "output": "<class 'uuid.UUID'>"
+    "output": "'UUID'"
   }
 }"""
     )

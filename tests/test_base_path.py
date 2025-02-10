@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from granular_configuration_language._base_path import read_base_path
 
 
