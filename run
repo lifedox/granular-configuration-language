@@ -193,11 +193,11 @@ stop() {
 
 usage+=("  $0 package - Build package")
 package() {
-    _run_cmd poetry run ./run _package "$@"
+    _run_cmd ./run _package "$@"
 }
 _package() {
     _logit Building package
-    _run_cmd poetry build
+    poetry build "$@"
 }
 
 usage+=("  $0 docgen - Generates sphinx documentation site")
