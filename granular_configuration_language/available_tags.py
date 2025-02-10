@@ -1,6 +1,6 @@
-from __future__ import annotations
-
+# isort:skip_file
 if __name__ == "__main__":
+
     import os
     import sys
 

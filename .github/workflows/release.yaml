@@ -46,12 +46,12 @@ jobs:
           GH_TOKEN: ${{ github.token }}
           TAG_NAME: ${{ github.event.release.tag_name }}
 
-  upload-test-pypi:
-    name: Upload (TestPyPI)
+  upload-pypi:
+    name: Upload (PyPI)
     runs-on: ubuntu-latest
     environment:
-      name: testpypi
-      url: https://test.pypi.org/project/granular-configuration-language/
+      name: pypi
+      url: https://pypi.org/project/granular-configuration-language/
     permissions:
       id-token: write
     needs: build
@@ -64,22 +64,3 @@ jobs:
       - uses: pypa/gh-action-pypi-publish@release/v1
         with:
           print-hash: true
-
-  # upload-pypi:
-  #   name: Upload (PyPI)
-  #   runs-on: ubuntu-latest
-  #   environment:
-  #     name: pypi
-  #     url: https://pypi.org/project/granular-configuration-language/
-  #   permissions:
-  #     id-token: write
-  #   needs: build
-  #   steps:
-  #     - uses: actions/download-artifact@v4
-  #       with:
-  #         name: distfiles
-  #         path: dist/
-
-  #     - uses: pypa/gh-action-pypi-publish@release/v1
-  #       with:
-  #         print-hash: true
