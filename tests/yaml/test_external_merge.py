@@ -67,3 +67,41 @@ def test_merging_paths_mutably() -> None:
         "from": "merge",
         "reach_in": "From parsefile1.yaml",
     }
+
+
+def test_ref_cannot_cross_loading_boundary() -> None:
+    # Merging three separate `LazyLoadConfiguration` instances
+    config = merge(sorted((ASSET_DIR / "ref_cannot_cross_loading_boundary").glob("*.yaml")))
+
+    assert config.as_dict() == {
+        "test": {
+            1: "I came from 1.yaml",
+            2: "I came from 2.yaml",
+            3: "I came from 3.yaml",
+        },
+        "ref": "I came from 3.yaml",
+    }
+
+    # One `LazyLoadConfiguration` merging three files
+    config = LazyLoadConfiguration(*sorted((ASSET_DIR / "ref_cannot_cross_loading_boundary").glob("*.yaml"))).config
+
+    assert config.as_dict() == {
+        "test": {
+            1: "I came from 3.yaml",
+            2: "I came from 3.yaml",
+            3: "I came from 3.yaml",
+        },
+        "ref": "I came from 3.yaml",
+    }
+
+    # !Merge
+    config = LazyLoadConfiguration(ASSET_DIR / "ref_cannot_cross_loading_boundary.yaml").config
+
+    assert config.as_dict() == {
+        "test": {
+            1: "I came from 3.yaml",
+            2: "I came from 3.yaml",
+            3: "I came from 3.yaml",
+        },
+        "ref": "I came from 3.yaml",
+    }

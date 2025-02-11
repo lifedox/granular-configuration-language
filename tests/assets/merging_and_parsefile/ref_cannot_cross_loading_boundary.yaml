@@ -1,0 +1,4 @@
+!Merge
+- !ParseFile ref_cannot_cross_loading_boundary/1.yaml
+- !ParseFile ref_cannot_cross_loading_boundary/2.yaml
+- !ParseFile ref_cannot_cross_loading_boundary/3.yaml

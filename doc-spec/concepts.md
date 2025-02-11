@@ -52,7 +52,7 @@ This means that a deep copy of a {py:class}`.Configuration` can share state with
 
 Merging is the heart of this library. With it, you gain the ability to have settings defined in multiple possible locations and the ability to override settings based on a consistent pattern.
 
-Merging is explicitly exposed through {py:class}`.LazyLoadConfiguration`, [`!Merge`](yaml.md#merge), and {py:func}`.merge`.
+Merging is explicitly exposed through {py:class}`.LazyLoadConfiguration`, [`!Merge`](yaml.md#merge), and {py:func}`.merge` (see [Load Boundary Limitations](#load-boundary-limitations) for an important note).
 
 ### Describing Priority
 
@@ -175,7 +175,7 @@ CONFIG = LazyLoadConfiguration("merge.yaml")
 
 Cases discussed included:
 
-- Using `env_location_var_name` from {py:class}`.LazyLoadConfiguration`, you would define an environment-specific files that and using the environment variable to select the associated file and a common config would pull strings from environment config to reduce copy-and-paste related problem.
+- Using `env_location_var_name` from {py:class}`.LazyLoadConfiguration`, you would define environment-specific files. Then use the environment variable to select the associated file and a common config would pull strings from environment config to reduce copy-and-paste related problem.
 
   ```yaml
   # config.yaml
@@ -241,3 +241,83 @@ JSON Path was selected as the syntax for being an open standard (and familiarity
 <!-- markdownlint-disable MD012 -->
 
 > Memory Note: `base_path` will remove a reference count toward Root, but any Tag needing Root will hold a reference until evaluated. [`!Sub`](yaml.md#sub) checks if it needs Root before holding a reference.
+
+### Load Boundary Limitations
+
+A load boundary is created by Root. You cannot query outside the Root and every load event is an independent Root.
+
+In more concrete terms, every {py:class}`.LazyLoadConfiguration` has an independent Root.
+
+Where this matter is merging configuration. [`!ParseFile`](yaml.md#parsefile--optionalparsefile) passes the Root it whatever it loads, so [`!Merge`](yaml.md#merge) does not introduce Load Boundaries.
+
+However, {py:func}`.merge` does introduce Load Boundaries.
+
+#### Working with an example
+
+We have three files in `ASSET_DIR / "ref_cannot_cross_loading_boundary/"`
+
+````{list-table}
+:header-rows: 0
+:align: center
+
+* - ```yaml
+    # 1.yaml
+    test:
+      1: !Ref /ref
+    ref: I came from 1.yaml
+    ```
+  - ```yaml
+    # 2.yaml
+    test:
+      2: !Ref /ref
+    ref: I came from 2.yaml
+    ```
+  - ```yaml
+    # 3.yaml
+    test:
+      3: !Ref /ref
+    ref: I came from 3.yaml
+    ```
+````
+
+```python
+config = merge(
+  (ASSET_DIR / "ref_cannot_cross_loading_boundary").glob("*.yaml")
+)
+
+assert config.as_dict() == {
+    "test": {
+        1: "I came from 1.yaml",
+        2: "I came from 2.yaml",
+        3: "I came from 3.yaml",
+    },
+    "ref": "I came from 3.yaml",
+}
+
+config = LazyLoadConfiguration(
+  *(ASSET_DIR / "ref_cannot_cross_loading_boundary").glob("*.yaml")
+).config
+
+assert config.as_dict() == {
+    "test": {
+        1: "I came from 3.yaml",
+        2: "I came from 3.yaml",
+        3: "I came from 3.yaml",
+    },
+    "ref": "I came from 3.yaml",
+}
+```
+
+In the {py:func}`.merge` case, merging work as expected. However, the three `!Ref /ref` ended up reference three different Roots.
+
+In the {py:class}`.LazyLoadConfiguration` case, the three `!Ref /ref` reference the same Root, as it generally desired.
+
+For completeness’ sake, merging with [`!Merge`](yaml.md#merge) has the same result as the {py:class}`.LazyLoadConfiguration` case.
+
+```yaml
+# ref_cannot_cross_loading_boundary.yaml
+!Merge
+- !ParseFile ref_cannot_cross_loading_boundary/1.yaml
+- !ParseFile ref_cannot_cross_loading_boundary/2.yaml
+- !ParseFile ref_cannot_cross_loading_boundary/3.yaml
+```

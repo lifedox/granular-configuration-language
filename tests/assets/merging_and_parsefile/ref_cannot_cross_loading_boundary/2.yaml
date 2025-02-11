@@ -1,0 +1,3 @@
+test:
+  2: !Ref /ref
+ref: I came from 2.yaml

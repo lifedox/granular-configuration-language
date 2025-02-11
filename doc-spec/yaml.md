@@ -212,7 +212,7 @@ json_pointer: !Ref /json/pointer/expression
   - _Supports Full Interpolation Syntax_
 - **Returns:** {py:data}`~typing.Any` ‒ Object referenced in absolute JSON Path or JSON Pointer syntax.
 - Notes:
-  - Must begin with either `$` for JSON Path or `/` for JSON Pointer. Otherwise, a `RefMustStartFromRoot` exception is thrown.
+  - Must begin with either `$` for JSON Path or `/` for JSON Pointer. Otherwise, a {py:class}`.RefMustStartFromRoot` exception is thrown.
   - `!Ref` underlies [`!Sub`](#sub) reference syntax. `!Ref` returns the object. Whereas [`!Sub`](#sub) stringifies the objects.
   - JSON Pointer is limited by designed to be a single reference.
   - JSON Path can be used to created objects. `$.*.things` returns a sequence of all values from mappings contain the `things` key. This behavior is not restricted, but not recommended.
@@ -352,7 +352,7 @@ function: !Mask ${SECRET}
   - _Supports Reduced Interpolation Syntax_
 - **Returns:** {py:class}`.Masked` ‒ the string as a {py:class}`.Masked`
 - Notes:
-  - {py:class}`.Masked` inherits from {py:class}`str`, overwriting the {py:meth}`~object.__repr__` to always be `"'<****>'"`.
+  - {py:class}`.Masked` inherits from {py:class}`str`, overwriting the {py:meth}`~object.__repr__` to always be `'<****>'`.
   - {py:class}`.Masked` objects are created at Load Time.
   - Some libraries (such as [`requests`]([https://requests.readthedocs.io/en/latest/)) explicitly only support {py:class}`str` and not subclasses of {py:class}`str`. In those cases, you can `str(masked_value)` to get back the pure {py:class}`str`.
 
