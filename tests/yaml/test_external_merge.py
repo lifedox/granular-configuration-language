@@ -70,8 +70,14 @@ def test_merging_paths_mutably() -> None:
 
 
 def test_ref_cannot_cross_loading_boundary() -> None:
+    files = (
+        ASSET_DIR / "ref_cannot_cross_loading_boundary/1.yaml",
+        ASSET_DIR / "ref_cannot_cross_loading_boundary/2.yaml",
+        ASSET_DIR / "ref_cannot_cross_loading_boundary/3.yaml",
+    )
+
     # Merging three separate `LazyLoadConfiguration` instances
-    config = merge(sorted((ASSET_DIR / "ref_cannot_cross_loading_boundary").glob("*.yaml")))
+    config = merge(files)
 
     assert config.as_dict() == {
         "test": {
@@ -83,7 +89,7 @@ def test_ref_cannot_cross_loading_boundary() -> None:
     }
 
     # One `LazyLoadConfiguration` merging three files
-    config = LazyLoadConfiguration(*sorted((ASSET_DIR / "ref_cannot_cross_loading_boundary").glob("*.yaml"))).config
+    config = LazyLoadConfiguration(*files).config
 
     assert config.as_dict() == {
         "test": {

@@ -281,9 +281,14 @@ We have three files in `ASSET_DIR / "ref_cannot_cross_loading_boundary/"`
 ````
 
 ```python
-config = merge(
-  (ASSET_DIR / "ref_cannot_cross_loading_boundary").glob("*.yaml")
+files = (
+    ASSET_DIR / "ref_cannot_cross_loading_boundary/1.yaml",
+    ASSET_DIR / "ref_cannot_cross_loading_boundary/2.yaml",
+    ASSET_DIR / "ref_cannot_cross_loading_boundary/3.yaml",
 )
+
+# Merging three separate `LazyLoadConfiguration` instances
+config = merge(files)
 
 assert config.as_dict() == {
     "test": {
@@ -294,9 +299,8 @@ assert config.as_dict() == {
     "ref": "I came from 3.yaml",
 }
 
-config = LazyLoadConfiguration(
-  *(ASSET_DIR / "ref_cannot_cross_loading_boundary").glob("*.yaml")
-).config
+# One `LazyLoadConfiguration` merging three files
+config = LazyLoadConfiguration(*files).config
 
 assert config.as_dict() == {
     "test": {
