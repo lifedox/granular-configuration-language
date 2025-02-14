@@ -207,7 +207,7 @@ class LazyLoadConfiguration(Mapping):
                     CONFIG = LazyLoadConfiguration("config.yaml").as_typed(Config)
 
 
-        :param ~typing.Type[C] typed_base: Subclass of :py:class:`Configuration` to assume
+        :param type[C] typed_base: Subclass of :py:class:`Configuration` to assume
         :return: :py:class:`.SafeConfigurationProxy` instance that has been cast to the provided type.
         :rtype: C
         :note: No runtime typing check occurs.

@@ -328,7 +328,7 @@ class Configuration(tabc.Mapping[typ.Any, typ.Any]):
         Provides a typed-checked :py:meth:`get` option
 
         Parameters:
-            type (~typing.Type[T]): Wanted typed
+            type (type[T]): Wanted typed
             key (~typing.Any): Key for wanted value
             default (T, optional): Provides a default value like :py:meth:`dict.get`
             predicate (\~typing.Callable[[~typing.Any], ~typing.TypeGuard[T]], optional):
@@ -359,7 +359,7 @@ class Configuration(tabc.Mapping[typ.Any, typ.Any]):
         """
         Cast this :py:class:`Configuration` instance into subclass of :py:class:`Configuration` with typed annotated attribute
 
-        :param ~typing.Type[C] typed_base: Subclass of :py:class:`Configuration` to assume
+        :param type[C] typed_base: Subclass of :py:class:`Configuration` to assume
         :return: This instance
         :rtype: C
         :note: No runtime typing check occurs.
