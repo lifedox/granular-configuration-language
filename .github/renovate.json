@@ -3,6 +3,7 @@
     "config:recommended",
     ":enablePreCommit"
   ],
+  "automerge": true,
   "recreateWhen": "always",
   "rangeStrategy": "update-lockfile",
   "enabledManagers": [
@@ -22,19 +23,11 @@
   "packageRules": [
     {
       "automerge": true,
-      "description": "Python: Pin dev-dependencies",
-      "matchCategories": [
-        "python"
-      ],
       "matchDepTypes": "dev-dependencies",
       "rangeStrategy": "pin"
     },
     {
       "automerge": true,
-      "description": "Python: Let dependencies ranges stay, but update lockfile",
-      "matchCategories": [
-        "python"
-      ],
       "matchDepTypes": "dependencies",
       "rangeStrategy": "update-lockfile"
     }
