@@ -23,11 +23,6 @@
   "packageRules": [
     {
       "automerge": true,
-      "matchDepTypes": "dev-dependencies",
-      "rangeStrategy": "pin"
-    },
-    {
-      "automerge": true,
       "matchDepTypes": "dependencies",
       "rangeStrategy": "update-lockfile"
     },
@@ -35,6 +30,11 @@
       "automerge": true,
       "matchDepTypes": "dev",
       "rangeStrategy": "pin"
+    },
+    {
+      "automerge": true,
+      "matchDepTypes": "renovate_main",
+      "rangeStrategy": "bump"
     }
   ]
 }
