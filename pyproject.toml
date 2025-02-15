@@ -35,7 +35,7 @@ dependencies = [
 [tool.poetry.group.renovate_main.dependencies]
 # pinned dependencies for Renovate
 python-jsonpath = ">=1.3.0"
-"ruamel.yaml" = ">=0.18"
+"ruamel.yaml" = ">=0.18.10"
 python-dateutil = { version = ">=2.9.0.post0", python = "<3.11" }
 
 
