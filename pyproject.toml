@@ -51,7 +51,7 @@ flake8 = "7.1.2"
 mypy = "1.15.0"
 black = "25.1.0"
 isort = "6.0.0"
-bandit = "1.8.2"
+bandit = "1.8.3"
 # Doc gen
 sphinx = "8.1.3"
 sphinx_rtd_theme = "3.0.2"
