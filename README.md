@@ -2,57 +2,57 @@
 
 [Full report](https://htmlpreview.github.io/?https://github.com/lifedox/granular-configuration-language/blob/python-coverage-comment-action-data/htmlcov/index.html)
 
-| Name                                                                                |    Stmts |     Miss |   Branch |   BrPart |   Cover |   Missing |
-|------------------------------------------------------------------------------------ | -------: | -------: | -------: | -------: | ------: | --------: |
-| granular\_configuration\_language/\_\_init\_\_.py                                   |        6 |        0 |        0 |        0 |    100% |           |
-| granular\_configuration\_language/\_base\_path.py                                   |       14 |        0 |        6 |        0 |    100% |           |
-| granular\_configuration\_language/\_build.py                                        |       51 |        0 |       18 |        0 |    100% |           |
-| granular\_configuration\_language/\_cache.py                                        |       67 |        0 |       12 |        0 |    100% |           |
-| granular\_configuration\_language/\_configuration.py                                |      132 |        0 |       22 |        0 |    100% |           |
-| granular\_configuration\_language/\_json.py                                         |       37 |        0 |       20 |        0 |    100% |           |
-| granular\_configuration\_language/\_lazy\_load\_configuration.py                    |       71 |        0 |        2 |        0 |    100% |           |
-| granular\_configuration\_language/\_load.py                                         |       21 |        1 |        4 |        1 |     92% |        28 |
-| granular\_configuration\_language/\_locations.py                                    |       64 |        0 |        6 |        0 |    100% |           |
-| granular\_configuration\_language/\_merge.py                                        |       27 |        0 |       14 |        0 |    100% |           |
-| granular\_configuration\_language/\_s.py                                            |        2 |        0 |        0 |        0 |    100% |           |
-| granular\_configuration\_language/\_utils.py                                        |       35 |        0 |        8 |        0 |    100% |           |
-| granular\_configuration\_language/available\_tags.py                                |        0 |        0 |        0 |        0 |    100% |           |
-| granular\_configuration\_language/exceptions.py                                     |       45 |        0 |        0 |        0 |    100% |           |
-| granular\_configuration\_language/proxy.py                                          |        2 |        0 |        0 |        0 |    100% |           |
-| granular\_configuration\_language/yaml/\_\_init\_\_.py                              |        3 |        0 |        0 |        0 |    100% |           |
-| granular\_configuration\_language/yaml/\_parsing.py                                 |       54 |       19 |       22 |        1 |     63% |14, 20-25, 28, 33-41, 62-65 |
-| granular\_configuration\_language/yaml/\_tags/\_\_init\_\_.py                       |        4 |        0 |        0 |        0 |    100% |           |
-| granular\_configuration\_language/yaml/\_tags/\_date.py                             |       22 |        0 |        2 |        0 |    100% |           |
-| granular\_configuration\_language/yaml/\_tags/\_del.py                              |        6 |        0 |        0 |        0 |    100% |           |
-| granular\_configuration\_language/yaml/\_tags/\_dict.py                             |        7 |        0 |        0 |        0 |    100% |           |
-| granular\_configuration\_language/yaml/\_tags/\_env.py                              |       12 |        0 |        0 |        0 |    100% |           |
-| granular\_configuration\_language/yaml/\_tags/\_mask.py                             |        8 |        0 |        0 |        0 |    100% |           |
-| granular\_configuration\_language/yaml/\_tags/\_merge.py                            |       10 |        0 |        0 |        0 |    100% |           |
-| granular\_configuration\_language/yaml/\_tags/\_parse\_env.py                       |       43 |        0 |        8 |        0 |    100% |           |
-| granular\_configuration\_language/yaml/\_tags/\_parse\_file.py                      |       30 |        0 |        4 |        0 |    100% |           |
-| granular\_configuration\_language/yaml/\_tags/\_placeholder.py                      |        7 |        0 |        0 |        0 |    100% |           |
-| granular\_configuration\_language/yaml/\_tags/\_ref.py                              |        8 |        0 |        0 |        0 |    100% |           |
-| granular\_configuration\_language/yaml/\_tags/\_sub.py                              |        8 |        0 |        0 |        0 |    100% |           |
-| granular\_configuration\_language/yaml/\_tags/\_uuid.py                             |        8 |        0 |        0 |        0 |    100% |           |
-| granular\_configuration\_language/yaml/\_tags/func\_and\_class.py                   |       34 |        0 |        4 |        0 |    100% |           |
-| granular\_configuration\_language/yaml/classes.py                                   |       86 |        0 |        4 |        0 |    100% |           |
-| granular\_configuration\_language/yaml/decorators/\_\_init\_\_.py                   |        6 |        0 |        0 |        0 |    100% |           |
-| granular\_configuration\_language/yaml/decorators/\_base.py                         |       67 |        0 |       12 |        0 |    100% |           |
-| granular\_configuration\_language/yaml/decorators/\_lazy.py                         |       41 |        0 |        4 |        0 |    100% |           |
-| granular\_configuration\_language/yaml/decorators/\_lazy\_eval.py                   |       16 |        0 |        0 |        0 |    100% |           |
-| granular\_configuration\_language/yaml/decorators/\_tag\_loader.py                  |       84 |        0 |       26 |        0 |    100% |           |
-| granular\_configuration\_language/yaml/decorators/\_tag\_tracker.py                 |       19 |        0 |        0 |        0 |    100% |           |
-| granular\_configuration\_language/yaml/decorators/\_type\_checking.py               |       43 |        0 |        2 |        0 |    100% |           |
-| granular\_configuration\_language/yaml/decorators/interpolate/\_\_init\_\_.py       |        2 |        0 |        0 |        0 |    100% |           |
-| granular\_configuration\_language/yaml/decorators/interpolate/\_env\_var\_parser.py |       23 |        0 |        4 |        0 |    100% |           |
-| granular\_configuration\_language/yaml/decorators/interpolate/\_interpolate.py      |       72 |        0 |       18 |        0 |    100% |           |
-| granular\_configuration\_language/yaml/decorators/ref/\_\_init\_\_.py               |        2 |        0 |        0 |        0 |    100% |           |
-| granular\_configuration\_language/yaml/decorators/ref/\_ref.py                      |       39 |        0 |       14 |        0 |    100% |           |
-| granular\_configuration\_language/yaml/load/\_\_init\_\_.py                         |        2 |        0 |        0 |        0 |    100% |           |
-| granular\_configuration\_language/yaml/load/\_constructors.py                       |       17 |        0 |        6 |        0 |    100% |           |
-| granular\_configuration\_language/yaml/load/\_external.py                           |       18 |        0 |        4 |        0 |    100% |           |
-| granular\_configuration\_language/yaml/load/\_handler.py                            |       23 |        0 |        4 |        0 |    100% |           |
-|                                                                           **TOTAL** | **1398** |   **20** |  **250** |    **2** | **98%** |           |
+| Name                                                                                |    Stmts |     Miss |   Branch |   BrPart |    Cover |   Missing |
+|------------------------------------------------------------------------------------ | -------: | -------: | -------: | -------: | -------: | --------: |
+| granular\_configuration\_language/\_\_init\_\_.py                                   |        6 |        0 |        0 |        0 |     100% |           |
+| granular\_configuration\_language/\_base\_path.py                                   |       14 |        0 |        6 |        0 |     100% |           |
+| granular\_configuration\_language/\_build.py                                        |       51 |        0 |       18 |        0 |     100% |           |
+| granular\_configuration\_language/\_cache.py                                        |       67 |        0 |       12 |        0 |     100% |           |
+| granular\_configuration\_language/\_configuration.py                                |      132 |        0 |       22 |        0 |     100% |           |
+| granular\_configuration\_language/\_json.py                                         |       37 |        0 |       20 |        0 |     100% |           |
+| granular\_configuration\_language/\_lazy\_load\_configuration.py                    |       71 |        0 |        2 |        0 |     100% |           |
+| granular\_configuration\_language/\_load.py                                         |       23 |        0 |        4 |        0 |     100% |           |
+| granular\_configuration\_language/\_locations.py                                    |       64 |        0 |        6 |        0 |     100% |           |
+| granular\_configuration\_language/\_merge.py                                        |       27 |        0 |       14 |        0 |     100% |           |
+| granular\_configuration\_language/\_s.py                                            |        2 |        0 |        0 |        0 |     100% |           |
+| granular\_configuration\_language/\_utils.py                                        |       35 |        0 |        8 |        0 |     100% |           |
+| granular\_configuration\_language/available\_tags.py                                |        0 |        0 |        0 |        0 |     100% |           |
+| granular\_configuration\_language/exceptions.py                                     |       45 |        0 |        0 |        0 |     100% |           |
+| granular\_configuration\_language/proxy.py                                          |        2 |        0 |        0 |        0 |     100% |           |
+| granular\_configuration\_language/yaml/\_\_init\_\_.py                              |        3 |        0 |        0 |        0 |     100% |           |
+| granular\_configuration\_language/yaml/\_parsing.py                                 |       55 |        0 |       18 |        0 |     100% |           |
+| granular\_configuration\_language/yaml/\_tags/\_\_init\_\_.py                       |        4 |        0 |        0 |        0 |     100% |           |
+| granular\_configuration\_language/yaml/\_tags/\_date.py                             |       22 |        0 |        2 |        0 |     100% |           |
+| granular\_configuration\_language/yaml/\_tags/\_del.py                              |        6 |        0 |        0 |        0 |     100% |           |
+| granular\_configuration\_language/yaml/\_tags/\_dict.py                             |        7 |        0 |        0 |        0 |     100% |           |
+| granular\_configuration\_language/yaml/\_tags/\_env.py                              |       12 |        0 |        0 |        0 |     100% |           |
+| granular\_configuration\_language/yaml/\_tags/\_mask.py                             |        8 |        0 |        0 |        0 |     100% |           |
+| granular\_configuration\_language/yaml/\_tags/\_merge.py                            |       10 |        0 |        0 |        0 |     100% |           |
+| granular\_configuration\_language/yaml/\_tags/\_parse\_env.py                       |       43 |        0 |        8 |        0 |     100% |           |
+| granular\_configuration\_language/yaml/\_tags/\_parse\_file.py                      |       30 |        0 |        4 |        0 |     100% |           |
+| granular\_configuration\_language/yaml/\_tags/\_placeholder.py                      |        7 |        0 |        0 |        0 |     100% |           |
+| granular\_configuration\_language/yaml/\_tags/\_ref.py                              |        8 |        0 |        0 |        0 |     100% |           |
+| granular\_configuration\_language/yaml/\_tags/\_sub.py                              |        8 |        0 |        0 |        0 |     100% |           |
+| granular\_configuration\_language/yaml/\_tags/\_uuid.py                             |        8 |        0 |        0 |        0 |     100% |           |
+| granular\_configuration\_language/yaml/\_tags/func\_and\_class.py                   |       34 |        0 |        4 |        0 |     100% |           |
+| granular\_configuration\_language/yaml/classes.py                                   |       86 |        0 |        4 |        0 |     100% |           |
+| granular\_configuration\_language/yaml/decorators/\_\_init\_\_.py                   |        6 |        0 |        0 |        0 |     100% |           |
+| granular\_configuration\_language/yaml/decorators/\_base.py                         |       67 |        0 |       12 |        0 |     100% |           |
+| granular\_configuration\_language/yaml/decorators/\_lazy.py                         |       41 |        0 |        4 |        0 |     100% |           |
+| granular\_configuration\_language/yaml/decorators/\_lazy\_eval.py                   |       16 |        0 |        0 |        0 |     100% |           |
+| granular\_configuration\_language/yaml/decorators/\_tag\_loader.py                  |       84 |        0 |       26 |        0 |     100% |           |
+| granular\_configuration\_language/yaml/decorators/\_tag\_tracker.py                 |       19 |        0 |        0 |        0 |     100% |           |
+| granular\_configuration\_language/yaml/decorators/\_type\_checking.py               |       43 |        0 |        2 |        0 |     100% |           |
+| granular\_configuration\_language/yaml/decorators/interpolate/\_\_init\_\_.py       |        2 |        0 |        0 |        0 |     100% |           |
+| granular\_configuration\_language/yaml/decorators/interpolate/\_env\_var\_parser.py |       23 |        0 |        4 |        0 |     100% |           |
+| granular\_configuration\_language/yaml/decorators/interpolate/\_interpolate.py      |       72 |        0 |       18 |        0 |     100% |           |
+| granular\_configuration\_language/yaml/decorators/ref/\_\_init\_\_.py               |        2 |        0 |        0 |        0 |     100% |           |
+| granular\_configuration\_language/yaml/decorators/ref/\_ref.py                      |       39 |        0 |       14 |        0 |     100% |           |
+| granular\_configuration\_language/yaml/load/\_\_init\_\_.py                         |        2 |        0 |        0 |        0 |     100% |           |
+| granular\_configuration\_language/yaml/load/\_constructors.py                       |       17 |        0 |        6 |        0 |     100% |           |
+| granular\_configuration\_language/yaml/load/\_external.py                           |       18 |        0 |        4 |        0 |     100% |           |
+| granular\_configuration\_language/yaml/load/\_handler.py                            |       23 |        0 |        4 |        0 |     100% |           |
+|                                                                           **TOTAL** | **1401** |    **0** |  **246** |    **0** | **100%** |           |
 
 
 ## Setup coverage badge
