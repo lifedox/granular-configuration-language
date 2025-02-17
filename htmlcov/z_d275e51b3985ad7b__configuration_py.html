@@ -67,7 +67,7 @@
             <a id="nextFileLink" class="nav" href="z_d275e51b3985ad7b__json_py.html">&#xbb; next</a>
             &nbsp; &nbsp; &nbsp;
             <a class="nav" href="https://coverage.readthedocs.io/en/7.6.4">coverage.py v7.6.4</a>,
-            created at 2025-02-17 11:32 +0000
+            created at 2025-02-17 21:46 +0000
         </p>
         <aside class="hidden">
             <button type="button" class="button_next_chunk" data-shortcut="j"></button>
@@ -243,9 +243,9 @@
     <p class="run"><span class="n"><a id="t159" href="#t159">159</a></span><span class="t">            <span class="key">try</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t160" href="#t160">160</a></span><span class="t">                <span class="nam">value</span> <span class="op">=</span> <span class="nam">value</span><span class="op">.</span><span class="nam">result</span>&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t161" href="#t161">161</a></span><span class="t">                <span class="nam">self</span><span class="op">.</span><span class="nam">_private_set</span><span class="op">(</span><span class="nam">name</span><span class="op">,</span> <span class="nam">value</span><span class="op">,</span> <span class="nam">setter_secret</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
-    <p class="run"><span class="n"><a id="t162" href="#t162">162</a></span><span class="t">            <span class="key">except</span> <span class="nam">RecursionError</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
+    <p class="run"><span class="n"><a id="t162" href="#t162">162</a></span><span class="t">            <span class="key">except</span> <span class="nam">RecursionError</span> <span class="key">as</span> <span class="nam">e</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t163" href="#t163">163</a></span><span class="t">                <span class="key">raise</span> <span class="nam">RecursionError</span><span class="op">(</span>&nbsp;</span><span class="r"></span></p>
-    <p class="pln"><span class="n"><a id="t164" href="#t164">164</a></span><span class="t">                    <span class="fst">f"</span><span class="op">{</span><span class="nam">value</span><span class="op">.</span><span class="nam">tag</span><span class="op">}</span><span class="fst"> at `</span><span class="op">{</span><span class="nam">self</span><span class="op">.</span><span class="nam">__attribute_name</span><span class="op">.</span><span class="nam">with_suffix</span><span class="op">(</span><span class="nam">name</span><span class="op">)</span><span class="op">}</span><span class="fst">` caused a recursion error. Please check your configuration for a self-referencing loop.</span><span class="fst">"</span>&nbsp;</span><span class="r"></span></p>
+    <p class="pln"><span class="n"><a id="t164" href="#t164">164</a></span><span class="t">                    <span class="fst">f"</span><span class="op">{</span><span class="nam">value</span><span class="op">.</span><span class="nam">tag</span><span class="op">}</span><span class="fst"> at `</span><span class="op">{</span><span class="nam">self</span><span class="op">.</span><span class="nam">__attribute_name</span><span class="op">.</span><span class="nam">with_suffix</span><span class="op">(</span><span class="nam">name</span><span class="op">)</span><span class="op">}</span><span class="fst">` caused a recursion error: </span><span class="op">{</span><span class="nam">e</span><span class="op">}</span><span class="fst">"</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t165" href="#t165">165</a></span><span class="t">                <span class="op">)</span> <span class="key">from</span> <span class="key">None</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t166" href="#t166">166</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t167" href="#t167">167</a></span><span class="t">        <span class="key">if</span> <span class="nam">isinstance</span><span class="op">(</span><span class="nam">value</span><span class="op">,</span> <span class="nam">Placeholder</span><span class="op">)</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
@@ -441,7 +441,7 @@
     <p class="pln"><span class="n"><a id="t357" href="#t357">357</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t358" href="#t358">358</a></span><span class="t">    <span class="key">def</span> <span class="nam">as_typed</span><span class="op">(</span><span class="nam">self</span><span class="op">,</span> <span class="nam">typed_base</span><span class="op">:</span> <span class="nam">type</span><span class="op">[</span><span class="nam">C</span><span class="op">]</span><span class="op">)</span> <span class="op">-></span> <span class="nam">C</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t359" href="#t359">359</a></span><span class="t">        <span class="str">"""</span>&nbsp;</span><span class="r"></span></p>
-    <p class="pln"><span class="n"><a id="t360" href="#t360">360</a></span><span class="t"><span class="str">        Cast this :py:class:`Configuration` instance into subclass of :py:class:`Configuration` with typed annotated attribute</span>&nbsp;</span><span class="r"></span></p>
+    <p class="pln"><span class="n"><a id="t360" href="#t360">360</a></span><span class="t"><span class="str">        Cast this :py:class:`Configuration` instance into subclass of :py:class:`Configuration` with typed annotated attributes</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t361" href="#t361">361</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t362" href="#t362">362</a></span><span class="t"><span class="str">        :param type[C] typed_base: Subclass of :py:class:`Configuration` to assume</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t363" href="#t363">363</a></span><span class="t"><span class="str">        :return: This instance</span>&nbsp;</span><span class="r"></span></p>
@@ -498,7 +498,7 @@
             <a class="nav" href="z_d275e51b3985ad7b__json_py.html">&#xbb; next</a>
             &nbsp; &nbsp; &nbsp;
             <a class="nav" href="https://coverage.readthedocs.io/en/7.6.4">coverage.py v7.6.4</a>,
-            created at 2025-02-17 11:32 +0000
+            created at 2025-02-17 21:46 +0000
         </p>
     </div>
 </footer>
