@@ -89,3 +89,11 @@ def test_scalar_ref_throws_exception() -> None:
 """
     with pytest.raises(JSONPathOnlyWorksOnMappings):
         loads(test_data)
+
+
+def test_recursion_throws_exception() -> None:
+    test_data = """
+a: !Ref /a
+"""
+    with pytest.raises(RecursionError):
+        loads(test_data).a

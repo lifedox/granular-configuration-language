@@ -1,5 +1,12 @@
 # Changelog
 
+## 2.1.0
+
+### Changed <!-- markdownlint-disable MD024 -->
+
+- `!ParseFile`, `!OptionalParseFile`, and `ParseEnv` will now actively check if there is a loading loop and throw `ParsingTriedToCreateALoop`.
+  - Previously, this could result in unexpected behaviors, `RecursionError`, or infinite loops and was not explicitly support and warned against.
+
 ## 2.0.0
 
 ### ⚠️ Breaking Changes ⚠️
@@ -64,7 +71,7 @@
   - `JSONPathMustStartFromRoot` → `RefMustStartFromRoot`
 - (_internal detail_) `LazyEval.run()` usage replaced with `LazyEval.result`
 
-### Added
+### Added <!-- markdownlint-disable MD024 -->
 
 - Add JSON Pointer support where JSON Path is supported.
 - Added the following tags:
@@ -87,12 +94,12 @@
 - `Configuration` using `typing.dataclass_transform` to support typed attributes.
   - `Configuration.as_typed` and `LazyLoadConfiguration.as_typed` added enable typing.
 
-### Fixed
+### Fixed <!-- markdownlint-disable MD024 -->
 
 - (_internal detail_) Fixed `LazyEval` making copies of `Root`
   - Note: Copying with `LazyEval` still links copies unexpectedly. Now, it is just always connected to the original root (immutability is default now, so only copy immutable configurations).
 
-### Removed
+### Removed <!-- markdownlint-disable MD024 -->
 
 - Removed `set_config` pattern
 - Removed INI support

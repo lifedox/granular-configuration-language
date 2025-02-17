@@ -159,9 +159,9 @@ class Configuration(tabc.Mapping[typ.Any, typ.Any]):
             try:
                 value = value.result
                 self._private_set(name, value, setter_secret)
-            except RecursionError:
+            except RecursionError as e:
                 raise RecursionError(
-                    f"{value.tag} at `{self.__attribute_name.with_suffix(name)}` caused a recursion error. Please check your configuration for a self-referencing loop."
+                    f"{value.tag} at `{self.__attribute_name.with_suffix(name)}` caused a recursion error: {e}"
                 ) from None
 
         if isinstance(value, Placeholder):
@@ -357,7 +357,7 @@ class Configuration(tabc.Mapping[typ.Any, typ.Any]):
 
     def as_typed(self, typed_base: type[C]) -> C:
         """
-        Cast this :py:class:`Configuration` instance into subclass of :py:class:`Configuration` with typed annotated attribute
+        Cast this :py:class:`Configuration` instance into subclass of :py:class:`Configuration` with typed annotated attributes
 
         :param type[C] typed_base: Subclass of :py:class:`Configuration` to assume
         :return: This instance

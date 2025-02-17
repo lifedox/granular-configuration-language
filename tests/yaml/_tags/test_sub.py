@@ -209,3 +209,19 @@ def test_that_single_colon_interpolation_errors() -> None:
 def test_special_static_cases() -> None:
     assert loads("!Sub $") == "$"
     assert loads("!Sub ${") == "${"
+
+
+def test_recursion_throws_exception_using_jsonpointer() -> None:
+    test_data = """
+a: !Sub ${/a}
+"""
+    with pytest.raises(RecursionError):
+        loads(test_data).a
+
+
+def test_recursion_throws_exception_using_jsonpath() -> None:
+    test_data = """
+a: !Sub ${$.a}
+"""
+    with pytest.raises(RecursionError):
+        loads(test_data).a

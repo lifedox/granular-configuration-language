@@ -3,6 +3,7 @@ from __future__ import annotations
 import typing as typ
 from pathlib import Path
 
+from granular_configuration_language.yaml._parsing import is_in_chain, make_chain_message
 from granular_configuration_language.yaml.classes import LazyRoot
 from granular_configuration_language.yaml.decorators import (
     LoadOptions,
@@ -14,15 +15,20 @@ from granular_configuration_language.yaml.decorators import (
 )
 
 
-def as_file_path(value: str, options: LoadOptions) -> Path:
-    return options.relative_to_directory / value
+def _as_file_path(tag: str, value: str, options: LoadOptions) -> Path:
+    result = options.relative_to_directory / value
+
+    if is_in_chain(result, options):
+        raise make_chain_message(tag, value, options)
+
+    return result
 
 
-def load(file: Path, option: LoadOptions, root: Root) -> typ.Any:
+def _load(file: Path, options: LoadOptions, root: Root) -> typ.Any:
     from granular_configuration_language._load import load_file
 
     lazy_root = LazyRoot.with_root(root)
-    output = load_file(file, lazy_root=lazy_root, mutable=option.mutable)
+    output = load_file(file, lazy_root=lazy_root, mutable=options.mutable, previous_options=options)
     return output
 
 
@@ -30,18 +36,18 @@ def load(file: Path, option: LoadOptions, root: Root) -> typ.Any:
 @as_lazy_with_root_and_load_options
 @interpolate_value_with_ref
 def handler(value: str, root: Root, options: LoadOptions) -> typ.Any:
-    file = as_file_path(value, options)
+    file = _as_file_path("!ParseFile", value, options)
 
-    return load(file, options, root)
+    return _load(file, options, root)
 
 
 @string_tag(Tag("!OptionalParseFile"))
 @as_lazy_with_root_and_load_options
 @interpolate_value_with_ref
 def handler_optional(value: str, root: Root, options: LoadOptions) -> typ.Any:
-    file = as_file_path(value, options)
+    file = _as_file_path("!OptionalParseFile", value, options)
 
     if file.exists():
-        return load(file, options, root)
+        return _load(file, options, root)
     else:
         return options.obj_pairs_func()

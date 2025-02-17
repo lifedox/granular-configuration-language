@@ -1,0 +1,2 @@
+safe: 1.yaml
+next: !ParseFile ../2.yaml

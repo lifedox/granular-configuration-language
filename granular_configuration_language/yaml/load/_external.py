@@ -11,18 +11,20 @@ from granular_configuration_language.yaml.load._handler import load_yaml_string
 def loads(
     config_str: str,
     *,
-    lazy_root: typ.Optional[LazyRoot] = None,
-    file_path: typ.Optional[Path] = None,
+    lazy_root: LazyRoot | None = None,
+    file_path: Path | None = None,
+    previous_options: LoadOptions | None = None,
     mutable: bool = False,
 ) -> typ.Any:
     state = StateHolder(
         lazy_root_obj=lazy_root or LazyRoot(),
         options=LoadOptions(
             file_location=file_path,
-            relative_to_directory=file_path.parent if file_path is not None else Path("."),
+            relative_to_directory=file_path.parent if file_path is not None else Path(),
             obj_pairs_func=obj_pairs_func(mutable),
             sequence_func=sequence_func(mutable),
             mutable=mutable,
+            previous=previous_options,
         ),
     )
 

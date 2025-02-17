@@ -34,9 +34,10 @@ class Masked(str):
     """
     Used to keep secrets from printing to screen when running tests.
 
-    Inherits for :py:class:`str`. Replaces the :py:meth:`~object.__repr__` with the constant ``"'<****>'"``.
-
-    Used by ``!Mask`` tag
+    - Inherits from :py:class:`str`.
+    - Replaces the standard :py:meth:`~object.__repr__` result with the
+      constant literal ``'<****>'``.
+    - Used by ``!Mask`` tag
 
     Note:
         Does not alter text or prevent :py:func:`print` from display the string value.
@@ -152,7 +153,7 @@ class LazyEval(abc.ABC, typ.Generic[RT]):
         return self
 
 
-@dataclass(frozen=True, kw_only=True)
+@dataclass(frozen=True, kw_only=True, slots=True)
 class LoadOptions:
     """
     Type: frozen :py:func:`dataclass <dataclasses.dataclass>`
@@ -180,9 +181,13 @@ class LoadOptions:
     """
     Path for making relative file paths
     """
+    previous: LoadOptions | None
+    """
+    Pointer to previous options, if this file was loaded by another
+    """
 
 
-@dataclass(frozen=True, kw_only=True)
+@dataclass(frozen=True, kw_only=True, slots=True)
 class StateHolder:
     """
     Type: frozen :py:func:`dataclass <dataclasses.dataclass>`

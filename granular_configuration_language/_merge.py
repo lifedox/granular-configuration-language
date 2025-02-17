@@ -23,7 +23,7 @@ def merge(
     - Any :py:class:`os.PathLike` objects are loaded via individual :py:class:`.LazyLoadConfiguration` instances.
 
     .. caution::
-        Don't use ``merge`` as a replacement for :py:class:`.LazyLoadConfiguration`. It is less efficient and creates Load Boundaries on each configuration.
+        Don't use :py:func:`.merge` as a replacement for :py:class:`.LazyLoadConfiguration`. It is less efficient and creates Load Boundaries on each configuration.
 
     :param ~collections.abc.Iterable[Configuration | LazyLoadConfiguration | LazyEval | ~os.PathLike | ~typing.Any] configs: Configurations
         to be merged

@@ -73,9 +73,17 @@ class ParseEnvParsingError(Exception):
     pass
 
 
+class ParsingTriedToCreateALoop(Exception):
+    pass
+
+
 class PlaceholderConfigurationError(Exception):
     pass
 
 
 class RefMustStartFromRoot(Exception):
+    pass
+
+
+class ReservedFileExtension(Exception):
     pass

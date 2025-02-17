@@ -93,7 +93,7 @@ $: !Sub ${$}
 
 ```{admonition} Recursion Possible
 :class: caution
-JSON Path and JSON Pointer can be used to cause infinite loops and/or a {py:class}`RecursionError`
+**Example:** Loading `a: !Sub ${$.a}` will throw {py:class}`RecursionError`, when `CONFIG.a` is called.
 ```
 
 ---
@@ -220,7 +220,7 @@ json_pointer: !Ref /json/pointer/expression
 
 ```{admonition} Recursion Possible
 :class: caution
-`!Ref` can be used to cause infinite loops and/or a {py:class}`RecursionError`.
+**Example:** Loading `a: !Ref /a` will throw {py:class}`RecursionError`, when `CONFIG.a` is called.
 ```
 
 ---
@@ -246,11 +246,8 @@ single_line_example: !ParseEnv [ENV_VAR, false]
     - If argument is {py:class}`tuple`, the second object will be returned.
 - Notes:
   - `!ParseEnvSafe` uses a pure safe YAML loader. `!ParseEnv` uses this library's loader.
-
-```{admonition} Recursion Possible
-:class: caution
-`!ParseEnv` can be used to cause infinite loops and/or a {py:class}`RecursionError`. `!ParseEnv VAR`, where `VAR='!ParseEnv VAR'`, will loop infinitely.
-```
+  - _(Since 2.1.0)_ `!ParseEnv` detects loading loops and throws {py:class}`.ParsingTriedToCreateALoop` when trying to load an environment variable already part of the chain.
+    - See [Loading Loops](concepts.md#loading-loops) for examples.
 
 ---
 
@@ -270,11 +267,8 @@ file_may_exist: !ParseFile relative/path/to/optional/file.yaml
 - Notes:
   - `!ParseFile` can be used at the root of the configuration document to act as a file redirect.
   - `!OptionalParseFile` is intended to be used with [`!Merge`](#merge), where nulls are filtered out.
-
-```{admonition} Recursion Possible
-:class: caution
-`!ParseFile` and `!OptionalParseFile` can be used to cause infinite loops and/or a {py:class}`RecursionError`.
-```
+  - _(Since 2.1.0)_ `!ParseFile` detects file loading loops and throws {py:class}`.ParsingTriedToCreateALoop` when trying to load a file already part of the chain.
+    - See [Loading Loops](concepts.md#loading-loops) for examples.
 
 ---
 
@@ -352,9 +346,10 @@ function: !Mask ${SECRET}
   - _Supports Reduced Interpolation Syntax_
 - **Returns:** {py:class}`.Masked` ‒ the string as a {py:class}`.Masked`
 - Notes:
-  - {py:class}`.Masked` inherits from {py:class}`str`, overwriting the {py:meth}`~object.__repr__` to always be `'<****>'`.
+  - {py:class}`.Masked` inherits from {py:class}`str`, using the constant literal `'<****>'` for {py:meth}`~object.__repr__`.
   - {py:class}`.Masked` objects are created at Load Time.
-  - Some libraries (such as [`requests`]([https://requests.readthedocs.io/en/latest/)) explicitly only support {py:class}`str` and not subclasses of {py:class}`str`. In those cases, you can `str(masked_value)` to get back the pure {py:class}`str`.
+  - Some libraries (such as [`requests`](https://requests.readthedocs.io/en/latest/)) explicitly only support {py:class}`str` and not subclasses of {py:class}`str`.
+    - In those cases, you can `str(masked_value)` to get back the pure {py:class}`str`.
 
 ---
 

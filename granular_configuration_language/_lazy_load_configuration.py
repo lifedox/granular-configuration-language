@@ -195,7 +195,7 @@ class LazyLoadConfiguration(Mapping):
 
     def as_typed(self, typed_base: typ.Type[C]) -> C:
         """
-        Create a proxy that is cast to provide :py:class:`Configuration` subclass with typed annotated attribute.
+        Create a proxy that is cast to provide :py:class:`Configuration` subclass with typed annotated attributes.
 
         This proxy ensures laziness is preserved and is fully compatible with :py:class:`Configuration`.
 

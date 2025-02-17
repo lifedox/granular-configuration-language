@@ -258,7 +258,7 @@ We have three files in `ASSET_DIR / "ref_cannot_cross_loading_boundary/"`
 
 ````{list-table}
 :header-rows: 0
-:align: center
+:align: left
 
 * - ```yaml
     # 1.yaml
@@ -324,4 +324,126 @@ For completeness’ sake, merging with [`!Merge`](yaml.md#merge) has the same re
 - !ParseFile ref_cannot_cross_loading_boundary/1.yaml
 - !ParseFile ref_cannot_cross_loading_boundary/2.yaml
 - !ParseFile ref_cannot_cross_loading_boundary/3.yaml
+```
+
+## Loading Loops
+
+Because [`!ParseFile`](yaml.md#parsefile--optionalparsefile), [`!OptionalParseFile`](yaml.md#parsefile--optionalparsefile), and [`!ParseEnv`](yaml.md#parseenv--parseenvsafe) load data from an external source (i.e. files and environment variables), they introduce the risk of circularly loading these sources.
+
+> Note: [`!ParseEnvSafe`](yaml.md#parseenv--parseenvsafe) does not include support for tags, so it does not have this risk, as it can only ever be an end to the chain.
+
+In order to prevent looping, each load of a file or environment to tracked per chain, and a {py:class}`.ParsingTriedToCreateALoop` exception is thrown just before a source, previously loaded in the chain, tries to load.
+
+### Multiple Chains
+
+This does not prevent the same source load being loaded more than once if it is multiple chains.
+
+**Environment:**
+
+```shell
+VAR=!ParseFile 2.yaml
+```
+
+**Configuration:**
+
+````{list-table}
+:header-rows: 0
+:align: left
+
+* - ```yaml
+    # 1.yaml
+    chain1: !ParseEnv VAR
+    chain2: !ParseEnv VAR
+    ```
+  - ```yaml
+    # 2.yaml
+    key: value
+    ```
+````
+
+**Code:**
+
+```python
+CONFIG = LoadLazyConfiguration("1.yaml")
+
+assert CONFIG.chain1.key == "value"  # 1.yaml→#VAR→2.yaml
+assert CONFIG.chain2.key == "value"  # 1.yaml→#VAR→2.yaml
+```
+
+Sources `$VAR` and `2.yaml` are loaded twice. Once for `CONFIG.chain1` and once for `CONFIG.chain2`.
+
+_(Note: Using `!Ref chain1` for `chain2` would have prevented the second load)_
+
+### Looping Example with Environment Variables
+
+The following is an example of a catastrophic loop, using [`!ParseEnv`](yaml.md#parseenv--parseenvsafe)
+
+**Environment:**
+
+```shell
+VAR1=!ParseEnv VAR2
+VAR2=!ParseEnv VAR3
+VAR3=!ParseEnv VAR1
+```
+
+**Configuration:**
+
+```yaml
+# config.yaml
+setting1: !ParseEnv VAR1
+```
+
+**Code:**
+
+```python
+CONFIG = LoadLazyConfiguration("config.yaml")
+
+CONFIG.setting1 # Would cause an infinite loop without detection.
+                # Note: This is not recursion, because a new LazyEval
+                #       instance is created every load.
+                #       You would be waiting to run out of memory or stack.
+```
+
+### Looping Example with Files
+
+The following is an example of a loop, using [`!ParseFile`](yaml.md#parsefile--optionalparsefile):
+
+**Configuration:**
+
+````{list-table}
+:header-rows: 0
+:align: left
+
+* - ```yaml
+    # 1.yaml
+    safe: 1.yaml
+    next: !ParseFile 2.yaml
+    ```
+  - ```yaml
+    # 2.yaml
+    safe: 2.yaml
+    next: !ParseFile 3.yaml
+    ```
+  - ```yaml
+    # 3.yaml
+    safe: 3.yaml
+    next: !ParseFile 1.yaml
+    ```
+````
+
+**Code:**
+
+```python
+CONFIG = LoadLazyConfiguration("1.yaml")
+
+CONFIG.safe           # "1.yaml"
+CONFIG.next.safe      # "2.yaml"
+CONFIG.next.next.safe # "3.yaml"
+CONFIG.next.next.next # Would load `1.yaml` again without detection.
+
+# Without detection, `.next` could be appended endlessly
+CONFIG.next.next.next                # 1.yaml→2.yaml→3.yaml→1.yaml
+CONFIG.next.next.next.next           # 1.yaml→2.yaml→3.yaml→1.yaml→2.yaml
+CONFIG.next.next.next.next.next      # 1.yaml→2.yaml→3.yaml→1.yaml→2.yaml→3.yaml
+CONFIG.next.next.next.next.next.next # 1.yaml→2.yaml→3.yaml→1.yaml→2.yaml→3.yaml→1.yaml
 ```

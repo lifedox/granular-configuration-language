@@ -4,11 +4,11 @@
 
 > ⚠️ **This library is meant for trusted configuration files.** ⚠️
 
-## Get started
+## How to get started?
 
-Go to [Documentation](https://lifedox.github.io/granular-configuration-language/doc-spec/getting_started.html).
+See [Documentation - Getting Started](https://lifedox.github.io/granular-configuration-language/doc-spec/getting_started.html).
 
-## How to install
+## How to install?
 
 From [PyPi](https://pypi.org/project/granular-configuration-language/):
 
@@ -119,6 +119,7 @@ Some use cases:
 
 - It's "granular" because you can specify settings across multiple files at a fine granularity for overriding values.
 - It is meant for trusted "configuration" files.
-- Including "language" make it clear that this is not the source of configuration.
-  - A valid piece of feedback was that it sounded like it was the source for configuration, not the processing of generic configuration files.
+- Including "language" makes it clear that this is not the source of configuration, but a library for processing generic configuration files.
+  - Feedback was that "granular-configuration" sounded like it was the source for configuration.
   - "Format" sounded weirder than "language".
+  - Including "YAML" sounded like this was trying to be more than YAML, rather than just using YAML.
