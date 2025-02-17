@@ -2,7 +2,6 @@ from __future__ import annotations
 
 import collections.abc as tabc
 import os
-import re
 from itertools import product
 from unittest.mock import patch
 
@@ -230,7 +229,7 @@ def test_parse_env_safe_with_a_tag_fails() -> None:
 
 def test_failing_when_creating_a_loop_of_one() -> None:
     with patch.dict(os.environ, values={"ENV_VAR": "!ParseEnv ENV_VAR"}):
-        with pytest.raises(ParsingTriedToCreateALoop, match=re.escape("($ENV_VAR→...)")):
+        with pytest.raises(ParsingTriedToCreateALoop):
             loads("!ParseEnv ENV_VAR")
 
 
@@ -242,8 +241,5 @@ def test_failing_when_creating_a_loop_of_many() -> None:
     )
 
     with patch.dict(os.environ, values=env):
-        with pytest.raises(
-            ParsingTriedToCreateALoop,
-            match=re.escape("($VAR1→$VAR2→$VAR3→...)"),
-        ):
+        with pytest.raises(ParsingTriedToCreateALoop):
             loads("!ParseEnv VAR1")

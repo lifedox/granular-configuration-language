@@ -3,6 +3,8 @@ from __future__ import annotations
 import collections.abc as tabc
 import sys
 import typing as typ
+from functools import partial
+from itertools import chain
 from pathlib import Path
 
 from granular_configuration_language.exceptions import ParsingTriedToCreateALoop
@@ -33,7 +35,7 @@ else:
         for step, path in enumerate([relative_to] + list(relative_to.parents)):
             if file.is_relative_to(path):
                 break
-            elif path.name == "..":
+            elif path.name == "..":  # pragma: no cover
                 raise ValueError(f"'..' segment in {str(relative_to)!r} cannot be walked")
         else:
             raise ValueError(f"{str(file)!r} and {str(relative_to)!r} have different anchors")
@@ -44,25 +46,29 @@ else:
 FILE_EXTENSION: typ.Final = ".environment_variable-a5b55071-b86e-4f22-90fc-c9db335691f6"
 
 
-def _get_chain_reversed(options: LoadOptions) -> tabc.Iterator[str]:
-    relative_to = Path().resolve()
-    seen: set[str] = set()
-
-    if options.previous:
-        yield from _get_chain_reversed(options.previous)
-
-    if not options.file_location:
-        pass
-    elif options.file_location.suffix == FILE_EXTENSION:
-        yield "$" + options.file_location.stem
-    elif options.file_location.name not in seen:
-        seen.add(options.file_location.name)
-        yield options.file_location.name
+def _pretty_source(source: Path, *, relative_to: Path, seen: set[str]) -> str:
+    if source.suffix == FILE_EXTENSION:
+        return "$" + source.stem
+    elif source.name not in seen:
+        seen.add(source.name)
+        return source.name
     else:
         try:
-            yield str(walkup(options.file_location, relative_to))
+            return str(walkup(source, relative_to))
         except ValueError:
-            yield "?/" + options.file_location.name
+            return "?/" + source.name
+
+
+def _get_reversed_source_chain(options: LoadOptions) -> tabc.Iterator[Path]:
+    if options.previous:
+        yield from _get_reversed_source_chain(options.previous)
+
+    if options.file_location:
+        yield options.file_location
+
+
+def _stringify_source_chain(sources: tabc.Iterable[Path]) -> str:
+    return "→".join(chain(map(partial(_pretty_source, relative_to=Path().resolve(), seen=set()), sources), ("...",)))
 
 
 def is_in_chain(file: Path, options: LoadOptions) -> bool:
@@ -82,7 +88,7 @@ def is_in_chain(file: Path, options: LoadOptions) -> bool:
 
 def make_chain_message(tag: str, value: str, options: LoadOptions) -> ParsingTriedToCreateALoop:
     return ParsingTriedToCreateALoop(
-        f"`{tag} {value}` tried to load itself in chain: ({'→'.join(_get_chain_reversed(options))}→...)"
+        f"`{tag} {value}` tried to load itself in chain: ({_stringify_source_chain(_get_reversed_source_chain(options))})"
     )
 
 
