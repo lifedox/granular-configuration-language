@@ -215,9 +215,7 @@ _docn() {
     clear
     rm -rf docs/
 
-    _docgen --nitpicky 3>&2 2>&1 1>&3- |
-        grep -v -e 'optional \[ref.class\]' |
-        grep -v -e 'docstring of collections\.'
+    _docgen --nitpicky 3>&2 2>&1 1>&3-
 }
 
 cmd="$1"

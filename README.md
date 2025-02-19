@@ -10,7 +10,7 @@ See [Documentation - Getting Started](https://lifedox.github.io/granular-configu
 
 ## How to install?
 
-From [PyPi](https://pypi.org/project/granular-configuration-language/):
+From [PyPI](https://pypi.org/project/granular-configuration-language/):
 
 ```shell
 pip install granular-configuration-language
