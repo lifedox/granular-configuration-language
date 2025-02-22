@@ -1,6 +1,7 @@
 # `granular-configuration-language` – A General Purpose Configuration Utility Library
 
 [![Coverage badge](https://raw.githubusercontent.com/lifedox/granular-configuration-language/python-coverage-comment-action-data/badge.svg)](https://github.com/lifedox/granular-configuration-language/tree/python-coverage-comment-action-data) ![Testing workflow](https://github.com/lifedox/granular-configuration-language/actions/workflows/testing.yaml/badge.svg?event=push) ![codeql workflow](https://github.com/lifedox/granular-configuration-language/actions/workflows/codeql-analysis.yaml/badge.svg?event=push)
+<br>
 [![pypi](https://img.shields.io/pypi/v/granular-configuration-language.svg)](https://pypi.org/project/granular-configuration-language/) [![pypi](https://img.shields.io/pypi/pyversions/granular-configuration-language.svg)](https://pypi.org/project/granular-configuration-language/) [![pypi](https://img.shields.io/pypi/types/granular-configuration-language.svg)](https://pypi.org/project/granular-configuration-language/) [![pypi](https://img.shields.io/pypi/l/granular-configuration-language.svg)](https://pypi.org/project/granular-configuration-language/)
 
 > ⚠️ **This library is meant for trusted configuration files.** ⚠️
