@@ -15,7 +15,7 @@ jobs:
           python-version: "3.12"
       - run: pipx install poetry
       - run: poetry install
-      - run: poetry run ./run _docgen
+      - run: poetry run ./run _docs
 
       - uses: actions/upload-pages-artifact@v3
         with:
