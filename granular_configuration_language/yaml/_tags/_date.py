@@ -16,14 +16,14 @@ else:  # if sys.version_info
     date_fromisoformat = lambda value: datetime_fromisoformat(value).date()
 
 
-@string_tag(Tag("!Date"))
+@string_tag(Tag("!Date"), "Typer")
 @as_lazy
 @interpolate_value_without_ref
 def date_handler(value: str) -> date:
     return date_fromisoformat(value)
 
 
-@string_tag(Tag("!DateTime"))
+@string_tag(Tag("!DateTime"), "Typer")
 @as_lazy
 @interpolate_value_without_ref
 def datetime_handler(value: str) -> date:

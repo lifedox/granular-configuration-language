@@ -12,7 +12,7 @@ from granular_configuration_language.yaml.decorators import (
 )
 
 
-@sequence_of_any_tag(Tag("!Merge"))
+@sequence_of_any_tag(Tag("!Merge"), "Manipulator")
 @as_lazy_with_load_options
 def handler(value: tabc.Sequence[typ.Any], options: LoadOptions) -> Configuration:
     from granular_configuration_language import merge

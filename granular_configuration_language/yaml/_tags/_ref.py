@@ -10,7 +10,7 @@ from granular_configuration_language.yaml.decorators import (
 from granular_configuration_language.yaml.decorators.ref import resolve_json_ref
 
 
-@string_tag(Tag("!Ref"))
+@string_tag(Tag("!Ref"), "Manipulator")
 @as_lazy_with_root
 @interpolate_value_with_ref
 def handler(value: str, root: Root) -> str:

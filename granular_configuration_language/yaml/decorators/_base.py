@@ -12,6 +12,10 @@ from granular_configuration_language.exceptions import ErrorWhileLoadingTags
 from granular_configuration_language.yaml.classes import RT, StateHolder, T, Tag
 from granular_configuration_language.yaml.load._constructors import construct_mapping, construct_sequence
 
+Category = typ.NewType("Category", str)
+SortedAs = typ.NewType("SortedAs", str)
+FriendlyType = typ.NewType("FriendlyType", str)
+
 
 @dataclasses.dataclass(frozen=True, eq=False, slots=True, repr=False)
 class TagConstructor:
@@ -20,8 +24,14 @@ class TagConstructor:
     """
 
     tag: Tag
-    friendly_type: str
+    category: Category
+    sort_as: SortedAs
+    friendly_type: FriendlyType
     constructor: tabc.Callable[[typ.Type[SafeConstructor], StateHolder], None]
+    plugin: str = dataclasses.field(default="Unknown", init=False)
+
+    def set_plugin(self, plugin: str) -> None:
+        object.__setattr__(self, "plugin", plugin)
 
     def __eq__(self, value: object) -> bool:
         return (isinstance(value, self.__class__) and self.tag == value.tag) or (
@@ -70,13 +80,25 @@ class TagDecoratorBase(typ.Generic[T], abc.ABC):
     :py:meth:`scalar_node_transformer`, or :py:meth:`mapping_node_transformer`, as needed.
 
     The transformer is called if the associated node type check passes, just before the value is passed to tag function.
-
     """
 
-    __slots__ = ("tag",)
+    __slots__ = ("tag", "category", "sort_as")
 
-    def __init__(self, tag: Tag) -> None:
+    def __init__(self, tag: Tag, category: str = "General", *, sort_as: str | None = None) -> None:
+        """
+        :param Tag tag:
+            Value of Tag.
+            Expected to be constructed inline using :py:class:`.Tag` (e.g. ``Tag("!Tag")``).
+            Must start with ``!``.
+        :param str, optional category:
+            Category of Tag. Used by ``available_tags`` to organize tags, defaults to "General".
+        :param str, optional sort_as:
+            Alternative Tag string. Used for sorting tags different to its explict value. Used by ``available_tags``.
+        """
+
         self.tag: typ.Final = tag
+        self.category: typ.Final = Category(category)
+        self.sort_as: typ.Final = SortedAs(sort_as or tag)
 
         if not tag.startswith("!"):
             raise ErrorWhileLoadingTags(f"Tag `{tag}` error: All tags must begin with `!`.")
@@ -200,7 +222,9 @@ class TagDecoratorBase(typ.Generic[T], abc.ABC):
 
         # Don't capture self in the function generation
         tag = self.tag
-        user_friendly_type = self.user_friendly_type
+        user_friendly_type = FriendlyType(self.user_friendly_type)
+        category = self.category
+        sort_as = self.sort_as
         scalar_node_type_check = self.scalar_node_type_check
         sequence_node_type_check = self.sequence_node_type_check
         mapping_node_type_check = self.mapping_node_type_check
@@ -235,4 +259,4 @@ class TagDecoratorBase(typ.Generic[T], abc.ABC):
 
             constructor.add_constructor(tag, type_handler)
 
-        return TagConstructor(tag, user_friendly_type, add_handler)
+        return TagConstructor(tag, category, sort_as, user_friendly_type, add_handler)

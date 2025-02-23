@@ -75,13 +75,13 @@ def parse_input(load: tabc.Callable[[str, str], typ.Any], value: string_or_twopl
         return parse_env(load, *value)
 
 
-@string_or_twople_tag(Tag("!ParseEnv"))
+@string_or_twople_tag(Tag("!ParseEnv"), "Parser")
 @as_lazy_with_root_and_load_options
 def handler(value: string_or_twople_tag.Type, root: Root, options: LoadOptions) -> typ.Any:
     return parse_input(partial(load_advance, options, root), value)
 
 
-@string_or_twople_tag(Tag("!ParseEnvSafe"))
+@string_or_twople_tag(Tag("!ParseEnvSafe"), "Parser")
 @as_lazy
 def handler_safe(value: string_or_twople_tag.Type) -> typ.Any:
     return parse_input(load_safe, value)

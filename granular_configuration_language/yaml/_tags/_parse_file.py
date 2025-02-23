@@ -32,7 +32,7 @@ def _load(file: Path, options: LoadOptions, root: Root) -> typ.Any:
     return output
 
 
-@string_tag(Tag("!ParseFile"))
+@string_tag(Tag("!ParseFile"), "Parser")
 @as_lazy_with_root_and_load_options
 @interpolate_value_with_ref
 def handler(value: str, root: Root, options: LoadOptions) -> typ.Any:
@@ -41,7 +41,7 @@ def handler(value: str, root: Root, options: LoadOptions) -> typ.Any:
     return _load(file, options, root)
 
 
-@string_tag(Tag("!OptionalParseFile"))
+@string_tag(Tag("!OptionalParseFile"), "Parser", sort_as="!ParseFile1")
 @as_lazy_with_root_and_load_options
 @interpolate_value_with_ref
 def handler_optional(value: str, root: Root, options: LoadOptions) -> typ.Any:

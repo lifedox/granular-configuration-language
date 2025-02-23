@@ -13,7 +13,7 @@ def load_env(env_name: str, default: typ.Optional[str] = None) -> str:
     return get_environment_variable(env_name, default)
 
 
-@string_tag(Tag("!Env"))
+@string_tag(Tag("!Env"), "Formatter")
 @as_lazy
 def handler(value: str) -> str:
     return ENV_PATTERN.sub(lambda x: load_env(**x.groupdict()), value)

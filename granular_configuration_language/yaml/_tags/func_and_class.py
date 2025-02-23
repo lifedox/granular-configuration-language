@@ -26,7 +26,7 @@ def get_func(func_path: str) -> tabc.Callable:
         raise DoesNotExist(f"Could not load {func_path}")
 
 
-@string_tag(Tag("!Class"))
+@string_tag(Tag("!Class"), "Typer")
 @as_lazy
 @interpolate_value_without_ref
 def class_handler(value: str) -> tabc.Callable:
@@ -37,7 +37,7 @@ def class_handler(value: str) -> tabc.Callable:
         raise IsNotAClass(f"Classes loaded by !Class must pass `inspect.isclass`: `{value}` is not a class")
 
 
-@string_tag(Tag("!Func"))
+@string_tag(Tag("!Func"), "Typer")
 @as_lazy
 @interpolate_value_without_ref
 def func_handler(value: str) -> tabc.Callable:
