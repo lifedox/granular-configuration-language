@@ -57,7 +57,7 @@ def get_external_tag_plugins() -> tabc.Iterator[tuple[PluginName, ModuleName]]:
 
 
 def get_all_tag_plugins(*, disable_plugin: typ.AbstractSet[str]) -> tabc.Iterator[tuple[ModuleName, PluginName]]:
-    builtin = PluginName("<built-in>")
+    builtin = PluginName("<gcl-built-in>")
 
     for module in get_internal_tag_plugins():
         yield module, builtin

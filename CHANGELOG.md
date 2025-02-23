@@ -1,5 +1,16 @@
 # Changelog
 
+## 2.2.0
+
+### Added <!-- markdownlint-disable MD024 -->
+
+- `python -m granular_configuration_language.available_tags` is publicly usable now
+- `python -m granular_configuration_language.available_plugin`
+
+### Changed <!-- markdownlint-disable MD024 -->
+
+- Refactored `load_file` and `make_chain_message` to make testing easier
+
 ## 2.1.0
 
 ### Changed <!-- markdownlint-disable MD024 -->

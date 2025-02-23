@@ -4,7 +4,7 @@ if __name__ == "__main__":
     import operator as op
 
     from granular_configuration_language.yaml._tags import handlers
-    from granular_configuration_language.yaml.decorators._viewer import AvailableTags, can_table
+    from granular_configuration_language.yaml.decorators._viewer import AvailablePlugins, can_table
 
     choices = ["csv", "json"]
     default = "csv"
@@ -14,10 +14,10 @@ if __name__ == "__main__":
         default = "table"
 
     parser = argparse.ArgumentParser(
-        description="Shows available tags", epilog=AvailableTags(handlers).table(_force_missing=True)
+        description="Shows available plugins", epilog=AvailablePlugins(handlers).table(_force_missing=True)
     )
     parser.add_argument("type", default=default, choices=choices, nargs="?")
 
     args = parser.parse_args()
 
-    print(op.methodcaller(args.type)(AvailableTags(handlers)))
+    print(op.methodcaller(args.type)(AvailablePlugins(handlers)))

@@ -9,6 +9,7 @@ from granular_configuration_language.exceptions import ErrorWhileLoadingTags
 from granular_configuration_language.yaml._tags import handlers
 from granular_configuration_language.yaml.decorators._tag_loader import load_tags
 from granular_configuration_language.yaml.decorators._tag_set import TagSet
+from granular_configuration_language.yaml.decorators._viewer import AvailablePlugins, AvailableTags, can_table
 
 
 def test_singletonness() -> None:
@@ -66,34 +67,35 @@ def test_trying_to_override_a_tag_errors() -> None:
         TagSet((tag, tag))
 
 
-def test_csv() -> None:
+def test_available_tags_csv() -> None:
     tags = handlers.get_subset("!Del", "!UUID", "!Merge", "!Sub")
+    output = AvailableTags(tags).csv()
 
-    print(tags.csv())
+    print(output)
 
     assert (
-        tags.csv()
+        output
         == """\
-category,tag,type,interpolates,lazy,returns,handler
-Formatter,!Sub,str,full,,str,granular_configuration_language.yaml._tags._sub.handler
-Manipulator,!Del,str,,NOT_LAZY,str,granular_configuration_language.yaml._tags._del.handler
-Manipulator,!Merge,list[Any],,,Configuration,granular_configuration_language.yaml._tags._merge.handler
-Typer,!UUID,str,reduced,,UUID,granular_configuration_language.yaml._tags._uuid.handler"""
+category,tag,type,interpolates,lazy,returns
+Formatter,!Sub,str,full,,str
+Manipulator,!Del,str,,NOT_LAZY,str
+Manipulator,!Merge,list[Any],,,Configuration
+Typer,!UUID,str,reduced,,UUID"""
     )
 
 
-def test_json() -> None:
+def test_available_tags_json() -> None:
     tags = handlers.get_subset("!Del", "!UUID", "!Merge", "!Sub")
+    output = AvailableTags(tags).json()
 
-    print(tags.json())
+    print(output)
 
     assert (
-        tags.json()
+        output
         == """\
 {
   "Formatter": {
     "!Sub": {
-      "handler": "granular_configuration_language.yaml._tags._sub.handler",
       "interpolates": "full",
       "lazy": "",
       "returns": "str",
@@ -102,14 +104,12 @@ def test_json() -> None:
   },
   "Manipulator": {
     "!Del": {
-      "handler": "granular_configuration_language.yaml._tags._del.handler",
       "interpolates": "",
       "lazy": "NOT_LAZY",
       "returns": "str",
       "type": "str"
     },
     "!Merge": {
-      "handler": "granular_configuration_language.yaml._tags._merge.handler",
       "interpolates": "",
       "lazy": "",
       "returns": "Configuration",
@@ -118,7 +118,6 @@ def test_json() -> None:
   },
   "Typer": {
     "!UUID": {
-      "handler": "granular_configuration_language.yaml._tags._uuid.handler",
       "interpolates": "reduced",
       "lazy": "",
       "returns": "UUID",
@@ -129,28 +128,28 @@ def test_json() -> None:
     )
 
 
-def test_table() -> None:
+def test_available_tags_table() -> None:
     tags = handlers.get_subset("!Del", "!UUID", "!Merge", "!Sub")
-    output = tags.table()
+    output = AvailableTags(tags).table()
 
     print(output)
 
-    if tags.can_table:
+    if can_table:
         assert (
             output
             == """\
-category     tag     type       interpolates    lazy      returns        handler
------------  ------  ---------  --------------  --------  -------------  ---------------------------------------------------------
-Formatter    !Sub    str        full                      str            granular_configuration_language.yaml._tags._sub.handler
-Manipulator  !Del    str                        NOT_LAZY  str            granular_configuration_language.yaml._tags._del.handler
-Manipulator  !Merge  list[Any]                            Configuration  granular_configuration_language.yaml._tags._merge.handler
-Typer        !UUID   str        reduced                   UUID           granular_configuration_language.yaml._tags._uuid.handler"""
+category     tag     type       interpolates    lazy      returns
+-----------  ------  ---------  --------------  --------  -------------
+Formatter    !Sub    str        full                      str
+Manipulator  !Del    str                        NOT_LAZY  str
+Manipulator  !Merge  list[Any]                            Configuration
+Typer        !UUID   str        reduced                   UUID"""
         )
 
 
 def test_table_missing() -> None:
     tags = handlers.get_subset("!Del", "!UUID", "!Merge", "!Sub")
-    output = tags.table(_force_missing=True)
+    output = AvailableTags(tags).table(_force_missing=True)
 
     print(output)
 
@@ -160,3 +159,79 @@ def test_table_missing() -> None:
 The "table" option requires `tabulate` to be installed.
 You can use the "printing" extra to install the needed dependencies"""
     )
+
+
+def test_available_plugins_csv() -> None:
+    tags = handlers.get_subset("!Func", "!UUID", "!Merge", "!Mask")
+    output = AvailablePlugins(tags).csv()
+
+    print(output)
+
+    assert (
+        output
+        == """\
+plugin,category,tag,handler
+<gcl-built-in>,Manipulator,!Merge,granular_configuration_language.yaml._tags._merge.handler
+<gcl-built-in>,Typer,!Mask,granular_configuration_language.yaml._tags._mask.handler
+<gcl-built-in>,Typer,!UUID,granular_configuration_language.yaml._tags._uuid.handler
+official_extra,Typer,!Func,granular_configuration_language.yaml._tags.func_and_class.func_handler"""
+    )
+
+
+def test_available_plugins_json() -> None:
+    tags = handlers.get_subset("!Func", "!UUID", "!Merge", "!Mask")
+    output = AvailablePlugins(tags).json()
+
+    print(output)
+
+    assert (
+        output
+        == """\
+{
+  "<gcl-built-in>": {
+    "Manipulator": {
+      "!Merge": {
+        "handler": "granular_configuration_language.yaml._tags._merge.handler",
+        "plugin": "<gcl-built-in>"
+      }
+    },
+    "Typer": {
+      "!Mask": {
+        "handler": "granular_configuration_language.yaml._tags._mask.handler",
+        "plugin": "<gcl-built-in>"
+      },
+      "!UUID": {
+        "handler": "granular_configuration_language.yaml._tags._uuid.handler",
+        "plugin": "<gcl-built-in>"
+      }
+    }
+  },
+  "official_extra": {
+    "Typer": {
+      "!Func": {
+        "handler": "granular_configuration_language.yaml._tags.func_and_class.func_handler",
+        "plugin": "official_extra"
+      }
+    }
+  }
+}"""
+    )
+
+
+def test_available_plugins_table() -> None:
+    tags = handlers.get_subset("!Func", "!UUID", "!Merge", "!Mask")
+    output = AvailablePlugins(tags).table()
+
+    print(output)
+
+    if can_table:
+        assert (
+            output
+            == """\
+plugin          category     tag     handler
+--------------  -----------  ------  ----------------------------------------------------------------------
+<gcl-built-in>  Manipulator  !Merge  granular_configuration_language.yaml._tags._merge.handler
+<gcl-built-in>  Typer        !Mask   granular_configuration_language.yaml._tags._mask.handler
+<gcl-built-in>  Typer        !UUID   granular_configuration_language.yaml._tags._uuid.handler
+official_extra  Typer        !Func   granular_configuration_language.yaml._tags.func_and_class.func_handler"""
+        )

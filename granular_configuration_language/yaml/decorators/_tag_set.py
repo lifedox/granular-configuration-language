@@ -1,53 +1,11 @@
 from __future__ import annotations
 
 import collections.abc as tabc
-import inspect
-import itertools
-import operator as op
 import typing as typ
 from collections import OrderedDict
 
 from granular_configuration_language.exceptions import ErrorWhileLoadingTags
 from granular_configuration_language.yaml.decorators._base import Tag, TagConstructor
-from granular_configuration_language.yaml.decorators._tag_tracker import is_not_lazy, is_with_ref, is_without_ref
-
-try:
-    import tabulate
-except ImportError:  # pragma: no cover
-    tabulate = None  # type: ignore
-
-Imode = typ.Literal["full"] | typ.Literal["reduced"] | typ.Literal[""]
-
-
-class RowType(typ.TypedDict, total=False):
-    category: str
-    tag: str
-    type: str
-    interpolates: Imode
-    lazy: typ.Literal["NOT_LAZY"] | typ.Literal[""]
-    returns: str
-    handler: str
-
-
-def _interpolates(tc: TagConstructor) -> Imode:
-    if is_with_ref(tc.constructor):
-        return "full"
-    elif is_without_ref(tc.constructor):
-        return "reduced"
-    else:
-        return ""
-
-
-def _make_row(tc: TagConstructor) -> RowType:
-    return RowType(
-        category=tc.category,
-        tag=tc.tag,
-        type=tc.friendly_type,
-        interpolates=_interpolates(tc),
-        lazy="NOT_LAZY" if is_not_lazy(tc.constructor) else "",
-        returns=str(inspect.signature(tc.constructor).return_annotation).removeprefix("typ.").removeprefix("tabc."),
-        handler=tc.constructor.__module__ + "." + tc.constructor.__name__,
-    )
 
 
 class TagSet(tabc.Iterable[TagConstructor], typ.Container[str]):
@@ -85,49 +43,3 @@ class TagSet(tabc.Iterable[TagConstructor], typ.Container[str]):
                     yield tag
 
         return TagSet(subset())
-
-    @property
-    def headers(self) -> OrderedDict[str, str]:
-        return OrderedDict(zip(*itertools.tee(typ.get_type_hints(RowType).keys(), 2)))
-
-    def get_rows(self) -> tabc.Iterator[RowType]:
-        return map(_make_row, sorted(self, key=op.attrgetter("category", "sort_as")))
-
-    @property
-    def can_table(self) -> bool:
-        return bool(tabulate)
-
-    def table(self, *, _force_missing: bool = False) -> str:
-        if tabulate and not _force_missing:
-            return tabulate.tabulate(self.get_rows(), headers=self.headers)
-        else:
-            return """\
-The "table" option requires `tabulate` to be installed.
-You can use the "printing" extra to install the needed dependencies"""
-
-    def csv(self) -> str:
-        import csv
-        import io
-
-        with io.StringIO(newline="") as output:
-            writer = csv.DictWriter(output, self.headers.keys(), lineterminator="\n")
-            writer.writeheader()
-            writer.writerows(self.get_rows())
-            return output.getvalue()[:-1]
-
-    def json(self) -> str:
-        import json
-
-        def strip_tag(row: RowType) -> tuple[str, RowType]:
-            tag = row.pop("tag")
-            del row["category"]
-            return tag, row
-
-        def handle_group(category: str, group: tabc.Iterator[RowType]) -> tuple[str, dict[str, RowType]]:
-            return category, dict(map(strip_tag, group))
-
-        return json.dumps(
-            dict(itertools.starmap(handle_group, itertools.groupby(self.get_rows(), key=op.itemgetter("category")))),
-            sort_keys=True,
-            indent=2,
-        )
