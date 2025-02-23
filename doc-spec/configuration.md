@@ -10,6 +10,7 @@ The following environment variables are used as configuration for this library:
   - **Input:** Comma-delimited list of plugin names
   - **Description:** Disables tags provided by the selected plugins.
   - Use [`available_plugins`](#viewing-available-plugins) to view plugins
+  - Internal tags cannot be disabled as a plugin.
 - `G_CONFIG_DISABLE_TAGS`
   - **Input:** Comma-delimited list of tag names
   - **Description:** Disables the selected tags.
@@ -22,15 +23,23 @@ The following environment variables are used as configuration for this library:
 
 ### Viewing Available Tags
 
-This script lists the available tags and the properties in each tag.
+This script prints the available tags and the properties in each tag.
 
 This script is affected by [`G_CONFIG_DISABLE_PLUGINS`](#environment-variables) and [`G_CONFIG_DISABLE_TAGS`](#environment-variables).
 
 #### Command
 
 ```shell
-python -m granular_configuration_language.available_tags --help
+python -m granular_configuration_language.available_tags
 ```
+
+#### Options
+
+- `csv`: Output is formatted as a csv table.
+  - Default, if `table` is not available.
+- `json`: Output is JSON-mapping.
+- `table`: Output is pretty table.
+  - Requires `tabulate` to be available. Default, if available.
 
 #### Usage
 
@@ -56,6 +65,19 @@ When `tabulate` is installed, the default option is `table`, otherwise `csv`.
 ```shell
 pip install 'granular-configuration-language[printing]'
 ```
+
+#### Headers
+
+- `category`: Category of the Tag
+- `tag`: Name of the Tag
+- `type`: Argument type
+  - Value comes from {py:meth}`TagDecoratorBase.user_friendly_type <granular_configuration_language.yaml.decorators.TagDecoratorBase.user_friendly_type>`.
+- `interpolates`: Specifies if the tags interpolates
+  - `full` - Tags uses {py:func}`.interpolate_value_with_ref`
+  - `reduced` - Tags uses {py:func}`.interpolate_value_without_ref`
+- `lazy` - Specifies if the tags is lazy.
+  - `NOT_LAZY` - Tags uses {py:func}`.as_not_lazy`
+- `returns` - Type annotation of the return of function that implements that Tag
 
 #### Sample Output (using `table` mode)
 
@@ -85,15 +107,23 @@ Undoc-ed     !Dict               dict[Any, Any]                                 
 
 ### Viewing Available Plugins
 
-This script lists the available plugins, what tags are included with the plugins, and where the implementation of the Tag is.
+This script prints the available plugins, what tags are included with the plugins, and where the implementation of the Tag is.
 
 This script is affected by [`G_CONFIG_DISABLE_PLUGINS`](#environment-variables) and [`G_CONFIG_DISABLE_TAGS`](#environment-variables).
 
 #### Command
 
 ```shell
-python -m granular_configuration_language.available_plugins -h
+python -m granular_configuration_language.available_plugins
 ```
+
+#### Options
+
+- `csv`: Output is formatted as a csv table.
+  - Default, if `table` is not available.
+- `json`: Output is JSON-mapping.
+- `table`: Output is pretty table.
+  - Requires `tabulate` to be available. Default, if available.
 
 #### Usage
 
@@ -119,6 +149,14 @@ When `tabulate` is installed, the default option is `table`, otherwise `csv`.
 ```shell
 pip install 'granular-configuration-language[printing]'
 ```
+
+#### Headers
+
+- `plugin`: Plugin name
+  - `<gcl-built-in>` represents internal tags
+- `category`: Category of the Tag
+- `tag`: Tag Name
+- `handler`: function that implements that Tag.
 
 #### Sample Output (using `table` mode)
 
