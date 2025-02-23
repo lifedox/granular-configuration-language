@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import collections.abc as tabc
 import os
 from unittest.mock import patch
 
@@ -8,7 +7,8 @@ import pytest
 
 from granular_configuration_language.exceptions import ErrorWhileLoadingTags
 from granular_configuration_language.yaml._tags import handlers
-from granular_configuration_language.yaml.decorators._tag_loader import TagConstructor, TagSet, load_tags
+from granular_configuration_language.yaml.decorators._tag_loader import load_tags
+from granular_configuration_language.yaml.decorators._tag_set import TagSet
 
 
 def test_singletonness() -> None:
@@ -66,59 +66,97 @@ def test_trying_to_override_a_tag_errors() -> None:
         TagSet((tag, tag))
 
 
-def test_pretty() -> None:
-    select = ("!Del", "!UUID", "!Merge", "!Sub")
+def test_csv() -> None:
+    tags = handlers.get_subset("!Del", "!UUID", "!Merge", "!Sub")
 
-    def subset(tags: tabc.Iterable[TagConstructor]) -> tabc.Iterator[TagConstructor]:
-        for tag in tags:
-            if tag.tag in select:
-                yield tag
-
-    tags = TagSet(subset(handlers))
-
-    print(tags.pretty())
-    print("---")
-    print(tags.pretty(as_json=True))
+    print(tags.csv())
 
     assert (
-        tags.pretty()
+        tags.csv()
         == """\
-TagSet{
-  '!Del': 'str [NOT-LAZY] (granular_configuration_language.yaml._tags._del.handler) `str`',
-  '!Merge': 'list[Any] (granular_configuration_language.yaml._tags._merge.handler) `Configuration`',
-  '!Sub': 'str [interpolates] (granular_configuration_language.yaml._tags._sub.handler) `str`',
-  '!UUID': 'str [interpolates-reduced] (granular_configuration_language.yaml._tags._uuid.handler) `UUID`'
-}"""
+category,tag,type,interpolates,lazy,returns,handler
+Formatter,!Sub,str,full,,str,granular_configuration_language.yaml._tags._sub.handler
+Manipulator,!Del,str,,NOT_LAZY,str,granular_configuration_language.yaml._tags._del.handler
+Manipulator,!Merge,list[Any],,,Configuration,granular_configuration_language.yaml._tags._merge.handler
+Typer,!UUID,str,reduced,,UUID,granular_configuration_language.yaml._tags._uuid.handler"""
     )
+
+
+def test_json() -> None:
+    tags = handlers.get_subset("!Del", "!UUID", "!Merge", "!Sub")
+
+    print(tags.json())
+
     assert (
-        tags.pretty(as_json=True)
+        tags.json()
         == """\
-TagSet{
-  "!Del": {
-    "input": "str",
-    "notes": [
-      "NOT-LAZY"
-    ],
-    "output": "'str'"
+{
+  "Formatter": {
+    "!Sub": {
+      "handler": "granular_configuration_language.yaml._tags._sub.handler",
+      "interpolates": "full",
+      "lazy": "",
+      "returns": "str",
+      "type": "str"
+    }
   },
-  "!Merge": {
-    "input": "list[Any]",
-    "notes": [],
-    "output": "'Configuration'"
+  "Manipulator": {
+    "!Del": {
+      "handler": "granular_configuration_language.yaml._tags._del.handler",
+      "interpolates": "",
+      "lazy": "NOT_LAZY",
+      "returns": "str",
+      "type": "str"
+    },
+    "!Merge": {
+      "handler": "granular_configuration_language.yaml._tags._merge.handler",
+      "interpolates": "",
+      "lazy": "",
+      "returns": "Configuration",
+      "type": "list[Any]"
+    }
   },
-  "!Sub": {
-    "input": "str",
-    "notes": [
-      "interpolates"
-    ],
-    "output": "'str'"
-  },
-  "!UUID": {
-    "input": "str",
-    "notes": [
-      "interpolates-reduced"
-    ],
-    "output": "'UUID'"
+  "Typer": {
+    "!UUID": {
+      "handler": "granular_configuration_language.yaml._tags._uuid.handler",
+      "interpolates": "reduced",
+      "lazy": "",
+      "returns": "UUID",
+      "type": "str"
+    }
   }
 }"""
+    )
+
+
+def test_table() -> None:
+    tags = handlers.get_subset("!Del", "!UUID", "!Merge", "!Sub")
+    output = tags.table()
+
+    print(output)
+
+    if tags.can_table:
+        assert (
+            output
+            == """\
+category     tag     type       interpolates    lazy      returns        handler
+-----------  ------  ---------  --------------  --------  -------------  ---------------------------------------------------------
+Formatter    !Sub    str        full                      str            granular_configuration_language.yaml._tags._sub.handler
+Manipulator  !Del    str                        NOT_LAZY  str            granular_configuration_language.yaml._tags._del.handler
+Manipulator  !Merge  list[Any]                            Configuration  granular_configuration_language.yaml._tags._merge.handler
+Typer        !UUID   str        reduced                   UUID           granular_configuration_language.yaml._tags._uuid.handler"""
+        )
+
+
+def test_table_missing() -> None:
+    tags = handlers.get_subset("!Del", "!UUID", "!Merge", "!Sub")
+    output = tags.table(_force_missing=True)
+
+    print(output)
+
+    assert (
+        output
+        == """\
+The "table" option requires `tabulate` to be installed.
+You can use the "printing" extra to install the needed dependencies"""
     )
