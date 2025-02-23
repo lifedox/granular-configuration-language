@@ -17,11 +17,11 @@ COPY --chown=granular:granular pyproject.toml poetry.lock README.md /app/
 
 WORKDIR /app
 
-RUN poetry install --no-root
+RUN poetry install --no-root --all-extras
 
 # For testing entry-points/plugins, an install is needed
 # Doing it seperating from the --no-rooot install to have Docker cache the virtualenv
 # and then quickly append the dist-info every change
 COPY --chown=granular:granular granular_configuration_language/ /app/granular_configuration_language/
 
-RUN poetry install
+RUN poetry install --all-extras

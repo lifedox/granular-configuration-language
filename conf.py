@@ -65,7 +65,6 @@ myst_heading_anchors = 7
 
 nitpicky = True
 nitpick_ignore = [
-    # ("py:class", "TypeAliasForwardRef"),
     ("py:class", "optional"),
     # From from collections.abc
     ("py:class", "(k, v), remove and return some (key, value) pair"),
@@ -78,3 +77,9 @@ nitpick_ignore = [
     ("py:class", "None.  Update D from mapping/iterable E and F."),
     ("py:class", "v, remove specified key and return the corresponding value."),
 ]
+
+# Patching that makes sphinx 8.2.0 and 8.2.1 work
+
+from sphinx.util import inspect  # noqa: E402
+
+inspect.TypeAliasForwardRef.__repr__ = lambda self: self.name  # type: ignore
