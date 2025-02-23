@@ -18,7 +18,7 @@ Example `pyproject.toml` entry:
 ```
 
 - `official_extra` is the name of the plugin.
-  - `G_CONFIG_DISABLE_PLUGINS` uses this name.
+  - [`G_CONFIG_DISABLE_PLUGINS`](configuration.md#environment-variables) uses this name.
   - No whitespace in names.
 - `granular_configuration_language.yaml._tags.func_and_class` is the module searched for Tags.
   - Please keep this import lightweight.

@@ -91,11 +91,10 @@ class TagDecoratorBase(typ.Generic[T], abc.ABC):
             Expected to be constructed inline using :py:class:`.Tag` (e.g. ``Tag("!Tag")``).
             Must start with ``!``.
         :param str, optional category:
-            Category of Tag. Used by ``available_tags`` to organize tags, defaults to "General".
+            Category of Tag. Used by :ref:`available_tags <available_tags>` and :ref:`available_plugins <available_plugins>` to organize tags, defaults to ``General``.
         :param str, optional sort_as:
-            Alternative Tag string. Used for sorting tags different to its explict value. Used by ``available_tags``.
+            Alternative Tag string. Used for sorting tags different to its explict value. Used by :ref:`available_tags <available_tags>` and :ref:`available_plugins <available_plugins>`.
         """
-
         self.tag: typ.Final = tag
         self.category: typ.Final = Category(category)
         self.sort_as: typ.Final = SortedAs(sort_as or tag)

@@ -19,6 +19,7 @@ exclude_patterns = ["_build", "Thumbs.db", ".DS_Store", "doc_gen", "README_old.m
 extensions = [
     "sphinx_rtd_dark_mode",
     "myst_parser",
+    "sphinx_copybutton",
     "sphinx.ext.autodoc",
     # "sphinx.ext.doctest",
     "sphinx.ext.intersphinx",

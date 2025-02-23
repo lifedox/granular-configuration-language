@@ -15,7 +15,7 @@
 
 ## Summary Table
 
-````{list-table}
+```{list-table}
 :header-rows: 1
 :align: center
 
@@ -95,7 +95,7 @@
   - [`!UUID`](#uuid) [ⁱ](#interpolates-reduced)
   - `str`
   - `!UUID 9d7130a6-{...}-29f0b765be9e`
-````
+```
 
 <a id="interpolates-full"></a>ⁱ⁺: Supports full interpolation syntax of [`!Sub`](#sub).
 <br> <!--Looks good in GitHub-->
@@ -249,6 +249,8 @@ user: *user_id
 
 ---
 
+(tag-placeholder)=
+
 ### `!Placeholder`
 
 ```yaml
@@ -397,6 +399,8 @@ function: !Func functool.reduce
   - Returned object pass {py:func}`callable` test.
 
 ---
+
+(tag-mask)=
 
 ### `!Mask`
 

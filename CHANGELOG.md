@@ -1,19 +1,21 @@
 # Changelog
 
+<!-- markdownlint-disable-file MD024 -->
+
 ## 2.2.0
 
-### Added <!-- markdownlint-disable MD024 -->
+### Added
 
 - `python -m granular_configuration_language.available_tags` is publicly usable now
 - `python -m granular_configuration_language.available_plugin`
 
-### Changed <!-- markdownlint-disable MD024 -->
+### Changed
 
 - Refactored `load_file` and `make_chain_message` to make testing easier
 
 ## 2.1.0
 
-### Changed <!-- markdownlint-disable MD024 -->
+### Changed
 
 - `!ParseFile`, `!OptionalParseFile`, and `ParseEnv` will now actively check if there is a loading loop and throw `ParsingTriedToCreateALoop`.
   - Previously, this could result in unexpected behaviors, `RecursionError`, or infinite loops and was not explicitly support and warned against.
@@ -57,7 +59,7 @@
   - `JSONPathMustStartFromRoot` → `RefMustStartFromRoot`
 - Previously, YAML Mappings could not override non-Mappings. This has been changed to be more consistent with merge outcomes being "to merge" or "to replace".
 
-### Changed <!-- markdownlint-disable MD024 -->
+### Changed
 
 - Switched from `PyYAML` to `ruamel.yaml`
   - Note: `PyYAML` is very dead
@@ -82,7 +84,7 @@
   - `JSONPathMustStartFromRoot` → `RefMustStartFromRoot`
 - (_internal detail_) `LazyEval.run()` usage replaced with `LazyEval.result`
 
-### Added <!-- markdownlint-disable MD024 -->
+### Added
 
 - Add JSON Pointer support where JSON Path is supported.
 - Added the following tags:
@@ -105,12 +107,12 @@
 - `Configuration` using `typing.dataclass_transform` to support typed attributes.
   - `Configuration.as_typed` and `LazyLoadConfiguration.as_typed` added enable typing.
 
-### Fixed <!-- markdownlint-disable MD024 -->
+### Fixed
 
 - (_internal detail_) Fixed `LazyEval` making copies of `Root`
   - Note: Copying with `LazyEval` still links copies unexpectedly. Now, it is just always connected to the original root (immutability is default now, so only copy immutable configurations).
 
-### Removed <!-- markdownlint-disable MD024 -->
+### Removed
 
 - Removed `set_config` pattern
 - Removed INI support
@@ -118,19 +120,19 @@
 
 ## 1.8.0
 
-### Changed <!-- markdownlint-disable MD024 -->
+### Changed
 
 - Adds `!Sub` Tag
 
 ## 1.5.0
 
-### Changed <!-- markdownlint-disable MD024 -->
+### Changed
 
 - Adds `!ParseEnv` Tag
 
 ## 1.4.0
 
-### Changed <!-- markdownlint-disable MD024 -->
+### Changed
 
 - Adds `InvalidBasePathException` as an exception that can be thrown during the load phase of `LazyLoadConfiguration`.
   - This subclasses `KeyError` maintaining compatibility with the state before this exception.
@@ -138,13 +140,13 @@
 
 ## 1.3.1
 
-### Changed <!-- markdownlint-disable MD024 -->
+### Changed
 
 - Adds clear_config
 
 ## 1.3
 
-### Changed <!-- markdownlint-disable MD024 -->
+### Changed
 
 - Adds string path support to `LazyLoadConfiguration`
 - Adds `set_config`/`get_config` pattern
@@ -152,13 +154,13 @@
 
 ## 1.2
 
-### Changed <!-- markdownlint-disable MD024 -->
+### Changed
 
 - Adding INI support
 
 ## 1.1
 
-### Changed <!-- markdownlint-disable MD024 -->
+### Changed
 
 - Adds `!Placeholder` Tag
 - Makes tags evaluate lazily (i.e. at first use)
