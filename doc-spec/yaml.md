@@ -15,25 +15,87 @@
 
 ## Summary Table
 
-<!--If you are reading this markdown raw with word wrap, this table is not for you. See the list based documentation for an easier read.-->
+````{list-table}
+:header-rows: 1
+:align: center
 
-|                 Category                 |                                      Tag                                       |           Argument           |                                                                                                            Usage                                                                                                            |
-| :--------------------------------------: | :----------------------------------------------------------------------------: | :--------------------------: | :-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------: |
-| [**String <br> Formatter**](#formatters) |                    [`!Sub`](#sub) [ⁱ⁺](#interpolates-full)                     |            `str`             | `!Sub ${ENVIRONMENT_VARIABLE}` <br> `!Sub ${ENVIRONMENT_VAR:-default value}` <br> `!Sub ${$.JSON.Path.expression}` <br> `!Sub ${/JSON/Pointer/expression}` <br> `!Sub ${$}` <br> `!Sub ${&#x24;&#x7B; Escaped HTML &#x7D;}` |
-|     [**Manipulator**](#manipulators)     |                                 [`!Del`](#del)                                 |            `str`             |                                                                                                      `!Del key: value`                                                                                                      |
-|                                          |                               [`!Merge`](#merge)                               |      `list[dict\|None]`      |                                                                                      `!Merge`<br>`- key1: value1`<br>`- key2: value2`                                                                                       |
-|                                          |                         [`!Placeholder`](#placeholder)                         |            `str`             |                                                                                               `!Placeholder helpful message`                                                                                                |
-|                                          |                    [`!Ref`](#ref) [ⁱ⁺](#interpolates-full)                     |            `str`             |                                                                             `!Ref $.JSON.Path.expression}` <br> `!Ref /JSON/Pointer/expression`                                                                             |
-|          [**Parser**](#parsers)          |                     [`!ParseEnv`](#parseenv--parseenvsafe)                     | `str \|`<br>`tuple[str,Any]` |                                                                          `!ParseEnv ENVIRONMENT_VARIABLE` <br> `!ParseEnv ["ENVIRONMENT_VAR", 42]`                                                                          |
-|                                          |                   [`!ParseEnvSafe`](#parseenv--parseenvsafe)                   | `str \|`<br>`tuple[str,Any]` |                                                                      `!ParseEnvSafe ENVIRONMENT_VARIABLE` <br> `!ParseEnvSafe ["ENVIRONMENT_VAR", 42]`                                                                      |
-|                                          |     [`!ParseFile`](#parsefile--optionalparsefile) [ⁱ⁺](#interpolates-full)     |            `str`             |                                                                                               `!ParseFile relative/path.yaml`                                                                                               |
-|                                          | [`!OptionalParseFile`](#parsefile--optionalparsefile) [ⁱ⁺](#interpolates-full) |            `str`             |                                                                                             `!OptionalParseFile optional.yaml`                                                                                              |
-|           [**Typer**](#typers)           |                 [`!Class`](#class) [ⁱ](#interpolates-reduced)                  |            `str`             |                                                                                                     `!Class uuid.UUID`                                                                                                      |
-|                                          |                  [`!Date`](#date) [ⁱ](#interpolates-reduced)                   |            `str`             |                                                                                                     `!Date 1988-12-28`                                                                                                      |
-|                                          |              [`!DateTime`](#datetime) [ⁱ](#interpolates-reduced)               |            `str`             |                                                                              `!Date 1988-12-28T23:38:00-0600` <br> `!Date 2019-18-17T16:15:14`                                                                              |
-|                                          |                  [`!Func`](#func) [ⁱ](#interpolates-reduced)                   |            `str`             |                                                                                                  `!Func functools.reduce`                                                                                                   |
-|                                          |                  [`!Mask`](#mask) [ⁱ](#interpolates-reduced)                   |            `str`             |                                                                                                      `!Mask ${SECRET}`                                                                                                      |
-|                                          |                  [`!UUID`](#uuid) [ⁱ](#interpolates-reduced)                   |            `str`             |                                                                                             `!UUID 9d7130a6-{...}-29f0b765be9e`                                                                                             |
+* - Category
+  - Tag
+  - Argument
+  - Usage
+* - [**Formatters**](#formatters)
+  - [`!Sub`](#sub) [ⁱ⁺](#interpolates-full)
+  - `str`
+  - `!Sub ${ENVIRONMENT_VARIABLE}` <br>
+    `!Sub ${ENVIRONMENT_VAR:-default value}` <br>
+    `!Sub ${$.JSON.Path.expression}` <br>
+    `!Sub ${/JSON/Pointer/expression}` <br>
+    `!Sub ${$}` <br> `!Sub ${&#x24;&#x7B; Escaped HTML &#x7D;}`
+* - [**Manipulators**](#manipulators)
+  -  [`!Del`](#del)
+  - `str`
+  - `!Del key: value`
+* -
+  - [`!Merge`](#merge)
+  - `list[dict|None]`
+  - `!Merge` <br>
+    `  - key1: value1` <br>
+    `  - key2: value2`
+* -
+  - [`!Placeholder`](#placeholder)
+  - `str`
+  - `!Placeholder helpful message`
+* -
+  - [`!Ref`](#ref) [ⁱ⁺](#interpolates-full)
+  - `str`
+  - `!Ref $.JSON.Path.expression` <br>
+    `!Ref /JSON/Pointer/expression`
+* - [**Parsers**](#parsers)
+  - [`!ParseEnv`](#parseenv--parseenvsafe)
+  - `str |` <br>
+    `tuple[str,Any]`
+  - `!ParseEnv ENVIRONMENT_VARIABLE` <br>
+    `!ParseEnv ["ENVIRONMENT_VAR", 42]`
+* -
+  - [`!ParseEnvSafe`](#parseenv--parseenvsafe)
+  - `str |` <br>
+    `tuple[str,Any]`
+  - `!ParseEnvSafe ENVIRONMENT_VARIABLE` <br>
+    `!ParseEnvSafe ["ENVIRONMENT_VAR", 42]`
+* -
+  - [`!ParseFile`](#parsefile--optionalparsefile) [ⁱ⁺](#interpolates-full)
+  - `str`
+  - `!ParseFile relative/path.yaml`
+* -
+  - [`!OptionalParseFile`](#parsefile--optionalparsefile) [ⁱ⁺](#interpolates-full)
+  - `str`
+  - `!OptionalParseFile optional.yaml`
+* - [**Typers**](#typers)
+  - [`!Class`](#class) [ⁱ](#interpolates-reduced)
+  - `str`
+  - `!Class uuid.UUID`
+* -
+  - [`!Date`](#date) [ⁱ](#interpolates-reduced)
+  - `str`
+  - `!Date 1988-12-28`
+* -
+  - [`!DateTime`](#datetime) [ⁱ](#interpolates-reduced)
+  - `str`
+  - `!Date 1988-12-28T23:38:00-0600` <br>
+    `!Date 2019-18-17T16:15:14`
+* -
+  - [`!Func`](#func) [ⁱ](#interpolates-reduced)
+  - `str`
+  - `!Func functools.reduce`
+* -
+  - [`!Mask`](#mask) [ⁱ](#interpolates-reduced)
+  - `str`
+  - `!Mask ${SECRET}`
+* -
+  - [`!UUID`](#uuid) [ⁱ](#interpolates-reduced)
+  - `str`
+  - `!UUID 9d7130a6-{...}-29f0b765be9e`
+````
 
 <a id="interpolates-full"></a>ⁱ⁺: Supports full interpolation syntax of [`!Sub`](#sub).
 <br> <!--Looks good in GitHub-->

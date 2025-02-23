@@ -13,3 +13,4 @@
     :show-inheritance:
     :member-order: groupwise
     :exclude-members: LoadOptions, Root, TagDecoratorBase
+    :inherited-members: TagDecoratorBase
