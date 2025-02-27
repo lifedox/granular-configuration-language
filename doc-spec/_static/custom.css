@@ -9,7 +9,6 @@
   width: fit-content;
 }
 
-
 /* Adding arrow to collapsible */
 
 summary {
@@ -23,18 +22,22 @@ summary::-webkit-details-marker {
   display: None;
 }
 
+/* url = chevron-down-solid.svg */
 summary::after {
   content: "";
   padding: 15px 10px 10px 10px;
-  background: url(chevron-down-solid.svg) no-repeat;
+  background: url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA1MTIgNTEyIj48IS0tIUZvbnQgQXdlc29tZSBGcmVlIDYuNy4yIGJ5IEBmb250YXdlc29tZSAtIGh0dHBzOi8vZm9udGF3ZXNvbWUuY29tIExpY2Vuc2UgLSBodHRwczovL2ZvbnRhd2Vzb21lLmNvbS9saWNlbnNlL2ZyZWUgQ29weXJpZ2h0IDIwMjUgRm9udGljb25zLCBJbmMuLS0+PHBhdGggZmlsbD0iI2ZmZmZmZiIgZD0iTTIzMy40IDQwNi42YzEyLjUgMTIuNSAzMi44IDEyLjUgNDUuMyAwbDE5Mi0xOTJjMTIuNS0xMi41IDEyLjUtMzIuOCAwLTQ1LjNzLTMyLjgtMTIuNS00NS4zIDBMMjU2IDMzOC43IDg2LjYgMTY5LjRjLTEyLjUtMTIuNS0zMi44LTEyLjUtNDUuMyAwcy0xMi41IDMyLjggMCA0NS4zbDE5MiAxOTJ6Ii8+PC9zdmc+")
+    no-repeat;
   background-size: 18px;
   float: right;
 }
 
+/* url = chevron-down-up.svg */
 details[open] summary:after {
   content: "";
   padding: 15px 10px 10px 10px;
-  background: url(chevron-up-solid.svg) no-repeat;
+  background: url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA1MTIgNTEyIj48IS0tIUZvbnQgQXdlc29tZSBGcmVlIDYuNy4yIGJ5IEBmb250YXdlc29tZSAtIGh0dHBzOi8vZm9udGF3ZXNvbWUuY29tIExpY2Vuc2UgLSBodHRwczovL2ZvbnRhd2Vzb21lLmNvbS9saWNlbnNlL2ZyZWUgQ29weXJpZ2h0IDIwMjUgRm9udGljb25zLCBJbmMuLS0+PHBhdGggZmlsbD0iI2ZmZmZmZiIgZD0iTTIzMy40IDEwNS40YzEyLjUtMTIuNSAzMi44LTEyLjUgNDUuMyAwbDE5MiAxOTJjMTIuNSAxMi41IDEyLjUgMzIuOCAwIDQ1LjNzLTMyLjggMTIuNS00NS4zIDBMMjU2IDE3My4zIDg2LjYgMzQyLjZjLTEyLjUgMTIuNS0zMi44IDEyLjUtNDUuMyAwcy0xMi41LTMyLjggMC00NS4zbDE5Mi0xOTJ6Ii8+PC9zdmc+")
+    no-repeat;
   background-size: 18px;
   float: right;
 }

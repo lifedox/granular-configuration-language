@@ -106,7 +106,8 @@ class Configuration(tabc.Mapping[typ.Any, typ.Any]):
 
         typed = LazyLoadConfiguration("config.yaml").as_typed(Config)
 
-    .. tip::
+    .. admonition:: Notice
+        :class: tip
 
         You should use :py:meth:`LazyLoadConfiguration.as_typed` to load as a
         typed :py:class:`.Configuration`.
@@ -280,15 +281,13 @@ class Configuration(tabc.Mapping[typ.Any, typ.Any]):
         Returns this :py:class:`Configuration` as standard Python :py:class:`dict`.
         Nested :class:`Configuration` objects will also be converted.
 
-        .. admonition:: Note
-            :class: note
+        .. note::
             :collapsible: closed
 
             This will evaluate all lazy tag functions and throw an exception on :py:class:`~.Placeholder` objects.
 
         :return: A shallow :py:class:`dict` copy
         :rtype: dict
-        :note: This will evaluate all lazy tag functions and throw an exception on :py:class:`~.Placeholder` objects.
         """
         return dict(
             starmap(
@@ -303,11 +302,15 @@ class Configuration(tabc.Mapping[typ.Any, typ.Any]):
         library and (as default) the default factory provided by this library
         (:py:func:`granular_configuration_language.json_default`).
 
+        .. note::
+            :collapsible: closed
+
+            This will evaluate all lazy tag functions and throw an exception on :py:class:`~.Placeholder` objects.
+
         :param \~typing.Callable[[\~typing.Any], \~typing.Any], optional default: Replacement ``default`` factory. Defaults to :py:func:`~granular_configuration_language.json_default`.
         :param ~typing.Any \*\*kwds: Arguments to be passed into :py:func:`json.dumps`
         :return: JSON-format string
         :rtype: str
-        :note: This will evaluate all lazy tag functions and throw an exception on :py:class:`~.Placeholder` objects.
         """
         from granular_configuration_language import json_default
 
@@ -363,10 +366,15 @@ class Configuration(tabc.Mapping[typ.Any, typ.Any]):
         """
         Cast this :py:class:`Configuration` instance into subclass of :py:class:`Configuration` with typed annotated attributes
 
+
+        .. note::
+            :collapsible: closed
+
+            No runtime typing check occurs.
+
         :param type[C] typed_base: Subclass of :py:class:`Configuration` to assume
         :return: This instance
         :rtype: C
-        :note: No runtime typing check occurs.
         """
         return typ.cast(C, self)
 

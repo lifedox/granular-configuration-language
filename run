@@ -226,6 +226,13 @@ _docn() {
 
     _docs 3>&2 2>&1 1>&3-
 }
+# For Dark Reader to make local viewing bearable
+_doch() {
+    _docs
+    pushd docs/html
+    poetry run python -m http.server 9999
+    popd
+}
 
 cmd="$1"
 

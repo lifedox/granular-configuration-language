@@ -12,12 +12,16 @@ from granular_configuration_language.yaml.decorators._tag_tracker import track_a
 def as_lazy(func: tabc.Callable[[T], RT]) -> tabc.Callable[[Tag, T, StateHolder], LazyEval[RT]]:
     """Wraps the "Tag" function in a :py:class:`~.LazyEval`, so that the function being wrapped is run just-in-time.
 
+    .. admonition:: Postional Parameters for "Tag" function
+        :class: hint
+
+        1. (:py:class:`~granular_configuration_language.yaml.classes.T`) - YAML value
+
     :param ~collections.abc.Callable[[T], RT] func: Function to be wrapped
 
     :returns: Wrapped Function
     :rtype: ~collections.abc.Callable[[Tag, T, StateHolder], LazyEval[RT]]
 
-    :note: - First Positional Argument: YAML value
     :example:
         .. code-block:: python
 
@@ -39,13 +43,17 @@ def as_lazy_with_load_options(
 ) -> tabc.Callable[[Tag, T, StateHolder], LazyEval[RT]]:
     """Wraps the "Tag" function in a :py:class:`~.LazyEval`, so that the function being wrapped is run just-in-time.
 
+    .. admonition:: Postional Parameters for "Tag" function
+        :class: hint
+
+        1. (:py:class:`~granular_configuration_language.yaml.classes.T`) - YAML value
+        2. (:py:class:`.LoadOptions`) - A :py:class:`.LoadOptions` instance
+
     :param ~collections.abc.Callable[[T, LoadOptions], RT] func: Function to be wrapped
 
     :returns: Wrapped Function
     :rtype: ~collections.abc.Callable[[Tag, T, StateHolder], LazyEval[RT]]
 
-    :note: - First Positional Argument: YAML value
-        - Second Positional Argument: A :py:class:`.LoadOptions` instance
     :example:
         .. code-block:: python
 
@@ -81,10 +89,28 @@ def as_lazy_with_root(
 ):
     r"""Wraps the "Tag" function in a :py:class:`~.LazyEval`, so that the function being wrapped is run just-in-time.
 
-    Note:
-        autodoc isn't exposing the :py:func:`typing.overload`. See the example for a clearer type signatures
+    .. admonition:: Postional Parameters for "Tag" function
+        :class: hint
 
-    :param ~collections.abc.Callable[[T, Root], RT] func: Function to be wrapped
+        1. (:py:class:`~granular_configuration_language.yaml.classes.T`) -- YAML value
+        2. (:py:type:`~granular_configuration_language.yaml.classes.Root`) -- Configuration Root
+
+    .. admonition:: Documentation Issue
+        :class: caution
+
+        ``sphinx.ext.autodoc`` isn't exposing the :py:func:`typing.overload`. See the example for a clearer type signatures
+
+    :param ~collections.abc.Callable[[T, Root], RT] func:
+        Function to be wrapped
+    :param ~collections.abc.Callable[[T], bool], optional needs_root_condition:
+        - A Boolean Condition used to test the raw YAML value.
+
+            - If :py:data:`True`, :py:type:`~granular_configuration_language.yaml.classes.Root` is set to the Configuration Root.
+            - If :py:data:`False`, :py:type:`~granular_configuration_language.yaml.classes.Root` is set to :py:data:`None`.
+
+        - Used as a decorator factory:
+
+            - ``@as_lazy_with_root(needs_root_condition= ... )``
 
     :returns: Wrapped Function
     :rtype: ~collections.abc.Callable[[Tag, T, StateHolder], LazyEval[RT]]
@@ -129,14 +155,18 @@ def as_lazy_with_root_and_load_options(
 ) -> tabc.Callable[[Tag, T, StateHolder], LazyEval[RT]]:
     """Wraps the "Tag" function in a :py:class:`~.LazyEval`, so that the function being wrapped is run just-in-time.
 
+    .. admonition:: Postional Parameters for "Tag" function
+        :class: hint
+
+        1. (:py:class:`~granular_configuration_language.yaml.classes.T`) -- YAML value
+        2. (:py:type:`~granular_configuration_language.yaml.classes.Root`) -- Configuration root
+        3. (:py:class:`.LoadOptions`) -- A :py:class:`.LoadOptions` instance
+
     :param ~collections.abc.Callable[[T, ~granular_configuration_language.yaml.classes.Root, LoadOptions], RT] func: Function to be wrapped
 
     :returns: Wrapped Function
     :rtype: ~collections.abc.Callable[[Tag, T, StateHolder], LazyEval[RT]]
 
-    :note: - First Positional Argument: YAML value
-        - Second Positional Argument: Configuration root, as type :py:type:`~granular_configuration_language.yaml.classes.Root`
-        - Third Positional Argument: A :py:class:`.LoadOptions` instance
     :example:
         .. code-block:: python
 
@@ -157,12 +187,16 @@ def as_lazy_with_root_and_load_options(
 def as_not_lazy(func: tabc.Callable[[T], RT]) -> tabc.Callable[[Tag, T, StateHolder], RT]:
     """Wraps the "Tag" function, but does not make it lazy. The function being wrapped is run at load time.
 
+    .. admonition:: Postional Parameters for "Tag" function
+        :class: hint
+
+        1. (:py:class:`~granular_configuration_language.yaml.classes.T`) - YAML value
+
     :param ~collections.abc.Callable[[T], RT] func: Function to be wrapped
 
     :returns: Wrapped Function
     :rtype: ~collections.abc.Callable[[Tag, T, StateHolder], LazyEval[RT]]
 
-    :note: - First Positional Argument: YAML value
     :example:
         .. code:: python
 

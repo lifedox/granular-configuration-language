@@ -99,7 +99,7 @@ def handler(value: str) -> Masked:  # Function Signature
 - Options:
   - {py:func}`.interpolate_value_without_ref` - Does not include JSON Path or JSON Pointer syntax.
   - {py:func}`.interpolate_value_with_ref` - Includes full interpolation syntax.
-    - Requires {py:class}`.Root` as a parameter, even if you don't use it in the Tag Logic.
+    - Requires {py:class}`.Root` as the second parameter, even if you don't use it in the Tag Logic.
 
 ---
 

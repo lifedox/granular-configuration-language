@@ -30,11 +30,29 @@ class SafeConfigurationProxy(Mapping):
     Wraps a :py:class:`.LazyLoadConfiguration` instance to proxy all method and
     attribute calls to its :py:class:`.Configuration` instance.
 
+    .. admonition:: Implementation Reasoning
+        :collapsible: closed
+
+        Wrapping :py:class:`.LazyLoadConfiguration` maintains all laziness build
+        into :py:class:`.LazyLoadConfiguration`, while exposing all of :py:class:`.Configuration`
+
+        This class is used behind :py:func:`typing.cast` in :py:meth:`.LazyLoadConfiguration.as_typed` so it is not exposed explicitly.
+
+        .. warning::
+            This class does not inherit from :py:class:`.Configuration`.
+
+            .. code-block:: python
+
+                from collections.abc import Mapping
+                from granular_configuration_language import Configuration, LazyLoadConfiguration
+
+                config = LazyLoadConfiguration( ... ).as_typed(Config)
+
+                isinstance(config, Configuration)  # returns false
+                isinstance(config, Mapping)  # returns true
+
     :param LazyLoadConfiguration llc:
         :py:class:`.LazyLoadConfiguration` instance to be wrapped
-    :note:
-        Wrapping :py:class:`.LazyLoadConfiguration` maintains all laziness build
-        into :py:class:`.LazyLoadConfiguration`.
     """
 
     __slots__ = ("__llc",)
@@ -77,14 +95,54 @@ class LazyLoadConfiguration(Mapping):
 
     See :py:meth:`LazyLoadConfiguration.as_typed` for type annotated usage.
 
+    ``inject_before`` and ``inject_after`` allow you to introduce dynamic settings into you configuration.
+
+    .. admonition:: Inject Rules
+        :class: hint
+        :collapsible: closed
+
+          - Injections must use :py:class:`.Configuration` for all mappings.
+
+            - Otherwise, they will be treated as a normal value and not merged.
+          - This is only available for :py:class:`.LazyLoadConfiguration`
+
+            - As :py:class:`.MutableLazyLoadConfiguration` doesn't required this.
+          - Examples:
+
+            - You might want to have a setting the is the current date.
+            - You want to provide substitution options via ``!Sub``.
+
+        .. code-block:: yaml
+
+            data:
+                key1: !Sub ${$.LOOKUP_KEY}
+                key2: !Sub ${$.LOOKUP_KEY}
+
+        .. code-block:: python
+
+            CONFIG = LazyLoadConfiguration(
+              ... ,
+              inject_after=Configuration(
+                today=date.today().isoformat(),
+                LOOKUP_KEY="value made available to `!Sub`",
+              )
+            )
+
+            CONFIG.today  # Today's data as a string.
+            CONFIG.data   # Data defined with a reusable library defined value.
+
     :param ~pathlib.Path | str | os.PathLike load_order_location:
             File path to configuration file
     :param str | ~collections.abc.Sequence[str], optional base_path:
         Defines the subsection of the configuration file to use. See Examples for usage options.
     :param bool, optional use_env_location:
-        Enabled to use the default environment variable location.
+        - Enabled to use the default environment variable location.
+        - Setting to :py:data:`True` is only required if you don't change ``env_location_var_name`` from its default value.
     :param str, optional env_location_var_name:
-        Specify what environment variable to check for additional file paths.
+        - Specify what environment variable to check for additional file paths.
+        - The Environment Variable is read as a comma-delimited list of configuration path that will be appended to ``load_order_location`` list.
+        - Setting the Environment Variable is always optional.
+        - _Default_: ``G_CONFIG_LOCATION``
     :param Configuration, optional inject_before:
         Inject a runtime :py:class:`.Configuration` instance as if it were the first load file.
     :param Configuration, optional inject_after:
@@ -108,19 +166,6 @@ class LazyLoadConfiguration(Mapping):
 
             # With a typed `Configuration`
             LazyLoadConfiguration( ... ).as_typed(TypedConfig)
-
-    :note:
-        - The Environment Variable is read as a comma-delimited list of configuration path that will be appended to ``load_order_location`` list.
-        - Setting the Environment Variable is always optional.
-        - Setting ``use_env_location`` to :py:data:`True` is only required if you don't change ``env_location_var_name`` from its default value of ``G_CONFIG_LOCATION``.
-        - ``inject_before`` and ``inject_after`` allow you to introduce dynamic settings into you configuration.
-
-          - These injections must use :py:class:`.Configuration` for all mappings. Otherwise, they will be treated as a normal value and not merged.
-          - This is only available for :py:class:`.LazyLoadConfiguration`, as :py:class:`.MutableLazyLoadConfiguration` doesn't required this.
-          - Examples:
-
-            - You might want to have a setting the is the current date. ``CONFIG.today``
-            - You want to provide substitution options via ``!Sub``.  ``!Sub ${$.VALUE_DYNAMICALLY_SET_BY_LIBRARY}``
     """
 
     def __init__(
@@ -147,13 +192,15 @@ class LazyLoadConfiguration(Mapping):
     def __getattr__(self, name: str) -> typ.Any:
         """Loads (if not loaded) and fetches from the underlying `Configuration` object
 
+        .. note::
+            :collapsible: closed
+
+            This also exposes the methods of :py:class:`Configuration` (except dunders).
+
         :param str name: Attribute name
 
         :returns: Result
         :rtype: ~typing.Any
-
-        :note: This also exposes the methods of :py:class:`Configuration` (except dunders).
-
         """
         return getattr(self.config, name)
 
@@ -161,8 +208,10 @@ class LazyLoadConfiguration(Mapping):
     def config(self) -> Configuration:
         """Load and fetch the configuration. Configuration is cached for subsequent calls.
 
-        :note: Loading the configuration is thread-safe and locks while the configuration is loaded to prevent
-            duplicative processing and data
+        .. note::
+
+            Loading the configuration is thread-safe and locks while the
+            configuration is loaded to prevent duplicative processing and data
 
         """
         config = self.__config
@@ -206,11 +255,14 @@ class LazyLoadConfiguration(Mapping):
 
                     CONFIG = LazyLoadConfiguration("config.yaml").as_typed(Config)
 
+        .. note::
+            :collapsible: closed
+
+            No runtime typing check occurs.
 
         :param type[C] typed_base: Subclass of :py:class:`Configuration` to assume
         :return: :py:class:`.SafeConfigurationProxy` instance that has been cast to the provided type.
         :rtype: C
-        :note: No runtime typing check occurs.
         """
         return typ.cast(C, SafeConfigurationProxy(self))
 
@@ -219,18 +271,27 @@ class MutableLazyLoadConfiguration(LazyLoadConfiguration, MutableMapping):
     r"""
     Provides a lazy interface for loading Configuration from file paths on first access.
 
-    :py:class:`.MutableLazyLoadConfiguration` uses: :py:class:`.MutableConfiguration` for mappings and :py:class:`list` for sequences.
-
     You can optionally enable pull locations from an environment variable.
+
+    .. admonition:: Classes used for mutability
+        :class: note
+        :collapsible: closed
+
+        - :py:class:`.MutableConfiguration` for mappings
+        - :py:class:`list` for sequences
 
     :param ~pathlib.Path | str | os.PathLike load_order_location:
             File path to configuration file
     :param str | ~collections.abc.Sequence[str], optional base_path:
         Defines the subsection of the configuration file to use. See Examples for usage options.
     :param bool, optional use_env_location:
-        Enabled to use the default environment variable location. (O)
+        - Enabled to use the default environment variable location.
+        - Setting to :py:data:`True` is only required if you don't change ``env_location_var_name`` from its default value.
     :param str, optional env_location_var_name:
-        Specify what environment variable to check for additional file paths.
+        - Specify what environment variable to check for additional file paths.
+        - The Environment Variable is read as a comma-delimited list of configuration path that will be appended to ``load_order_location`` list.
+        - Setting the Environment Variable is always optional.
+        - _Default_: ``G_CONFIG_LOCATION``
 
     :examples:
         .. code-block:: python
@@ -245,11 +306,6 @@ class MutableLazyLoadConfiguration(LazyLoadConfiguration, MutableMapping):
 
             # Use default Environment Variable: "G_CONFIG_LOCATION"
             MutableLazyLoadConfiguration(..., use_env_location=True)
-
-    :note:
-        - The Environment Variable is read as a comma-delimited list of configuration path that will be appended to ``load_order_location`` list.
-        - Setting the Environment Variable is always optional.
-        - Setting ``use_env_location`` to :py:data:`True` is only required if you don't change ``env_location_var_name`` from its default value of ``G_CONFIG_LOCATION``.
     """
 
     def __init__(
@@ -274,8 +330,11 @@ class MutableLazyLoadConfiguration(LazyLoadConfiguration, MutableMapping):
     def config(self) -> MutableConfiguration:
         """Load and fetch the configuration. Configuration is cached for subsequent calls.
 
-        :note: Loading the configuration is thread-safe and locks while the configuration is loaded to prevent
-            duplicative processing and data
+        .. note::
+            :collapsible: closed
+
+            Loading the configuration is thread-safe and locks while the
+            configuration is loaded to prevent duplicative processing and data
 
         """
         return typ.cast(MutableConfiguration, super().config)

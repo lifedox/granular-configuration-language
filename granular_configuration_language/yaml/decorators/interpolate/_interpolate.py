@@ -112,13 +112,17 @@ def interpolate_value_with_ref(
 
     "with_ref" does full interpolation, supporting references (e.g. ``${$.value}`` and ``${/value}``).
 
+    .. admonition:: Compatible Laziness Decorators
+        :class: caution
+
+        - :py:func:`.as_lazy_with_root`
+        - :py:func:`.as_lazy_with_root_and_load_options`
+
     :param ~collections.abc.Callable[~typing.Concatenate[str, ~granular_configuration_language.yaml.classes.Root, P], RT] func: Function to be wrapped
 
     :returns: Wrapped Function
     :rtype: ~collections.abc.Callable[~typing.Concatenate[str, ~granular_configuration_language.yaml.classes.Root, P], RT]
 
-    :note: - First positional argument must a :py:class:`str`.
-        - Second positional must be :py:type:`~granular_configuration_language.yaml.classes.Root` type, even if you do not use it.
     :example:
         .. code-block:: python
 
@@ -150,12 +154,18 @@ def interpolate_value_without_ref(
 
     "without_ref" does a limited interpolation that does not support references (e.g. ``${$.value}`` and ``${/value}``)
 
+    .. admonition:: Compatible Laziness Decorators
+        :class: caution
+
+        - :py:func:`.as_lazy`
+        - :py:func:`.as_lazy_with_root`
+        - :py:func:`.as_lazy_with_root_and_load_options`
+
     :param ~collections.abc.Callable[~typing.Concatenate[str, P], RT] func: Function to be wrapped
 
     :returns: Wrapped Function
     :rtype: ~collections.abc.Callable[~typing.Concatenate[str, P], RT]
 
-    :note: - First positional argument must a :py:class:`str`.
     :example:
         .. code-block:: python
 

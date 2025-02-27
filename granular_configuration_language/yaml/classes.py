@@ -110,9 +110,14 @@ class LazyEval(abc.ABC, typ.Generic[RT]):
         """
         Run the Tag Logic.
 
+        .. admonition:: Implementation Note
+            :class: caution
+            :collapsible: closed
+
+            Caching is handled by this base class and not by this method.
+
         :return: Result of the lazy evaluation
         :rtype: RT
-        :Note: Caching does not occur within this method
         """
         ...
 

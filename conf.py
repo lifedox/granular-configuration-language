@@ -44,7 +44,6 @@ napoleon_use_ivar = True
 napoleon_use_param = True
 napoleon_use_rtype = True
 
-html_baseurl = "README.html"
 html_theme = "sphinx_rtd_theme"
 html_theme_options = {
     "navigation_depth": -1,
