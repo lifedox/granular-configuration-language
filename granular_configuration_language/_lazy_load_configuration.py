@@ -97,7 +97,26 @@ class LazyLoadConfiguration(Mapping):
 
     ``inject_before`` and ``inject_after`` allow you to introduce dynamic settings into you configuration.
 
-    .. admonition:: Inject Rules
+    .. admonition:: :py:meth:`~LazyLoadConfiguration.as_typed` Example
+        :class: hint
+        :collapsible: closed
+
+        .. code-block:: python
+
+            class SubConfig(Configuration):
+                c: str
+
+            class Config(Configuration):
+                a: int
+                b: SubConfig
+
+            typed = LazyLoadConfiguration("config.yaml").as_typed(Config)
+
+            assert typed.a == 101
+            assert typed.b.c == "test me"
+            assert typed["a"] == 101
+
+    .. admonition:: Inject Rules and Example
         :class: hint
         :collapsible: closed
 
@@ -129,7 +148,7 @@ class LazyLoadConfiguration(Mapping):
             )
 
             CONFIG.today  # Today's data as a string.
-            CONFIG.data   # Data defined with a reusable library defined value.
+            CONFIG.data   # Date defined with a reusable library defined value.
 
     :param ~pathlib.Path | str | os.PathLike load_order_location:
             File path to configuration file
@@ -192,10 +211,7 @@ class LazyLoadConfiguration(Mapping):
     def __getattr__(self, name: str) -> typ.Any:
         """Loads (if not loaded) and fetches from the underlying `Configuration` object
 
-        .. note::
-            :collapsible: closed
-
-            This also exposes the methods of :py:class:`Configuration` (except dunders).
+        *This also exposes the methods of* :py:class:`Configuration` *(except dunders).*
 
         :param str name: Attribute name
 
@@ -208,7 +224,8 @@ class LazyLoadConfiguration(Mapping):
     def config(self) -> Configuration:
         """Load and fetch the configuration. Configuration is cached for subsequent calls.
 
-        .. note::
+        .. admonition:: Thread-safe
+            :class: tip
 
             Loading the configuration is thread-safe and locks while the
             configuration is loaded to prevent duplicative processing and data
@@ -228,7 +245,7 @@ class LazyLoadConfiguration(Mapping):
             )  # pragma: no cover
 
     def load_configuration(self) -> None:
-        """Force load the configuration."""
+        """Loads the configuration."""
         # load_configuration existed prior to config, being a cached_property.
         # Now that logic is in the cached_property, so this legacy/clear code just calls the property
         self.config
@@ -248,17 +265,23 @@ class LazyLoadConfiguration(Mapping):
 
         This proxy ensures laziness is preserved and is fully compatible with :py:class:`Configuration`.
 
-        .. admonition:: Use as
+        .. admonition:: Example
             :class: hint
 
             .. code-block:: python
 
                     CONFIG = LazyLoadConfiguration("config.yaml").as_typed(Config)
 
-        .. note::
+        .. admonition:: No runtime type checking
+            :class: note
             :collapsible: closed
 
-            No runtime typing check occurs.
+            This method uses :py:func:`typing.cast` to return a :py:class:`.SafeConfigurationProxy` of this instance
+            as the requested :py:class:`Configuration` subclass.
+            This enables typing checking and typed attributes with minimal a runtime cost.
+            It is limited to just improving developer experience.
+
+            Use ``Pydantic``, or some like it, if you require runtime type checking.
 
         :param type[C] typed_base: Subclass of :py:class:`Configuration` to assume
         :return: :py:class:`.SafeConfigurationProxy` instance that has been cast to the provided type.
@@ -330,8 +353,8 @@ class MutableLazyLoadConfiguration(LazyLoadConfiguration, MutableMapping):
     def config(self) -> MutableConfiguration:
         """Load and fetch the configuration. Configuration is cached for subsequent calls.
 
-        .. note::
-            :collapsible: closed
+        .. admonition:: Thread-safe
+            :class: tip
 
             Loading the configuration is thread-safe and locks while the
             configuration is loaded to prevent duplicative processing and data

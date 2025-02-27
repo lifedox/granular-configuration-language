@@ -94,7 +94,6 @@ class Configuration(tabc.Mapping[typ.Any, typ.Any]):
             a: int
             b: SubConfig
 
-
         config = ... # A Configuration instance
         typed = config.as_typed(Config)
 
@@ -106,11 +105,11 @@ class Configuration(tabc.Mapping[typ.Any, typ.Any]):
 
         typed = LazyLoadConfiguration("config.yaml").as_typed(Config)
 
-    .. admonition:: Notice
+    .. admonition:: Advisement
         :class: tip
 
-        You should use :py:meth:`LazyLoadConfiguration.as_typed` to load as a
-        typed :py:class:`.Configuration`.
+        Consider using :py:meth:`LazyLoadConfiguration.as_typed` to load your
+        entire configuration as a typed :py:class:`.Configuration`.
 
     .. [#f1]
 
@@ -237,8 +236,11 @@ class Configuration(tabc.Mapping[typ.Any, typ.Any]):
         """
         Provides a potentially cleaner path as an alternative to :py:meth:`~object.__getitem__`.
 
-        Throws :py:exc:`AttributeError` instead of :py:exc:`KeyError`, as compared to :py:meth:`~object.__getitem__`
-        when an attribute is not present.
+        .. admonition:: Comparing to :py:meth:`~object.__getitem__`
+
+            - Three less characters
+            - Only accepts :py:class:`str`
+            - Throws :py:exc:`AttributeError` instead of :py:exc:`KeyError`
 
         :example:
             .. code-block:: python
@@ -281,7 +283,8 @@ class Configuration(tabc.Mapping[typ.Any, typ.Any]):
         Returns this :py:class:`Configuration` as standard Python :py:class:`dict`.
         Nested :class:`Configuration` objects will also be converted.
 
-        .. note::
+        .. admonition:: Evalution Notice
+            :class: note
             :collapsible: closed
 
             This will evaluate all lazy tag functions and throw an exception on :py:class:`~.Placeholder` objects.
@@ -302,7 +305,8 @@ class Configuration(tabc.Mapping[typ.Any, typ.Any]):
         library and (as default) the default factory provided by this library
         (:py:func:`granular_configuration_language.json_default`).
 
-        .. note::
+        .. admonition:: Evalution Notice
+            :class: note
             :collapsible: closed
 
             This will evaluate all lazy tag functions and throw an exception on :py:class:`~.Placeholder` objects.
@@ -366,11 +370,23 @@ class Configuration(tabc.Mapping[typ.Any, typ.Any]):
         """
         Cast this :py:class:`Configuration` instance into subclass of :py:class:`Configuration` with typed annotated attributes
 
+        .. admonition:: Advisement
+            :class: tip
 
-        .. note::
+            Consider using :py:meth:`LazyLoadConfiguration.as_typed` to load your
+            entire configuration as a typed :py:class:`.Configuration`, instead of
+            just a section with this version.
+
+        .. admonition:: No runtime type checking
+            :class: note
             :collapsible: closed
 
-            No runtime typing check occurs.
+            This method uses :py:func:`typing.cast` to return this instance, unmodified,
+            as the requested :py:class:`Configuration` subclass.
+            This enables typing checking and typed attributes with minimal a runtime cost.
+            It is limited to just improving developer experience.
+
+            Use ``Pydantic``, or some like it, if you require runtime type checking.
 
         :param type[C] typed_base: Subclass of :py:class:`Configuration` to assume
         :return: This instance
