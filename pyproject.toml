@@ -53,7 +53,7 @@ coverage = "7.6.12"
 flake8 = "7.1.2"
 mypy = "1.15.0"
 black = "25.1.0"
-isort = "6.0.0"
+isort = "6.0.1"
 bandit = "1.8.3"
 # Doc gen
 sphinx = { version = "8.2.1", python = ">=3.11" }
