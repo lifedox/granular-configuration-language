@@ -20,29 +20,38 @@ You should highly consider using the immutable configuration in you code.
 2. **First Fetch**: Configuration is fetched for the first time (through `CONFIG.value`, `CONFIG[value]`, `CONFIG.config`, and such)
    1. **Load Time**:
       1. The file system is scanned for specified configuration files.
-      2. Each file is read and parsed.
+      2. Each file that exists is read and loaded.
    2. **Merge Time**:
-      - Any Tags defined at the root of the file are run (i.e. the file beginning with a tag: `!Parsefile ...` or `!Merge ...`).
-      - The loaded Configurations are merged in-order into one Configuration.
-        - Any files that do not define a Mapping are filtered out.
-        - Mappings are merged recursively. Any non-mapping overrides. Newer values override older values. (See [more](#merging))
-          - `{"a": "b": 1}` + `{"a: {"b": {"c": 1}}` ⇒ `{"a: {"b": {"c": 1}}`
-          - `{"a: {"b": {"c": 1}}` + `{"a: {"b": {"c": 2}}` ⇒ `{"a: {"b": {"c": 2}}`
-          - `{"a: {"b": {"c": 2}}` + `{"a: {"b": {"d": 3}}` ⇒ `{"a: {"b": {"c": 2, "d": 3}}`
-          - `{"a: {"b": {"c": 2, "d": 3}}` + `{"a": "b": 1}` ⇒ `{"a": "b": 1}`
+      1. Any Tags defined at the root of the file are run (i.e. the file beginning with a tag: `!Parsefile ...` or `!Merge ...`).
+      2. The loaded Configurations are merged in-order into one Configuration.
+         - Any files that do not define a Mapping are filtered out.
+         - Mappings are merged recursively. Any non-mapping overrides. Newer values override older values. (See [more](#merging))
+           - `{"a": "b": 1}` + `{"a: {"b": {"c": 1}}` ⇒ `{"a: {"b": {"c": 1}}`
+           - `{"a: {"b": {"c": 1}}` + `{"a: {"b": {"c": 2}}` ⇒ `{"a: {"b": {"c": 2}}`
+           - `{"a: {"b": {"c": 2}}` + `{"a: {"b": {"d": 3}}` ⇒ `{"a: {"b": {"c": 2, "d": 3}}`
+           - `{"a: {"b": {"c": 2, "d": 3}}` + `{"a": "b": 1}` ⇒ `{"a": "b": 1}`
    3. **Build Time**:
       1. The Base Path is applied.
-      2. The Base Paths for any {py:class}`.LazyLoadConfiguration` shared this identical immutable configuration is applied.
+      2. The Base Paths for any {py:class}`.LazyLoadConfiguration` shared this identical immutable configuration are applied.
          - Exceptions that occur (such as {py:class}`.InvalidBasePathException`) are stored, so they emit for the first fetch of the associated {py:class}`.LazyLoadConfiguration`.
-      3. {py:class}`.LazyLoadConfiguration` no longer holds a reference to the root object. If no tags depend on the root Configuration, it will be free (`!Ref` is an example of a tag that holds a reference to the root Configuration until it is run).
-         - If an exception occurs, the root Configuration is unavoidable caught in the frame.
+      3. {py:class}`.LazyLoadConfiguration` no longer holds a reference to the Root configuration (see [Root](#json-pathpointer-ref--root) for a more detailed definition).
+         - If no tags depend on the Root, it will be free. (`!Ref` is an example of a tag that holds a reference to the Root until it is run.)
+         - If an exception occurs, the Root is unavoidable caught in the frame.
 3. **Fetching a Lazy Tag**:
    1. Upon first get of the {py:class}`.LazyEval` object, the underlying function is called.
    2. The result replaces the {py:class}`.LazyEval` in the Configuration, so the {py:class}`.LazyEval` runs exactly once.
 
-When making copies, it is important to note that {py:class}`.LazyEval` do not copy (they return themselves). This is to aid in running exactly once and prevent cycles with the root reference.
+---
 
-This means that a deep copy of a {py:class}`.Configuration` can share state with the original, if any {py:class}`.LazyEval` is present. Using immutable {py:class}`.Configuration` (and {py:class}`.LazyLoadConfiguration`) will prevent needing to make copies. {py:meth}`~.Configuration.as_dict()` is also a great way to make a mutable copy.
+## Making Copies
+
+When making copies, it is important to note that {py:class}`.LazyEval` instance do not copy with either {py:func}`~copy.copy` or {py:func}`~copy.deepcopy` (they return themselves). This is to aid in running exactly once, prevent deep copies of Root leading to branches might never run their {py:class}`.LazyEval` instances, and unexpected memory use.
+
+This means that a {py:func}`~copy.deepcopy` of a {py:class}`.Configuration` or {py:class}`.MutableConfiguration` instance can share state with the original, if any {py:class}`.LazyEval` is present, despite that breaking the definition of a deep copy.
+
+- Using immutable {py:class}`.Configuration` (and {py:class}`.LazyLoadConfiguration`) will prevent needing to make copies.
+- {py:meth}`~.Configuration.as_dict()` is also a great way to make a safe mutable copy.
+- {py:meth}`~.MutableConfiguration.evaluate_all()` will run all {py:class}`.LazyEval` instance, making a {py:class}`.MutableConfiguration` instance safe to copy.
 
 <sup>\*</sup> "identical immutable configurations" means using {py:class}`.LazyLoadConfiguration` with the same set of possible input files, and not using `inject_after` or `inject_before`.
 

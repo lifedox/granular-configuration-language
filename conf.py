@@ -17,7 +17,6 @@ author = "Eric Jensen (eric.jensen42@gmail.com)"
 
 exclude_patterns = ["_build", "Thumbs.db", ".DS_Store", "doc_gen", "README_old.md"]
 extensions = [
-    "sphinx_rtd_dark_mode",
     "myst_parser",
     "sphinx_copybutton",
     "sphinx.ext.autodoc",
@@ -45,6 +44,7 @@ napoleon_use_ivar = True
 napoleon_use_param = True
 napoleon_use_rtype = True
 
+html_baseurl = "README.html"
 html_theme = "sphinx_rtd_theme"
 html_theme_options = {
     "navigation_depth": -1,

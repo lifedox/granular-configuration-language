@@ -70,14 +70,14 @@ pip install 'granular-configuration-language[printing]'
 
 - `category`: Category of the Tag
 - `tag`: Name of the Tag
-- `type`: Argument type
+- `type`: Argument type of the Tag
   - Value comes from {py:meth}`TagDecoratorBase.user_friendly_type <granular_configuration_language.yaml.decorators.TagDecoratorBase.user_friendly_type>`.
 - `interpolates`: Specifies if the tags interpolates
   - `full` - Tags uses {py:func}`.interpolate_value_with_ref`
   - `reduced` - Tags uses {py:func}`.interpolate_value_without_ref`
 - `lazy` - Specifies if the tags is lazy.
   - `NOT_LAZY` - Tags uses {py:func}`.as_not_lazy`
-- `returns` - Type annotation of the return of function that implements that Tag
+- `returns` - Type annotation of the return of function that implements the Tag
 
 #### Sample Output (using `table` mode)
 
@@ -152,11 +152,11 @@ pip install 'granular-configuration-language[printing]'
 
 #### Headers
 
-- `plugin`: Plugin name
+- `plugin`: Name of Plugin
   - `<gcl-built-in>` represents internal tags
 - `category`: Category of the Tag
-- `tag`: Tag Name
-- `handler`: function that implements that Tag.
+- `tag`: Name of the Tag
+- `handler`: Function that implements the Tag.
 
 #### Sample Output (using `table` mode)
 

@@ -53,7 +53,7 @@ def test_mapping_of_any_tag_does_not_take_scalar() -> None:
         loads("!Dict abc")
 
 
-def test_mapping_of_any_tag_does_not_take_mapping() -> None:
+def test_mapping_of_any_tag_does_not_take_sequence() -> None:
     with pytest.raises(ValueError):
         loads("!Dict []")
 

@@ -193,7 +193,7 @@ class LazyLoadConfiguration(Mapping):
     def __len__(self) -> int:
         return len(self.config)
 
-    def as_typed(self, typed_base: typ.Type[C]) -> C:
+    def as_typed(self, typed_base: type[C]) -> C:
         """
         Create a proxy that is cast to provide :py:class:`Configuration` subclass with typed annotated attributes.
 

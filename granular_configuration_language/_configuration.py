@@ -106,7 +106,7 @@ class Configuration(tabc.Mapping[typ.Any, typ.Any]):
 
         typed = LazyLoadConfiguration("config.yaml").as_typed(Config)
 
-    .. note::
+    .. tip::
 
         You should use :py:meth:`LazyLoadConfiguration.as_typed` to load as a
         typed :py:class:`.Configuration`.
@@ -280,6 +280,12 @@ class Configuration(tabc.Mapping[typ.Any, typ.Any]):
         Returns this :py:class:`Configuration` as standard Python :py:class:`dict`.
         Nested :class:`Configuration` objects will also be converted.
 
+        .. admonition:: Note
+            :class: note
+            :collapsible: closed
+
+            This will evaluate all lazy tag functions and throw an exception on :py:class:`~.Placeholder` objects.
+
         :return: A shallow :py:class:`dict` copy
         :rtype: dict
         :note: This will evaluate all lazy tag functions and throw an exception on :py:class:`~.Placeholder` objects.
@@ -308,22 +314,20 @@ class Configuration(tabc.Mapping[typ.Any, typ.Any]):
         return json.dumps(self, default=default or json_default, **kwds)
 
     @typ.overload
-    def typed_get(self, type: typ.Type[T], key: typ.Any) -> T: ...
+    def typed_get(self, type: type[T], key: typ.Any) -> T: ...
 
     @typ.overload
-    def typed_get(self, type: typ.Type[T], key: typ.Any, *, default: T) -> T: ...
+    def typed_get(self, type: type[T], key: typ.Any, *, default: T) -> T: ...
 
     @typ.overload
-    def typed_get(
-        self, type: typ.Type[T], key: typ.Any, *, predicate: tabc.Callable[[typ.Any], typ.TypeGuard[T]]
-    ) -> T: ...
+    def typed_get(self, type: type[T], key: typ.Any, *, predicate: tabc.Callable[[typ.Any], typ.TypeGuard[T]]) -> T: ...
 
     @typ.overload
     def typed_get(
-        self, type: typ.Type[T], key: typ.Any, *, default: T, predicate: tabc.Callable[[typ.Any], typ.TypeGuard[T]]
+        self, type: type[T], key: typ.Any, *, default: T, predicate: tabc.Callable[[typ.Any], typ.TypeGuard[T]]
     ) -> T: ...
 
-    def typed_get(self, type: typ.Type[T], key: typ.Any, **kwds: Unpack[Kwords_typed_get[T]]) -> T:
+    def typed_get(self, type: type[T], key: typ.Any, **kwds: Unpack[Kwords_typed_get[T]]) -> T:
         r"""
         Provides a typed-checked :py:meth:`get` option
 

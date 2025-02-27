@@ -78,7 +78,7 @@ def handler(value: str) -> Masked:  # Function Signature
 
 - Defines the laziness of tags and the required positional parameters
   - `value`'s type is determined by [Tag Type Decorator](#tag-type-decorator).
-- There are five options (these are all possible options).
+- There are five options (these are all the possible options).
   - These make the tag lazy, so the Tag Logic runs at Fetch.
     - {py:func}`.as_lazy`
       - _Positional Parameters_ - `(value: ... )`
@@ -116,19 +116,20 @@ def handler(value: str) -> Masked:  # Function Signature
 ```{admonition} Notice of Future Intent
 :class: note
 
-`20` in `granular_configuration_language_20_tag` represents 2.0 tag plugin compatibility, and not directly connected to library version. Additional groups will added only if there is feature change to plugin support.
+`20` in `granular_configuration_language_20_tag` represents 2.0 tag plugin compatibility, and not directly connected to library version. Additional groups will be added only if there is feature change to plugin support.
 
-- A minor plugin change (e.g. `21`) would represent an added feature that requires a structural change but a change to the primary code.
-  - Minor compatibility version deprecates any previous compatibility version (e.g. `20`).
-    - Both `20` and `21` would be supported, with `20` using a compatibilty layer.
-- A major plugin change (e.g. `30`) would represent a breaking change to plugin, potentially requiring complete.
-  - Major compatibility version deprecates previous compatibility versions (e.g. `20` and `21`).
-    - If the library does not major version, then `20`, `21`, `30` would be all be supported, with compatibility layers for `20` and `21`
+- A minor plugin change (e.g. `21`) would represent an added feature that requires a structural change but not a change to the primary code.
+  - A minor compatibility version bump deprecates any previous compatibility version (e.g. `20`).
+    - Both `20` and `21` would be supported, with `20` deprecated, using a compatibilty layer.
+- A major plugin change (e.g. `30`) would represent a breaking change to plugin, potentially requiring a complete code change.
+  - A major compatibility version bump deprecates all previous compatibility versions (e.g. `20` and `21`).
+    - If the library does not major version, then `20`, `21`, `30` would be all be supported, with `20` and `21` deprecated, using compatibility layers.
 - A major version bump to this library may or may not introduce a new plugin compatible.
-  - It would remove any deprecated versions
-  - If there is no change to plugin compatibility, then only a non-zero minor would introduce to new major version.
-    -  If `21` and `22` were introduced within Version 2 of this library, then Version 3 removes `20` and `21` and adds `30` as a duplicate of `22`.
+  - It would remove any deprecated versions.
+  - If there is no change to plugin compatibility, then only a non-zero minor plugin version would introduce to new major plugin version.
+    - If `21` and `22` were introduced within Version 2 of this library, then Version 3 removes `20` and `21`, keeps `22`, and adds `30` as a duplicate of `22`. Version 4 would remove `22`, keep `30`, and add `40` as deplicate of `30`
     - If only `20` exists, then `30` is introduced as a duplicate of `20`, but `20` is not deprecated until a minor or major change.
+      - Adding `x0` for every non-breaking major version `x` is to reduce developer overhead. "Just match the major version of the minimum of your supported dependency range."
   - If there is a minor plugin change, then that version becomes the next major compatibility version.
   - If there is a major plugin change, all previously supported compatibility versions are removed.
 ```

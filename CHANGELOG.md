@@ -7,7 +7,7 @@
 ### Added
 
 - `python -m granular_configuration_language.available_tags` is publicly usable now
-- `python -m granular_configuration_language.available_plugin`
+- `python -m granular_configuration_language.available_plugins`
 
 ### Changed
 
@@ -18,7 +18,7 @@
 ### Changed
 
 - `!ParseFile`, `!OptionalParseFile`, and `ParseEnv` will now actively check if there is a loading loop and throw `ParsingTriedToCreateALoop`.
-  - Previously, this could result in unexpected behaviors, `RecursionError`, or infinite loops and was not explicitly support and warned against.
+  - Previously, this could result in unexpected behaviors, `RecursionError`, or infinite loops and was not explicitly supported and warned against.
 
 ## 2.0.0
 
@@ -35,12 +35,13 @@
       - `ImportError` occur on the `jsonpath` modules when both are installed.
 - `Configuration` no longer fakes being a subclass of `dict`.
   - It remains a `Mapping`.
-  - `dict` inheritance was done for compatible with `json.dumps` and other library that only support the primitive `dict`, instead of `Mapping`. However, faking the inheritance has always been sketchy and `json.dumps` has failed in rare occurrences.
+  - `dict` inheritance was done for compatible with `json.dumps` and other libraries that only support the primitive `dict`, instead of `Mapping`. However, faking the inheritance has always been sketchy and `json.dumps` has failed in rare occurrences.
   - Mitigation: Used one of the following methods:
     - `json.dumps(config.as_dict())`
     - `json.dumps(config, default=granular_configuration_language.json_default)`
+    - `config.as_json_string()`
 - Configuration is immutable by default now.
-  - `Configuration` and `LazyLoadConfiguration` is are now immutable mappings.
+  - `Configuration` and `LazyLoadConfiguration` are now immutable mappings.
   - Immutable sequences use `tuple` is used instead of `list`
   - Mitigation: Use `MutableLazyLoadConfiguration` in-place of `LazyLoadConfiguration`.
     - This uses `MutableConfiguration` instead of `Configuration` and `list` for sequences.

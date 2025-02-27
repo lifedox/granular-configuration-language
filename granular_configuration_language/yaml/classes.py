@@ -161,11 +161,11 @@ class LoadOptions:
     Holds the parameters used when loading the configuration file.
     """
 
-    obj_pairs_func: typ.Type[tabc.Mapping]
+    obj_pairs_func: type[tabc.Mapping]
     """
     Type being used for YAML mappings
     """
-    sequence_func: typ.Type[tabc.Sequence]
+    sequence_func: type[tabc.Sequence]
     """
     Type being used for YAML sequences
     """

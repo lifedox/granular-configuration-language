@@ -12,7 +12,7 @@ from granular_configuration_language.yaml.classes import StateHolder
 from granular_configuration_language.yaml.load._constructors import construct_mapping, construct_sequence
 
 
-def make_constructor_class(state: StateHolder) -> typ.Type[SafeConstructor]:
+def make_constructor_class(state: StateHolder) -> type[SafeConstructor]:
     class ExtendedSafeConstructor(SafeConstructor):
         yaml_constructors = copy(SafeConstructor.yaml_constructors)
 

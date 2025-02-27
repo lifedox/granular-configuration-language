@@ -16,7 +16,7 @@ from granular_configuration_language.yaml.load import obj_pairs_func
 _C = typ.TypeVar("_C", bound=Configuration)
 
 
-def _merge_into_base(configuration_type: typ.Type[_C], base_dict: _C, from_dict: _C) -> None:
+def _merge_into_base(configuration_type: type[_C], base_dict: _C, from_dict: _C) -> None:
     for key, value in from_dict._raw_items():
         if isinstance(value, configuration_type) and (key in base_dict):
             if base_dict.exists(key):
@@ -31,13 +31,13 @@ def _merge_into_base(configuration_type: typ.Type[_C], base_dict: _C, from_dict:
         base_dict._private_set(key, value, setter_secret)
 
 
-def _merge(configuration_type: typ.Type[_C], base_config: _C, configs: tabc.Iterable[_C]) -> _C:
+def _merge(configuration_type: type[_C], base_config: _C, configs: tabc.Iterable[_C]) -> _C:
     consume(map(partial(_merge_into_base, configuration_type, base_config), configs))
     return base_config
 
 
 def _load_configs_from_locations(
-    configuration_type: typ.Type[_C], locations: tabc.Iterable[Path], lazy_root: LazyRoot, mutable: bool
+    configuration_type: type[_C], locations: tabc.Iterable[Path], lazy_root: LazyRoot, mutable: bool
 ) -> tabc.Iterator[_C]:
     def configuration_only(
         configs: tabc.Iterable[_C | typ.Any],

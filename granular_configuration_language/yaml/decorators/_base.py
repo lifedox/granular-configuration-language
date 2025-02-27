@@ -27,7 +27,7 @@ class TagConstructor:
     category: Category
     sort_as: SortedAs
     friendly_type: FriendlyType
-    constructor: tabc.Callable[[typ.Type[SafeConstructor], StateHolder], None]
+    constructor: tabc.Callable[[type[SafeConstructor], StateHolder], None]
     plugin: str = dataclasses.field(default="Unknown", init=False)
 
     def set_plugin(self, plugin: str) -> None:
@@ -41,7 +41,7 @@ class TagConstructor:
     def __hash__(self) -> int:
         return hash(self.tag)
 
-    def __call__(self, constructor: typ.Type[SafeConstructor], state: StateHolder) -> None:
+    def __call__(self, constructor: type[SafeConstructor], state: StateHolder) -> None:
         return self.constructor(constructor, state)
 
     def __repr__(self) -> str:
@@ -233,7 +233,7 @@ class TagDecoratorBase(typ.Generic[T], abc.ABC):
 
         @wraps(handler)
         def add_handler(
-            constructor: typ.Type[SafeConstructor],
+            constructor: type[SafeConstructor],
             state: StateHolder,
         ) -> None:
             @wraps(handler)

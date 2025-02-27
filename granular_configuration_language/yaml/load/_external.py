@@ -39,9 +39,9 @@ def loads(
         return result
 
 
-def obj_pairs_func(mutable: bool) -> typ.Type[Configuration] | typ.Type[MutableConfiguration]:
+def obj_pairs_func(mutable: bool) -> type[Configuration] | type[MutableConfiguration]:
     return MutableConfiguration if mutable else Configuration
 
 
-def sequence_func(mutable: bool) -> typ.Type[list] | typ.Type[tuple]:
+def sequence_func(mutable: bool) -> type[list] | type[tuple]:
     return list if mutable else tuple
