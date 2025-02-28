@@ -131,18 +131,30 @@ _lint() {
     poetry run isort --check .
     _logit Running black check
     poetry run black --check .
-    for version in $released_python_versions; do
-        _logit Running mypy --python-version "${version}"
-        poetry run mypy --python-version "${version}" .
-    done
-    for version in $released_python_versions; do
-        _logit Running pyright --pythonversion "${version}"
-        poetry run pyright --pythonversion "${version}" .
-    done
     _logit Running flake8
     poetry run flake8 .
     _logit Running bandit
     bandit -c pyproject.toml -r .
+}
+
+mypy() {
+    _run_cmd ./run _mypy
+}
+_mypy() {
+    for version in $released_python_versions; do
+        _logit Running mypy --python-version "${version}"
+        poetry run mypy --python-version "${version}" .
+    done
+}
+
+pyright() {
+    _run_cmd ./run _pyright
+}
+_pyright() {
+    for version in $released_python_versions; do
+        _logit Running pyright --pythonversion "${version}"
+        poetry run pyright --pythonversion "${version}" .
+    done
 }
 
 usage+=("  $0 refmt - Run black and isort")

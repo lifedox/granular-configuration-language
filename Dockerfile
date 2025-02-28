@@ -24,4 +24,4 @@ RUN poetry install --no-root --all-extras
 # and then quickly append the dist-info every change
 COPY --chown=granular:granular granular_configuration_language/ /app/granular_configuration_language/
 
-RUN poetry install --all-extras
+RUN poetry install --all-extras --all-groups

@@ -35,6 +35,16 @@
       "automerge": true,
       "matchDepTypes": "renovate_main",
       "rangeStrategy": "bump"
+    },
+    {
+      "automerge": true,
+      "matchDepTypes": "pyright",
+      "rangeStrategy": "bump"
+    },
+    {
+      "automerge": true,
+      "matchDepTypes": "docs",
+      "rangeStrategy": "bump"
     }
   ]
 }

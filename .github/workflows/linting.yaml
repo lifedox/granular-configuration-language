@@ -6,8 +6,8 @@ on:
   pull_request:
 
 jobs:
-  build:
-    name: Lint
+  lint:
+    name: Lint[black, isort, flake8, bandit]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -18,3 +18,29 @@ jobs:
       - run: pipx install poetry
       - run: poetry install
       - run: poetry run ./run _lint
+
+  mypy:
+    name: Lint[mypy]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.x"
+      - run: pipx install poetry
+      - run: poetry install
+      - run: poetry run ./run _mypy
+
+  pyright:
+    name: Lint[pyright]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.x"
+      - run: pipx install poetry
+      - run: poetry install --with=pyright
+      - run: poetry run ./run _pyright
