@@ -1,0 +1,4 @@
+app:
+  data:
+    key1: !Sub ${$.LOOKUP_KEY}
+    key2: !Sub ${$.LOOKUP_KEY}

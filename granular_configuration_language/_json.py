@@ -10,7 +10,6 @@ from functools import partial, update_wrapper
 from uuid import UUID
 
 from granular_configuration_language import Configuration, LazyLoadConfiguration
-from granular_configuration_language.proxy import SafeConfigurationProxy
 
 
 def get_name(value: tabc.Callable) -> str:
@@ -49,8 +48,6 @@ def json_default(value: typ.Any) -> typ.Any:
         return value.as_dict()
     elif isinstance(value, LazyLoadConfiguration):
         return value.config.as_dict()
-    elif isinstance(value, SafeConfigurationProxy):
-        return value.as_dict()
     elif isinstance(value, UUID):
         return str(value)
     elif isinstance(value, (date, datetime)):

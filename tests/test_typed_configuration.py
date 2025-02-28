@@ -53,7 +53,7 @@ def test_proxy_copies_Configuration() -> None:
 
     assert isinstance(copy.copy(config), Configuration)
     assert isinstance(copy.deepcopy(config), Configuration)
-    assert not isinstance(config, Configuration)
+    assert isinstance(config, Configuration)
     assert isinstance(config, SafeConfigurationProxy)
 
 

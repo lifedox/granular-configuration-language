@@ -2,6 +2,13 @@
 
 <!-- markdownlint-disable-file MD024 -->
 
+## 2.2.1
+
+### Changed
+
+- `SafeConfigurationProxy` is now registered as a subclass of `Configuration`.
+- Updated many docstrings to improve generated documentation.
+
 ## 2.2.0
 
 ### Added

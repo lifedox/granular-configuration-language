@@ -69,3 +69,57 @@ def test_injection() -> None:
 
     assert len(gc.get_referrers(injected_after)) == 0
     assert len(gc.get_referrers(injected_before)) == 0
+
+
+def test_injection_from_documentation() -> None:
+    from datetime import date
+
+    today = date(2025, 12, 28)
+
+    CONFIG = LazyLoadConfiguration(
+        ASSET_DIR / "injection_from_documentation.yaml",
+        base_path="app",
+        inject_after=Configuration(
+            app=Configuration(
+                today=today.isoformat(),
+            ),
+            LOOKUP_KEY="value made available to `!Sub`",
+        ),
+    )
+
+    assert CONFIG.today == "2025-12-28"
+    assert CONFIG.data.as_dict() == dict(
+        key1="value made available to `!Sub`",
+        key2="value made available to `!Sub`",
+    )
+
+
+@pytest.mark.parametrize(
+    "before,after, expected",
+    (
+        (Configuration(before="b"), Configuration(after="c"), dict(key1="a", key2="a", before="b", after="c")),
+        (dict(before="b"), Configuration(after="c"), dict(key1="a", key2="a", after="c")),
+        (Configuration(before="b"), dict(after="c"), dict(after="c")),
+    ),
+    ids=("correct_method", "before_wrong", "after_wrong"),
+)
+def test_injection_with_dict_fails_to_merge(
+    before: dict | Configuration, after: dict | Configuration, expected: dict
+) -> None:
+    CONFIG = LazyLoadConfiguration(
+        ASSET_DIR / "injection_from_documentation.yaml",
+        base_path="app",
+        inject_before=Configuration(
+            app=Configuration(
+                data=before,
+            ),
+        ),
+        inject_after=Configuration(
+            app=Configuration(
+                data=after,
+            ),
+            LOOKUP_KEY="a",
+        ),
+    )
+
+    assert CONFIG.data == expected

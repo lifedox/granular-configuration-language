@@ -3,6 +3,7 @@ from __future__ import annotations
 import collections.abc as tabc
 import copy
 import os
+import sys
 import typing as typ
 from collections.abc import Mapping, MutableMapping
 from functools import cached_property
@@ -12,6 +13,11 @@ from granular_configuration_language._cache import NoteOfIntentToRead, prepare_t
 from granular_configuration_language._configuration import C, Configuration, MutableConfiguration
 from granular_configuration_language._locations import Locations, PathOrStr
 from granular_configuration_language.exceptions import ErrorWhileLoadingConfig
+
+if sys.version_info >= (3, 12):
+    from typing import override
+elif typ.TYPE_CHECKING:
+    from typing_extensions import override
 
 
 def _read_locations(
@@ -25,10 +31,13 @@ def _read_locations(
     return Locations(load_order_location)
 
 
+@Configuration.register  # pyright: ignore
 class SafeConfigurationProxy(Mapping):
     """
     Wraps a :py:class:`.LazyLoadConfiguration` instance to proxy all method and
     attribute calls to its :py:class:`.Configuration` instance.
+
+    This class is :py:meth:`~abc.ABCMeta.register`-ed as a subclass of Configuration, so it pass ``isinstance( ... , Configuration)``
 
     .. admonition:: Implementation Reasoning
         :collapsible: closed
@@ -37,19 +46,6 @@ class SafeConfigurationProxy(Mapping):
         into :py:class:`.LazyLoadConfiguration`, while exposing all of :py:class:`.Configuration`
 
         This class is used behind :py:func:`typing.cast` in :py:meth:`.LazyLoadConfiguration.as_typed` so it is not exposed explicitly.
-
-        .. warning::
-            This class does not inherit from :py:class:`.Configuration`.
-
-            .. code-block:: python
-
-                from collections.abc import Mapping
-                from granular_configuration_language import Configuration, LazyLoadConfiguration
-
-                config = LazyLoadConfiguration( ... ).as_typed(Config)
-
-                isinstance(config, Configuration)  # returns false
-                isinstance(config, Mapping)  # returns true
 
     :param LazyLoadConfiguration llc:
         :py:class:`.LazyLoadConfiguration` instance to be wrapped
@@ -63,15 +59,19 @@ class SafeConfigurationProxy(Mapping):
     def __getattr__(self, name: str) -> typ.Any:
         return getattr(self.__llc.config, name)
 
+    @override
     def __getitem__(self, key: typ.Any) -> typ.Any:
         return self.__llc.config[key]
 
+    @override
     def __iter__(self) -> tabc.Iterator[typ.Any]:
         return iter(self.__llc.config)
 
+    @override
     def __len__(self) -> int:
         return len(self.__llc.config)
 
+    @override
     def __contains__(self, key: typ.Any) -> bool:
         return key in self.__llc.config
 
@@ -83,6 +83,7 @@ class SafeConfigurationProxy(Mapping):
 
     copy = __copy__
 
+    @override
     def __repr__(self) -> str:
         return repr(self.__llc.config)
 
@@ -97,7 +98,7 @@ class LazyLoadConfiguration(Mapping):
 
     ``inject_before`` and ``inject_after`` allow you to introduce dynamic settings into you configuration.
 
-    .. admonition:: :py:meth:`~LazyLoadConfiguration.as_typed` Example
+    .. admonition:: :py:meth:`!as_typed` Example
         :class: hint
         :collapsible: closed
 
@@ -123,6 +124,7 @@ class LazyLoadConfiguration(Mapping):
           - Injections must use :py:class:`.Configuration` for all mappings.
 
             - Otherwise, they will be treated as a normal value and not merged.
+          - Inject occurs before ``base_path`` is applied.
           - This is only available for :py:class:`.LazyLoadConfiguration`
 
             - As :py:class:`.MutableLazyLoadConfiguration` doesn't required this.
@@ -133,22 +135,27 @@ class LazyLoadConfiguration(Mapping):
 
         .. code-block:: yaml
 
-            data:
-                key1: !Sub ${$.LOOKUP_KEY}
-                key2: !Sub ${$.LOOKUP_KEY}
+            # "config.yaml"
+            app:
+                data:
+                    key1: !Sub ${$.LOOKUP_KEY}
+                    key2: !Sub ${$.LOOKUP_KEY}
 
         .. code-block:: python
 
             CONFIG = LazyLoadConfiguration(
-              ... ,
-              inject_after=Configuration(
-                today=date.today().isoformat(),
-                LOOKUP_KEY="value made available to `!Sub`",
-              )
+                "config.yaml",
+                base_path="app",
+                inject_after=Configuration(
+                    app=Configuration(
+                        today=date.today().isoformat(),
+                    ),
+                    LOOKUP_KEY="value made available to `!Sub`",
+                )
             )
 
-            CONFIG.today  # Today's data as a string.
-            CONFIG.data   # Date defined with a reusable library defined value.
+            CONFIG.today           # Today's date as a constant string.
+            CONFIG.data.as_dict()  # Data defined with a reusable library defined value.
 
     :param ~pathlib.Path | str | os.PathLike load_order_location:
             File path to configuration file
@@ -226,6 +233,7 @@ class LazyLoadConfiguration(Mapping):
 
         .. admonition:: Thread-safe
             :class: tip
+            :collapsible: closed
 
             Loading the configuration is thread-safe and locks while the
             configuration is loaded to prevent duplicative processing and data
@@ -250,12 +258,15 @@ class LazyLoadConfiguration(Mapping):
         # Now that logic is in the cached_property, so this legacy/clear code just calls the property
         self.config
 
+    @override
     def __getitem__(self, key: typ.Any) -> typ.Any:
         return self.config[key]
 
+    @override
     def __iter__(self) -> tabc.Iterator[typ.Any]:
         return iter(self.config)
 
+    @override
     def __len__(self) -> int:
         return len(self.config)
 
@@ -267,10 +278,22 @@ class LazyLoadConfiguration(Mapping):
 
         .. admonition:: Example
             :class: hint
+            :collapsible: closed
 
             .. code-block:: python
 
-                    CONFIG = LazyLoadConfiguration("config.yaml").as_typed(Config)
+                class SubConfig(Configuration):
+                    c: str
+
+                class Config(Configuration):
+                    a: int
+                    b: SubConfig
+
+                typed = LazyLoadConfiguration("config.yaml").as_typed(Config)
+
+                assert typed.a == 101
+                assert typed.b.c == "test me"
+                assert typed["a"] == 101
 
         .. admonition:: No runtime type checking
             :class: note
@@ -350,11 +373,13 @@ class MutableLazyLoadConfiguration(LazyLoadConfiguration, MutableMapping):
         )
 
     @property
+    @override
     def config(self) -> MutableConfiguration:
         """Load and fetch the configuration. Configuration is cached for subsequent calls.
 
         .. admonition:: Thread-safe
             :class: tip
+            :collapsible: closed
 
             Loading the configuration is thread-safe and locks while the
             configuration is loaded to prevent duplicative processing and data
@@ -362,12 +387,15 @@ class MutableLazyLoadConfiguration(LazyLoadConfiguration, MutableMapping):
         """
         return typ.cast(MutableConfiguration, super().config)
 
+    @override
     def __delitem__(self, key: typ.Any) -> None:
         del self.config[key]
 
+    @override
     def __setitem__(self, key: typ.Any, value: typ.Any) -> None:
         self.config[key] = value
 
+    @override
     def as_typed(self, typed_base: type[C]) -> typ.NoReturn:
         """
         :py:meth:`as_typed` is not supported for :py:class:`MutableLazyLoadConfiguration`.

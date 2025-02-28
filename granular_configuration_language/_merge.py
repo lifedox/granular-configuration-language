@@ -6,7 +6,6 @@ from os import PathLike
 
 from granular_configuration_language import Configuration, LazyLoadConfiguration, MutableLazyLoadConfiguration
 from granular_configuration_language._build import _merge
-from granular_configuration_language.proxy import SafeConfigurationProxy
 from granular_configuration_language.yaml import LazyEval
 from granular_configuration_language.yaml.load import obj_pairs_func
 
@@ -23,7 +22,14 @@ def merge(
     - Any :py:class:`os.PathLike` objects are loaded via individual :py:class:`.LazyLoadConfiguration` instances.
 
     .. caution::
+
         Don't use :py:func:`.merge` as a replacement for :py:class:`.LazyLoadConfiguration`. It is less efficient and creates Load Boundaries on each configuration.
+
+    .. admonition:: Attention
+        :class: error
+
+        - :py:class:`dict` does not act as :py:class:`.Configuration`.
+        - :py:class:`dict` instances are values that do not merge.
 
     :param ~collections.abc.Iterable[Configuration | LazyLoadConfiguration | LazyEval | ~os.PathLike | ~typing.Any] configs: Configurations
         to be merged
@@ -44,8 +50,6 @@ def merge(
 
             if isinstance(config, Configuration):
                 yield config
-            elif isinstance(config, SafeConfigurationProxy):
-                yield config.copy()
             elif isinstance(config, LazyLoadConfiguration):
                 yield config.config
             elif isinstance(config, PathLike):
