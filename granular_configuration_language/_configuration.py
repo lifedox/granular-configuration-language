@@ -13,10 +13,30 @@ from granular_configuration_language._s import setter_secret
 from granular_configuration_language.exceptions import InvalidBasePathException, PlaceholderConfigurationError
 from granular_configuration_language.yaml.classes import RT, LazyEval, P, Placeholder, T
 
+if sys.version_info >= (3, 12):
+    from typing import override
+elif typ.TYPE_CHECKING:
+    from typing_extensions import override
+else:
+
+    def override(func: typ.Callable[P, RT]) -> typ.Callable[P, RT]:
+        return func
+
+
 if sys.version_info >= (3, 11):
     from typing import Generic, TypedDict, Unpack, dataclass_transform
+
+    class Kwords_typed_get(Generic[T], TypedDict, total=False):
+        default: T
+        predicate: tabc.Callable[[typ.Any], typ.TypeGuard[T]]
+
 elif typ.TYPE_CHECKING:
     from typing_extensions import Generic, TypedDict, Unpack, dataclass_transform
+
+    class Kwords_typed_get(Generic[T], TypedDict, total=False):
+        default: T
+        predicate: tabc.Callable[[typ.Any], typ.TypeGuard[T]]
+
 else:
 
     def dataclass_transform(**kwargs: typ.Any) -> typ.Callable[[typ.Callable[P, RT]], typ.Callable[P, RT]]:
@@ -24,13 +44,6 @@ else:
             return func
 
         return identity
-
-
-if typ.TYPE_CHECKING:
-
-    class Kwords_typed_get(Generic[T], TypedDict, total=False):
-        default: T
-        predicate: tabc.Callable[[typ.Any], typ.TypeGuard[T]]
 
 
 class AttributeName(tabc.Iterable[str]):
@@ -57,6 +70,7 @@ class AttributeName(tabc.Iterable[str]):
     def with_suffix(self, name: typ.Any) -> str:
         return ".".join(self._plus_one(name))
 
+    @override
     def __iter__(self) -> tabc.Iterator[str]:
         if self.__prev:
             yield from self.__prev() or tuple()
@@ -68,6 +82,7 @@ class AttributeName(tabc.Iterable[str]):
         yield from self
         yield last if isinstance(last, str) else f"`{repr(last)}`"
 
+    @override
     def __str__(self) -> str:
         return ".".join(self)
 
@@ -137,12 +152,15 @@ class Configuration(tabc.Mapping[typ.Any, typ.Any]):
     # Required for Mapping
     #################################################################
 
+    @override
     def __iter__(self) -> tabc.Iterator:
         return iter(self.__data)
 
+    @override
     def __len__(self) -> int:
         return len(self.__data)
 
+    @override
     def __getitem__(self, name: typ.Any) -> typ.Any:
         try:
             value = self.__data[name]
@@ -179,9 +197,11 @@ class Configuration(tabc.Mapping[typ.Any, typ.Any]):
     # Overridden Mapping methods
     #################################################################
 
+    @override
     def __contains__(self, key: typ.Any) -> bool:
         return key in self.__data
 
+    @override
     def get(self, key: typ.Any, default: typ.Any = None) -> typ.Any:
         """
         Return the value for key if key is in the :py:class:`Configuration`, else default.
@@ -199,6 +219,7 @@ class Configuration(tabc.Mapping[typ.Any, typ.Any]):
     # Required behavior overrides
     #################################################################
 
+    @override
     def __repr__(self) -> str:
         return repr(self.__data)
 
@@ -410,12 +431,15 @@ class MutableConfiguration(tabc.MutableMapping[typ.Any, typ.Any], Configuration)
     # Type checkers do ignore this fact, because this is something to be avoided.
     # I want to continue to use self.__data to avoid people being tempted to reach in.
 
+    @override
     def __delitem__(self, key: typ.Any) -> None:
         del self._Configuration__data[key]
 
+    @override
     def __setitem__(self, key: typ.Any, value: typ.Any) -> None:
         self._Configuration__data[key] = value
 
+    @override
     def __deepcopy__(self, memo: dict[int, typ.Any]) -> MutableConfiguration:
         other = MutableConfiguration()
         memo[id(self)] = other
@@ -423,6 +447,7 @@ class MutableConfiguration(tabc.MutableMapping[typ.Any, typ.Any], Configuration)
         setattr(other, "_Configuration__data", copy.deepcopy(self._Configuration__data, memo=memo))
         return other
 
+    @override
     def __copy__(self) -> MutableConfiguration:
         other = MutableConfiguration()
         # Use setattr to avoid mypy and pylance being confused

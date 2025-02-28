@@ -1,14 +1,24 @@
 from __future__ import annotations
 
 import collections.abc as tabc
+import sys
 import typing as typ
 from collections import OrderedDict
 
 from granular_configuration_language.exceptions import ErrorWhileLoadingTags
 from granular_configuration_language.yaml.decorators._base import Tag, TagConstructor
 
+if sys.version_info >= (3, 12):
+    from typing import override
+elif typ.TYPE_CHECKING:
+    from typing_extensions import override
+else:
 
-class TagSet(tabc.Iterable[TagConstructor], typ.Container[str]):
+    def override(func: typ.Callable) -> typ.Callable:
+        return func
+
+
+class TagSet(tabc.Iterable[TagConstructor], tabc.Container[str]):
     def __init__(self, tags: tabc.Iterable[TagConstructor]) -> None:
         self.__state: OrderedDict[Tag, TagConstructor] = OrderedDict()
 
@@ -21,12 +31,15 @@ class TagSet(tabc.Iterable[TagConstructor], typ.Container[str]):
             else:
                 self.__state[tag] = tc
 
+    @override
     def __contains__(self, x: typ.Any) -> bool:
         return x in self.__state
 
+    @override
     def __iter__(self) -> tabc.Iterator[TagConstructor]:
         return iter(self.__state.values())
 
+    @override
     def __repr__(self) -> str:
         return f"TagSet{{{','.join(sorted(self.__state.keys()))}}}"
 

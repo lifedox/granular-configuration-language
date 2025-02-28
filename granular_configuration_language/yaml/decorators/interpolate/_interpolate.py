@@ -64,7 +64,7 @@ def round_sub(root: Root, *, contents: str) -> str:
     return "$(" + contents + ")"
 
 
-SUB_PATTERNS: typ.Final[tabc.Sequence[tuple[tabc.Callable, typ.Pattern[str]]]] = (
+SUB_PATTERNS: typ.Final[tabc.Sequence[tuple[tabc.Callable, re.Pattern[str]]]] = (
     (round_sub, re.compile(r"(\$\((?P<contents>.*?)\))")),
     (curly_sub, re.compile(r"(\$\{(?P<contents>.*?)\})")),
 )

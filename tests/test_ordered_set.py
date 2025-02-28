@@ -14,7 +14,7 @@ def test_order_is_maintained() -> None:
 def test_acts_like_a_set() -> None:
     value = OrderedSet((1, 1, 2, 2, 3, 3, 4, 4))
     assert tuple(value) == (1, 2, 3, 4)
-    assert value == {1, 2, 3, 4}  # type: ignore
+    assert value == {1, 2, 3, 4}  # type: ignore[comparison-overlap]
     assert 3 in value
 
 
@@ -22,7 +22,7 @@ def test_reorder_requires_pop() -> None:
     value = OrderedSet((1, 1, 2, 2, 3, 3, 4, 4))
     value.remove(2)
     value.add(2)
-    assert value == {1, 3, 4, 2}  # type: ignore
+    assert value == {1, 3, 4, 2}  # type: ignore[comparison-overlap]
 
 
 def test_first_seen_wins() -> None:

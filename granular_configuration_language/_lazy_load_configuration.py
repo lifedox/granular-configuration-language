@@ -18,6 +18,10 @@ if sys.version_info >= (3, 12):
     from typing import override
 elif typ.TYPE_CHECKING:
     from typing_extensions import override
+else:
+
+    def override(func: typ.Callable) -> typ.Callable:
+        return func
 
 
 def _read_locations(

@@ -135,6 +135,10 @@ _lint() {
         _logit Running mypy --python-version "${version}"
         poetry run mypy --python-version "${version}" .
     done
+    for version in $released_python_versions; do
+        _logit Running pyright --pythonversion "${version}"
+        poetry run pyright --pythonversion "${version}" .
+    done
     _logit Running flake8
     poetry run flake8 .
     _logit Running bandit
@@ -229,6 +233,12 @@ _docn() {
 # For Dark Reader to make local viewing bearable
 _doch() {
     _docs
+    pushd docs/html
+    poetry run python -m http.server 9999
+    popd
+}
+_dochn() {
+    _docn
     pushd docs/html
     poetry run python -m http.server 9999
     popd

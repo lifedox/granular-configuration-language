@@ -16,11 +16,11 @@ def test_delimited_singular_ends_slash() -> None:
 
 
 def test_delimited_multiple() -> None:
-    assert read_base_path("/base/path") == ("base", "path")  # type: ignore
+    assert read_base_path("/base/path") == ("base", "path")  # type: ignore[comparison-overlap]
 
 
 def test_sequence() -> None:
-    assert read_base_path(["base", "path"]) == ("base", "path")  # type: ignore
+    assert read_base_path(["base", "path"]) == ("base", "path")  # type: ignore[comparison-overlap]
 
 
 def test_none() -> None:

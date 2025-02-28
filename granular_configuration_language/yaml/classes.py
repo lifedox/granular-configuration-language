@@ -2,11 +2,22 @@ from __future__ import annotations
 
 import abc
 import collections.abc as tabc
+import sys
 import typing as typ
 from dataclasses import dataclass
 from functools import cached_property
 from pathlib import Path
 from threading import RLock
+
+if sys.version_info >= (3, 12):
+    from typing import override
+elif typ.TYPE_CHECKING:
+    from typing_extensions import override
+else:
+
+    def override(func: typ.Callable) -> typ.Callable:
+        return func
+
 
 P = typ.ParamSpec("P")
 T = typ.TypeVar("T")
@@ -43,6 +54,7 @@ class Masked(str):
         Does not alter text or prevent :py:func:`print` from display the string value.
     """
 
+    @override
     def __repr__(self) -> str:
         return "'<****>'"
 
@@ -59,6 +71,7 @@ class Placeholder:
     def __init__(self, message: str) -> None:
         self.message: typ.Final = message
 
+    @override
     def __str__(self) -> str:
         return str(self.message)
 
@@ -146,6 +159,7 @@ class LazyEval(abc.ABC, typ.Generic[RT]):
             result = result.__run()
         return result
 
+    @override
     def __repr__(self) -> str:
         return f"<{self.__class__.__name__}: {self.tag}>"
 
@@ -166,11 +180,11 @@ class LoadOptions:
     Holds the parameters used when loading the configuration file.
     """
 
-    obj_pairs_func: type[tabc.Mapping]
+    obj_pairs_func: type[tabc.Mapping[typ.Any, typ.Any]]
     """
     Type being used for YAML mappings
     """
-    sequence_func: type[tabc.Sequence]
+    sequence_func: type[tuple[typ.Any] | list[typ.Any]]
     """
     Type being used for YAML sequences
     """

@@ -3,6 +3,7 @@ from __future__ import annotations
 import abc
 import collections.abc as tabc
 import dataclasses
+import sys
 import typing as typ
 from functools import wraps
 
@@ -11,6 +12,16 @@ from ruamel.yaml import MappingNode, Node, SafeConstructor, ScalarNode, Sequence
 from granular_configuration_language.exceptions import ErrorWhileLoadingTags
 from granular_configuration_language.yaml.classes import RT, StateHolder, T, Tag
 from granular_configuration_language.yaml.load._constructors import construct_mapping, construct_sequence
+
+if sys.version_info >= (3, 12):
+    from typing import override
+elif typ.TYPE_CHECKING:
+    from typing_extensions import override
+else:
+
+    def override(func: typ.Callable) -> typ.Callable:
+        return func
+
 
 Category = typ.NewType("Category", str)
 SortedAs = typ.NewType("SortedAs", str)
@@ -33,17 +44,20 @@ class TagConstructor:
     def set_plugin(self, plugin: str) -> None:
         object.__setattr__(self, "plugin", plugin)
 
+    @override
     def __eq__(self, value: object) -> bool:
         return (isinstance(value, self.__class__) and self.tag == value.tag) or (
             isinstance(value, str) and self.tag == value
         )
 
+    @override
     def __hash__(self) -> int:
         return hash(self.tag)
 
     def __call__(self, constructor: type[SafeConstructor], state: StateHolder) -> None:
         return self.constructor(constructor, state)
 
+    @override
     def __repr__(self) -> str:
         return f"<TagConstructor(`{self.tag}`): {self.constructor.__module__}.{self.constructor.__name__}>"
 

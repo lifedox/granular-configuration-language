@@ -15,7 +15,7 @@ try:
 
     can_table = True
 except ImportError:  # pragma: no cover
-    tabulate = None  # type: ignore
+    tabulate = None  # type: ignore[assignment]
     can_table = False
 
 
@@ -66,7 +66,7 @@ class AvailableBase:
         keys_to_del = row.keys() - set(self.headers)
 
         for key in keys_to_del:
-            del row[key]  # type: ignore
+            del row[key]  # type: ignore[misc]
         return row
 
     def get_rows(self) -> tabc.Iterator[RowType]:

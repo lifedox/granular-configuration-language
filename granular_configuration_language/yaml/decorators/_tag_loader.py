@@ -56,7 +56,7 @@ def get_external_tag_plugins() -> tabc.Iterator[tuple[PluginName, ModuleName]]:
     return map(attrgetter("name", "module"), entry_points(group="granular_configuration_language_20_tag"))
 
 
-def get_all_tag_plugins(*, disable_plugin: typ.AbstractSet[str]) -> tabc.Iterator[tuple[ModuleName, PluginName]]:
+def get_all_tag_plugins(*, disable_plugin: tabc.Set[str]) -> tabc.Iterator[tuple[ModuleName, PluginName]]:
     builtin = PluginName("<gcl-built-in>")
 
     for module in get_internal_tag_plugins():
@@ -69,8 +69,8 @@ def get_all_tag_plugins(*, disable_plugin: typ.AbstractSet[str]) -> tabc.Iterato
 
 def load_tags(
     *,
-    disable_plugins: typ.AbstractSet[str] = frozenset(),
-    disable_tags: typ.AbstractSet[Tag | str] = frozenset(),
+    disable_plugins: tabc.Set[str] = frozenset(),
+    disable_tags: tabc.Set[Tag | str] = frozenset(),
 ) -> TagSet:
     disable_plugins |= frozenset(filter(None, map(str.strip, os.getenv("G_CONFIG_DISABLE_PLUGINS", "").split(","))))
     disable_tags |= frozenset(filter(None, map(str.strip, os.getenv("G_CONFIG_DISABLE_TAGS", "").split(","))))

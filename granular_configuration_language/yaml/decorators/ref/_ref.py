@@ -16,7 +16,7 @@ from granular_configuration_language.exceptions import (
 from granular_configuration_language.yaml.classes import LazyEval
 from granular_configuration_language.yaml.decorators import Root
 
-SUB_PATTERN: typ.Pattern[str] = re.compile(r"(\$\{(?P<contents>.*?)\})")
+SUB_PATTERN: re.Pattern[str] = re.compile(r"(\$\{(?P<contents>.*?)\})")
 
 
 def _resolve_pointer(query: str, root: tabc.Mapping) -> typ.Any:
@@ -58,7 +58,7 @@ def _resolve_path(query: str, root: tabc.Mapping) -> typ.Any:
 
 
 def resolve_json_ref(query: str, root: Root) -> typ.Any:
-    if isinstance(root, LazyEval) and root.tag == "!Merge":
+    if isinstance(root, LazyEval) and root.tag == "!Merge":  # pyright: ignore[reportUnnecessaryIsInstance]
         raise RecursionError(
             f"JSON Query `{query}` attempted recursion. Please check your configuration for a self-referencing loop."
         )

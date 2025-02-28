@@ -19,7 +19,7 @@ def _load_file(
     *,
     filename: Path,
     mutable: bool,
-    lazy_root: typ.Optional[LazyRoot],
+    lazy_root: LazyRoot | None,
     previous_options: LoadOptions | None,
 ) -> typ.Any:
     try:
@@ -42,7 +42,7 @@ def load_file(
     filename: Path,
     *,
     mutable: bool,
-    lazy_root: typ.Optional[LazyRoot] = None,
+    lazy_root: LazyRoot | None = None,
     previous_options: LoadOptions | None = None,
 ) -> typ.Any:
     if filename.suffix == ".ini":
