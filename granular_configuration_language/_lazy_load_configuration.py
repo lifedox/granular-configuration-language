@@ -41,7 +41,7 @@ class SafeConfigurationProxy(Mapping):
     Wraps a :py:class:`.LazyLoadConfiguration` instance to proxy all method and
     attribute calls to its :py:class:`.Configuration` instance.
 
-    This class is :py:meth:`~abc.ABCMeta.register`-ed as a subclass of Configuration, so it pass ``isinstance( ... , Configuration)``
+    Passes ``isinstance( ... , Configuration)`` checks, as this class is :py:meth:`~abc.ABCMeta.register`-ed as a subclass of :py:class:`.Configuration`.
 
     .. admonition:: Implementation Reasoning
         :collapsible: closed
