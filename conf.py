@@ -79,7 +79,7 @@ nitpick_ignore = [
 ]
 
 # Patching that makes sphinx 8.2.0 and 8.2.1 work
+# Done weirding to hide the evil from pyright and mypy
+import importlib  # noqa: E402
 
-from sphinx.util import inspect  # noqa: E402
-
-inspect.TypeAliasForwardRef.__repr__ = lambda self: self.name  # type: ignore
+importlib.import_module("sphinx.util").inspect.TypeAliasForwardRef.__repr__ = lambda self: self.name
