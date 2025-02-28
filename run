@@ -256,6 +256,19 @@ _dochn() {
     popd
 }
 
+##################################################################################################
+# poetry shortcuts
+##################################################################################################
+
+sync() {
+    echo poetry sync --all-extras --all-groups
+    poetry sync --all-extras --all-groups
+}
+install() {
+    echo poetry install --all-extras --all-groups
+    poetry install --all-extras --all-groups
+}
+
 cmd="$1"
 
 # If there was a command, then shift so $@ is the args

@@ -23,11 +23,6 @@
   "packageRules": [
     {
       "automerge": true,
-      "matchDepTypes": "dependencies",
-      "rangeStrategy": "update-lockfile"
-    },
-    {
-      "automerge": true,
       "matchDepTypes": "dev",
       "rangeStrategy": "pin"
     },
