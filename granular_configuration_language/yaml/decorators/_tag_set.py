@@ -56,3 +56,11 @@ class TagSet(tabc.Iterable[TagConstructor], tabc.Container[str]):
                     yield tag
 
         return TagSet(subset())
+
+    def get_difference(self, *select: str) -> TagSet:
+        def subset() -> tabc.Iterator[TagConstructor]:
+            for tag in self:
+                if tag.tag not in select:
+                    yield tag
+
+        return TagSet(subset())

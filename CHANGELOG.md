@@ -2,6 +2,20 @@
 
 <!-- markdownlint-disable-file MD024 -->
 
+## 2.2.2
+
+### Added
+
+- Added `needs_root_condition` column to `available_plugins`.
+- `G_CONFIG_ENABLE_TAG_TRACKER` to Environment Variables.
+
+### Changed
+
+- Made tag attribute tracking optional via `G_CONFIG_ENABLE_TAG_TRACKER`.
+  - `available_plugins` and `available_tags` set `G_CONFIG_ENABLE_TAG_TRACKER` temporarily.
+- `!Masked` is now lazy, for consistency with `interpolate_value_without_ref` recommendations.
+- Improved documentation.
+
 ## 2.2.1
 
 ### Changed

@@ -7,12 +7,13 @@ from functools import partial
 from ruamel.yaml import YAML, SafeConstructor
 from ruamel.yaml.resolver import BaseResolver
 
-from granular_configuration_language.yaml._tags import handlers
 from granular_configuration_language.yaml.classes import StateHolder
 from granular_configuration_language.yaml.load._constructors import construct_mapping, construct_sequence
 
 
 def make_constructor_class(state: StateHolder) -> type[SafeConstructor]:
+    from granular_configuration_language.yaml._tags import handlers
+
     class ExtendedSafeConstructor(SafeConstructor):
         yaml_constructors = copy(SafeConstructor.yaml_constructors)
 

@@ -6,7 +6,7 @@ from functools import wraps
 
 from granular_configuration_language.yaml.classes import RT, LazyEval, LoadOptions, Root, StateHolder, T, Tag
 from granular_configuration_language.yaml.decorators._lazy_eval import LazyEvalBasic, LazyEvalWithRoot
-from granular_configuration_language.yaml.decorators._tag_tracker import track_as_not_lazy
+from granular_configuration_language.yaml.decorators._tag_tracker import track_as_not_lazy, track_needs_root_condition
 
 
 def as_lazy(func: tabc.Callable[[T], RT]) -> tabc.Callable[[Tag, T, StateHolder], LazyEval[RT]]:
@@ -100,6 +100,30 @@ def as_lazy_with_root(
 
         ``sphinx.ext.autodoc`` isn't exposing the :py:func:`typing.overload`. See the example for a clearer type signatures
 
+        .. admonition:: Typing Stub
+            :class: note
+            :collapsible: closed
+
+            .. code-block:: python
+
+                # Decorator
+                # Uses as: ``@as_lazy_with_root``
+                @overload
+                def as_lazy_with_root(
+                    func: Callable[[T, Root], RT]
+                ) -> Callable[
+                    [Tag, T, StateHolder], LazyEval[RT]
+                ]: ...
+
+                # Decorator Factory
+                # Uses as: ``@as_lazy_with_root(needs_root_condition=condition)``
+                @overload
+                def as_lazy_with_root(
+                    *, needs_root_condition: Callable[[T], bool]
+                ) -> Callable[
+                    [Callable[[T, Root], RT]], Callable[[Tag, T, StateHolder], LazyEval[RT]]
+                ]: ...
+
     :param ~collections.abc.Callable[[T, Root], RT] func:
         Function to be wrapped
     :param ~collections.abc.Callable[[T], bool], optional needs_root_condition:
@@ -133,6 +157,9 @@ def as_lazy_with_root(
     """
 
     def decorator_generator(func: tabc.Callable[[T, Root], RT]) -> tabc.Callable[[Tag, T, StateHolder], LazyEval[RT]]:
+
+        if needs_root_condition:
+            track_needs_root_condition(func, needs_root_condition)
 
         @wraps(func)
         def lazy_wrapper(tag: Tag, value: T, state: StateHolder) -> LazyEval[RT]:

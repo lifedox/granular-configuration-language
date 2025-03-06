@@ -98,6 +98,7 @@ class TagDecoratorBase(typ.Generic[T], abc.ABC):
 
     __slots__ = ("tag", "category", "sort_as")
 
+    @typ.final
     def __init__(self, tag: Tag, category: str = "General", *, sort_as: str | None = None) -> None:
         """
         :param Tag tag:
@@ -224,6 +225,7 @@ class TagDecoratorBase(typ.Generic[T], abc.ABC):
         """
         return value
 
+    @typ.final
     def __call__(self, handler: tabc.Callable[[Tag, T, StateHolder], RT]) -> TagConstructor:
         # """Takes the wrapped tag function and further wraps it for configuration loading.
         # :param (~collections.abc.Callable[[Tag, T, StateHolder], RT]) handler: Wrapped Tag Function

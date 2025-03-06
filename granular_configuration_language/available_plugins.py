@@ -2,6 +2,9 @@
 if __name__ == "__main__":
     import argparse
     import operator as op
+    import os
+
+    os.environ["G_CONFIG_ENABLE_TAG_TRACKER"] = "TRUE"
 
     from granular_configuration_language.yaml._tags import handlers
     from granular_configuration_language.yaml.decorators._viewer import AvailablePlugins, can_table
