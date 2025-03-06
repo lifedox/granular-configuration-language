@@ -1,5 +1,5 @@
-``granular_configuration_language.yaml.decorators``
-===================================================
+``granular_configuration_language`` ``.yaml.decorators``
+========================================================
 
 .. autoclass:: granular_configuration_language.yaml.decorators.TagDecoratorBase
     :members:
@@ -12,5 +12,13 @@
     :imported-members:
     :show-inheritance:
     :member-order: groupwise
-    :exclude-members: LoadOptions, Root, TagDecoratorBase
+    :exclude-members: LoadOptions, Root, TagDecoratorBase, interpolate_value_with_ref, interpolate_value_without_ref
     :inherited-members: TagDecoratorBase
+
+.. Made available from :py:mod:`.interpolate <granular_configuration_language.yaml.decorators.interpolate>`
+.. --------------------------------------------------------------------------------------------------------
+
+.. autofunction:: granular_configuration_language.yaml.decorators.interpolate_value_with_ref
+
+
+.. autofunction:: granular_configuration_language.yaml.decorators.interpolate_value_without_ref

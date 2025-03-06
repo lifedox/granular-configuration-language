@@ -1,5 +1,5 @@
-``granular_configuration_language.exceptions``
-====================================================
+``granular_configuration_language`` ``.exceptions``
+===================================================
 
 .. automodule:: granular_configuration_language.exceptions
    :members:

@@ -2,11 +2,11 @@
 
 ## Immutable vs. Mutable
 
-Originally {py:class}`.Configuration` sought to be a drop-in replacement for {py:class}`dict`, so that {py:func}`json.dumps` would just work. This goal has been given up on (as unmaintainable) with version 2.0. With the {py:class}`~collections.abc.MutableMapping` interface of {py:class}`dict` no longer required and cache adding, it was decided that a mutable configuration was dangerous and immutability should be the default.
+Originally {py:class}`.Configuration` sought to be a drop-in replacement for {py:class}`dict`, so that {py:func}`json.dumps` would just work. This goal has been given up on (as unmaintainable) with version 2.0. With the {py:class}`~collections.abc.MutableMapping` interface of {py:class}`dict` no longer required and in order to add caching, it was decided that a mutable configuration was dangerous and immutability should be the default.
 
 As such, {py:class}`.Configuration` and {py:class}`.LazyLoadConfiguration` were changed from {py:class}`~collections.abc.MutableMapping` to {py:class}`~collections.abc.Mapping` and loaded YAML sequences from changed from {py:class}`list` to {py:class}`tuple`/{py:class}`~collections.abc.Sequence` by default. Immutability makes them thread-safe, as well.
 
-For compatibility, mutable configuration support was added explicitly, as {py:class}`.MutableConfiguration` and {py:class}`.MutableLazyLoadConfiguration`. In mutable-mode, YAML sequences are loaded as {py:class}`list`/{py:class}`~collections.abc.MutableSequence` and caching is disabled. Modifying a {py:class}`.MutableConfiguration` is not thread-safe. Apart from the added methods of {py:class}`~collections.abc.MutableMapping`, {py:class}`.MutableConfiguration` is identical to {py:class}`.Configuration` and {py:class}`.MutableLazyLoadConfiguration` is identical to {py:class}`.LazyLoadConfiguration`. Any documentation on {py:class}`.Configuration` or {py:class}`.LazyLoadConfiguration` applied to their mutable counterparts.
+For compatibility, mutable configuration support was added explicitly, as {py:class}`.MutableConfiguration` and {py:class}`.MutableLazyLoadConfiguration`, both just adding {py:class}`~collections.abc.MutableMapping`. In mutable-mode, YAML sequences are loaded as {py:class}`list`/{py:class}`~collections.abc.MutableSequence` and caching is disabled. Modifying a {py:class}`.MutableConfiguration` is not thread-safe. Documentation will reference {py:class}`.Configuration` or {py:class}`.LazyLoadConfiguration`, but all concepts apply to their mutable counterparts, use noted in the [Code Specification](spec)
 
 You should highly consider using the immutable configuration in you code.
 
@@ -14,28 +14,34 @@ You should highly consider using the immutable configuration in you code.
 
 ## Lifecycle
 
+<sup>\*</sup> "identical immutable configurations" means using {py:class}`.LazyLoadConfiguration` with the same set of possible input files, and not using `inject_after` or `inject_before`.
+
 1. **Import Time**: {py:class}`.LazyLoadConfiguration`'s are defined (`CONFIG = LazyLoadConfiguration(...)`).
-   - So long as the next step does not occur, all identical immutable configurations<sup>\*</sup> identified and marked for caching.
-     - Loading a configuration clears the cache for all identical immutable configurations, meaning if another identical immutable configuration is created, it will be loaded separately.
-2. **First Fetch**: Configuration is fetched for the first time (through `CONFIG.value`, `CONFIG[value]`, `CONFIG.config`, and such)
+   - So long as the next step does not occur, all "identical immutable configurations"<sup>\*</sup> are marked as using the same configuration cache.
+     - Loading a configuration clears its marks from the cache, meaning if another identical immutable configuration is created, it will be loaded separately.
+2. **First Fetch**: Configuration is fetched for the first time (through `CONFIG.value`, `CONFIG["value"]`, `CONFIG.config`, and such)
    1. **Load Time**:
       1. The file system is scanned for specified configuration files.
+         - Paths are expanded ({py:meth}`~pathlib.Path.expanduser`) and resolved ({py:meth}`~pathlib.Path.resolve`) at Import Time, but checked for existence and read during Load Time.
       2. Each file that exists is read and loaded.
    2. **Merge Time**:
       1. Any Tags defined at the root of the file are run (i.e. the file beginning with a tag: `!Parsefile ...` or `!Merge ...`).
-      2. The loaded Configurations are merged in-order into one Configuration.
-         - Any files that do not define a Mapping are filtered out.
-         - Mappings are merged recursively. Any non-mapping overrides. Newer values override older values. (See [more](#merging))
+      2. The loaded {py:class}`.Configuration` instances are merged in-order into one {py:class}`.Configuration`.
+         - Any files that do not define a {py:class}`~collections.abc.Mapping` are filtered out.
+           - `"str"` is valid YAML, but not a {py:class}`~collections.abc.Mapping`.
+           - Everything being filtered out results in an empty {py:class}`.Configuration`.
+         - Mappings are merged recursively. Any non-mapping overrides. Newer values override older values. (See [Merging](#merging) for more)
            - `{"a": "b": 1}` + `{"a: {"b": {"c": 1}}` ⇒ `{"a: {"b": {"c": 1}}`
            - `{"a: {"b": {"c": 1}}` + `{"a: {"b": {"c": 2}}` ⇒ `{"a: {"b": {"c": 2}}`
            - `{"a: {"b": {"c": 2}}` + `{"a: {"b": {"d": 3}}` ⇒ `{"a: {"b": {"c": 2, "d": 3}}`
            - `{"a: {"b": {"c": 2, "d": 3}}` + `{"a": "b": 1}` ⇒ `{"a": "b": 1}`
    3. **Build Time**:
       1. The Base Path is applied.
-      2. The Base Paths for any {py:class}`.LazyLoadConfiguration` shared this identical immutable configuration are applied.
+      2. The Base Paths for any {py:class}`.LazyLoadConfiguration` that shared this identical immutable configuration are applied.
          - Exceptions that occur (such as {py:class}`.InvalidBasePathException`) are stored, so they emit for the first fetch of the associated {py:class}`.LazyLoadConfiguration`.
       3. {py:class}`.LazyLoadConfiguration` no longer holds a reference to the Root configuration (see [Root](#json-pathpointer-ref--root) for a more detailed definition).
-         - If no tags depend on the Root, it will be free. (`!Ref` is an example of a tag that holds a reference to the Root until it is run.)
+         - If no tags depend on the Root, it will be freed.
+           - [`!Ref`](yaml.md#ref) is an example of a tag that holds a reference to the Root until it is run.
          - If an exception occurs, the Root is unavoidable caught in the frame.
 3. **Fetching a Lazy Tag**:
    1. Upon first get of the {py:class}`.LazyEval` object, the underlying function is called.
@@ -49,11 +55,13 @@ When making copies, it is important to note that {py:class}`.LazyEval` instance 
 
 This means that a {py:func}`~copy.deepcopy` of a {py:class}`.Configuration` or {py:class}`.MutableConfiguration` instance can share state with the original, if any {py:class}`.LazyEval` is present, despite that breaking the definition of a deep copy.
 
+```{admonition} Mitigation
+:class: tip
+
 - Using immutable {py:class}`.Configuration` (and {py:class}`.LazyLoadConfiguration`) will prevent needing to make copies.
 - {py:meth}`~.Configuration.as_dict()` is also a great way to make a safe mutable copy.
 - {py:meth}`~.MutableConfiguration.evaluate_all()` will run all {py:class}`.LazyEval` instance, making a {py:class}`.MutableConfiguration` instance safe to copy.
-
-<sup>\*</sup> "identical immutable configurations" means using {py:class}`.LazyLoadConfiguration` with the same set of possible input files, and not using `inject_after` or `inject_before`.
+```
 
 ---
 
@@ -245,11 +253,17 @@ In order to not create a doubly-linked structure or lose `base_path` ability to 
 
 JSON Path was selected as the syntax for being an open standard (and familiarity). JSON Pointer was added when `python-jsonpath` was selected as the JSON Path implementation, because it is ready supported. JSON Pointer is the more correct choice, as it can only be a reference.
 
-> Note: If you explore the code or need to [add a custom tag](plugins.md#adding-custom-tags), {py:class}`.Root` and {py:class}`.RootType` represent Root as a type. {py:class}`.LazyRoot` is used during Build Time to allow the delayed reference of Root after it has been created.
+```{admonition} About Types
+:class: note
 
-<!-- markdownlint-disable MD012 -->
+If you explore the code or need to [add a custom tag](plugins.md#adding-custom-tags), {py:class}`.Root` and {py:class}`.RootType` represent Root as a type. {py:class}`.LazyRoot` is used during Build Time to allow delayed reference of Root until after it has been created.
+```
 
-> Memory Note: `base_path` will remove a reference count toward Root, but any Tag needing Root will hold a reference until evaluated. [`!Sub`](yaml.md#sub) checks if it needs Root before holding a reference.
+```{admonition} About Memory
+:class: note
+
+`base_path` will remove a reference count toward Root, but any Tag needing Root will hold a reference until evaluated. [`!Sub`](yaml.md#sub) checks if it needs Root before holding a reference.
+```
 
 ### Load Boundary Limitations
 
@@ -257,7 +271,7 @@ A load boundary is created by Root. You cannot query outside the Root and every 
 
 In more concrete terms, every {py:class}`.LazyLoadConfiguration` has an independent Root.
 
-Where this matter is merging configuration. [`!ParseFile`](yaml.md#parsefile--optionalparsefile) passes the Root it whatever it loads, so [`!Merge`](yaml.md#merge) does not introduce Load Boundaries.
+Where this matter is merging configuration. [`!ParseFile`](yaml.md#parsefile--optionalparsefile) passes the Root to whatever it loads, so [`!Merge`](yaml.md#merge) does not introduce Load Boundaries.
 
 However, {py:func}`.merge` does introduce Load Boundaries.
 
@@ -339,13 +353,16 @@ For completeness’ sake, merging with [`!Merge`](yaml.md#merge) has the same re
 
 Because [`!ParseFile`](yaml.md#parsefile--optionalparsefile), [`!OptionalParseFile`](yaml.md#parsefile--optionalparsefile), and [`!ParseEnv`](yaml.md#parseenv--parseenvsafe) load data from an external source (i.e. files and environment variables), they introduce the risk of circularly loading these sources.
 
-> Note: [`!ParseEnvSafe`](yaml.md#parseenv--parseenvsafe) does not include support for tags, so it does not have this risk, as it can only ever be an end to the chain.
+```{note}
 
-In order to prevent looping, each load of a file or environment to tracked per chain, and a {py:class}`.ParsingTriedToCreateALoop` exception is thrown just before a source, previously loaded in the chain, tries to load.
+[`!ParseEnvSafe`](yaml.md#parseenv--parseenvsafe) does not include support for tags, so it does not have this risk, as it can only ever be an end to the chain.
+```
 
-### Multiple Chains
+In order to prevent looping, each load of a file or environment is tracked **per chain**, and a {py:class}`.ParsingTriedToCreateALoop` exception is thrown just before a previously loaded (in chain) source tries to load.
 
 This does not prevent the same source load being loaded more than once if it is multiple chains.
+
+### Example of Multiple Chains
 
 **Environment:**
 

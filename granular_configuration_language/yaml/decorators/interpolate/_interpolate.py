@@ -102,6 +102,18 @@ del (
 
 
 def interpolation_needs_ref_condition(value: str) -> bool:
+    """
+    A ``needs_root_condition`` usable by :py:func:`.as_lazy_with_root`.
+
+    Works with :py:func:`.interpolate_value_with_ref` to check if ``value`` uses a JSON Path or JSON Pointer interpolation.
+
+    Used by :ref:`tag-sub`.
+
+    :param str value: Unprocessed YAML str
+    :return: :py:data:`True`, if the value contains an interpolation that uses JSON Path or Pointer
+    :rtype: bool
+    """
+
     return bool(DOES_REF_PATTERN.search(value))
 
 

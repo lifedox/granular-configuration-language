@@ -2,9 +2,9 @@
 
 ## Defining a Configuration
 
-Configuration is always defined by constructing a {py:class}`.LazyLoadConfiguration` and providing the paths to possible files. Paths can be {py:class}`str` or {py:class}`pathlib.Path` objects.
+Configuration is always defined by constructing a {py:class}`.LazyLoadConfiguration` and providing the paths to possible files. Paths can be {py:class}`str`, {py:class}`pathlib.Path`, or any {py:class}`os.PathLike` objects.
 
-Examples:
+_\* The discussion with each example is intended to build on previous examples, each adding a concept to the set of ideas._
 
 ### One-off library with three possible sources
 
@@ -18,14 +18,13 @@ CONFIG = LazyLoadConfiguration(
 )
 ```
 
-- Comments:
-  - `Path(__file___).parent /` creates a file relative directory. Using this ensures that the embedded configuration (the one shipped with this library) is correctly reference within site-package.
-    - This example shows the common pattern of having a `config.py` (or `config` with `_config.py`) and then have config file (`config.yaml`) live next to it.
-    - ⚠️ Don't forget to add the embedded config to package data.
-  - `~/.config/` is useful when you have settings that developers may want to on their machines.
-    - For example, plain text logs while debugging and JSON logs for deploys.
-  - `./` is useful for application deployment-specific settings.
-    - For example, say we have an application deploying to a Lambda package and a container service. With a current working directory option, Lambda specific settings and the container specific settings are single file addition to common deploy package.
+- `Path(__file___).parent /` creates a file relative directory. Using this ensures that the embedded configuration (the one shipped with this library) is correctly reference within site-packages.
+  - This example shows a common pattern of having a `config.py` (or `config` with `_config.py`) and then have config file (`config.yaml`) live next to it.
+    - ⚠️ Don't forget to add this embedded config to package data.
+- `~/.config/` is useful when you have settings that developers may want to on their machines.
+  - For example, plain text logs while debugging and JSON logs for deploys.
+- `./` is useful for application deployment-specific settings.
+  - For example, say we have an application deploying to a Lambda package and a container service. With a current working directory option, Lambda specific settings and the container specific settings are single file addition to common deploy package.
 
 ### Library that shares configuration files with other libraries
 
@@ -42,11 +41,12 @@ CONFIG = LazyLoadConfiguration(
 )
 ```
 
-- Comments:
-  - Ecosystem/framework for configuration adds the concept of one file (or set of files) containing configuration for multiple libraries (and maybe the application as well). As such, in addition to using shared files, the need to separate configuration into sections becomes necessary. By having each library have a dedicated section, the libraries maintain loose coupling and no settings will accidentally be used by multiple library with different meanings. `base_path` defines the path your library section.
-    - `base_path` can be defined as a single key, a list of keys, or as a JSON Pointer (when the string start with `/`)
+- Configuration within an ecosystem or framework adds the concept of one file (or set of files) containing configuration for multiple libraries (and maybe the application as well). As such, in addition to using shared files, the need to separate configuration into sections becomes necessary.
+  - By having each library have a dedicated section, the libraries maintain loose coupling and no settings will accidentally be used by multiple library with different meanings.
+  - `base_path` defines the path your library section.
+    - `base_path` can be defined as a single key, a list of keys, or as a JSON Pointer (when the string starts with `/`)
     - `base_path` keys must be strings.
-    - Even for a one-off library, using a `base_path` can be useful for making configuration identifiable by contents and for enabling the library to join a shared configuration without requiring a breaking change.
+  - Even for a one-off library, using a `base_path` can be useful for making configuration identifiable by contents and for enabling the library to join a shared configuration without requiring a breaking change.
 
 ### Library or application where the environment decides configuration files
 
@@ -61,10 +61,9 @@ CONFIG = LazyLoadConfiguration(
 )
 ```
 
-- Comments:
-  - `env_location_var_name` specifies an optional environment variable that contains a comma-separated list of file paths.
-    - Paths from the environment variable are appended to the end of list of explicit paths.
-    - The environment variable is read at import time.
+- `env_location_var_name` specifies an optional environment variable that contains a comma-separated list of file paths.
+  - Paths from the environment variable are appended to the end of list of explicit paths.
+  - The environment variable is read at import time.
 
 ### Framework that only uses shared configuration files and does schema validation
 
@@ -77,12 +76,13 @@ CONFIG = LazyLoadConfiguration(
 )
 ```
 
-- Comments:
-  - This case has been seen enough in the past that the caching of configurations was added for this option.
-  - This case requires not having an embedded configuration.
-    - Which means, defaults are defined programmatically, which means configuration is split between Python and YAML code, which is additional context switching and file search (one `config.yaml` vs. many `.py` files with one called `config.py`).
-  - Use of [Pydantic](https://docs.pydantic.dev/latest/) is recommended for configuration validation and, if using, for defaulting.
-    - Use a [cached](https://docs.python.org/3/library/functools.html#functools.cache) function to do Pydantic check, so the configuration stays cached during import time. Otherwise, each Pydantic check will flush the cache.
+- This case has been seen enough in the past that the caching of configurations was added for this option.
+  - Caching is only available for immutable configurations. (See [Immutable vs. Mutable](concepts.md#immutable-vs-mutable))
+- This case requires not having an embedded configuration.
+  - Which means, defaults are defined programmatically, which means configuration is split between Python and YAML code, which is additional context switching and file search (one `config.yaml` vs. many `.py` files with one called `config.py`).
+- Use of [Pydantic](https://docs.pydantic.dev/latest/) is recommended for configuration validation and, if using, for defaulting.
+  - Use a cached function (such as using {py:func}`~functools.cache`) to do Pydantic check, so the configuration stays cached during import time. Otherwise, each Pydantic check will flush the cache.
+  - For just type annotated configuration, see [Type annotating your configuration](#type-annotating-your-configuration)
 
 ### Pulling configuration using wildcards
 
@@ -102,11 +102,10 @@ CONFIG = LazyLoadConfiguration(
 )
 ```
 
-- Comments:
-  - Flat: Sometimes it is useful separate subsections of a configuration into multiple files within the embedded configuration.
-    - For example, your configuration has three types of things with twenty options per type. Having a file per type can make development easier and not having name specified can make it easier to add a fourth type.
-  - Recursive: Sometimes it is useful to search current working directory for configuration.
-    - For example, your library can generate fixtures for [`pytest`](https://docs.pytest.org/en/stable/). This enables to have fixtures declarations in the same directory as the test cases that use them.
+- _Flat_: Sometimes it is useful separate subsections of a configuration into multiple files within the embedded configuration.
+  - For example, your configuration has three types of things with twenty options per type. Having a file per type can make development easier and not having name specified can make it easier to add a fourth type.
+- _Recursive_: Sometimes it is useful to search current working directory for configuration.
+  - For example, your library can generate fixtures for [`pytest`](https://docs.pytest.org/en/stable/). This enables to have fixtures declarations in the same directory as the test cases that use them.
 
 ---
 
@@ -131,16 +130,20 @@ example_config: # Example Base Path
 
 - Take a look at the [YAML Tags](yaml.md) for options.
   - Use [`!PlaceHolder`](yaml.md#placeholder) to specify values the user need to provide.
-- Setting names should be compatible Python attribute names.
-  - This lets you use {py:meth}`~.LazyLoadConfiguration.__getattr__`.
-- Use subsection to organize settings.
-- Avoid you using non-string lookup keys.
+- Setting names should be compatible with Python attribute names.
+  - This lets you use {py:meth}`~.Configuration.__getattr__` and type annotations.
+  - In this vein, do **not** use names starting with two underscores (e.g. `__name`) or double-underscored names (e.g. `__name__`), as {py:meth}`~.object.__getattr__` treats these names with special behavior.
+- Use subsections to organize settings.
+- Avoid using non-string lookup keys.
   - `status_message_lookup: Mapping[int, str] = CONFIG.example_of_codes` is probably clearer than `success_message: str = CONFIG.example_of_codes[200]`
 - A {py:class}`base_path <.LazyLoadConfiguration>` can be useful for making configuration identifiable by contents and for enabling the library to join a shared configuration without requiring a breaking change.
 - Don't be afraid to comment your configuration when desired.
   - You may want your documentation to just point at your embedded configuration file.
 - `key: ` specifies a value of {py:data}`None`. <!-- markdownlint-disable MD038 -->
-  - Use `key: []` for an empty sequence or `key: {}` for an empty mapping.
+  - Use:
+    - `key: []` for an empty sequence
+    - `key: {}` for an empty mapping.
+    - `key: ""` for an empty string.
 
 ### Type annotating your configuration
 

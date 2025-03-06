@@ -45,7 +45,7 @@ tests:
         assert output.tests.as_dict() == dict(
             a="nitro",
             b="{'name': 'nitro'}",
-            c="['nitro', 'never owned a cat']",
+            c="('nitro', 'never owned a cat')",
             d="test me nitro defaulting value",
             e="123",
         )

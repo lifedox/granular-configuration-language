@@ -1,16 +1,16 @@
 /* Enables a scollbar when menu items are wider than planned */
 /* It works */
 
-.wy-menu-vertical {
+/* .wy-menu-vertical {
   overflow-x: auto;
 }
 
 .wy-side-scroll {
   width: fit-content;
-}
+} */
 
 /* Adding arrow to collapsible */
-
+/* 
 summary {
   list-style: none;
 }
@@ -20,7 +20,7 @@ details > summary {
 }
 summary::-webkit-details-marker {
   display: None;
-}
+} */
 
 /* url = chevron-down-solid.svg */
 summary::after {

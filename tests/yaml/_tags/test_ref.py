@@ -29,7 +29,7 @@ tests:
     assert output.tests.as_dict() == dict(
         a="nitro",
         b={"name": "nitro"},
-        c=["nitro", "never owned a cat"],
+        c=("nitro", "never owned a cat"),
     )
     assert output.data.dog.name is output.tests.a
     assert output.data.dog is output.tests.b

@@ -8,7 +8,7 @@ If you need tags that are not included and have external dependencies, you add t
 
 This library using the `granular_configuration_language_20_tag` group.
 
-### Using Poetry
+### Using `pyproject.toml`
 
 Example `pyproject.toml` entry:
 
@@ -53,7 +53,7 @@ def handler(value: str) -> Masked:  # Function Signature
 ### Function Signature
 
 - **Name**: Completely up to you. Only used for documentation and exception messages.
-- **Parameters**: At most three positional are possible (determined by your chosen [Laziness Decorator](#laziness-decorator))
+- **Parameters**: At most three positional are possible (determined by your chosen [Laziness Decorator](#laziness-decorator)).
   1. `value` - This is the value loaded from YAML, after its passes through the {py:class}`.TagDecoratorBase`.
      - Its type is determined by the [Tag Type Decorator](#tag-type-decorator) you use.
      - `value` will always be a single variable no matter its type or union of types. It will never be processed with `*` or `**`.
@@ -65,9 +65,9 @@ def handler(value: str) -> Masked:  # Function Signature
 
 ### Tag Type Decorator
 
-- Defines the Python type of the tag (`value`'s type), while naming the tag, using {py:class}`.Tag`
+- Defines the Python type of the tag (`value`'s type), while naming the tag, using {py:class}`.Tag`.
   - Explicitly requiring use of {py:class}`.Tag` is purely for easy `grep`-ing.
-  - Tags must start with `!`
+  - Tags must start with `!`.
 - There are four built-in options, but you can define you [own](#creating-your-own-tag-type-decorator).
   - {py:class}`.string_tag` - `str`
   - {py:class}`.string_or_twople_tag` - `str | tuple[str, typing.Any]`
@@ -76,7 +76,7 @@ def handler(value: str) -> Masked:  # Function Signature
 
 ### Laziness Decorator
 
-- Defines the laziness of tags and the required positional parameters
+- Defines the laziness of tags and the required positional parameters.
   - `value`'s type is determined by [Tag Type Decorator](#tag-type-decorator).
 - There are five options (these are all the possible options).
   - These make the tag lazy, so the Tag Logic runs at Fetch.
@@ -86,6 +86,10 @@ def handler(value: str) -> Masked:  # Function Signature
       - _Positional Parameters_ - `(value: ... , options: LoadOptions)`
     - {py:func}`.as_lazy_with_root`
       - _Positional Parameters_ - `(value: ... , root: Root)`
+      - Note: {py:func}`.as_lazy_with_root` has a decorator factory version.
+        - Keyword Parameters:
+          - `needs_root_condition`: `Callable[[ ... ], bool]`
+        - Used by [`!Sub`](yaml.md#sub) to check if Root is required before holding on to a reference to it.
     - {py:func}`.as_lazy_with_root_and_load_options`
       - _Positional Parameters_ - `(value: ... , root: Root, options: LoadOptions)`
   - This make the Tag Logic run at Load Time
@@ -94,7 +98,7 @@ def handler(value: str) -> Masked:  # Function Signature
 
 ### Interpolate Decorator
 
-- Interpolate Decorator is **optional**. `value` must be typed as a {py:class}`str`.
+- Interpolate Decorator is **optional**. `value` must be a {py:class}`str`.
 - These decorators run the interpolation syntax prior to running the Tag Logic (i.e. `value` is output of the interpolation).
 - Options:
   - {py:func}`.interpolate_value_without_ref` - Does not include JSON Path or JSON Pointer syntax.

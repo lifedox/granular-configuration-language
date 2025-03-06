@@ -100,7 +100,7 @@ class LazyLoadConfiguration(Mapping):
 
     See :py:meth:`LazyLoadConfiguration.as_typed` for type annotated usage.
 
-    ``inject_before`` and ``inject_after`` allow you to introduce dynamic settings into you configuration.
+    ``inject_before`` and ``inject_after`` allow you to inject Python-created settings into you configuration without use a file.
 
     .. admonition:: :py:meth:`!as_typed` Example
         :class: hint
@@ -121,7 +121,7 @@ class LazyLoadConfiguration(Mapping):
             assert typed.b.c == "test me"
             assert typed["a"] == 101
 
-    .. admonition:: Inject Rules and Example
+    .. admonition:: Injection Rules and Example
         :class: hint
         :collapsible: closed
 
@@ -161,6 +161,12 @@ class LazyLoadConfiguration(Mapping):
             CONFIG.today           # Today's date as a constant string.
             CONFIG.data.as_dict()  # Data defined with a reusable library defined value.
 
+        .. admonition:: Attention
+            :class: error
+
+            - :py:class:`dict` does not act as :py:class:`.Configuration`.
+            - :py:class:`dict` instances are values that do not merge.
+
     :param ~pathlib.Path | str | os.PathLike load_order_location:
             File path to configuration file
     :param str | ~collections.abc.Sequence[str], optional base_path:
@@ -172,11 +178,11 @@ class LazyLoadConfiguration(Mapping):
         - Specify what environment variable to check for additional file paths.
         - The Environment Variable is read as a comma-delimited list of configuration path that will be appended to ``load_order_location`` list.
         - Setting the Environment Variable is always optional.
-        - _Default_: ``G_CONFIG_LOCATION``
+        - *Default*: ``G_CONFIG_LOCATION``
     :param Configuration, optional inject_before:
-        Inject a runtime :py:class:`.Configuration` instance as if it were the first load file.
+        Inject a runtime :py:class:`.Configuration` instance, as if it were the first loaded file.
     :param Configuration, optional inject_after:
-        Inject a runtime :py:class:`.Configuration` instance as if it were the last load file.
+        Inject a runtime :py:class:`.Configuration` instance, as if it were the last loaded file.
     :param bool, optional disable_caching:
         When :py:data:`True`, caching of "identical immutable configurations" is disabled.
 
@@ -341,7 +347,7 @@ class MutableLazyLoadConfiguration(LazyLoadConfiguration, MutableMapping):
         - Specify what environment variable to check for additional file paths.
         - The Environment Variable is read as a comma-delimited list of configuration path that will be appended to ``load_order_location`` list.
         - Setting the Environment Variable is always optional.
-        - _Default_: ``G_CONFIG_LOCATION``
+        - *Default*: ``G_CONFIG_LOCATION``
 
     :examples:
         .. code-block:: python

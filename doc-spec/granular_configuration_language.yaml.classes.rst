@@ -1,5 +1,5 @@
-``granular_configuration_language.yaml.classes``
-================================================
+``granular_configuration_language`` ``.yaml.classes``
+=====================================================
 
 .. automodule:: granular_configuration_language.yaml.classes
     :members:

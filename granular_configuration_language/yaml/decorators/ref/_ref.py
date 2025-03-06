@@ -40,7 +40,7 @@ def _resolve_pointer(query: str, root: tabc.Mapping) -> typ.Any:
 
 def _resolve_path(query: str, root: tabc.Mapping) -> typ.Any:
     try:
-        result = list(map(op.attrgetter("value"), jsonpath.finditer(query, root)))
+        result = tuple(map(op.attrgetter("value"), jsonpath.finditer(query, root)))
 
         if len(result) == 1:
             return result[0]
@@ -58,6 +58,28 @@ def _resolve_path(query: str, root: tabc.Mapping) -> typ.Any:
 
 
 def resolve_json_ref(query: str, root: Root) -> typ.Any:
+    """
+    Queries ``Root`` using JSON Pointer or JSON Path
+
+    .. admonition:: JSON Path
+        :class: note
+        :collapsible: closed
+
+        - JSON Path can be used to be a pointer to data or a constructor from data.
+        - If the query matches one item, then that one item is returned.
+        - If the query matches more than one item, that a :py:class:`tuple` of items is returned.
+
+    :param str query:
+        - Starts with ``$`` for a JSON Path query
+        - Starts with ``/`` for a JSON Pointer
+    :param Root root:
+        :py:class:`~collections.abc.Mapping` being queried
+    :raises JSONPathOnlyWorksOnMappings: Raised if ``root`` is not a :py:class:`~collections.abc.Mapping`
+    :raises RefMustStartFromRoot: Raised if the ``query`` does not start with ``$`` or ``/``.
+    :return: Result of the query
+    :rtype: ~typing.Any
+    """
+
     if isinstance(root, LazyEval) and root.tag == "!Merge":  # pyright: ignore[reportUnnecessaryIsInstance]
         raise RecursionError(
             f"JSON Query `{query}` attempted recursion. Please check your configuration for a self-referencing loop."

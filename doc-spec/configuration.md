@@ -7,15 +7,21 @@
 The following environment variables are used as configuration for this library:
 
 - `G_CONFIG_DISABLE_PLUGINS`
-  - **Input:** Comma-delimited list of plugin names
+  - **Input:** Comma-delimited list of plugin names.
   - **Description:** Disables tags provided by the selected plugins.
-  - Use [`available_plugins`](#viewing-available-plugins) to view plugins
+  - Use `python -m granular_configuration_language.available_plugins` to [view](#viewing-available-plugins) plugins.
   - Internal tags cannot be disabled as a plugin.
 - `G_CONFIG_DISABLE_TAGS`
-  - **Input:** Comma-delimited list of tag names
+  - **Input:** Comma-delimited list of tag names.
   - **Description:** Disables the selected tags.
-  - Use [`available_tags`](#viewing-available-tags) to view plugins
-  - Tag names start with `!`
+  - Use `python -m granular_configuration_language.available_tags` to [view](#viewing-available-tags) tags.
+  - Tag names start with `!`.
+- Internally used variables:
+  - `G_CONFIG_ENABLE_TAG_TRACKER`
+    - **Input:** `TRUE`
+    - **Description:** Enables tag property tracking.
+    - Automatically set while [`available_plugins`](#viewing-available-plugins) and [`available_tags`](#viewing-available-tags) run.
+    - _Added_: 2.2.2
 
 ## Helper Scripts
 
@@ -39,7 +45,8 @@ python -m granular_configuration_language.available_tags
   - Default, if `table` is not available.
 - `json`: Output is JSON-mapping.
 - `table`: Output is pretty table.
-  - Requires `tabulate` to be available. Default, if available.
+  - Requires [tabulate](https://pypi.org/project/tabulate/) to be available. Default, if available.
+  - Use a terminal width of at least 100 characters for best viewing.
 
 #### Usage
 
@@ -58,7 +65,7 @@ The "table" option requires `tabulate` to be installed.
 You can use the "printing" extra to install the needed dependencies
 ```
 
-When `tabulate` is installed, the default option is `table`, otherwise `csv`.
+When [tabulate](https://pypi.org/project/tabulate/) is installed, the default option is `table`, otherwise `csv`.
 
 **Example install:**
 
@@ -69,7 +76,9 @@ pip install 'granular-configuration-language[printing]'
 #### Headers
 
 - `category`: Category of the Tag
+  - Value comes from {py:meth}`.TagDecoratorBase.__init__`→`category`
 - `tag`: Name of the Tag
+  - Value comes from {py:meth}`.TagDecoratorBase.__init__`→`tag`
 - `type`: Argument type of the Tag
   - Value comes from {py:meth}`TagDecoratorBase.user_friendly_type <granular_configuration_language.yaml.decorators.TagDecoratorBase.user_friendly_type>`.
 - `interpolates`: Specifies if the tags interpolates
@@ -98,7 +107,7 @@ Typer        !Class              str                    reduced                 
 Typer        !Date               str                    reduced                   date
 Typer        !DateTime           str                    reduced                   date
 Typer        !Func               str                    reduced                   Callable
-Typer        !Mask               str                    reduced         NOT_LAZY  Masked
+Typer        !Mask               str                    reduced                   Masked
 Typer        !UUID               str                    reduced                   UUID
 Undoc-ed     !Dict               dict[Any, Any]                                   dict
 ```
@@ -123,7 +132,8 @@ python -m granular_configuration_language.available_plugins
   - Default, if `table` is not available.
 - `json`: Output is JSON-mapping.
 - `table`: Output is pretty table.
-  - Requires `tabulate` to be available. Default, if available.
+  - Requires [tabulate](https://pypi.org/project/tabulate/) to be available. Default, if available.
+  - Use a terminal width of at least 160 characters for best viewing.
 
 #### Usage
 
@@ -142,7 +152,7 @@ The "table" option requires `tabulate` to be installed.
 You can use the "printing" extra to install the needed dependencies
 ```
 
-When `tabulate` is installed, the default option is `table`, otherwise `csv`.
+When [tabulate](https://pypi.org/project/tabulate/) is installed, the default option is `table`, otherwise `csv`.
 
 **Example install:**
 
@@ -153,18 +163,24 @@ pip install 'granular-configuration-language[printing]'
 #### Headers
 
 - `plugin`: Name of Plugin
+  - Value comes from `[project.entry-points."granular_configuration_language_20_tag"]`
   - `<gcl-built-in>` represents internal tags
 - `category`: Category of the Tag
+  - Value comes from {py:meth}`.TagDecoratorBase.__init__`→`category`
 - `tag`: Name of the Tag
+  - Value comes from {py:meth}`.TagDecoratorBase.__init__`→`tag`
 - `handler`: Function that implements the Tag.
+- `needs_root_condition`: Named of the "needs_root_condition" function.
+  - Comes from {py:func}`.as_lazy_with_root`
+  - _Added_: 2.2.2
 
 #### Sample Output (using `table` mode)
 
 ```text
-plugin          category     tag                 handler
---------------  -----------  ------------------  -----------------------------------------------------------------------
+plugin          category     tag                 handler                                                                  needs_root_condition
+--------------  -----------  ------------------  -----------------------------------------------------------------------  ---------------------------------
 <gcl-built-in>  Formatter    !Env                granular_configuration_language.yaml._tags._env.handler
-<gcl-built-in>  Formatter    !Sub                granular_configuration_language.yaml._tags._sub.handler
+<gcl-built-in>  Formatter    !Sub                granular_configuration_language.yaml._tags._sub.handler                  interpolation_needs_ref_condition
 <gcl-built-in>  Manipulator  !Del                granular_configuration_language.yaml._tags._del.handler
 <gcl-built-in>  Manipulator  !Merge              granular_configuration_language.yaml._tags._merge.handler
 <gcl-built-in>  Manipulator  !Placeholder        granular_configuration_language.yaml._tags._placeholder.handler
