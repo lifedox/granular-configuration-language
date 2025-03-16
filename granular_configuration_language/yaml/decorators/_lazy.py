@@ -12,7 +12,7 @@ from granular_configuration_language.yaml.decorators._tag_tracker import track_a
 def as_lazy(func: tabc.Callable[[T], RT]) -> tabc.Callable[[Tag, T, StateHolder], LazyEval[RT]]:
     """Wraps the "Tag" function in a :py:class:`~.LazyEval`, so that the function being wrapped is run just-in-time.
 
-    .. admonition:: Postional Parameters for "Tag" function
+    .. admonition:: Positional Parameters for "Tag" function
         :class: hint
 
         1. (:py:class:`~granular_configuration_language.yaml.classes.T`) - YAML value
@@ -43,7 +43,7 @@ def as_lazy_with_load_options(
 ) -> tabc.Callable[[Tag, T, StateHolder], LazyEval[RT]]:
     """Wraps the "Tag" function in a :py:class:`~.LazyEval`, so that the function being wrapped is run just-in-time.
 
-    .. admonition:: Postional Parameters for "Tag" function
+    .. admonition:: Positional Parameters for "Tag" function
         :class: hint
 
         1. (:py:class:`~granular_configuration_language.yaml.classes.T`) - YAML value
@@ -89,7 +89,7 @@ def as_lazy_with_root(
 ):
     r"""Wraps the "Tag" function in a :py:class:`~.LazyEval`, so that the function being wrapped is run just-in-time.
 
-    .. admonition:: Postional Parameters for "Tag" function
+    .. admonition:: Positional Parameters for "Tag" function
         :class: hint
 
         1. (:py:class:`~granular_configuration_language.yaml.classes.T`) -- YAML value
@@ -182,7 +182,7 @@ def as_lazy_with_root_and_load_options(
 ) -> tabc.Callable[[Tag, T, StateHolder], LazyEval[RT]]:
     """Wraps the "Tag" function in a :py:class:`~.LazyEval`, so that the function being wrapped is run just-in-time.
 
-    .. admonition:: Postional Parameters for "Tag" function
+    .. admonition:: Positional Parameters for "Tag" function
         :class: hint
 
         1. (:py:class:`~granular_configuration_language.yaml.classes.T`) -- YAML value
@@ -214,7 +214,7 @@ def as_lazy_with_root_and_load_options(
 def as_not_lazy(func: tabc.Callable[[T], RT]) -> tabc.Callable[[Tag, T, StateHolder], RT]:
     """Wraps the "Tag" function, but does not make it lazy. The function being wrapped is run at load time.
 
-    .. admonition:: Postional Parameters for "Tag" function
+    .. admonition:: Positional Parameters for "Tag" function
         :class: hint
 
         1. (:py:class:`~granular_configuration_language.yaml.classes.T`) - YAML value

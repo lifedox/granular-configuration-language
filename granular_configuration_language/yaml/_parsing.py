@@ -72,7 +72,7 @@ def _stringify_source_chain(sources: tabc.Iterable[Path]) -> str:
 
 
 def is_in_chain(file: Path, options: LoadOptions) -> bool:
-    # Note *.environment_variable don't exist, so .resolve() and .samefile() fail
+    # Note *.environment_variable don't exist, so `.resolve()` and `.samefile()` fail
 
     if (
         options.file_location

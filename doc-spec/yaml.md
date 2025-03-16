@@ -15,12 +15,14 @@
 
 ## Summary Table
 
-```{list-table}
+<!-- Non-breaking space on "Tag" Header forces horzontal scrollbar to be appear before tags become unreadable on a narrow view -->
+
+````{list-table}
 :header-rows: 1
-:align: center
+:width: 100%
 
 * - Category
-  - Tag
+  - Tag&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
   - Argument
   - Usage
 * - [**Formatters**](#formatters)
@@ -40,9 +42,11 @@
 * -
   - [`!Merge`](#merge)
   - `list[dict|None]`
-  - `!Merge` <br>
-    `  - key1: value1` <br>
-    `  - key2: value2`
+  - ```
+    !Merge
+    - key1: value1
+    - key2: value2
+    ```
 * -
   - [`!Placeholder`](#placeholder)
   - `str`
@@ -97,10 +101,10 @@
   - [`!UUID`](#uuid) [ⁱ](#interpolates-reduced)
   - `str`
   - `!UUID 9d7130a6-{...}-29f0b765be9e`
-```
+````
 
 <a id="interpolates-full"></a>ⁱ⁺: Supports full interpolation syntax of [`!Sub`](#sub).
-<br> <!--Looks good in GitHub-->
+<br><!--Looks good in GitHub-->
 <a id="interpolates-reduced"></a>ⁱ: Supports reduced interpolation syntax of [`!Sub`](#sub) without JSON Path and JSON Pointer syntax.
 
 ---
@@ -133,7 +137,7 @@ $: !Sub ${$}
   - `${ENVIRONMENT_VARIABLE:+<nested_interpolation_spec>}`: Replaced with the specified Environment Variable.
     - If variable does not exist, use the text after `:+` to interpolate a result.
     - Note: specifier is `:+`.
-  - `${/json/pointer/expression}`: Replaced by the object in the configuration specified in JSON Path syntax.
+  - `${/json/pointer/expression}`: Replaced by the object in the configuration specified in JSON Pointer syntax.
     - Paths must start at full root of the configuration, using `/` as the first character.
     - Results:
       - Referencing strings is recommended.
@@ -229,43 +233,45 @@ user: *user_id
 ```
 
 - **Argument:** _list[Any]_.
-- **Returns:** {py:class}`.Configuration` ‒ Merges the sequence of mappings into a single {py:class}`.Configuration`, filtering out any non-mappings item.
+- **Returns:** {py:class}`.Configuration` ‒ The merged {py:class}`.Configuration` from the sequence of mappings, filtering out any non-mapping entries.
   - When merging with {py:class}`.MutableLazyLoadConfiguration`, the return type is {py:class}`.MutableConfiguration`.
 - Notes:
+  - For more details about merging see [Merging](concepts.md#merging).
   - The expected use-case for `!Merge` is to be paired with multiple [`!ParseFile`](#parsefile--optionalparsefile)and/or [`!OptionalParseFile`](#parsefile--optionalparsefile) tags.
   - When merging, all objects in the merge list are evaluated.
-    - As an explicit example, a [`!ParseFile`](#parsefile--optionalparsefile) item in the merge list is evaluated with the `!Merge`.
-  - If every items is filtered out, the result is an {py:class}`.Configuration`.
+    - From the example, both the [`!ParseFile`](#parsefile--optionalparsefile) and [`!OptionalParseFile`](#parsefile--optionalparsefile) entries are evaluated with `!Merge`, not after `!Merge`.
+  - If every item is filtered out, the result is an empty {py:class}`.Configuration`.
 
-<!--Seperate the weird spacing caused by code blocks-->
+::: {caution}
 
-- Tags in the list merge cannot reference what is being merged.
-  - Following is not allowed, because this [`!Ref`](#ref) acts during the merge:
-    ```yaml
-    key1: !Merge
-      - nested_key:
-          settings: values
-      - !Ref $.key1.nested_key
-    ```
-  - Following is allowed, because this [`!Ref`](#ref) acts after the merge:
-    ```yaml
-    key1: !Merge
-      - nested_key:
-          settings: values
-      - nested_key2: !Ref $.key1.nested_key
-    ```
-- `!Merge` is equivalent to the merge that occurs at Merge Time.
-  - The following options result is the same Configuration:
-    - `LazyLoadConfiguration("file1.yaml", "file2.yaml")`
-      - This is the only option that remains lazy.
-    - Loading a file containing:
-      ```yaml
-      !Merge
-      - !OptionalParseFile file1.yaml
-      - !OptionalParseFile file2.yaml
-      ```
-    - `merge("file1.yaml", "file2.yaml")`
-      - see {py:func}`.merge` for full signature.
+Tags in the sequence argument cannot reference what is being merged.
+:::
+
+:::{admonition} Following is not allowed, because this [`!Ref`](#ref) acts during the merge:
+:class: danger
+:collapsible: closed
+
+```yaml
+key1: !Merge
+  - nested_key:
+      settings: values
+  - !Ref $.key1.nested_key
+```
+
+:::
+
+:::{admonition} Following is allowed, because this [`!Ref`](#ref) acts after the merge:
+:class: tip
+:collapsible: closed
+
+```yaml
+key1: !Merge
+  - nested_key:
+      settings: values
+  - nested_key2: !Ref $.key1.nested_key
+```
+
+:::
 
 ---
 
@@ -327,12 +333,18 @@ single_line_example: !ParseEnv [ENV_VAR, false]
 ```
 
 - **Argument:** _str | tuple[str, Any]_
-- **Returns:** {py:data}`~typing.Any` ‒ specified environment variable parsed.
+- **Returns:** {py:data}`~typing.Any` ‒ Result of parsing the specified environment variable.
   - When environment variable does not exist:
     - If argument is {py:class}`str`, a {py:class}`.EnvironmentVaribleNotFound` error will be thrown.
     - If argument is {py:class}`tuple`, the second object will be returned.
 - Notes:
   - `!ParseEnvSafe` uses a pure safe YAML loader. `!ParseEnv` uses this library's loader.
+  - This was created to make Boolean environment variables more consistent.
+    - For `value: !ParseEnvSafe [ENV_VAR, false]`:
+      - If `ENV_VAR=TRUE`, `Config.value` is {py:data}`True`.
+      - If `ENV_VAR=FALSE`, `Config.value` is {py:data}`False`.
+      - If `ENV_VAR` is not set, `Config.value` is {py:data}`False`.
+      - Using [`!Sub`](#sub), `FALSE` would need to be an empty string (`""`), which is less obvious than `FALSE`.
   - _(Since 2.1.0)_ `!ParseEnv` detects loading loops and throws {py:class}`.ParsingTriedToCreateALoop` when trying to load an environment variable already part of the chain.
     - See [Loading Loops](concepts.md#loading-loops) for an explanation with examples.
 
@@ -347,7 +359,7 @@ file_may_exist: !ParseFile relative/path/to/optional/file.yaml
 
 - **Argument:** _str_
   - _Supports Full Interpolation Syntax_
-- **Returns:** {py:data}`~typing.Any` ‒ Loads the specified file.
+- **Returns:** {py:data}`~typing.Any` ‒ Result of loading the specified file.
   - When the file does not exist:
     - `!ParseFile` throws {py:class}`FileNotFoundError`.
     - `!OptionalParseFile` return null ({py:data}`None`).
@@ -371,10 +383,10 @@ class_type: !Class uuid.UUID
 
 - **Argument:** _str_
   - _Supports Reduced Interpolation Syntax_
-- **Returns:** {py:class}`type` ‒ Imports and returns the specified the class
+- **Returns:** {py:class}`type` ‒ Specified the class.
 - Notes:
-  - The current working directory is added prior to importing.
-  - Returned object pass {py:func}`inspect.isclass` test.
+  - The current working directory is added prior to importing the specified module.
+  - Returned object must pass {py:func}`inspect.isclass` as {py:data}`True`.
 
 ---
 
@@ -386,7 +398,7 @@ date: !Date 1988-12-28
 
 - **Argument:** _str_
   - _Supports Reduced Interpolation Syntax_
-- **Returns:** {py:class}`~datetime.date` ‒ Returns the string parsed as ISO 8601 in a Python {py:class}`datetime.date`.
+- **Returns:** {py:class}`~datetime.date` ‒ String parsed as ISO 8601 in a Python {py:class}`datetime.date`.
 - Notes:
   - For Python 3.11+, {py:meth}`date.fromisoformat() <datetime.date.fromisoformat>` is used.
   - For Python 3.10, `dateutil.parser.parse(value, yearfirst=True, dayfirst=False).date()` is used.
@@ -396,13 +408,13 @@ date: !Date 1988-12-28
 ### `!DateTime`
 
 ```yaml
-with_timezone: !DateTime "2012-10-31T13:12:09-0600"
-without_timezone: !DateTime "2012-10-31T13:12:09"
+with_time_zone: !DateTime "2012-10-31T13:12:09-0600"
+without_time_zone: !DateTime "2012-10-31T13:12:09"
 ```
 
 - **Argument:** _str_
   - _Supports Reduced Interpolation Syntax_
-- **Returns:** {py:class}`~datetime.datetime` ‒ Returns the string parsed as ISO 8601 in a Python {py:class}`datetime.datetime`.
+- **Returns:** {py:class}`~datetime.datetime` ‒ String parsed as ISO 8601 in a Python {py:class}`datetime.datetime`.
 - Notes:
   - For Python 3.11+, {py:meth}`datetime.fromisoformat() <datetime.datetime.fromisoformat>` is used.
   - For Python 3.10, `dateutil.parser.parse(value, yearfirst=True, dayfirst=False)` is used.
@@ -412,15 +424,15 @@ without_timezone: !DateTime "2012-10-31T13:12:09"
 ### `!Func`
 
 ```yaml
-function: !Func functool.reduce
+function: !Func functools.reduce
 ```
 
 - **Argument:** _str_
   - _Supports Reduced Interpolation Syntax_
-- **Returns:** {py:class}`~collections.abc.Callable` ‒ Imports and returns the specified the function
+- **Returns:** {py:class}`~collections.abc.Callable` ‒ Specified function.
 - Notes:
-  - The current working directory is added prior to importing.
-  - Returned object pass {py:func}`callable` test.
+  - The current working directory is added prior to importing the specified module.
+  - Returned object must pass {py:func}`callable` as {py:data}`True`.
 
 ---
 
@@ -434,7 +446,7 @@ function: !Mask ${SECRET}
 
 - **Argument:** _str_
   - _Supports Reduced Interpolation Syntax_
-- **Returns:** {py:class}`.Masked` ‒ the string as a {py:class}`.Masked`
+- **Returns:** {py:class}`.Masked` ‒ The string as a {py:class}`.Masked`
 - Notes:
   - {py:class}`.Masked` inherits from {py:class}`str`, with the {py:meth}`~object.__repr__` overridden to always return the same constant literal `'<****>'`.
   - Some libraries (such as [requests](https://requests.readthedocs.io/en/latest/)) explicitly only support {py:class}`str` and not subclasses of {py:class}`str`.
@@ -450,4 +462,4 @@ id: !UUID 9d7130a6-192f-41e6-88ce-29f0b765be9e
 
 - **Argument:** _str_
   - _Supports Reduced Interpolation Syntax_
-- **Returns:** {py:class}`~uuid.UUID` ‒ the string parsed by Python {py:class}`uuid.UUID`,
+- **Returns:** {py:class}`~uuid.UUID` ‒ The string parsed by Python {py:class}`uuid.UUID`,

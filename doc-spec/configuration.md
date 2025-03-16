@@ -41,7 +41,7 @@ python -m granular_configuration_language.available_tags
 
 #### Options
 
-- `csv`: Output is formatted as a csv table.
+- `csv`: Output is formatted as a CSV table.
   - Default, if `table` is not available.
 - `json`: Output is JSON-mapping.
 - `table`: Output is pretty table.
@@ -84,7 +84,7 @@ pip install 'granular-configuration-language[printing]'
 - `interpolates`: Specifies if the tags interpolates
   - `full` - Tags uses {py:func}`.interpolate_value_with_ref`
   - `reduced` - Tags uses {py:func}`.interpolate_value_without_ref`
-- `lazy` - Specifies if the tags is lazy.
+- `lazy` - Specifies if the tags are lazy.
   - `NOT_LAZY` - Tags uses {py:func}`.as_not_lazy`
 - `returns` - Type annotation of the return of function that implements the Tag
 
@@ -128,7 +128,7 @@ python -m granular_configuration_language.available_plugins
 
 #### Options
 
-- `csv`: Output is formatted as a csv table.
+- `csv`: Output is formatted as a CSV table.
   - Default, if `table` is not available.
 - `json`: Output is JSON-mapping.
 - `table`: Output is pretty table.

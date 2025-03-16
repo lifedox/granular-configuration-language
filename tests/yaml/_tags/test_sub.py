@@ -225,3 +225,9 @@ a: !Sub ${$.a}
 """
     with pytest.raises(RecursionError):
         loads(test_data).a
+
+
+def test_empty_string_can_be_default() -> None:
+    test_data = "!Sub ${ENV_VAR:-}"
+    with patch.dict(os.environ, values={}):
+        assert loads(test_data) == ""

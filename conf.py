@@ -30,6 +30,9 @@ extensions = [
     "sphinx.ext.githubpages",
     "sphinx.ext.napoleon",
 ]
+myst_enable_extensions = [
+    "colon_fence",
+]
 
 # Napoleon settings
 napoleon_google_docstring = True

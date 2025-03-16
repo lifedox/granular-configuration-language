@@ -80,8 +80,8 @@ CONFIG = LazyLoadConfiguration(
   - Caching is only available for immutable configurations. (See [Immutable vs. Mutable](concepts.md#immutable-vs-mutable))
 - This case requires not having an embedded configuration.
   - Which means, defaults are defined programmatically, which means configuration is split between Python and YAML code, which is additional context switching and file search (one `config.yaml` vs. many `.py` files with one called `config.py`).
-- Use of [Pydantic](https://docs.pydantic.dev/latest/) is recommended for configuration validation and, if using, for defaulting.
-  - Use a cached function (such as using {py:func}`~functools.cache`) to do Pydantic check, so the configuration stays cached during import time. Otherwise, each Pydantic check will flush the cache.
+- Use of [`Pydantic`](https://docs.pydantic.dev/latest/) is recommended for configuration validation and, if using, for defaulting.
+  - Use a cached function (such as using {py:func}`~functools.cache`) to do `Pydantic` check, so the configuration stays cached during import time. Otherwise, each `Pydantic` check will flush the cache.
   - For just type annotated configuration, see [Type annotating your configuration](#type-annotating-your-configuration)
 
 ### Pulling configuration using wildcards
@@ -125,6 +125,8 @@ example_config: # Example Base Path
     200: Success
     404: Not Found
 ```
+
+<br>
 
 ### Things to bear in mind
 
@@ -175,40 +177,61 @@ This does not apply any runtime checks, just enables static code analysis.
 
 ## Using your configuration
 
-You can fetch settings using {py:meth}`~.Configuration.__getattr__` or if you [Type annotate your configuration](#type-annotating-your-configuration):
+:::{list-table}
+:header-rows: 1
+:width: 100%
 
-```python
-CONFIG.setting1
-CONFIG.setting2.sub_setting1
-CONFIG.example_of_codes
-```
+- - Case
+  - Example Code
+- - If you [type annotate your configuration](#type-annotating-your-configuration)
+  - ```python
+    CONFIG.setting1
+    CONFIG.setting2.sub_setting1
+    CONFIG.example_of_codes
+    ```
+- - Using {py:meth}`~.Configuration.__getattr__`
+  - ```python
+    CONFIG.setting1
+    CONFIG.setting2.sub_setting1
+    CONFIG.example_of_codes
+    ```
+- - Using {py:meth}`~object.__getitem__`
+  - ```python
+    CONFIG["setting1"]
+    CONFIG["setting2"]["sub_setting1"]
+    CONFIG["example_of_codes"]
+    ```
+- - Runtime type check, use {py:meth}`~.Configuration.typed_get`
+  - ```python
+    (
+      CONFIG.config
+      .typed_get(str, "setting1")
+    )
+    (
 
-You can fetch settings using {py:meth}`~object.__getitem__`:
+      CONFIG.config
+      .typed_get(Configuration, "setting2")
+      .typed_get(str, "sub_setting1"))
+    (
+      CONFIG.config
+      .typed_get(
+        Mapping[int, str],
+        "example_of_codes",
+      )
+    )
+    ```
 
-```python
-CONFIG["setting1"]
-CONFIG["setting2"]["sub_setting1"]
-CONFIG["example_of_codes"]
-```
+- - As a {py:class}`dict`, use {py:meth}`~.Configuration.as_dict`
+  - ```python
+    CONFIG.config.setting2.as_dict()
+    ```
+- - As a JSON string, use {py:meth}`~.Configuration.as_json_string`<br>
+    (uses {py:mod}`json`)
+  - ```python
+    CONFIG.config.as_json_string()
+    ```
+- - For all options, see full specification
+  - - {py:class}`.Configuration`
+    - {py:class}`.LazyLoadConfiguration`
 
-Doing a runtime type check (using {py:meth}`~.Configuration.typed_get`):
-
-```python
-CONFIG.config.typed_get(str, "setting1")
-CONFIG.config.typed_get(Configuration, "setting2").typed_get(str, "sub_setting1")
-CONFIG.config.typed_get(Mapping[int, str], "example_of_codes")
-```
-
-If you need your settings as a {py:class}`dict` (using {py:meth}`~.Configuration.as_dict`):
-
-```python
-CONFIG.config.setting2.as_dict()
-```
-
-As JSON, using {py:mod}`json` (using ({py:meth}`~.Configuration.as_json_string`)):
-
-```python
-CONFIG.config.as_json_string()
-```
-
-Full specification at {py:class}`.Configuration` and {py:class}`.LazyLoadConfiguration`
+:::

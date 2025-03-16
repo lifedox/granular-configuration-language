@@ -69,7 +69,7 @@ This means that a {py:func}`~copy.deepcopy` of a {py:class}`.Configuration` or {
 
 Merging is the heart of this library. With it, you gain the ability to have settings defined in multiple possible locations and the ability to override settings based on a consistent pattern.
 
-Merging is explicitly exposed through {py:class}`.LazyLoadConfiguration`, [`!Merge`](yaml.md#merge), and {py:func}`.merge` (see [Load Boundary Limitations](#load-boundary-limitations) for an important note).
+See [Merge Equivalency](#merge-equivalency) for examples using merge.
 
 ### Describing Priority
 
@@ -79,15 +79,37 @@ Merging is explicitly exposed through {py:class}`.LazyLoadConfiguration`, [`!Mer
 
 #### As a table with code
 
-| From <br> `First-in.yaml` | From <br> `Next-in.yaml` | Outcome                             |
-| :-----------------------: | :----------------------: | ----------------------------------- |
-|           Value           |            \*            | Next-in **replaces** First-in       |
-|          Scalar           |            \*            | Next-in **replaces** First-in       |
-|         Sequence          |            \*            | Next-in **replaces** First-in       |
-|          Mapping          |          Value           | Next-in **replaces** First-in       |
-|          Mapping          |          Scalar          | Next-in **replaces** First-in       |
-|          Mapping          |         Sequence         | Next-in **replaces** First-in       |
-|          Mapping          |         Mapping          | Next-in is **merged** into First-in |
+:::{list-table}
+:header-rows: 1
+:align: center
+:width: 80%
+
+- - <div align="center"> From <code class="docutils literal notranslate">First-in.yaml</code></div>
+  - <div align="center"> From <code class="docutils literal notranslate">Next-in.yaml</code></div>
+  - Outcome
+- - <div align="center"> Value</div>
+  - <div align="center"> *</div>
+  - Next-in **replaces** First-in
+- - <div align="center"> Scalar</div>
+  - <div align="center"> *</div>
+  - Next-in **replaces** First-in
+- - <div align="center"> Sequence</div>
+  - <div align="center"> *</div>
+  - Next-in **replaces** First-in
+- - <div align="center"> Mapping</div>
+  - <div align="center"> Value</div>
+  - Next-in **replaces** First-in
+- - <div align="center"> Mapping</div>
+  - <div align="center"> Scalar</div>
+  - Next-in **replaces** First-in
+- - <div align="center"> Mapping</div>
+  - <div align="center"> Sequence</div>
+  - Next-in **replaces** First-in
+- - <div align="center"> Mapping</div>
+  - <div align="center"> Mapping</div>
+  - Next-in is **merged** into First-in
+
+:::
 
 Code:
 
@@ -109,23 +131,25 @@ CONFIG = LazyLoadConfiguration("merge.yaml")
 ````{list-table}
 :header-rows: 1
 :align: center
+:width: 60%
+:widths: 4 1 4 1 4
 
-* - First-in
-  - \+
-  - Next-in
-  - ⇒
-  - Result
+* - <div align="center">First-in</div>
+  - <div align="center">+</div>
+  - <div align="center">Next-in</div>
+  - <div align="center">⇒</div>
+  - <div align="center">Result</div>
 * - ```yaml
     a:
       b: 1
     ```
-  - \+
+  - <div align="center">+</div>
   - ```yaml
     a:
       b:
         c: 1
     ```
-  - ⇒
+  - <div align="center">⇒</div>
   - ```yaml
     a:
       b:
@@ -136,13 +160,13 @@ CONFIG = LazyLoadConfiguration("merge.yaml")
       b:
         c: 1
     ```
-  - \+
+  - <div align="center">+</div>
   - ```yaml
     a:
       b:
         c: 2
     ```
-  - ⇒
+  - <div align="center">⇒</div>
   - ```yaml
     a:
       b:
@@ -153,13 +177,13 @@ CONFIG = LazyLoadConfiguration("merge.yaml")
       b:
         c: 2
     ```
-  - \+
+  - <div align="center">+</div>
   - ```yaml
     a:
       b:
         d: 3
     ```
-  - ⇒
+  - <div align="center">⇒</div>
   - ```yaml
     a:
       b:
@@ -172,17 +196,70 @@ CONFIG = LazyLoadConfiguration("merge.yaml")
         c: 2
         d: 3
     ```
-  - \+
+  - <div align="center">+</div>
   - ```yaml
     a:
       b: 1
     ```
-  - ⇒
+  - <div align="center">⇒</div>
   - ```yaml
     a:
       b: 1
     ```
 ````
+
+### Merge Equivalency
+
+The following options result is the same Configuration:
+
+:::{list-table}
+:header-rows: 1
+:width: 100%
+
+- - Case
+  - Notes
+- - ```python
+    CONFIG = LazyLoadConfiguration(
+        "file1.yaml",
+        "file2.yaml",
+    )
+    ```
+  - {py:class}`.LazyLoadConfiguration`
+    - `"file1.yaml"` and `"file2.yaml"` are read during the "Load Time" of the "First Fetch".
+    - The merge occurs as a part of the "Merge Time" merge.
+    - Best option.
+- - ```python
+    CONFIG = LazyLoadConfiguration(
+        "merged.yaml",
+    )
+    ```
+    ```yaml
+    # merged.yaml
+    !Merge
+    - !OptionalParseFile file1.yaml
+    - !OptionalParseFile file2.yaml
+    ```
+  - [`!Merge`](yaml.md#merge)
+    - `"file1.yaml"` and `"file2.yaml"` are read during the "Load Time" of the "First Fetch".
+    - The merged occurs before the "Merge Time" merge.
+      - The [`!Merge`](yaml.md#merge) must be evaluated fully, in order to be merged into the final configuration.
+    - This is less efficient merging with {py:class}`.LazyLoadConfiguration`.
+- - ```python
+    CONFIG = merge(
+        "file1.yaml",
+        "file2.yaml"
+    )
+    ```
+  - {py:func}`.merge`
+    - `"file1.yaml"` and `"file2.yaml"` are read immediately.
+    - `"file1.yaml"` and `"file2.yaml"` are loaded as separate {py:class}`.LazyLoadConfiguration` with individual Load Boundaries.
+    - This is far less efficient merging with {py:class}`.LazyLoadConfiguration`
+    - Exists for merging a framework configuration with a library-specific configuration.
+      - The explicit case was for a `pytest` sub-plugin that was a part of a framework plugin.
+      - Using {py:func}`.merge` allows users to set settings in the framework configuration without requiring
+        the framework configuration needing to know about the sub-plugin.
+
+:::
 
 ---
 
@@ -265,6 +342,8 @@ If you explore the code or need to [add a custom tag](plugins.md#adding-custom-t
 `base_path` will remove a reference count toward Root, but any Tag needing Root will hold a reference until evaluated. [`!Sub`](yaml.md#sub) checks if it needs Root before holding a reference.
 ```
 
+(load-boundary-limitations)=
+
 ### Load Boundary Limitations
 
 A load boundary is created by Root. You cannot query outside the Root and every load event is an independent Root.
@@ -277,11 +356,12 @@ However, {py:func}`.merge` does introduce Load Boundaries.
 
 #### Working with an example
 
-We have three files in `ASSET_DIR / "ref_cannot_cross_loading_boundary/"`
+We have the following three files in `ASSET_DIR / "ref_cannot_cross_loading_boundary/"`
 
 ````{list-table}
 :header-rows: 0
-:align: left
+:width: 100%
+:widths: 1 1 1
 
 * - ```yaml
     # 1.yaml
@@ -302,6 +382,8 @@ We have three files in `ASSET_DIR / "ref_cannot_cross_loading_boundary/"`
     ref: I came from 3.yaml
     ```
 ````
+
+With the following code:
 
 ```python
 files = (
@@ -335,6 +417,8 @@ assert config.as_dict() == {
 }
 ```
 
+<br>
+
 In the {py:func}`.merge` case, merging works as expected. However, the three `!Ref /ref` ended up referencing three different Roots.
 
 In the {py:class}`.LazyLoadConfiguration` case, the three `!Ref /ref` reference the same Root, as is generally desired.
@@ -348,6 +432,8 @@ For completeness’ sake, merging with [`!Merge`](yaml.md#merge) has the same re
 - !ParseFile ref_cannot_cross_loading_boundary/2.yaml
 - !ParseFile ref_cannot_cross_loading_boundary/3.yaml
 ```
+
+---
 
 ## Loading Loops
 
@@ -375,6 +461,8 @@ VAR=!ParseFile 2.yaml
 ````{list-table}
 :header-rows: 0
 :align: left
+:width: 66%
+:widths: 1 1
 
 * - ```yaml
     # 1.yaml
@@ -438,7 +526,8 @@ The following is an example of a loop, using [`!ParseFile`](yaml.md#parsefile--o
 
 ````{list-table}
 :header-rows: 0
-:align: left
+:width: 100%
+:widths: 1 1 1
 
 * - ```yaml
     # 1.yaml

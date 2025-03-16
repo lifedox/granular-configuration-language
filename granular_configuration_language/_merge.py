@@ -21,9 +21,21 @@ def merge(
     - Extracts :py:class:`.Configuration` from :py:class:`.LazyEval` and :py:class:`.LazyLoadConfiguration`.
     - Any :py:class:`os.PathLike` objects are loaded via individual :py:class:`.LazyLoadConfiguration` instances.
 
+    .. admonition:: Why does this exist?
+        :class: tip
+
+        - To enable merging a framework configuration with a library-specific configuration.
+
+          - The explicit case was for a ``pytest`` sub-plugin that was a part of a framework plugin.
+          - Using :py:func:`.merge` allows users to set settings in the framework configuration without requiring
+            the framework configuration needing to know about the sub-plugin.
+
+            - ``base_path`` is required to ensure safety.
+
     .. caution::
 
-        Don't use :py:func:`.merge` as a replacement for :py:class:`.LazyLoadConfiguration`. It is less efficient and creates Load Boundaries on each configuration.
+        Don't use :py:func:`.merge` as a replacement for :py:class:`.LazyLoadConfiguration`.
+        It is less efficient and creates :ref:`Load Boundaries <load-boundary-limitations>` on each configuration.
 
     .. admonition:: Attention
         :class: error

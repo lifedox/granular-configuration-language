@@ -108,7 +108,7 @@ class TagDecoratorBase(typ.Generic[T], abc.ABC):
         :param str, optional category:
             Category of Tag. Used by :ref:`available_tags <available_tags>` and :ref:`available_plugins <available_plugins>` to organize tags, defaults to ``General``.
         :param str, optional sort_as:
-            Alternative Tag string. Used for sorting tags different to its explict value. Used by :ref:`available_tags <available_tags>` and :ref:`available_plugins <available_plugins>`.
+            Alternative Tag string. Used for sorting tags different to its explicit value. Used by :ref:`available_tags <available_tags>` and :ref:`available_plugins <available_plugins>`.
         """
         self.tag: typ.Final = tag
         self.category: typ.Final = Category(category)

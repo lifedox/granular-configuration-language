@@ -304,7 +304,7 @@ class Configuration(tabc.Mapping[typ.Any, typ.Any]):
         Returns this :py:class:`Configuration` as standard Python :py:class:`dict`.
         Nested :class:`Configuration` objects will also be converted.
 
-        .. admonition:: Evalution Notice
+        .. admonition:: Evaluation Notice
             :class: note
             :collapsible: closed
 
@@ -326,7 +326,7 @@ class Configuration(tabc.Mapping[typ.Any, typ.Any]):
         library and (as default) the default factory provided by this library
         (:py:func:`granular_configuration_language.json_default`).
 
-        .. admonition:: Evalution Notice
+        .. admonition:: Evaluation Notice
             :class: note
             :collapsible: closed
 

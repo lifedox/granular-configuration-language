@@ -27,7 +27,7 @@ RootType = typ.NewType("RootType", tabc.Mapping)
 """
 :py:class:`~typing.NewType` used to type the configuration root.
 
-Aliases :py:class:`~collections.abc.Mapping` as root has to be a mapping for it to be used and no Tag should mutate it.
+Aliases :py:class:`~collections.abc.Mapping` as root has to be a mapping for it to be used, and no Tag should mutate it.
 """
 
 Root = RootType | None
@@ -164,11 +164,11 @@ class LazyEval(abc.ABC, typ.Generic[RT]):
         return f"<{self.__class__.__name__}: {self.tag}>"
 
     def __deepcopy__(self, memo: dict[int, typ.Any]) -> LazyEval:
-        # Don't copy LazyEval's
+        # Don't copy `LazyEval` instances
         return self
 
     def __copy__(self) -> LazyEval:
-        # Don't copy LazyEval's
+        # Don't copy `LazyEval` instances
         return self
 
 

@@ -122,7 +122,7 @@ test_many() {
     done
 }
 
-usage+=("  $0 lint - Runs linting (black, isort, mypy) checks; non-zero exit status on failure")
+usage+=("  $0 lint - Runs linting (isort, black, flake8, bandit) checks; non-zero exit status on failure")
 lint() {
     _run_cmd ./run _lint
 }
@@ -137,6 +137,7 @@ _lint() {
     bandit -c pyproject.toml -r .
 }
 
+usage+=("  $0 mypy - Runs mypy checks using all Python version modes; non-zero exit status on failure")
 mypy() {
     _run_cmd ./run _mypy
 }
@@ -147,6 +148,7 @@ _mypy() {
     done
 }
 
+usage+=("  $0 mypy - Runs pyright checks using all Python version modes; non-zero exit status on failure")
 pyright() {
     _run_cmd ./run _pyright
 }

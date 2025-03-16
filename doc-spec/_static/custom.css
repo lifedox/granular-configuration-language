@@ -1,26 +1,4 @@
-/* Enables a scollbar when menu items are wider than planned */
-/* It works */
-
-/* .wy-menu-vertical {
-  overflow-x: auto;
-}
-
-.wy-side-scroll {
-  width: fit-content;
-} */
-
 /* Adding arrow to collapsible */
-/* 
-summary {
-  list-style: none;
-}
-
-details > summary {
-  list-style: none;
-}
-summary::-webkit-details-marker {
-  display: None;
-} */
 
 /* url = chevron-down-solid.svg */
 summary::after {
@@ -40,4 +18,23 @@ details[open] summary:after {
     no-repeat;
   background-size: 18px;
   float: right;
+}
+
+/* override table width restrictions 
+From: https://github.com/readthedocs/sphinx_rtd_theme/issues/117
+*/
+.wy-table-responsive table td,
+.wy-table-responsive table th {
+  /* !important prevents the common CSS stylesheets from
+     overriding this as on RTD they are loaded after this stylesheet */
+  white-space: normal !important;
+}
+
+/*
+Decrease margin around code blocks
+*/
+
+.rst-content div[class^="highlight"],
+.rst-content pre.literal-block {
+  margin: 1px 0 5px;
 }
