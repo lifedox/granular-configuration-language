@@ -51,7 +51,7 @@ def curly_sub(root: Root, *, contents: str) -> str:
         )
     elif contents == "$":
         return "$"
-    elif root and contents.startswith("$") or contents.startswith("/"):
+    elif root and (contents.startswith("$") or contents.startswith("/")):
         return _get_ref_string(root, contents)
     elif contents.startswith("&") and contents.endswith(";"):
         return unescape(contents)

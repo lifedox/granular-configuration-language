@@ -1,13 +1,17 @@
 from __future__ import annotations
 
 import copy
+import os
+import re
 from datetime import date
 from unittest.mock import Mock, patch
 
 import pytest
 
 from granular_configuration_language import Configuration
+from granular_configuration_language.exceptions import EnvironmentVaribleNotFound
 from granular_configuration_language.yaml import LazyEval, loads
+from granular_configuration_language.yaml.decorators.interpolate._interpolate import interpolate
 
 
 def test_supported_key_types() -> None:
@@ -169,3 +173,13 @@ def test_LazyEval_keys_throw_errors() -> None:
 !Date 20121031: date
 """
         )
+
+
+def test_interpolatations_starting_with_slash_without_root_error_with_env_var() -> None:
+    with patch.dict(os.environ, values={}), pytest.raises(EnvironmentVaribleNotFound, match=re.escape("'/file'")):
+        interpolate("${/file}", None)
+
+
+def test_interpolatations_starting_with_dollar_without_root_error_with_env_var() -> None:
+    with patch.dict(os.environ, values={}), pytest.raises(EnvironmentVaribleNotFound, match=re.escape("'$file'")):
+        interpolate("${$file}", None)
