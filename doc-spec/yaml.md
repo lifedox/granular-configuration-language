@@ -12,6 +12,7 @@
   - Tags in YAML only support "scalar", "sequence", and "mapping".
     - As such,`!Tag 1.0` is always a string, despite `1.0` normally being a floating point number.
 - YAML Tags provided by this library are lazy (running when the value is request, not load time) unless noted.
+- YAML Tags that are lazy do not support being used as keys to mappings.
 
 ## Summary Table
 
