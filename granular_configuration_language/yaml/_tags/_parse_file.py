@@ -50,4 +50,4 @@ def handler_optional(value: str, root: Root, options: LoadOptions) -> typ.Any:
     if file.exists():
         return _load(file, options, root)
     else:
-        return options.obj_pairs_func()
+        return None
