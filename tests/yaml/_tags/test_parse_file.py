@@ -24,6 +24,10 @@ def test_loading_missing_file() -> None:
         loads("!ParseFile does_not_exist.yaml", file_path=ASSET_DIR / "dummy.yaml")
 
 
+def test_loading_missing_file_with_optional_is_none() -> None:
+    assert loads("!OptionalParseFile does_not_exist.yaml", file_path=ASSET_DIR / "dummy.yaml") is None
+
+
 def test_redirect_loading() -> None:
     config = LazyLoadConfiguration(ASSET_DIR / "redirect_parsefile.yaml")
     expect = {

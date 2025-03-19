@@ -2,6 +2,13 @@
 
 <!-- markdownlint-disable-file MD024 -->
 
+## Next
+
+### Fixed
+
+- Boolean expression for the `without_ref` interpolations missing parentheses.
+- `!OptionalParseFile` is documented to return `None`. It was returning empty mapping. Changed to result to match documentation.
+
 ## 2.2.2
 
 ### Added
