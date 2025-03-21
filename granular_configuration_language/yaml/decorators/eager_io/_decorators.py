@@ -4,16 +4,11 @@ import abc
 import collections.abc as tabc
 import typing as typ
 from concurrent.futures import ThreadPoolExecutor
-from functools import wraps
 
 from granular_configuration_language.yaml.classes import IT, RT, LazyEval, StateHolder, T
-from granular_configuration_language.yaml.decorators import (
-    LoadOptions,
-    Root,
-    Tag,
-)
+from granular_configuration_language.yaml.decorators import LoadOptions, Root, Tag
 from granular_configuration_language.yaml.decorators._lazy_eval import LazyEvalBasic, LazyEvalWithRoot
-from granular_configuration_language.yaml.decorators._tag_tracker import is_without_ref, track_as_without_ref
+from granular_configuration_language.yaml.decorators._tag_tracker import tracker
 
 
 class as_eager_io_with_root_and_load_options(abc.ABC, typ.Generic[T, RT, IT]):
@@ -26,10 +21,7 @@ class as_eager_io_with_root_and_load_options(abc.ABC, typ.Generic[T, RT, IT]):
         self,
         func: tabc.Callable[[IT, Root, LoadOptions], RT],
     ) -> tabc.Callable[[Tag, T, StateHolder], LazyEval[RT]]:
-        if is_without_ref(self.__eager_io):  # pragma: no cover
-            track_as_without_ref(func)
-
-        @wraps(func)
+        @tracker.wraps(func, track_eager_io=self.__eager_io)
         def lazy_wrapper(tag: Tag, value: T, state: StateHolder) -> LazyEvalWithRoot[RT]:
             options = state.options
 
@@ -56,10 +48,7 @@ class as_eager_io(abc.ABC, typ.Generic[T, RT, IT]):
         self,
         func: tabc.Callable[[IT], RT],
     ) -> tabc.Callable[[Tag, T, StateHolder], LazyEval[RT]]:
-        if is_without_ref(self.__eager_io):  # pragma: no cover
-            track_as_without_ref(func)
-
-        @wraps(func)
+        @tracker.wraps(func, track_eager_io=self.__eager_io)
         def lazy_wrapper(tag: Tag, value: T, state: StateHolder) -> LazyEvalBasic[RT]:
 
             eager_io_executer = ThreadPoolExecutor(1)

@@ -4,13 +4,12 @@ import collections.abc as tabc
 import re
 import typing as typ
 import warnings
-from functools import wraps
 from html import unescape
 
 from granular_configuration_language._utils import get_environment_variable
 from granular_configuration_language.exceptions import InterpolationSyntaxError, InterpolationWarning
-from granular_configuration_language.yaml.classes import RT, P, Root
-from granular_configuration_language.yaml.decorators._tag_tracker import track_as_with_ref, track_as_without_ref
+from granular_configuration_language.yaml.classes import RT, P, Root, Tag
+from granular_configuration_language.yaml.decorators._tag_tracker import tracker
 from granular_configuration_language.yaml.decorators.interpolate._env_var_parser import (
     parse_environment_variable_syntax,
 )
@@ -151,11 +150,11 @@ def interpolate_value_with_ref(
                 ...
     """
 
-    @wraps(func)
+    @tracker.wraps(func)
     def lazy_wrapper(value: str, root: Root, /, *args: P.args, **kwargs: P.kwargs) -> RT:
         return func(interpolate(value, root), root, *args, **kwargs)
 
-    track_as_with_ref(func)
+    tracker.track_as_with_ref(func)
     return lazy_wrapper
 
 
@@ -196,9 +195,39 @@ def interpolate_value_without_ref(
 
     """
 
-    @wraps(func)
+    @tracker.wraps(func)
     def lazy_wrapper(value: str, /, *args: P.args, **kwargs: P.kwargs) -> RT:
         return func(interpolate(value, None), *args, **kwargs)
 
-    track_as_without_ref(func)
+    tracker.track_as_without_ref(func)
+    return lazy_wrapper
+
+
+def interpolate_value_eager_io(
+    func: tabc.Callable[typ.Concatenate[str, P], RT],
+) -> tabc.Callable[typ.Concatenate[str, P], RT]:
+    """Replaces the 1st parameter with the interpolated value before calling the function.
+
+    This version is for Eager IO functions.
+
+    This does a limited interpolation that does not support references (e.g. ``${$.value}`` and ``${/value}``)
+
+    .. admonition:: This is not for Tags functions.
+        :class: error
+
+        - This decorator is for functions passed to :py:func:`!.as_eager_io` and :py:func:`!.as_eager_io_with_root_and_load_options`, not wrapped by.
+        - For Tags, use :py:func:`.interpolate_value_without_ref`
+
+    :param ~collections.abc.Callable[~typing.Concatenate[str, P], RT] func: Function to be wrapped
+
+    :returns: Wrapped Function
+    :rtype: ~collections.abc.Callable[~typing.Concatenate[str, P], RT]
+    """
+
+    @tracker.wraps(func)
+    def lazy_wrapper(value: str, /, *args: P.args, **kwargs: P.kwargs) -> RT:
+        return func(interpolate(value, None), *args, **kwargs)
+
+    tracker.track_as_without_ref(func)
+    tracker.get(func).set_tag(Tag("!Faker"))
     return lazy_wrapper

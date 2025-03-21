@@ -10,19 +10,26 @@ from granular_configuration_language.exceptions import (
     ParseEnvParsingError,
     ParsingTriedToCreateALoop,
 )
-from granular_configuration_language.yaml.classes import LazyRoot
 from granular_configuration_language.yaml.decorators import (
     LoadOptions,
     Root,
     Tag,
-    as_lazy,
+    as_lazy_with_load_options,
     as_lazy_with_root_and_load_options,
     string_or_twople_tag,
+    with_tag,
 )
-from granular_configuration_language.yaml.file_loading import as_environment_variable_path
+from granular_configuration_language.yaml.file_loading import (
+    EagerIOTextFile,
+    environment_variable_as_file,
+    load_safe_yaml_from_file,
+    load_yaml_from_file,
+)
+
+LoadFunc = tabc.Callable[[EagerIOTextFile], typ.Any]
 
 
-def parse_env(load: tabc.Callable[[str, str], typ.Any], env_var: str, *default: typ.Any) -> typ.Any:
+def parse_env(tag: Tag, options: LoadOptions, load: LoadFunc, env_var: str, *default: typ.Any) -> typ.Any:
     env_missing = env_var not in os.environ
 
     if env_missing and (len(default) > 0):
@@ -31,7 +38,7 @@ def parse_env(load: tabc.Callable[[str, str], typ.Any], env_var: str, *default: 
         raise EnvironmentVaribleNotFound(env_var)
     else:
         try:
-            return load(env_var, os.environ[env_var])
+            return load(environment_variable_as_file(tag, env_var, options))
         except ParsingTriedToCreateALoop:
             raise
         except Exception as e:
@@ -40,41 +47,22 @@ def parse_env(load: tabc.Callable[[str, str], typ.Any], env_var: str, *default: 
             ) from None
 
 
-def load_advance(options: LoadOptions, root: Root, env_var: str, value: str) -> typ.Any:
-    from granular_configuration_language.yaml import loads
-
-    file_path = as_environment_variable_path("!ParseEnv", env_var, options)
-
-    lazy_root = LazyRoot.with_root(root)
-    return loads(
-        value,
-        lazy_root=lazy_root,
-        mutable=options.mutable,
-        previous_options=options,
-        file_path=file_path,
-    )
-
-
-def load_safe(env_var: str, value: str) -> typ.Any:
-    from ruamel.yaml import YAML
-
-    return YAML(typ="safe").load(value)
-
-
-def parse_input(load: tabc.Callable[[str, str], typ.Any], value: string_or_twople_tag.Type) -> typ.Any:
+def parse_input(tag: Tag, value: string_or_twople_tag.Type, options: LoadOptions, load: LoadFunc) -> typ.Any:
     if isinstance(value, str):
-        return parse_env(load, value)
+        return parse_env(tag, options, load, value)
     else:
-        return parse_env(load, *value)
+        return parse_env(tag, options, load, *value)
 
 
 @string_or_twople_tag(Tag("!ParseEnv"), "Parser")
 @as_lazy_with_root_and_load_options
-def handler(value: string_or_twople_tag.Type, root: Root, options: LoadOptions) -> typ.Any:
-    return parse_input(partial(load_advance, options, root), value)
+@with_tag
+def handler(tag: Tag, value: string_or_twople_tag.Type, root: Root, options: LoadOptions) -> typ.Any:
+    return parse_input(tag, value, options, partial(load_yaml_from_file, options=options, root=root))
 
 
 @string_or_twople_tag(Tag("!ParseEnvSafe"), "Parser")
-@as_lazy
-def handler_safe(value: string_or_twople_tag.Type) -> typ.Any:
-    return parse_input(load_safe, value)
+@as_lazy_with_load_options
+@with_tag
+def handler_safe(tag: Tag, value: string_or_twople_tag.Type, options: LoadOptions) -> typ.Any:
+    return parse_input(tag, value, options, partial(load_safe_yaml_from_file))

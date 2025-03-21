@@ -2,11 +2,18 @@ from __future__ import annotations
 
 import collections.abc as tabc
 import typing as typ
-from functools import wraps
 
-from granular_configuration_language.yaml.classes import RT, LazyEval, LoadOptions, Root, StateHolder, T, Tag
+from granular_configuration_language.yaml.classes import RT, LazyEval, LoadOptions, P, Root, StateHolder, T, Tag
 from granular_configuration_language.yaml.decorators._lazy_eval import LazyEvalBasic, LazyEvalWithRoot
-from granular_configuration_language.yaml.decorators._tag_tracker import track_as_not_lazy, track_needs_root_condition
+from granular_configuration_language.yaml.decorators._tag_tracker import tracker
+
+
+def with_tag(func: tabc.Callable[typ.Concatenate[Tag, P], RT]) -> tabc.Callable[P, RT]:
+    @tracker.wraps(func)
+    def lazy_wrapper(*args: P.args, **kwargs: P.kwargs) -> RT:
+        return func(tracker.get(func).tag, *args, **kwargs)
+
+    return lazy_wrapper
 
 
 def as_lazy(func: tabc.Callable[[T], RT]) -> tabc.Callable[[Tag, T, StateHolder], LazyEval[RT]]:
@@ -31,7 +38,7 @@ def as_lazy(func: tabc.Callable[[T], RT]) -> tabc.Callable[[Tag, T, StateHolder]
                 ...
     """
 
-    @wraps(func)
+    @tracker.wraps(func)
     def lazy_wrapper(tag: Tag, value: T, state: StateHolder) -> LazyEvalBasic[RT]:
         return LazyEvalBasic(tag, lambda: func(value))
 
@@ -63,7 +70,7 @@ def as_lazy_with_load_options(
                 ...
     """
 
-    @wraps(func)
+    @tracker.wraps(func)
     def lazy_wrapper(tag: Tag, value: T, state: StateHolder) -> LazyEvalBasic[RT]:
         options = state.options
         return LazyEvalBasic(tag, lambda: func(value, options))
@@ -157,11 +164,7 @@ def as_lazy_with_root(
     """
 
     def decorator_generator(func: tabc.Callable[[T, Root], RT]) -> tabc.Callable[[Tag, T, StateHolder], LazyEval[RT]]:
-
-        if needs_root_condition:
-            track_needs_root_condition(func, needs_root_condition)
-
-        @wraps(func)
+        @tracker.wraps(func, track_needs_root_condition=needs_root_condition)
         def lazy_wrapper(tag: Tag, value: T, state: StateHolder) -> LazyEval[RT]:
 
             if (needs_root_condition is None) or needs_root_condition(value):
@@ -203,7 +206,7 @@ def as_lazy_with_root_and_load_options(
                 ...
     """
 
-    @wraps(func)
+    @tracker.wraps(func)
     def lazy_wrapper(tag: Tag, value: T, state: StateHolder) -> LazyEvalWithRoot[RT]:
         options = state.options
         return LazyEvalWithRoot(tag, state.lazy_root_obj, lambda root: func(value, root, options))
@@ -233,9 +236,9 @@ def as_not_lazy(func: tabc.Callable[[T], RT]) -> tabc.Callable[[Tag, T, StateHol
                 ...
     """
 
-    @wraps(func)
+    @tracker.wraps(func)
     def lazy_wrapper(tag: Tag, value: T, state: StateHolder) -> RT:
         return func(value)
 
-    track_as_not_lazy(func)
+    tracker.track_as_not_lazy(func)
     return lazy_wrapper

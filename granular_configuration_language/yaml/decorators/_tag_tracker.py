@@ -1,51 +1,102 @@
 from __future__ import annotations
 
 import collections.abc as tabc
-import os
-from operator import attrgetter
+import dataclasses
+import itertools
+import operator as op
+import typing as typ
+from functools import wraps as real_wraps
 
-TrackerId = tuple[str, str, str]
-tracker_id = attrgetter("__module__", "__name__", "__qualname__")
-
-with_ref: set[TrackerId] = set()
-without_ref: set[TrackerId] = set()
-not_lazy: set[TrackerId] = set()
-needs_root_condition: dict[TrackerId, tabc.Callable] = dict()
-
-ENABLED = os.environ.get("G_CONFIG_ENABLE_TAG_TRACKER") == "TRUE"
+from granular_configuration_language.yaml.classes import RT, P, Tag
 
 
-def track_as_with_ref(func: tabc.Callable) -> None:
-    if ENABLED:  # pragma: no cover  # coverage shown by test output
-        with_ref.add(tracker_id(func))
+@dataclasses.dataclass
+class HandlerAttributes:
+    func: tabc.Callable
+    is_not_lazy: bool = False
+    is_eager: bool = False
+    is_without_ref = False
+    is_with_ref = False
+    needs_root_condition: tabc.Callable | None = None
+    eager_io: tabc.Callable | None = None
+    tag: Tag = Tag("")
+
+    def set_tag(self, tag: Tag) -> None:
+        self.tag = tag
 
 
-def is_with_ref(func: tabc.Callable) -> bool:
-    return tracker_id(func) in with_ref
+class HandlerTracker(tabc.Iterable[HandlerAttributes]):
+    def __init__(self) -> None:
+        self.__data: dict[int, HandlerAttributes] = dict()
+
+    def __iter__(self) -> tabc.Iterator[HandlerAttributes]:
+        return map(
+            next,
+            map(
+                op.itemgetter(1),
+                itertools.groupby(
+                    sorted(
+                        self.__data.values(),
+                        key=op.attrgetter("tag"),
+                    ),
+                    op.attrgetter("tag"),
+                ),
+            ),
+        )
+
+    def wrapped(self, wrapped_func: tabc.Callable, func: tabc.Callable) -> None:
+        id_wf = id(wrapped_func)
+        id_f = id(func)
+
+        if id_f in self.__data:
+            self.__data[id_wf] = self.__data[id_wf]
+        elif id_wf in self.__data:
+            self.__data[id_f] = self.__data[id_wf]
+        else:
+            attributes = HandlerAttributes(func)
+            self.__data[id_f] = attributes
+            self.__data[id_wf] = attributes
+
+    def get(self, func: tabc.Callable) -> HandlerAttributes:
+        id_f = id(func)
+        if id_f in self.__data:
+            return self.__data[id_f]
+        else:
+            attributes = HandlerAttributes(func)
+            self.__data[id_f] = attributes
+            return attributes
+
+    def wraps(
+        self,
+        func: tabc.Callable,
+        /,
+        *,
+        track_needs_root_condition: tabc.Callable | None = None,
+        track_eager_io: tabc.Callable | None = None,
+    ) -> tabc.Callable[[tabc.Callable[P, RT]], tabc.Callable[P, RT]]:
+        if track_needs_root_condition:
+            self.get(func).needs_root_condition = track_needs_root_condition
+
+        if track_eager_io:
+            self.get(func).eager_io = track_eager_io
+
+            if self.get(track_eager_io).is_without_ref:
+                self.track_as_without_ref(func)
+
+        def wrapper(wrapper_func: tabc.Callable[P, RT]) -> tabc.Callable[P, RT]:
+            self.wrapped(func, wrapper_func)
+            return real_wraps(func)(wrapper_func)
+
+        return wrapper
+
+    def track_as_not_lazy(self, func: tabc.Callable) -> None:
+        self.get(func).is_not_lazy = True
+
+    def track_as_with_ref(self, func: tabc.Callable) -> None:
+        self.get(func).is_with_ref = True
+
+    def track_as_without_ref(self, func: tabc.Callable) -> None:
+        self.get(func).is_without_ref = True
 
 
-def track_as_without_ref(func: tabc.Callable) -> None:
-    if ENABLED:  # pragma: no cover  # coverage shown by test output
-        without_ref.add(tracker_id(func))
-
-
-def is_without_ref(func: tabc.Callable) -> bool:
-    return tracker_id(func) in without_ref
-
-
-def track_as_not_lazy(func: tabc.Callable) -> None:
-    if ENABLED:  # pragma: no cover  # coverage shown by test output
-        not_lazy.add(tracker_id(func))
-
-
-def is_not_lazy(func: tabc.Callable) -> bool:
-    return tracker_id(func) in not_lazy
-
-
-def track_needs_root_condition(func: tabc.Callable, condition: tabc.Callable) -> None:
-    if ENABLED:  # pragma: no cover  # coverage shown by test output
-        needs_root_condition[tracker_id(func)] = condition
-
-
-def get_needs_root_condition(func: tabc.Callable) -> tabc.Callable | None:
-    return needs_root_condition.get(tracker_id(func))
+tracker: typ.Final = HandlerTracker()

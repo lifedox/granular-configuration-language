@@ -13,6 +13,7 @@ from granular_configuration_language.exceptions import ErrorWhileLoadingTags
 from granular_configuration_language.yaml._tags import handlers
 from granular_configuration_language.yaml.decorators._tag_loader import load_tags
 from granular_configuration_language.yaml.decorators._tag_set import TagSet
+from granular_configuration_language.yaml.decorators._tag_tracker import tracker
 from granular_configuration_language.yaml.decorators._viewer import AvailablePlugins, AvailableTags, can_table
 
 
@@ -184,24 +185,25 @@ You can use the "printing" extra to install the needed dependencies"""
 
 
 def test_available_plugins_csv() -> None:
-    output = call("available_plugins", "csv", ("!Func", "!UUID", "!Merge", "!Sub"))
+    output = call("available_plugins", "csv", ("!Func", "!UUID", "!Merge", "!Sub", "!EagerParseFile"))
 
     print(output)
 
     assert (
         output
         == """\
-plugin,category,tag,handler,needs_root_condition
-<gcl-built-in>,Formatter,!Sub,granular_configuration_language.yaml._tags._sub.handler,interpolation_needs_ref_condition
-<gcl-built-in>,Manipulator,!Merge,granular_configuration_language.yaml._tags._merge.handler,
-<gcl-built-in>,Typer,!UUID,granular_configuration_language.yaml._tags._uuid.handler,
-official_extra,Typer,!Func,granular_configuration_language.yaml._tags.func_and_class.func_handler,
+plugin,category,tag,handler,needs_root_condition,eager_io
+<gcl-built-in>,Formatter,!Sub,granular_configuration_language.yaml._tags._sub.handler,interpolation_needs_ref_condition,
+<gcl-built-in>,Manipulator,!Merge,granular_configuration_language.yaml._tags._merge.handler,,
+<gcl-built-in>,Parser,!EagerParseFile,granular_configuration_language.yaml._tags._eager_parse_file.handler,,eager_io_text_loader
+<gcl-built-in>,Typer,!UUID,granular_configuration_language.yaml._tags._uuid.handler,,
+official_extra,Typer,!Func,granular_configuration_language.yaml._tags.func_and_class.func_handler,,
 """
     )
 
 
 def test_available_plugins_json() -> None:
-    output = call("available_plugins", "json", ("!Func", "!UUID", "!Merge", "!Sub"))
+    output = call("available_plugins", "json", ("!Func", "!UUID", "!Merge", "!Sub", "!EagerParseFile"))
 
     print(output)
 
@@ -212,18 +214,28 @@ def test_available_plugins_json() -> None:
   "<gcl-built-in>": {
     "Formatter": {
       "!Sub": {
+        "eager_io": null,
         "handler": "granular_configuration_language.yaml._tags._sub.handler",
         "needs_root_condition": "interpolation_needs_ref_condition"
       }
     },
     "Manipulator": {
       "!Merge": {
+        "eager_io": null,
         "handler": "granular_configuration_language.yaml._tags._merge.handler",
+        "needs_root_condition": null
+      }
+    },
+    "Parser": {
+      "!EagerParseFile": {
+        "eager_io": "eager_io_text_loader",
+        "handler": "granular_configuration_language.yaml._tags._eager_parse_file.handler",
         "needs_root_condition": null
       }
     },
     "Typer": {
       "!UUID": {
+        "eager_io": null,
         "handler": "granular_configuration_language.yaml._tags._uuid.handler",
         "needs_root_condition": null
       }
@@ -232,6 +244,7 @@ def test_available_plugins_json() -> None:
   "official_extra": {
     "Typer": {
       "!Func": {
+        "eager_io": null,
         "handler": "granular_configuration_language.yaml._tags.func_and_class.func_handler",
         "needs_root_condition": null
       }
@@ -243,7 +256,7 @@ def test_available_plugins_json() -> None:
 
 
 def test_available_plugins_table() -> None:
-    output = call("available_plugins", "table", ("!Func", "!UUID", "!Merge", "!Sub"))
+    output = call("available_plugins", "table", ("!Func", "!UUID", "!Merge", "!Sub", "!EagerParseFile"))
 
     print(output)
 
@@ -251,11 +264,17 @@ def test_available_plugins_table() -> None:
     assert (
         output
         == """\
-plugin          category     tag     handler                                                                 needs_root_condition
---------------  -----------  ------  ----------------------------------------------------------------------  ---------------------------------
-<gcl-built-in>  Formatter    !Sub    granular_configuration_language.yaml._tags._sub.handler                 interpolation_needs_ref_condition
-<gcl-built-in>  Manipulator  !Merge  granular_configuration_language.yaml._tags._merge.handler
-<gcl-built-in>  Typer        !UUID   granular_configuration_language.yaml._tags._uuid.handler
-official_extra  Typer        !Func   granular_configuration_language.yaml._tags.func_and_class.func_handler
+plugin          category     tag              handler                                                                 needs_root_condition               eager_io
+--------------  -----------  ---------------  ----------------------------------------------------------------------  ---------------------------------  --------------------
+<gcl-built-in>  Formatter    !Sub             granular_configuration_language.yaml._tags._sub.handler                 interpolation_needs_ref_condition
+<gcl-built-in>  Manipulator  !Merge           granular_configuration_language.yaml._tags._merge.handler
+<gcl-built-in>  Parser       !EagerParseFile  granular_configuration_language.yaml._tags._eager_parse_file.handler                                       eager_io_text_loader
+<gcl-built-in>  Typer        !UUID            granular_configuration_language.yaml._tags._uuid.handler
+official_extra  Typer        !Func            granular_configuration_language.yaml._tags.func_and_class.func_handler
 """
     )
+
+
+def test_all_attributes_have_tags() -> None:
+    for attribute in tracker:
+        assert attribute.tag

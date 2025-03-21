@@ -8,12 +8,6 @@ import typing as typ
 from collections import OrderedDict
 
 from granular_configuration_language.yaml.decorators._base import TagConstructor
-from granular_configuration_language.yaml.decorators._tag_tracker import (
-    get_needs_root_condition,
-    is_not_lazy,
-    is_with_ref,
-    is_without_ref,
-)
 
 try:
     import tabulate
@@ -37,24 +31,33 @@ class RowType(typ.TypedDict, total=False):
     returns: str
     handler: str
     needs_root_condition: str
+    eager_io: str
 
 
-NULLIFY_JSON = ("interpolates", "lazy", "needs_root_condition")
+NULLIFY_JSON = ("interpolates", "lazy", "needs_root_condition", "eager_io")
 
 
 def _interpolates(tc: TagConstructor) -> Imode:
-    if is_with_ref(tc.constructor):
+    if tc.attributes.is_with_ref:
         return "full"  # pragma: no cover  # coverage shown by test output
-    elif is_without_ref(tc.constructor):
+    elif tc.attributes.is_without_ref:
         return "reduced"  # pragma: no cover  # coverage shown by test output
     else:
         return ""
 
 
 def _needs_root_condition(tc: TagConstructor) -> str:
-    condition = get_needs_root_condition(tc.constructor)
+    condition = tc.attributes.needs_root_condition
     if condition:
         return condition.__name__  # pragma: no cover  # coverage shown by test output
+    else:
+        return ""
+
+
+def _eager_io(tc: TagConstructor) -> str:
+    eager_io = tc.attributes.eager_io
+    if eager_io:
+        return eager_io.__name__  # pragma: no cover  # coverage shown by test output
     else:
         return ""
 
@@ -66,10 +69,11 @@ def _make_row(tc: TagConstructor) -> RowType:
         tag=tc.tag,
         type=tc.friendly_type,
         interpolates=_interpolates(tc),
-        lazy="NOT_LAZY" if is_not_lazy(tc.constructor) else "",
+        lazy="NOT_LAZY" if tc.attributes.is_not_lazy else "",
         returns=str(inspect.signature(tc.constructor).return_annotation).removeprefix("typ.").removeprefix("tabc."),
         handler=tc.constructor.__module__ + "." + tc.constructor.__name__,
         needs_root_condition=_needs_root_condition(tc),
+        eager_io=_eager_io(tc),
     )
 
 
@@ -143,7 +147,7 @@ class AvailableTags(AvailableBase):
 
 
 class AvailablePlugins(AvailableBase):
-    headers = ("plugin", "category", "tag", "handler", "needs_root_condition")
+    headers = ("plugin", "category", "tag", "handler", "needs_root_condition", "eager_io")
     sort_keys = op.attrgetter("plugin", "category", "sort_as")
     json_remove = ("category", "plugin")
 

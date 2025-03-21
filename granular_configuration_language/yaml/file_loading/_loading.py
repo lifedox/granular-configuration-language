@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import collections.abc as tabc
+import os
 import sys
 import typing as typ
 from functools import partial
@@ -8,7 +9,7 @@ from itertools import chain
 from pathlib import Path
 
 from granular_configuration_language.exceptions import ParsingTriedToCreateALoop
-from granular_configuration_language.yaml.classes import LoadOptions
+from granular_configuration_language.yaml.classes import LazyRoot, LoadOptions, Root, Tag
 
 if sys.version_info >= (3, 12):
 
@@ -86,7 +87,7 @@ def is_in_chain(file: Path, options: LoadOptions) -> bool:
         return False
 
 
-def make_chain_message(tag: str, value: str, options: LoadOptions) -> ParsingTriedToCreateALoop:
+def make_chain_message(tag: Tag, value: str, options: LoadOptions) -> ParsingTriedToCreateALoop:
     return ParsingTriedToCreateALoop(
         f"`{tag} {value}` tried to load itself in chain: ({_stringify_source_chain(_get_reversed_source_chain(options))})"
     )
@@ -96,7 +97,7 @@ def create_environment_variable_path(env_var: str) -> Path:
     return Path(env_var + ENV_VAR_FILE_EXTENSION)
 
 
-def as_file_path(tag: str, value: str, options: LoadOptions) -> Path:
+def as_file_path(tag: Tag, value: str, options: LoadOptions) -> Path:
     result = options.relative_to_directory / value
 
     if is_in_chain(result, options):
@@ -105,11 +106,11 @@ def as_file_path(tag: str, value: str, options: LoadOptions) -> Path:
     return result
 
 
-def as_environment_variable_path(tag: str, value: str, options: LoadOptions) -> Path:
-    file_path = create_environment_variable_path(value)
+def as_environment_variable_path(tag: Tag, variable_name: str, options: LoadOptions) -> Path:
+    file_path = create_environment_variable_path(variable_name)
 
     if is_in_chain(file_path, options):
-        raise make_chain_message(tag, value, options)
+        raise make_chain_message(tag, variable_name, options)
 
     return file_path
 
@@ -120,7 +121,15 @@ class EagerIOTextFile(typ.NamedTuple):
     data: str
 
 
-def read_text_file(file: Path) -> EagerIOTextFile:
+def environment_variable_as_file(tag: Tag, variable_name: str, options: LoadOptions) -> EagerIOTextFile:
+    return EagerIOTextFile(
+        as_environment_variable_path(tag, variable_name, options),
+        variable_name in os.environ,
+        os.environ.get(variable_name, ""),
+    )
+
+
+def read_text_file(file: Path, /) -> EagerIOTextFile:
     exists = file.exists()
     if exists:
         return EagerIOTextFile(file, exists, file.read_text())
@@ -134,7 +143,7 @@ class EagerIOBinaryFile(typ.NamedTuple):
     data: bytes
 
 
-def read_binary_file(file: Path) -> EagerIOBinaryFile:
+def read_binary_file(file: Path, /) -> EagerIOBinaryFile:
     exists = file.exists()
     if exists:
         return EagerIOBinaryFile(file, exists, file.read_bytes())
@@ -142,7 +151,7 @@ def read_binary_file(file: Path) -> EagerIOBinaryFile:
         return EagerIOBinaryFile(file, exists, b"")
 
 
-def read_text_data(filename: Path | EagerIOTextFile) -> str:
+def read_text_data(filename: Path | EagerIOTextFile, /) -> str:
     if isinstance(filename, EagerIOTextFile):
         if filename.exists:
             return filename.data
@@ -150,3 +159,29 @@ def read_text_data(filename: Path | EagerIOTextFile) -> str:
             raise FileNotFoundError(f"[Errno 2] No such file or directory: '{filename.path}'")
     else:
         return filename.read_text()
+
+
+def read_binary_data(filename: Path | EagerIOBinaryFile, /) -> bytes:
+    if isinstance(filename, EagerIOBinaryFile):
+        if filename.exists:
+            return filename.data
+        else:
+            raise FileNotFoundError(f"[Errno 2] No such file or directory: '{filename.path}'")
+    else:
+        return filename.read_bytes()
+
+
+def load_yaml_from_file(file: EagerIOTextFile | Path, /, options: LoadOptions, root: Root) -> typ.Any:
+    from granular_configuration_language._load import load_file
+
+    lazy_root = LazyRoot.with_root(root)
+    return load_file(file, lazy_root=lazy_root, mutable=options.mutable, previous_options=options)
+
+
+def load_safe_yaml_from_file(file: EagerIOTextFile | Path, /) -> typ.Any:
+    from ruamel.yaml import YAML
+
+    if isinstance(file, EagerIOTextFile):
+        return YAML(typ="safe").load(file.data)
+    else:
+        return YAML(typ="safe").load(file.read_text())
