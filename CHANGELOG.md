@@ -2,7 +2,7 @@
 
 <!-- markdownlint-disable-file MD024 -->
 
-## Next
+## 2.2.3
 
 ### Fixed
 
