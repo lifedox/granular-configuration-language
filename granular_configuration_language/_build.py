@@ -12,8 +12,8 @@ from granular_configuration_language._load import load_file
 from granular_configuration_language._s import setter_secret
 from granular_configuration_language._utils import consume
 from granular_configuration_language.yaml import LazyRoot
+from granular_configuration_language.yaml.file_loading import EagerIOTextFile, read_text_file
 from granular_configuration_language.yaml.load import obj_pairs_func
-from granular_configuration_language.yaml.file_loading import read_text_file, EagerIOTextFile
 
 _C = typ.TypeVar("_C", bound=Configuration)
 
@@ -38,9 +38,7 @@ def _merge(configuration_type: type[_C], base_config: _C, configs: tabc.Iterable
     return base_config
 
 
-def optionally_concurrent_map(
-    iterable: tabc.Iterable[Path], /, *, thread: bool
-) -> tabc.Iterable[EagerIOTextFile]:
+def optionally_concurrent_map(iterable: tabc.Iterable[Path], /, *, thread: bool) -> tabc.Iterable[EagerIOTextFile]:
     if thread:  # pragma: no cover
         with ThreadPoolExecutor() as executor:
             return executor.map(read_text_file, iterable)

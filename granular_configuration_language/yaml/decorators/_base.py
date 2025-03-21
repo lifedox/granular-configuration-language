@@ -5,12 +5,12 @@ import collections.abc as tabc
 import dataclasses
 import sys
 import typing as typ
-from functools import wraps
 
 from ruamel.yaml import MappingNode, Node, SafeConstructor, ScalarNode, SequenceNode
 
 from granular_configuration_language.exceptions import ErrorWhileLoadingTags
 from granular_configuration_language.yaml.classes import RT, StateHolder, T, Tag
+from granular_configuration_language.yaml.decorators._tag_tracker import HandlerAttributes, tracker
 from granular_configuration_language.yaml.load._constructors import construct_mapping, construct_sequence
 
 if sys.version_info >= (3, 12):
@@ -40,6 +40,11 @@ class TagConstructor:
     friendly_type: FriendlyType
     constructor: tabc.Callable[[type[SafeConstructor], StateHolder], None]
     plugin: str = dataclasses.field(default="Unknown", init=False)
+    attributes: HandlerAttributes = dataclasses.field(init=False)
+
+    def __post_init__(self) -> None:
+        object.__setattr__(self, "attributes", tracker.get(self.constructor))
+        self.attributes.set_tag(self.tag)
 
     def set_plugin(self, plugin: str) -> None:
         object.__setattr__(self, "plugin", plugin)
@@ -247,12 +252,12 @@ class TagDecoratorBase(typ.Generic[T], abc.ABC):
         sequence_node_transformers = self.sequence_node_transformer
         mapping_node_transformer = self.mapping_node_transformer
 
-        @wraps(handler)
+        @tracker.wraps(handler)
         def add_handler(
             constructor: type[SafeConstructor],
             state: StateHolder,
         ) -> None:
-            @wraps(handler)
+            @tracker.wraps(handler)
             def type_handler(constructor: SafeConstructor, node: Node) -> RT:
                 if isinstance(node, ScalarNode):
                     value = constructor.construct_scalar(node)

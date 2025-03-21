@@ -8,6 +8,7 @@ from granular_configuration_language.yaml.decorators._lazy import (
     as_lazy_with_root,
     as_lazy_with_root_and_load_options,
     as_not_lazy,
+    with_tag,
 )
 from granular_configuration_language.yaml.decorators._type_checking import (
     mapping_of_any_tag,
