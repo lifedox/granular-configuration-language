@@ -11,22 +11,22 @@ from granular_configuration_language.exceptions import (
 )
 from granular_configuration_language.yaml import LazyRoot
 from granular_configuration_language.yaml import loads as yaml_loader
-from granular_configuration_language.yaml._parsing import FILE_EXTENSION
 from granular_configuration_language.yaml.classes import LoadOptions
+from granular_configuration_language.yaml.file_loading import ENV_VAR_FILE_EXTENSION, EagerIOTextFile, read_text_data
 
 
 def _load_file(
     *,
-    filename: Path,
+    filename: Path | EagerIOTextFile,
     mutable: bool,
     lazy_root: LazyRoot | None,
     previous_options: LoadOptions | None,
 ) -> typ.Any:
     try:
         return yaml_loader(
-            filename.read_text(),
+            read_text_data(filename),
             lazy_root=lazy_root,
-            file_path=filename,
+            file_path=filename.path if isinstance(filename, EagerIOTextFile) else filename,
             mutable=mutable,
             previous_options=previous_options,
         )
@@ -39,16 +39,17 @@ def _load_file(
 
 
 def load_file(
-    filename: Path,
+    filename: Path | EagerIOTextFile,
     *,
     mutable: bool,
     lazy_root: LazyRoot | None = None,
     previous_options: LoadOptions | None = None,
 ) -> typ.Any:
-    if filename.suffix == ".ini":
+    suffix = filename.path.suffix if isinstance(filename, EagerIOTextFile) else filename.suffix
+    if suffix == ".ini":
         raise IniUnsupportedError("INI support has been removed")
-    elif filename.suffix == FILE_EXTENSION:
-        raise ReservedFileExtension(f"`{FILE_EXTENSION}` is a reserved internal file extension")
+    elif suffix == ENV_VAR_FILE_EXTENSION:
+        raise ReservedFileExtension(f"`{ENV_VAR_FILE_EXTENSION}` is a reserved internal file extension")
     else:
         return _load_file(
             filename=filename,

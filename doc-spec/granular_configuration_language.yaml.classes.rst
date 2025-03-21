@@ -24,6 +24,8 @@ Internal Typing Variables
 
     alias of ParamSpec("P")
 
+.. autoclass:: granular_configuration_language.yaml.classes.IT
+
 .. autoclass:: granular_configuration_language.yaml.classes.RT
 
 .. autoclass:: granular_configuration_language.yaml.classes.T

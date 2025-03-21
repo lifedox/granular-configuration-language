@@ -10,11 +10,6 @@ from granular_configuration_language.exceptions import (
     ParseEnvParsingError,
     ParsingTriedToCreateALoop,
 )
-from granular_configuration_language.yaml._parsing import (
-    create_environment_variable_path,
-    is_in_chain,
-    make_chain_message,
-)
 from granular_configuration_language.yaml.classes import LazyRoot
 from granular_configuration_language.yaml.decorators import (
     LoadOptions,
@@ -24,6 +19,7 @@ from granular_configuration_language.yaml.decorators import (
     as_lazy_with_root_and_load_options,
     string_or_twople_tag,
 )
+from granular_configuration_language.yaml.file_loading import as_environment_variable_path
 
 
 def parse_env(load: tabc.Callable[[str, str], typ.Any], env_var: str, *default: typ.Any) -> typ.Any:
@@ -47,10 +43,7 @@ def parse_env(load: tabc.Callable[[str, str], typ.Any], env_var: str, *default: 
 def load_advance(options: LoadOptions, root: Root, env_var: str, value: str) -> typ.Any:
     from granular_configuration_language.yaml import loads
 
-    file_path = create_environment_variable_path(env_var)
-
-    if is_in_chain(file_path, options):
-        raise make_chain_message("!ParseEnv", env_var, options)
+    file_path = as_environment_variable_path("!ParseEnv", env_var, options)
 
     lazy_root = LazyRoot.with_root(root)
     return loads(

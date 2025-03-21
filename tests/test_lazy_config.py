@@ -18,7 +18,7 @@ from granular_configuration_language.exceptions import (
     InvalidBasePathException,
     ReservedFileExtension,
 )
-from granular_configuration_language.yaml._parsing import FILE_EXTENSION
+from granular_configuration_language.yaml.file_loading import ENV_VAR_FILE_EXTENSION
 
 ASSET_DIR = (Path(__file__).parent / "assets" / "test_lazy_config").resolve()
 
@@ -165,4 +165,4 @@ def test_missing_environment_variable_in_base_path() -> None:
 
 def test_loading_environment_variable_file_extension_fails() -> None:
     with pytest.raises(ReservedFileExtension):
-        LazyLoadConfiguration(ASSET_DIR / ("bad" + FILE_EXTENSION)).config
+        LazyLoadConfiguration(ASSET_DIR / ("bad" + ENV_VAR_FILE_EXTENSION)).config
