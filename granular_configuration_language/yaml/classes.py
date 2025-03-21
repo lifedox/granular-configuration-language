@@ -22,6 +22,7 @@ else:
 P = typ.ParamSpec("P")
 T = typ.TypeVar("T")
 RT = typ.TypeVar("RT")
+IT = typ.TypeVar("IT")
 
 RootType = typ.NewType("RootType", tabc.Mapping)
 """

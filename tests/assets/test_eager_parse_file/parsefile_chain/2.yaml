@@ -1,0 +1,2 @@
+safe: 2.yaml
+next: !EagerParseFile up/3.yaml

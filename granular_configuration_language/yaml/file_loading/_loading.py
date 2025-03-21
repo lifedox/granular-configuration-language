@@ -43,11 +43,11 @@ else:
         return Path(*parts)
 
 
-FILE_EXTENSION: typ.Final = ".environment_variable-a5b55071-b86e-4f22-90fc-c9db335691f6"
+ENV_VAR_FILE_EXTENSION: typ.Final = ".environment_variable-a5b55071-b86e-4f22-90fc-c9db335691f6"
 
 
 def _pretty_source(source: Path, *, relative_to: Path, seen: set[str]) -> str:
-    if source.suffix == FILE_EXTENSION:
+    if source.suffix == ENV_VAR_FILE_EXTENSION:
         return "$" + source.stem
     elif source.name not in seen:
         seen.add(source.name)
@@ -93,4 +93,60 @@ def make_chain_message(tag: str, value: str, options: LoadOptions) -> ParsingTri
 
 
 def create_environment_variable_path(env_var: str) -> Path:
-    return Path(env_var + FILE_EXTENSION)
+    return Path(env_var + ENV_VAR_FILE_EXTENSION)
+
+
+def as_file_path(tag: str, value: str, options: LoadOptions) -> Path:
+    result = options.relative_to_directory / value
+
+    if is_in_chain(result, options):
+        raise make_chain_message(tag, value, options)
+
+    return result
+
+
+def as_environment_variable_path(tag: str, value: str, options: LoadOptions) -> Path:
+    file_path = create_environment_variable_path(value)
+
+    if is_in_chain(file_path, options):
+        raise make_chain_message(tag, value, options)
+
+    return file_path
+
+
+class EagerIOTextFile(typ.NamedTuple):
+    path: Path
+    exists: bool
+    data: str
+
+
+def read_text_file(file: Path) -> EagerIOTextFile:
+    exists = file.exists()
+    if exists:
+        return EagerIOTextFile(file, exists, file.read_text())
+    else:
+        return EagerIOTextFile(file, exists, "")
+
+
+class EagerIOBinaryFile(typ.NamedTuple):
+    path: Path
+    exists: bool
+    data: bytes
+
+
+def read_binary_file(file: Path) -> EagerIOBinaryFile:
+    exists = file.exists()
+    if exists:
+        return EagerIOBinaryFile(file, exists, file.read_bytes())
+    else:
+        return EagerIOBinaryFile(file, exists, b"")
+
+
+def read_text_data(filename: Path | EagerIOTextFile) -> str:
+    if isinstance(filename, EagerIOTextFile):
+        if filename.exists:
+            return filename.data
+        else:
+            raise FileNotFoundError(f"[Errno 2] No such file or directory: '{filename.path}'")
+    else:
+        return filename.read_text()

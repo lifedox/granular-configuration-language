@@ -9,7 +9,7 @@ import pytest
 from granular_configuration_language import LazyLoadConfiguration
 from granular_configuration_language.exceptions import ParsingTriedToCreateALoop
 from granular_configuration_language.yaml import loads
-from granular_configuration_language.yaml._parsing import _stringify_source_chain, create_environment_variable_path
+from granular_configuration_language.yaml.file_loading._loading import _stringify_source_chain, create_environment_variable_path
 
 ASSET_DIR = (Path(__file__).parent / "../assets/" / "merging_and_parsefile").resolve()
 

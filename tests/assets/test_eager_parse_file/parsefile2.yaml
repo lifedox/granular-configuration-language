@@ -1,0 +1,2 @@
+a: from parsefile2.yaml
+b: !Sub ${$.data}
