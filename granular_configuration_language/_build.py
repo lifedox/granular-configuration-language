@@ -8,12 +8,11 @@ from itertools import chain
 from pathlib import Path
 
 from granular_configuration_language import Configuration
-from granular_configuration_language._load import load_file
 from granular_configuration_language._s import setter_secret
 from granular_configuration_language._utils import consume
 from granular_configuration_language.yaml import LazyRoot
 from granular_configuration_language.yaml.file_loading import EagerIOTextFile, read_text_file
-from granular_configuration_language.yaml.load import obj_pairs_func
+from granular_configuration_language.yaml.load import load_file, obj_pairs_func
 
 _C = typ.TypeVar("_C", bound=Configuration)
 

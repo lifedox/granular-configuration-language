@@ -5,7 +5,7 @@ from pathlib import Path
 
 from granular_configuration_language._configuration import Configuration, MutableConfiguration
 from granular_configuration_language.yaml.classes import LazyEval, LazyRoot, LoadOptions, StateHolder
-from granular_configuration_language.yaml.load._handler import load_yaml_string
+from granular_configuration_language.yaml.load._load_yaml_string import load_yaml_string
 
 
 def loads(

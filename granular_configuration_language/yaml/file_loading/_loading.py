@@ -172,7 +172,7 @@ def read_binary_data(filename: Path | EagerIOBinaryFile, /) -> bytes:
 
 
 def load_yaml_from_file(file: EagerIOTextFile | Path, /, options: LoadOptions, root: Root) -> typ.Any:
-    from granular_configuration_language._load import load_file
+    from granular_configuration_language.yaml.load import load_file
 
     lazy_root = LazyRoot.with_root(root)
     return load_file(file, lazy_root=lazy_root, mutable=options.mutable, previous_options=options)

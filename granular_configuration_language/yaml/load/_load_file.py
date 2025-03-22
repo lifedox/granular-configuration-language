@@ -8,10 +8,9 @@ from granular_configuration_language.exceptions import (
     IniUnsupportedError,
     ParsingTriedToCreateALoop,
 )
-from granular_configuration_language.yaml import LazyRoot
-from granular_configuration_language.yaml import loads as yaml_loader
-from granular_configuration_language.yaml.classes import LoadOptions
+from granular_configuration_language.yaml.classes import LazyRoot, LoadOptions
 from granular_configuration_language.yaml.file_loading import EagerIOTextFile, read_text_data
+from granular_configuration_language.yaml.load import loads as yaml_loader
 
 
 def _load_file(
