@@ -36,7 +36,4 @@ def handler_optional(value: EagerIOTextFile, root: Root, options: LoadOptions) -
 @string_tag(Tag("!EagerSafeParseFile"), "Undoc-ed", sort_as="!ParseFile5")
 @as_eager_io(eager_io_text_loader_interpolates)
 def handler_safe(value: EagerIOTextFile) -> typ.Any:
-    if value.exists:
-        return _load_safe(value.data)
-    else:
-        return None
+    return _load_safe(value.data)

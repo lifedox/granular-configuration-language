@@ -183,5 +183,5 @@ def load_safe_yaml_from_file(file: EagerIOTextFile | Path, /) -> typ.Any:
 
     if isinstance(file, EagerIOTextFile):
         return YAML(typ="safe").load(file.data)
-    else:
+    else:  # pragma: no cover
         return YAML(typ="safe").load(file.read_text())

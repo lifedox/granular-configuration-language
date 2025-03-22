@@ -22,4 +22,4 @@ def eager_io_binary_loader(value: str, tag: Tag, options: LoadOptions) -> EagerI
     return read_binary_file(as_file_path(tag, value, options))
 
 
-eager_io_binary_loader_interpolates = interpolate_value_eager_io(eager_io_text_loader)
+eager_io_binary_loader_interpolates = interpolate_value_eager_io(eager_io_binary_loader)
