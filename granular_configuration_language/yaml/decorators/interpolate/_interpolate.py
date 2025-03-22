@@ -8,7 +8,7 @@ from html import unescape
 
 from granular_configuration_language._utils import get_environment_variable
 from granular_configuration_language.exceptions import InterpolationSyntaxError, InterpolationWarning
-from granular_configuration_language.yaml.classes import RT, P, Root, Tag
+from granular_configuration_language.yaml.classes import RT, P, Root
 from granular_configuration_language.yaml.decorators._tag_tracker import tracker
 from granular_configuration_language.yaml.decorators.interpolate._env_var_parser import (
     parse_environment_variable_syntax,
@@ -150,11 +150,10 @@ def interpolate_value_with_ref(
                 ...
     """
 
-    @tracker.wraps(func)
+    @tracker.wraps(func, is_with_ref=True)
     def lazy_wrapper(value: str, root: Root, /, *args: P.args, **kwargs: P.kwargs) -> RT:
         return func(interpolate(value, root), root, *args, **kwargs)
 
-    tracker.track_as_with_ref(func)
     return lazy_wrapper
 
 
@@ -195,11 +194,10 @@ def interpolate_value_without_ref(
 
     """
 
-    @tracker.wraps(func)
+    @tracker.wraps(func, is_without_ref=True)
     def lazy_wrapper(value: str, /, *args: P.args, **kwargs: P.kwargs) -> RT:
         return func(interpolate(value, None), *args, **kwargs)
 
-    tracker.track_as_without_ref(func)
     return lazy_wrapper
 
 
@@ -224,10 +222,8 @@ def interpolate_value_eager_io(
     :rtype: ~collections.abc.Callable[~typing.Concatenate[str, P], RT]
     """
 
-    @tracker.wraps(func)
+    @tracker.wraps(func, is_without_ref=True, fake_tag=True)
     def lazy_wrapper(value: str, /, *args: P.args, **kwargs: P.kwargs) -> RT:
         return func(interpolate(value, None), *args, **kwargs)
 
-    tracker.track_as_without_ref(func)
-    tracker.get(func).set_tag(Tag("!Faker"))
     return lazy_wrapper

@@ -3,17 +3,9 @@ from __future__ import annotations
 import collections.abc as tabc
 import typing as typ
 
-from granular_configuration_language.yaml.classes import RT, LazyEval, LoadOptions, P, Root, StateHolder, T, Tag
+from granular_configuration_language.yaml.classes import RT, LazyEval, LoadOptions, Root, StateHolder, T, Tag
 from granular_configuration_language.yaml.decorators._lazy_eval import LazyEvalBasic, LazyEvalWithRoot
 from granular_configuration_language.yaml.decorators._tag_tracker import tracker
-
-
-def with_tag(func: tabc.Callable[typ.Concatenate[Tag, P], RT]) -> tabc.Callable[P, RT]:
-    @tracker.wraps(func)
-    def lazy_wrapper(*args: P.args, **kwargs: P.kwargs) -> RT:
-        return func(tracker.get(func).tag, *args, **kwargs)
-
-    return lazy_wrapper
 
 
 def as_lazy(func: tabc.Callable[[T], RT]) -> tabc.Callable[[Tag, T, StateHolder], LazyEval[RT]]:
@@ -164,7 +156,7 @@ def as_lazy_with_root(
     """
 
     def decorator_generator(func: tabc.Callable[[T, Root], RT]) -> tabc.Callable[[Tag, T, StateHolder], LazyEval[RT]]:
-        @tracker.wraps(func, track_needs_root_condition=needs_root_condition)
+        @tracker.wraps(func, needs_root_condition=needs_root_condition)
         def lazy_wrapper(tag: Tag, value: T, state: StateHolder) -> LazyEval[RT]:
 
             if (needs_root_condition is None) or needs_root_condition(value):
@@ -236,9 +228,8 @@ def as_not_lazy(func: tabc.Callable[[T], RT]) -> tabc.Callable[[Tag, T, StateHol
                 ...
     """
 
-    @tracker.wraps(func)
+    @tracker.wraps(func, is_not_lazy=True)
     def lazy_wrapper(tag: Tag, value: T, state: StateHolder) -> RT:
         return func(value)
 
-    tracker.track_as_not_lazy(func)
     return lazy_wrapper

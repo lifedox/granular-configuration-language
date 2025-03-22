@@ -21,7 +21,7 @@ class as_eager_io_with_root_and_load_options(abc.ABC, typ.Generic[T, RT, IT]):
         self,
         func: tabc.Callable[[IT, Root, LoadOptions], RT],
     ) -> tabc.Callable[[Tag, T, StateHolder], LazyEval[RT]]:
-        @tracker.wraps(func, track_eager_io=self.__eager_io)
+        @tracker.wraps(func, eager_io=self.__eager_io)
         def lazy_wrapper(tag: Tag, value: T, state: StateHolder) -> LazyEvalWithRoot[RT]:
             options = state.options
 
@@ -48,7 +48,7 @@ class as_eager_io(abc.ABC, typ.Generic[T, RT, IT]):
         self,
         func: tabc.Callable[[IT], RT],
     ) -> tabc.Callable[[Tag, T, StateHolder], LazyEval[RT]]:
-        @tracker.wraps(func, track_eager_io=self.__eager_io)
+        @tracker.wraps(func, eager_io=self.__eager_io)
         def lazy_wrapper(tag: Tag, value: T, state: StateHolder) -> LazyEvalBasic[RT]:
 
             eager_io_executer = ThreadPoolExecutor(1)

@@ -44,18 +44,8 @@ class HandlerTracker(tabc.Iterable[HandlerAttributes]):
             ),
         )
 
-    def wrapped(self, wrapped_func: tabc.Callable, func: tabc.Callable) -> None:
-        id_wf = id(wrapped_func)
-        id_f = id(func)
-
-        if id_f in self.__data:
-            self.__data[id_wf] = self.__data[id_wf]
-        elif id_wf in self.__data:
-            self.__data[id_f] = self.__data[id_wf]
-        else:
-            attributes = HandlerAttributes(func)
-            self.__data[id_f] = attributes
-            self.__data[id_wf] = attributes
+    def wrapped(self, func: tabc.Callable, wrapped_func: tabc.Callable) -> None:
+        self.__data[id(wrapped_func)] = self.__data[id(func)]
 
     def get(self, func: tabc.Callable) -> HandlerAttributes:
         id_f = id(func)
@@ -71,32 +61,34 @@ class HandlerTracker(tabc.Iterable[HandlerAttributes]):
         func: tabc.Callable,
         /,
         *,
-        track_needs_root_condition: tabc.Callable | None = None,
-        track_eager_io: tabc.Callable | None = None,
+        needs_root_condition: tabc.Callable | None = None,
+        eager_io: tabc.Callable | None = None,
+        **attributes: typ.Literal[True],
     ) -> tabc.Callable[[tabc.Callable[P, RT]], tabc.Callable[P, RT]]:
-        if track_needs_root_condition:
-            self.get(func).needs_root_condition = track_needs_root_condition
+        attrs = self.get(func)
 
-        if track_eager_io:
-            self.get(func).eager_io = track_eager_io
+        if attributes.pop("fake_tag", None):
+            attrs.set_tag(Tag("!Faker"))
 
-            if self.get(track_eager_io).is_without_ref:
-                self.track_as_without_ref(func)
+        for attribute in attributes.keys():
+            setattr(self.get(func), attribute, True)
+
+        if needs_root_condition:
+            attrs.needs_root_condition = needs_root_condition
+
+        if eager_io:
+            attrs.eager_io = eager_io
+
+            if self.get(eager_io).is_without_ref:
+                attrs.is_without_ref = True
+            else:  # pragma: no cover
+                pass
 
         def wrapper(wrapper_func: tabc.Callable[P, RT]) -> tabc.Callable[P, RT]:
             self.wrapped(func, wrapper_func)
             return real_wraps(func)(wrapper_func)
 
         return wrapper
-
-    def track_as_not_lazy(self, func: tabc.Callable) -> None:
-        self.get(func).is_not_lazy = True
-
-    def track_as_with_ref(self, func: tabc.Callable) -> None:
-        self.get(func).is_with_ref = True
-
-    def track_as_without_ref(self, func: tabc.Callable) -> None:
-        self.get(func).is_without_ref = True
 
 
 tracker: typ.Final = HandlerTracker()
