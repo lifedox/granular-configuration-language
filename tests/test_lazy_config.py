@@ -16,7 +16,9 @@ from granular_configuration_language.exceptions import (
     ErrorWhileLoadingFileOccurred,
     IniUnsupportedError,
     InvalidBasePathException,
+    ReservedFileExtension,
 )
+from granular_configuration_language.yaml.file_ops.environment_variable import ENV_VAR_FILE_EXTENSION
 
 ASSET_DIR = (Path(__file__).parent / "assets" / "test_lazy_config").resolve()
 
@@ -159,3 +161,8 @@ def test_missing_environment_variable_in_base_path() -> None:
     with patch.dict(os.environ, values={}):
         with pytest.raises(EnvironmentVaribleNotFound):
             LazyLoadConfiguration(ASSET_DIR / "bad_env_var_base_path.yaml", base_path=tuple("ab")).config
+
+
+def test_loading_environment_variable_file_extension_fails() -> None:
+    with pytest.raises(ReservedFileExtension):
+        LazyLoadConfiguration(ASSET_DIR / ("bad" + ENV_VAR_FILE_EXTENSION)).config

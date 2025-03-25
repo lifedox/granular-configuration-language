@@ -10,4 +10,4 @@ from granular_configuration_language.yaml.decorators.eager_io._funcs import (
     eager_io_text_loader,
     eager_io_text_loader_interpolates,
 )
-from granular_configuration_language.yaml.file_loading import EagerIOBinaryFile, EagerIOTextFile
+from granular_configuration_language.yaml.file_ops import EagerIOBinaryFile, EagerIOTextFile

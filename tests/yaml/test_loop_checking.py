@@ -9,10 +9,8 @@ import pytest
 from granular_configuration_language import LazyLoadConfiguration
 from granular_configuration_language.exceptions import ParsingTriedToCreateALoop
 from granular_configuration_language.yaml import loads
-from granular_configuration_language.yaml.file_loading._loading import (
-    _stringify_source_chain,
-    create_environment_variable_path,
-)
+from granular_configuration_language.yaml.file_ops import create_environment_variable_path
+from granular_configuration_language.yaml.file_ops._chain import stringify_source_chain
 
 ASSET_DIR = (Path(__file__).parent / "../assets/" / "merging_and_parsefile").resolve()
 
@@ -45,8 +43,8 @@ def test_parsefile_and_parseenv_can_fail_together_in_a_loop_starting_with_a_var(
 def test_stringify_source_chain_singles() -> None:
     cwd = Path().resolve()
 
-    assert _stringify_source_chain((cwd / "parsefile_itself.yaml",)) == "parsefile_itself.yaml→..."
-    assert _stringify_source_chain((create_environment_variable_path("VAR"),)) == "$VAR→..."
+    assert stringify_source_chain((cwd / "parsefile_itself.yaml",)) == "parsefile_itself.yaml→..."
+    assert stringify_source_chain((create_environment_variable_path("VAR"),)) == "$VAR→..."
 
 
 def test_stringify_source_chain_multiples() -> None:
@@ -63,17 +61,17 @@ def test_stringify_source_chain_multiples() -> None:
         create_environment_variable_path("VAR3"),
     )
 
-    assert _stringify_source_chain(files) == "1.yaml→2.yaml→3.yaml→..."
-    assert _stringify_source_chain(vars) == "$VAR1→$VAR2→$VAR3→..."
-    assert _stringify_source_chain(files + vars) == "1.yaml→2.yaml→3.yaml→$VAR1→$VAR2→$VAR3→..."
-    assert _stringify_source_chain(vars + files) == "$VAR1→$VAR2→$VAR3→1.yaml→2.yaml→3.yaml→..."
+    assert stringify_source_chain(files) == "1.yaml→2.yaml→3.yaml→..."
+    assert stringify_source_chain(vars) == "$VAR1→$VAR2→$VAR3→..."
+    assert stringify_source_chain(files + vars) == "1.yaml→2.yaml→3.yaml→$VAR1→$VAR2→$VAR3→..."
+    assert stringify_source_chain(vars + files) == "$VAR1→$VAR2→$VAR3→1.yaml→2.yaml→3.yaml→..."
 
 
 def test_stringify_source_chain_complex() -> None:
     cwd = Path().resolve()
 
     assert (
-        _stringify_source_chain(
+        stringify_source_chain(
             (
                 cwd / "1.yaml",
                 cwd.parent / "1.yaml",
@@ -83,7 +81,7 @@ def test_stringify_source_chain_complex() -> None:
     )
 
     assert (
-        _stringify_source_chain(
+        stringify_source_chain(
             (
                 Path("A://a/1.yaml"),
                 Path("B://b/2.yaml"),
@@ -94,7 +92,7 @@ def test_stringify_source_chain_complex() -> None:
     )
 
     assert (
-        _stringify_source_chain(
+        stringify_source_chain(
             (
                 Path("A://a/1.yaml"),
                 Path("B://b/1.yaml"),

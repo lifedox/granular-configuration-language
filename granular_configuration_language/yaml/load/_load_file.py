@@ -7,9 +7,14 @@ from granular_configuration_language.exceptions import (
     ErrorWhileLoadingFileOccurred,
     IniUnsupportedError,
     ParsingTriedToCreateALoop,
+    ReservedFileExtension,
 )
 from granular_configuration_language.yaml.classes import LazyRoot, LoadOptions
-from granular_configuration_language.yaml.file_loading import EagerIOTextFile, read_text_data
+from granular_configuration_language.yaml.file_ops.environment_variable import (
+    ENV_VAR_FILE_EXTENSION,
+    _EagerIOEnvariableVariable,
+)
+from granular_configuration_language.yaml.file_ops.text import EagerIOTextFile, read_text_data
 from granular_configuration_language.yaml.load import loads as yaml_loader
 
 
@@ -46,6 +51,8 @@ def load_file(
     suffix = filename.path.suffix if isinstance(filename, EagerIOTextFile) else filename.suffix
     if suffix == ".ini":
         raise IniUnsupportedError("INI support has been removed")
+    elif (suffix == ENV_VAR_FILE_EXTENSION) and not isinstance(filename, _EagerIOEnvariableVariable):
+        raise ReservedFileExtension(f"`{ENV_VAR_FILE_EXTENSION}` is a reserved internal file extension")
     else:
         return _load_file(
             filename=filename,

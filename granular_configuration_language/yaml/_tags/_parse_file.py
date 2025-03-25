@@ -11,7 +11,8 @@ from granular_configuration_language.yaml.decorators import (
     string_tag,
     with_tag,
 )
-from granular_configuration_language.yaml.file_loading import as_file_path, load_yaml_from_file
+from granular_configuration_language.yaml.file_ops import as_file_path
+from granular_configuration_language.yaml.file_ops.yaml import load_from_file
 
 
 @string_tag(Tag("!ParseFile"), "Parser", sort_as="!ParseFile1")
@@ -21,7 +22,7 @@ from granular_configuration_language.yaml.file_loading import as_file_path, load
 def handler(tag: Tag, value: str, root: Root, options: LoadOptions) -> typ.Any:
     file = as_file_path(tag, value, options)
 
-    return load_yaml_from_file(file, options, root)
+    return load_from_file(file, options, root)
 
 
 @string_tag(Tag("!OptionalParseFile"), "Parser", sort_as="!ParseFile2")
@@ -29,9 +30,9 @@ def handler(tag: Tag, value: str, root: Root, options: LoadOptions) -> typ.Any:
 @interpolate_value_with_ref
 @with_tag
 def handler_optional(tag: Tag, value: str, root: Root, options: LoadOptions) -> typ.Any:
-    file = as_file_path(Tag("!OptionalParseFile"), value, options)
+    file = as_file_path(tag, value, options)
 
     if file.exists():
-        return load_yaml_from_file(file, options, root)
+        return load_from_file(file, options, root)
     else:
         return None
