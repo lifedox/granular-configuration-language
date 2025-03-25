@@ -13,7 +13,8 @@ from granular_configuration_language.yaml.decorators.eager_io import (
     as_eager_io,
     eager_io_binary_loader_interpolates,
 )
-from granular_configuration_language.yaml.file_loading import as_file_path, read_binary_data
+from granular_configuration_language.yaml.file_ops import as_file_path
+from granular_configuration_language.yaml.file_ops.binary import read_binary_data
 
 
 @string_tag(Tag("!LoadBinary"), "Undoc-ed")

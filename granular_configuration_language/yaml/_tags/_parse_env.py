@@ -19,12 +19,9 @@ from granular_configuration_language.yaml.decorators import (
     string_or_twople_tag,
     with_tag,
 )
-from granular_configuration_language.yaml.file_loading import (
-    EagerIOTextFile,
-    environment_variable_as_file,
-    load_safe_yaml_from_file,
-    load_yaml_from_file,
-)
+from granular_configuration_language.yaml.file_ops.environment_variable import load_as_file
+from granular_configuration_language.yaml.file_ops.text import EagerIOTextFile
+from granular_configuration_language.yaml.file_ops.yaml import load_from_file, safe_load_from_file
 
 LoadFunc = tabc.Callable[[EagerIOTextFile], typ.Any]
 
@@ -38,7 +35,7 @@ def parse_env(tag: Tag, options: LoadOptions, load: LoadFunc, env_var: str, *def
         raise EnvironmentVaribleNotFound(env_var)
     else:
         try:
-            return load(environment_variable_as_file(tag, env_var, options))
+            return load(load_as_file(tag, env_var, options))
         except ParsingTriedToCreateALoop:
             raise
         except Exception as e:
@@ -58,11 +55,11 @@ def parse_input(tag: Tag, value: string_or_twople_tag.Type, options: LoadOptions
 @as_lazy_with_root_and_load_options
 @with_tag
 def handler(tag: Tag, value: string_or_twople_tag.Type, root: Root, options: LoadOptions) -> typ.Any:
-    return parse_input(tag, value, options, partial(load_yaml_from_file, options=options, root=root))
+    return parse_input(tag, value, options, partial(load_from_file, options=options, root=root))
 
 
 @string_or_twople_tag(Tag("!ParseEnvSafe"), "Parser")
 @as_lazy_with_load_options
 @with_tag
 def handler_safe(tag: Tag, value: string_or_twople_tag.Type, options: LoadOptions) -> typ.Any:
-    return parse_input(tag, value, options, partial(load_safe_yaml_from_file))
+    return parse_input(tag, value, options, safe_load_from_file)
