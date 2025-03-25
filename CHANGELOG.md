@@ -2,6 +2,15 @@
 
 <!-- markdownlint-disable-file MD024 -->
 
+## 2.3.0 (next)
+
+- Added `granular_configuration_language.yaml.file_ops` module
+- Added `granular_configuration_language.yaml.decorator.eagerio` module
+
+- Added `!EagerParseFile` and `!EagerOptionalParseFile` Tags
+- Added Undocumented Tags:
+  - `!LoadBindary` and `!EagerLoadBinary` Tag to test binary EagerIO
+
 ## 2.2.3
 
 ### Fixed

@@ -14,6 +14,8 @@ def create_environment_variable_path(env_var: str) -> Path:
 
 def as_environment_variable_path(tag: Tag, variable_name: str, options: LoadOptions) -> Path:
     """
+    .. versionadded:: 2.3.0
+
     Converts the environment variable to a :py:class:`~pathlib.Path` and checks if it has already been loaded.
 
     .. note::
@@ -41,6 +43,8 @@ class _EagerIOEnvariableVariable(EagerIOTextFile):
 
 def load_as_file(tag: Tag, variable_name: str, options: LoadOptions) -> EagerIOTextFile:
     """
+    .. versionadded:: 2.3.0
+
     Load the environment variable, as if it were an already loaded file.
 
     (A missing environment variable follows the conventions of a missing file, setting the `exists` flag to :py:data:`False`)
