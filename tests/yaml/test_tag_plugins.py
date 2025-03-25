@@ -195,7 +195,7 @@ def test_available_plugins_csv() -> None:
 plugin,category,tag,handler,needs_root_condition,eager_io
 <gcl-built-in>,Formatter,!Sub,granular_configuration_language.yaml._tags._sub.handler,interpolation_needs_ref_condition,
 <gcl-built-in>,Manipulator,!Merge,granular_configuration_language.yaml._tags._merge.handler,,
-<gcl-built-in>,Parser,!EagerParseFile,granular_configuration_language.yaml._tags._eager_parse_file.handler,,eager_io_text_loader
+<gcl-built-in>,Parser,!EagerParseFile,granular_configuration_language.yaml._tags._eager_parse_file.handler,,eager_io_text_loader_interpolates
 <gcl-built-in>,Typer,!UUID,granular_configuration_language.yaml._tags._uuid.handler,,
 official_extra,Typer,!Func,granular_configuration_language.yaml._tags.func_and_class.func_handler,,
 """
@@ -228,7 +228,7 @@ def test_available_plugins_json() -> None:
     },
     "Parser": {
       "!EagerParseFile": {
-        "eager_io": "eager_io_text_loader",
+        "eager_io": "eager_io_text_loader_interpolates",
         "handler": "granular_configuration_language.yaml._tags._eager_parse_file.handler",
         "needs_root_condition": null
       }
@@ -265,10 +265,10 @@ def test_available_plugins_table() -> None:
         output
         == """\
 plugin          category     tag              handler                                                                 needs_root_condition               eager_io
---------------  -----------  ---------------  ----------------------------------------------------------------------  ---------------------------------  --------------------
+--------------  -----------  ---------------  ----------------------------------------------------------------------  ---------------------------------  ---------------------------------
 <gcl-built-in>  Formatter    !Sub             granular_configuration_language.yaml._tags._sub.handler                 interpolation_needs_ref_condition
 <gcl-built-in>  Manipulator  !Merge           granular_configuration_language.yaml._tags._merge.handler
-<gcl-built-in>  Parser       !EagerParseFile  granular_configuration_language.yaml._tags._eager_parse_file.handler                                       eager_io_text_loader
+<gcl-built-in>  Parser       !EagerParseFile  granular_configuration_language.yaml._tags._eager_parse_file.handler                                       eager_io_text_loader_interpolates
 <gcl-built-in>  Typer        !UUID            granular_configuration_language.yaml._tags._uuid.handler
 official_extra  Typer        !Func            granular_configuration_language.yaml._tags.func_and_class.func_handler
 """
