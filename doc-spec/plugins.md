@@ -46,6 +46,7 @@ from granular_configuration_language.yaml.decorators import (
 @string_tag(Tag("!Credstash"))      # Tag Type Decorator
 @as_lazy                            # Laziness Decorator
 @interpolate_value_without_ref      # (Optional) Interpolate Decorator
+# @with_tag                         # (Optional) With Attribute Decorator
 def handler(value: str) -> Masked:  # Function Signature
     return Masked(getSecret(value)) # Tag Logic
 ```
@@ -104,6 +105,29 @@ def handler(value: str) -> Masked:  # Function Signature
   - {py:func}`.interpolate_value_without_ref` - Does not include JSON Path or JSON Pointer syntax.
   - {py:func}`.interpolate_value_with_ref` - Includes full interpolation syntax.
     - Requires {py:class}`.Root` as the second parameter, even if you don't use it in the Tag Logic.
+
+### With Attribute Decorator
+
+- Currently, only {py:func}`.with_tag` is available, if you need your tag.
+- With the {py:func}`.with_tag` decorator, prepend a {py:class}`.Tag` parameter before your `value`.
+
+**Example:**
+
+```python
+from credstash import getSecret
+from granular_configuration_language.yaml.classes import Masked
+from granular_configuration_language.yaml.decorators import (
+    Tag, as_lazy, interpolate_value_without_ref, string_tag, with_tag
+)
+
+
+@string_tag(Tag("!Credstash"))      # Tag Type Decorator
+@as_lazy                            # Laziness Decorator
+@interpolate_value_without_ref      # (Optional) Interpolate Decorator
+@with_tag
+def handler(tag: Tag, value: str) -> Masked:  # Function Signature
+    return Masked(getSecret(value)) # Tag Logic
+```
 
 ---
 
