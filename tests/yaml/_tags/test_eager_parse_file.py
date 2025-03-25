@@ -19,10 +19,6 @@ def test_simple_loading_with_optional() -> None:
     assert loads("!EagerOptionalParseFile simple.yaml", file_path=ASSET_DIR / "dummy.yaml") == "simple.yaml"
 
 
-def test_simple_loading_with_safe() -> None:
-    assert loads("!EagerSafeParseFile simple.yaml", file_path=ASSET_DIR / "dummy.yaml") == "simple.yaml"
-
-
 def test_loading_a_file() -> None:
     assert LazyLoadConfiguration(ASSET_DIR / "parsefile1.yaml").config.as_dict() == {
         "base": {"a": "from parsefile2.yaml", "b": "From parsefile1.yaml"},

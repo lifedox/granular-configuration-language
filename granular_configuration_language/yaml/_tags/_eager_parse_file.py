@@ -5,11 +5,10 @@ import typing as typ
 from granular_configuration_language.yaml.decorators import LoadOptions, Root, Tag, string_tag
 from granular_configuration_language.yaml.decorators.eager_io import (
     EagerIOTextFile,
-    as_eager_io,
     as_eager_io_with_root_and_load_options,
     eager_io_text_loader_interpolates,
 )
-from granular_configuration_language.yaml.file_ops.yaml import load_from_file, safe_load_from_file
+from granular_configuration_language.yaml.file_ops.yaml import load_from_file
 
 
 @string_tag(Tag("!EagerParseFile"), "Parser", sort_as="!ParseFile3")
@@ -25,9 +24,3 @@ def handler_optional(value: EagerIOTextFile, root: Root, options: LoadOptions) -
         return load_from_file(value, options, root)
     else:
         return None
-
-
-@string_tag(Tag("!EagerSafeParseFile"), "Undoc-ed", sort_as="!ParseFile5")
-@as_eager_io(eager_io_text_loader_interpolates)
-def handler_safe(value: EagerIOTextFile) -> typ.Any:
-    return safe_load_from_file(value)
