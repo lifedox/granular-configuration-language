@@ -9,6 +9,8 @@ from granular_configuration_language.yaml.decorators._tag_tracker import tracker
 
 def with_tag(func: tabc.Callable[typ.Concatenate[Tag, P], RT]) -> tabc.Callable[P, RT]:
     """
+    .. versionadded:: 2.3.0
+
     Injects your tag as the first parameter to your "Tag" Function
 
     The wrapped function has the :py:class:`.Tag` parameter removed.
