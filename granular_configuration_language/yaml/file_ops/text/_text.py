@@ -7,6 +7,8 @@ from pathlib import Path
 @dataclasses.dataclass(frozen=True)
 class EagerIOTextFile:
     """
+    .. versionadded:: 2.3.0
+
     Encapsulates a file that has been read as text.
     """
 
@@ -26,6 +28,8 @@ class EagerIOTextFile:
 
 def load_text_file(file: Path, /) -> EagerIOTextFile:
     """
+    .. versionadded:: 2.3.0
+
     Load the text file as an :py:class:`.EagerIOTextFile` instance
 
     :param ~pathlib.Path file: file path
@@ -41,6 +45,8 @@ def load_text_file(file: Path, /) -> EagerIOTextFile:
 
 def read_text_data(filename: Path | EagerIOTextFile, /) -> str:
     """
+    .. versionadded:: 2.3.0
+
     Read file contents.
 
     Whether it is already loaded (as an :py:class:`.EagerIOTextFile` instance) or as a :py:class:`~pathlib.Path`

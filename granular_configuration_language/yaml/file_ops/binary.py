@@ -7,6 +7,8 @@ from pathlib import Path
 @dataclasses.dataclass(frozen=True)
 class EagerIOBinaryFile:
     """
+    .. versionadded:: 2.3.0
+
     Encapsulates a file that has been read as binary.
     """
 
@@ -26,6 +28,8 @@ class EagerIOBinaryFile:
 
 def load_binary_file(file: Path, /) -> EagerIOBinaryFile:
     """
+    .. versionadded:: 2.3.0
+
     Load the binary file as an :py:class:`.EagerIOBinaryFile` instance
 
     :param ~pathlib.Path file: file path
@@ -41,6 +45,8 @@ def load_binary_file(file: Path, /) -> EagerIOBinaryFile:
 
 def read_binary_data(filename: Path | EagerIOBinaryFile, /) -> bytes:
     """
+    .. versionadded:: 2.3.0
+
     Read file contents.
 
     Whether it is already loaded (as an :py:class:`.EagerIOBinaryFile` instance) or as a :py:class:`~pathlib.Path`

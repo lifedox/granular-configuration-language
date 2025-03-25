@@ -95,6 +95,8 @@ def make_chain_message(tag: Tag, value: str, options: LoadOptions) -> ParsingTri
 
 def as_file_path(tag: Tag, file_name: str, options: LoadOptions) -> Path:
     """
+    .. versionadded:: 2.3.0
+
     Converts the relative file name to a :py:class:`~pathlib.Path` and checks if it has already been loaded.
 
 
