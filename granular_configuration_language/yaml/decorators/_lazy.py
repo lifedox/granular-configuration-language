@@ -8,7 +8,7 @@ from granular_configuration_language.yaml.decorators._lazy_eval import LazyEvalB
 from granular_configuration_language.yaml.decorators._tag_tracker import tracker
 
 
-def as_lazy(func: tabc.Callable[[T], RT]) -> tabc.Callable[[Tag, T, StateHolder], LazyEval[RT]]:
+def as_lazy(func: tabc.Callable[[T], RT], /) -> tabc.Callable[[Tag, T, StateHolder], LazyEval[RT]]:
     """Wraps the "Tag" function in a :py:class:`~.LazyEval`, so that the function being wrapped is run just-in-time.
 
     .. admonition:: Positional Parameters for "Tag" function
@@ -71,7 +71,7 @@ def as_lazy_with_load_options(
 
 
 @typ.overload
-def as_lazy_with_root(func: tabc.Callable[[T, Root], RT]) -> tabc.Callable[[Tag, T, StateHolder], LazyEval[RT]]: ...
+def as_lazy_with_root(func: tabc.Callable[[T, Root], RT], /) -> tabc.Callable[[Tag, T, StateHolder], LazyEval[RT]]: ...
 
 
 @typ.overload
@@ -81,7 +81,7 @@ def as_lazy_with_root(
 
 
 def as_lazy_with_root(
-    func: tabc.Callable[[T, Root], RT] | None = None, *, needs_root_condition: tabc.Callable[[T], bool] | None = None
+    func: tabc.Callable[[T, Root], RT] | None = None, /, *, needs_root_condition: tabc.Callable[[T], bool] | None = None
 ) -> (
     tabc.Callable[[Tag, T, StateHolder], LazyEval[RT]]
     | tabc.Callable[[tabc.Callable[[T, Root], RT]], tabc.Callable[[Tag, T, StateHolder], LazyEval[RT]]]
@@ -155,7 +155,10 @@ def as_lazy_with_root(
                 ...
     """
 
-    def decorator_generator(func: tabc.Callable[[T, Root], RT]) -> tabc.Callable[[Tag, T, StateHolder], LazyEval[RT]]:
+    def decorator_generator(
+        func: tabc.Callable[[T, Root], RT],
+        /,
+    ) -> tabc.Callable[[Tag, T, StateHolder], LazyEval[RT]]:
         @tracker.wraps(func, needs_root_condition=needs_root_condition)
         def lazy_wrapper(tag: Tag, value: T, state: StateHolder) -> LazyEval[RT]:
 
@@ -174,6 +177,7 @@ def as_lazy_with_root(
 
 def as_lazy_with_root_and_load_options(
     func: tabc.Callable[[T, Root, LoadOptions], RT],
+    /,
 ) -> tabc.Callable[[Tag, T, StateHolder], LazyEval[RT]]:
     """Wraps the "Tag" function in a :py:class:`~.LazyEval`, so that the function being wrapped is run just-in-time.
 
@@ -206,7 +210,7 @@ def as_lazy_with_root_and_load_options(
     return lazy_wrapper
 
 
-def as_not_lazy(func: tabc.Callable[[T], RT]) -> tabc.Callable[[Tag, T, StateHolder], RT]:
+def as_not_lazy(func: tabc.Callable[[T], RT], /) -> tabc.Callable[[Tag, T, StateHolder], RT]:
     """Wraps the "Tag" function, but does not make it lazy. The function being wrapped is run at load time.
 
     .. admonition:: Positional Parameters for "Tag" function

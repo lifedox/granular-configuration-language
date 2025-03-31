@@ -7,7 +7,7 @@ from granular_configuration_language.yaml.classes import RT, P, Tag
 from granular_configuration_language.yaml.decorators._tag_tracker import tracker
 
 
-def with_tag(func: tabc.Callable[typ.Concatenate[Tag, P], RT]) -> tabc.Callable[P, RT]:
+def with_tag(func: tabc.Callable[typ.Concatenate[Tag, P], RT], /) -> tabc.Callable[P, RT]:
     """
     .. versionadded:: 2.3.0
 

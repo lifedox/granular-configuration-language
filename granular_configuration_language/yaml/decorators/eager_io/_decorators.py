@@ -11,6 +11,7 @@ from granular_configuration_language.yaml.decorators._tag_tracker import tracker
 
 def as_eager_io(
     eager_io_preprocessor: tabc.Callable[[T, Tag, LoadOptions], IT],
+    /,
 ) -> tabc.Callable[[tabc.Callable[[IT], RT]], tabc.Callable[[Tag, T, StateHolder], LazyEval[RT]]]:
     """
     .. versionadded:: 2.3.0
@@ -48,6 +49,7 @@ def as_eager_io(
 
     def decorator_factory(
         func: tabc.Callable[[IT], RT],
+        /,
     ) -> tabc.Callable[[Tag, T, StateHolder], LazyEval[RT]]:
         @tracker.wraps(func, eager_io=eager_io_preprocessor)
         def lazy_wrapper(tag: Tag, value: T, state: StateHolder) -> LazyEvalBasic[RT]:
@@ -69,6 +71,7 @@ def as_eager_io(
 
 def as_eager_io_with_root_and_load_options(
     eager_io_preprocessor: tabc.Callable[[T, Tag, LoadOptions], IT],
+    /,
 ) -> tabc.Callable[[tabc.Callable[[IT, Root, LoadOptions], RT]], tabc.Callable[[Tag, T, StateHolder], LazyEval[RT]]]:
     """
     .. versionadded:: 2.3.0
@@ -109,6 +112,7 @@ def as_eager_io_with_root_and_load_options(
 
     def decorator_factory(
         func: tabc.Callable[[IT, Root, LoadOptions], RT],
+        /,
     ) -> tabc.Callable[[Tag, T, StateHolder], LazyEval[RT]]:
         @tracker.wraps(func, eager_io=eager_io_preprocessor)
         def lazy_wrapper(tag: Tag, value: T, state: StateHolder) -> LazyEvalWithRoot[RT]:

@@ -4,6 +4,8 @@
 
 ## 2.3.0 (next)
 
+### Added
+
 - Added `granular_configuration_language.yaml.file_ops` module
 - Added `granular_configuration_language.yaml.decorator.eagerio` module
 - Added `LazyLoadConfiguration.eager_load`
@@ -13,6 +15,9 @@
 - Added `!EagerParseFile` and `!EagerOptionalParseFile` Tags
 - Added Undocumented Tags:
   - `!LoadBindary` and `!EagerLoadBinary` Tag to test binary EagerIO
+
+### Changed
+
 - Changes to `available_plugins`:
   - Added `-l`, `--long` option
   - Added `eager_io` column
@@ -23,6 +28,11 @@
 - Changes to `available_tags`:
   - Added `eio_inner_type` column
   - Improved `--help` message.
+
+### Fixed
+
+- Made the function parameter for all decorators positional-only.
+  - This is to enforce clearer usage in the unexpected case of not using `@`.
 
 ## 2.2.3
 
