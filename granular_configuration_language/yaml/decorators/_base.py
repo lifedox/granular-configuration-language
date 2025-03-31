@@ -231,7 +231,7 @@ class TagDecoratorBase(typ.Generic[T], abc.ABC):
         return value
 
     @typ.final
-    def __call__(self, handler: tabc.Callable[[Tag, T, StateHolder], RT]) -> TagConstructor:
+    def __call__(self, handler: tabc.Callable[[Tag, T, StateHolder], RT], /) -> TagConstructor:
         # """Takes the wrapped tag function and further wraps it for configuration loading.
         # :param (~collections.abc.Callable[[Tag, T, StateHolder], RT]) handler: Wrapped Tag Function
         # :return: Tag Function ready to be used when loading configuration

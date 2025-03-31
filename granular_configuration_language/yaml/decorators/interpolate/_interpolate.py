@@ -118,6 +118,7 @@ def interpolation_needs_ref_condition(value: str) -> bool:
 
 def interpolate_value_with_ref(
     func: tabc.Callable[typ.Concatenate[str, Root, P], RT],
+    /,
 ) -> tabc.Callable[typ.Concatenate[str, Root, P], RT]:
     """Replaces the YAML string value with the interpolated value before calling the tag function
 
@@ -159,6 +160,7 @@ def interpolate_value_with_ref(
 
 def interpolate_value_without_ref(
     func: tabc.Callable[typ.Concatenate[str, P], RT],
+    /,
 ) -> tabc.Callable[typ.Concatenate[str, P], RT]:
     """Replaces the YAML string value with the interpolated value before calling the tag function
 
@@ -203,6 +205,7 @@ def interpolate_value_without_ref(
 
 def interpolate_value_eager_io(
     func: tabc.Callable[typ.Concatenate[str, P], RT],
+    /,
 ) -> tabc.Callable[typ.Concatenate[str, P], RT]:
     """Replaces the 1st parameter with the interpolated value before calling the function.
 
