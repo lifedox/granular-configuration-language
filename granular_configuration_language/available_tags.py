@@ -4,22 +4,20 @@ if __name__ == "__main__":
     import operator as op
     import os
 
-    os.environ["G_CONFIG_ENABLE_TAG_TRACKER"] = "TRUE"
-
     from granular_configuration_language.yaml._tags import handlers
     from granular_configuration_language.yaml.decorators._viewer import AvailableTags, can_table
 
     choices = ["csv", "json"]
     default = "csv"
 
-    if can_table:
+    if can_table and (os.environ.get("G_CONFIG_FORCE_CAN_TABLE_FALSE", "FALSE") != "TRUE"):
         choices.append("table")
         default = "table"
 
     parser = argparse.ArgumentParser(
         description="Shows available tags", epilog=AvailableTags(handlers).table(_force_missing=True)
     )
-    parser.add_argument("type", default=default, choices=choices, nargs="?")
+    parser.add_argument("type", default=default, choices=choices, nargs="?", help=f"Mode, default={{{default}}}")
 
     args = parser.parse_args()
 

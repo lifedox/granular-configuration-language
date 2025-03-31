@@ -13,6 +13,16 @@
 - Added `!EagerParseFile` and `!EagerOptionalParseFile` Tags
 - Added Undocumented Tags:
   - `!LoadBindary` and `!EagerLoadBinary` Tag to test binary EagerIO
+- Changes to `available_plugins`:
+  - Added `-l`, `--long` option
+  - Added `eager_io` column
+  - Added shorten name option for `handler`, `needs_root_condition`, and `eager_io`.
+    - Defaults as enabled. `-l`, `--long` option disables.
+  - Improved `--help` message.
+  - Changed internal Tag Function names to be shorter for `handler` column.
+- Changes to `available_tags`:
+  - Added `eio_inner_type` column
+  - Improved `--help` message.
 
 ## 2.2.3
 
