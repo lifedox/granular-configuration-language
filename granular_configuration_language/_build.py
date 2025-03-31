@@ -2,16 +2,14 @@ from __future__ import annotations
 
 import collections.abc as tabc
 import typing as typ
-from concurrent.futures import ThreadPoolExecutor
 from functools import partial
-from itertools import chain
 from pathlib import Path
 
 from granular_configuration_language import Configuration
 from granular_configuration_language._s import setter_secret
 from granular_configuration_language._utils import consume
 from granular_configuration_language.yaml import LazyRoot
-from granular_configuration_language.yaml.file_ops.text import EagerIOTextFile, load_text_file
+from granular_configuration_language.yaml.file_ops.text import load_text_file
 from granular_configuration_language.yaml.load import load_file, obj_pairs_func
 
 _C = typ.TypeVar("_C", bound=Configuration)
@@ -37,14 +35,6 @@ def _merge(configuration_type: type[_C], base_config: _C, configs: tabc.Iterable
     return base_config
 
 
-def optionally_concurrent_map(iterable: tabc.Iterable[Path], /, *, thread: bool) -> tabc.Iterable[EagerIOTextFile]:
-    if thread:  # pragma: no cover
-        with ThreadPoolExecutor() as executor:
-            return executor.map(load_text_file, iterable)
-    else:
-        return map(load_text_file, iterable)
-
-
 def _load_configs_from_locations(
     configuration_type: type[_C], locations: tabc.Iterable[Path], lazy_root: LazyRoot, mutable: bool
 ) -> tabc.Iterator[_C]:
@@ -56,15 +46,7 @@ def _load_configs_from_locations(
                 yield config
 
     _load_file = partial(load_file, lazy_root=lazy_root, mutable=mutable)
-    return configuration_only(map(_load_file, optionally_concurrent_map(locations, thread=False)))
-
-
-def _inject(*new: Configuration, configs: tabc.Iterator[_C], in_front: bool) -> tabc.Iterator[_C]:
-    cast = typ.cast(_C, new)
-    if in_front:
-        return chain(cast, configs)
-    else:
-        return chain(configs, cast)
+    return configuration_only(map(_load_file, map(load_text_file, locations)))
 
 
 def _inject_configs(
@@ -74,12 +56,12 @@ def _inject_configs(
     after: Configuration | None,
 ) -> tabc.Iterator[_C]:
     if before and isinstance(before, Configuration):
-        configs = _inject(before, configs=configs, in_front=True)
+        yield typ.cast(_C, before)
+
+    yield from configs
 
     if after and isinstance(after, Configuration):
-        configs = _inject(after, configs=configs, in_front=False)
-
-    return configs
+        yield typ.cast(_C, after)
 
 
 def build_configuration(

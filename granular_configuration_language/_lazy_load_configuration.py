@@ -6,6 +6,7 @@ import os
 import sys
 import typing as typ
 from collections.abc import Mapping, MutableMapping
+from concurrent.futures import ThreadPoolExecutor
 from functools import cached_property
 from itertools import chain
 
@@ -90,6 +91,82 @@ class SafeConfigurationProxy(Mapping):
     @override
     def __repr__(self) -> str:
         return repr(self.__llc.config)
+
+
+def _eagerio_load(llc: LazyLoadConfiguration) -> Configuration:
+    return llc.config
+
+
+@Configuration.register  # pyright: ignore
+class EagerIOConfigurationProxy(Mapping):
+    """
+    .. versionadded:: 2.3.0
+
+    Wraps a :py:class:`.LazyLoadConfiguration` instance to proxy all method and
+    attribute calls to its :py:class:`.Configuration` instance.
+
+    Passes ``isinstance( ... , Configuration)`` checks, as this class is :py:meth:`~abc.ABCMeta.register`-ed as a subclass of :py:class:`.Configuration`.
+
+    .. admonition:: Part of the EagerIO feature set
+        :class: caution
+
+        This immediately spawns a thread to load and build the Configuration in the background.
+
+    .. admonition:: Implementation Reasoning
+        :collapsible: closed
+
+        Wrapping :py:class:`.LazyLoadConfiguration` maintains all laziness build
+        into :py:class:`.LazyLoadConfiguration`, while exposing all of :py:class:`.Configuration`
+
+        This class is used behind :py:func:`typing.cast` in :py:meth:`.LazyLoadConfiguration.eager_load` so it is not exposed explicitly.
+
+    :param LazyLoadConfiguration llc:
+        :py:class:`.LazyLoadConfiguration` instance to be wrapped
+    """
+
+    def __init__(self, llc: LazyLoadConfiguration) -> None:
+        self.__executor = ThreadPoolExecutor(1)
+        self.__future = self.__executor.submit(_eagerio_load, llc)
+
+    @cached_property
+    def __config(self) -> Configuration:
+        try:
+            return self.__future.result()
+        finally:
+            del self.__future
+            self.__executor.shutdown()
+            del self.__executor
+
+    def __getattr__(self, name: str) -> typ.Any:
+        return getattr(self.__config, name)
+
+    @override
+    def __getitem__(self, key: typ.Any) -> typ.Any:
+        return self.__config[key]
+
+    @override
+    def __iter__(self) -> tabc.Iterator[typ.Any]:
+        return iter(self.__config)
+
+    @override
+    def __len__(self) -> int:
+        return len(self.__config)
+
+    @override
+    def __contains__(self, key: typ.Any) -> bool:
+        return key in self.__config
+
+    def __deepcopy__(self, memo: dict[int, typ.Any]) -> Configuration:
+        return copy.deepcopy(self.__config, memo=memo)
+
+    def __copy__(self) -> Configuration:
+        return copy.copy(self.__config)
+
+    copy = __copy__
+
+    @override
+    def __repr__(self) -> str:
+        return repr(self.__config)
 
 
 class LazyLoadConfiguration(Mapping):
@@ -322,6 +399,27 @@ class LazyLoadConfiguration(Mapping):
         """
         return typ.cast(C, SafeConfigurationProxy(self))
 
+    def eager_load(self, typed_base: type[C]) -> C:
+        """
+        .. versionadded:: 2.3.0
+
+        This will eagerly load this instance, so that there is minimum IO load on future.
+
+        This is intended to play well with :py:mod:`asyncio`, by avoiding blocking the main thread on IO calls, without introducing an ``await`` paradigm just for a few one-time calls.
+
+        .. admonition:: Part of the EagerIO feature set
+            :class: caution
+
+            Using :py:meth:`eager_load` causes immediate loading of this instance in a background thread.
+
+        Behaves like :py:meth:`.as_typed` otherwise.
+
+        :param type[C] typed_base: Subclass of :py:class:`Configuration` to assume
+        :return: :py:class:`.EagerIOConfigurationProxy` instance that has been cast to the provided type.
+        :rtype: C
+        """
+        return typ.cast(C, EagerIOConfigurationProxy(self))
+
 
 class MutableLazyLoadConfiguration(LazyLoadConfiguration, MutableMapping):
     r"""
@@ -413,4 +511,14 @@ class MutableLazyLoadConfiguration(LazyLoadConfiguration, MutableMapping):
         """
         raise NotImplementedError(
             "`as_typed` is not supported for `MutableLazyLoadConfiguration`. Use `LazyLoadConfiguration`."
+        )
+
+    @override
+    def eager_load(self, typed_base: type[C]) -> typ.NoReturn:
+        """
+        :py:meth:`eager_load` is not supported for :py:class:`MutableLazyLoadConfiguration`.
+        Use :py:class:`LazyLoadConfiguration`.
+        """
+        raise NotImplementedError(
+            "`eager_load` is not supported for `MutableLazyLoadConfiguration`. Use `LazyLoadConfiguration`."
         )

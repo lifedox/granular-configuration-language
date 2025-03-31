@@ -22,6 +22,7 @@ The following environment variables are used as configuration for this library:
     - **Description:** Enables tag property tracking.
     - Automatically set while [`available_plugins`](#viewing-available-plugins) and [`available_tags`](#viewing-available-tags) run.
     - _Added_: 2.2.2
+    - _Removed_: 2.3.0 -- {py:func}`.with_tag` required a better framework for tracking tag attributes.
 
 ## Helper Scripts
 
