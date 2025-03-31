@@ -32,9 +32,10 @@ class RowType(typ.TypedDict, total=False):
     handler: str
     needs_root_condition: str
     eager_io: str
+    eio_inner_type: str
 
 
-NULLIFY_JSON = ("interpolates", "lazy", "needs_root_condition", "eager_io")
+NULLIFY_JSON = ("interpolates", "lazy", "needs_root_condition", "eager_io", "eio_inner_type")
 
 
 def _interpolates(tc: TagConstructor) -> Imode:
@@ -62,6 +63,14 @@ def _eager_io(tc: TagConstructor) -> str:
         return ""
 
 
+def _eager_io_type(tc: TagConstructor) -> str:
+    eager_io = tc.attributes.eager_io
+    if eager_io:  # pragma: no cover  # coverage shown by test output
+        return str(inspect.signature(eager_io).return_annotation).removeprefix("typ.").removeprefix("tabc.")
+    else:
+        return ""
+
+
 def _make_row(tc: TagConstructor) -> RowType:
     return RowType(
         plugin=tc.plugin,
@@ -74,6 +83,7 @@ def _make_row(tc: TagConstructor) -> RowType:
         handler=tc.constructor.__module__ + "." + tc.constructor.__name__,
         needs_root_condition=_needs_root_condition(tc),
         eager_io=_eager_io(tc),
+        eio_inner_type=_eager_io_type(tc),
     )
 
 
@@ -95,7 +105,7 @@ class AvailableBase:
     def get_rows(self) -> tabc.Iterator[RowType]:
         return map(self.__remove_keys, map(_make_row, sorted(self.tags, key=self.sort_keys)))
 
-    def table(self, *, _force_missing: bool = False, shorten: bool = True) -> str:
+    def table(self, *, shorten: bool = True, _force_missing: bool = False) -> str:
         rows = self.get_rows()
         notes: set[tuple[str, str]] = set()
 
@@ -118,7 +128,7 @@ class AvailableBase:
                     if value != row["eager_io"]:
                         notes.add((value, row["eager_io"]))
                         row["eager_io"] = value
-                    else:  # pragma: no cover
+                    else:  # pragma: no cover  # All cases get shortened
                         pass
 
                 if ("needs_root_condition" in row) and row["needs_root_condition"]:
@@ -132,13 +142,13 @@ class AvailableBase:
                     if value != row["needs_root_condition"]:
                         notes.add((value, row["needs_root_condition"]))
                         row["needs_root_condition"] = value
-                    else:  # pragma: no cover
+                    else:  # pragma: no cover  # All cases get shortened
                         pass
 
                 return row
 
             rows = iter(tuple(map(shorten_row, self.get_rows())))
-        else:  # pragma: no cover
+        else:
             pass
 
         if notes:
@@ -153,7 +163,7 @@ class AvailableBase:
 The "table" option requires `tabulate` to be installed.
 You can use the "printing" extra to install the needed dependencies"""
 
-    def csv(self) -> str:
+    def csv(self, *, shorten: bool = True) -> str:
         import csv
         import io
 
@@ -177,11 +187,11 @@ You can use the "printing" extra to install the needed dependencies"""
 
 
 class AvailableTags(AvailableBase):
-    headers = ("category", "tag", "type", "interpolates", "lazy", "returns")
+    headers = ("category", "tag", "type", "interpolates", "lazy", "returns", "eio_inner_type")
     sort_keys = op.attrgetter("category", "sort_as")
     json_remove = ("category",)
 
-    def json(self) -> str:
+    def json(self, *, shorten: bool = True) -> str:
         import json
 
         category_key = op.itemgetter("category")
@@ -201,7 +211,7 @@ class AvailablePlugins(AvailableBase):
     sort_keys = op.attrgetter("plugin", "category", "sort_as")
     json_remove = ("category", "plugin")
 
-    def json(self) -> str:
+    def json(self, *, shorten: bool = True) -> str:
         import json
 
         category_key = op.itemgetter("category")

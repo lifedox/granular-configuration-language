@@ -6,23 +6,28 @@
 
 The following environment variables are used as configuration for this library:
 
-- `G_CONFIG_DISABLE_PLUGINS`
-  - **Input:** Comma-delimited list of plugin names.
-  - **Description:** Disables tags provided by the selected plugins.
-  - Use `python -m granular_configuration_language.available_plugins` to [view](#viewing-available-plugins) plugins.
-  - Internal tags cannot be disabled as a plugin.
-- `G_CONFIG_DISABLE_TAGS`
-  - **Input:** Comma-delimited list of tag names.
-  - **Description:** Disables the selected tags.
-  - Use `python -m granular_configuration_language.available_tags` to [view](#viewing-available-tags) tags.
-  - Tag names start with `!`.
-- Internally used variables:
+- User Configuration Options:
+  - `G_CONFIG_DISABLE_PLUGINS`
+    - **Input:** Comma-delimited list of plugin names.
+    - **Description:** Disables tags provided by the selected plugins.
+    - Use `python -m granular_configuration_language.available_plugins` to [view](#viewing-available-plugins) plugins.
+    - Internal tags cannot be disabled as a plugin.
+  - `G_CONFIG_DISABLE_TAGS`
+    - **Input:** Comma-delimited list of tag names.
+    - **Description:** Disables the selected tags.
+    - Use `python -m granular_configuration_language.available_tags` to [view](#viewing-available-tags) tags.
+    - Tag names start with `!`.
+- Internally used variables (Documented as courtesy; not for users to use):
   - `G_CONFIG_ENABLE_TAG_TRACKER`
     - **Input:** `TRUE`
     - **Description:** Enables tag property tracking.
     - Automatically set while [`available_plugins`](#viewing-available-plugins) and [`available_tags`](#viewing-available-tags) run.
     - _Added_: 2.2.2
     - _Removed_: 2.3.0 -- {py:func}`.with_tag` required a better framework for tracking tag attributes.
+  - `G_CONFIG_FORCE_CAN_TABLE_FALSE`
+    - **Input:** `TRUE`
+    - **Description:** Used to test `table` not being available for [`available_plugins`](#viewing-available-plugins) and [`available_tags`](#viewing-available-tags).
+    - _Added_: 2.3.0
 
 ## Helper Scripts
 
@@ -57,10 +62,10 @@ usage: available_tags.py [-h] [{csv,json,table}]
 Shows available tags
 
 positional arguments:
-  {csv,json,table}
+  {csv,json,table}  Mode, default={table}
 
 options:
-  -h, --help  show this help message and exit
+  -h, --help        show this help message and exit
 
 The "table" option requires `tabulate` to be installed.
 You can use the "printing" extra to install the needed dependencies
@@ -88,12 +93,16 @@ pip install 'granular-configuration-language[printing]'
 - `lazy` - Specifies if the tags are lazy.
   - `NOT_LAZY` - Tags uses {py:func}`.as_not_lazy`
 - `returns` - Type annotation of the return of function that implements the Tag
+- `eio_inner_type` - EagerIO inner type.
+  - This is the type Tag Logic takes and the type the EagerIO Preprocessor returns.
+  - Value comes from the type annotation of the return of the EagerIO Preprocessor.
+  - _Added_: 2.3.0
 
 #### Sample Output (using `table` mode)
 
 ```text
-category     tag                      type                   interpolates    lazy      returns
------------  -----------------------  ---------------------  --------------  --------  -------------
+category     tag                      type                   interpolates    lazy      returns        eio_inner_type
+-----------  -----------------------  ---------------------  --------------  --------  -------------  -----------------
 Formatter    !Env                     str                                              str
 Formatter    !Sub                     str                    full                      str
 Manipulator  !Del                     str                                    NOT_LAZY  str
@@ -104,8 +113,8 @@ Parser       !ParseEnv                str | tuple[str, Any]                     
 Parser       !ParseEnvSafe            str | tuple[str, Any]                            Any
 Parser       !ParseFile               str                    full                      Any
 Parser       !OptionalParseFile       str                    full                      Any
-Parser       !EagerParseFile          str                    reduced                   Any
-Parser       !EagerOptionalParseFile  str                    reduced                   Any
+Parser       !EagerParseFile          str                    reduced                   Any            EagerIOTextFile
+Parser       !EagerOptionalParseFile  str                    reduced                   Any            EagerIOTextFile
 Typer        !Class                   str                    reduced                   Callable
 Typer        !Date                    str                    reduced                   date
 Typer        !DateTime                str                    reduced                   date
@@ -113,7 +122,7 @@ Typer        !Func                    str                    reduced            
 Typer        !Mask                    str                    reduced                   Masked
 Typer        !UUID                    str                    reduced                   UUID
 Undoc-ed     !Dict                    dict[Any, Any]                                   dict
-Undoc-ed     !EagerLoadBinary         str                    reduced                   bytes
+Undoc-ed     !EagerLoadBinary         str                    reduced                   bytes          EagerIOBinaryFile
 Undoc-ed     !LoadBinary              str                    reduced                   bytes
 ```
 
@@ -143,15 +152,17 @@ python -m granular_configuration_language.available_plugins
 #### Usage
 
 ```text
-usage: available_plugins.py [-h] [{csv,json,table}]
+usage: available_plugins.py [-h] [--long] [{csv,json,table}]
 
 Shows available plugins
 
 positional arguments:
-  {csv,json,table}
+  {csv,json,table}  Mode, default={table}
 
 options:
   -h, --help        show this help message and exit
+  --long, -l        In "table" mode, use long names.
+                    "Shortenings" lookup will not print.
 
 The "table" option requires `tabulate` to be installed.
 You can use the "printing" extra to install the needed dependencies
@@ -175,9 +186,12 @@ pip install 'granular-configuration-language[printing]'
 - `tag`: Name of the Tag
   - Value comes from {py:meth}`.TagDecoratorBase.__init__`→`tag`
 - `handler`: Function that implements the Tag.
-- `needs_root_condition`: Named of the "needs_root_condition" function.
+- `needs_root_condition`: Name of the "needs_root_condition" function.
   - Comes from {py:func}`.as_lazy_with_root`
   - _Added_: 2.2.2
+- `eager_io`: Name of the EagerIO Preprocessor.
+  - Comes from the input to {py:func}`.as_eager_io` or {py:func}`.as_eager_io_with_root_and_load_options`
+  - _Added_: 2.3.0
 
 #### Sample Output (using `table` mode)
 

@@ -22,16 +22,22 @@ def call(
     type: typ.Literal["csv"] | typ.Literal["json"] | typ.Literal["table"],
     tags: tuple[str, ...],
     /,
+    *options: str,
 ) -> str:
     available = AvailablePlugins if script == "available_plugins" else AvailableTags
 
     # For coverage:
-    op.methodcaller(type)(available(handlers.get_subset(*tags)))
+    if "--long" in options:
+        caller = op.methodcaller(type, shorten=False)
+    else:
+        caller = op.methodcaller(type)
+
+    caller(available(handlers.get_subset(*tags)))
 
     config_env = dict(G_CONFIG_DISABLE_TAGS=",".join(map(op.attrgetter("tag"), handlers.get_difference(*tags))))
 
     return subprocess.check_output(
-        [sys.executable, "-m", "granular_configuration_language." + script, type], env=config_env
+        [sys.executable, "-m", "granular_configuration_language." + script, type, *options], env=config_env
     ).decode()
 
 
@@ -90,25 +96,30 @@ def test_trying_to_override_a_tag_errors() -> None:
         TagSet((tag, tag))
 
 
+TAGS_TO_TEST_WITH = ("!Del", "!Func", "!UUID", "!Merge", "!Sub", "!EagerParseFile")
+
+
 def test_available_tags_csv() -> None:
-    output = call("available_tags", "csv", ("!Del", "!UUID", "!Merge", "!Sub"))
+    output = call("available_tags", "csv", TAGS_TO_TEST_WITH)
 
     print(output)
 
     assert (
         output
         == """\
-category,tag,type,interpolates,lazy,returns
-Formatter,!Sub,str,full,,str
-Manipulator,!Del,str,,NOT_LAZY,str
-Manipulator,!Merge,list[Any],,,Configuration
-Typer,!UUID,str,reduced,,UUID
+category,tag,type,interpolates,lazy,returns,eio_inner_type
+Formatter,!Sub,str,full,,str,
+Manipulator,!Del,str,,NOT_LAZY,str,
+Manipulator,!Merge,list[Any],,,Configuration,
+Parser,!EagerParseFile,str,reduced,,Any,EagerIOTextFile
+Typer,!Func,str,reduced,,Callable,
+Typer,!UUID,str,reduced,,UUID,
 """
     )
 
 
 def test_available_tags_json() -> None:
-    output = call("available_tags", "json", ("!Del", "!UUID", "!Merge", "!Sub"))
+    output = call("available_tags", "json", TAGS_TO_TEST_WITH)
 
     print(output)
 
@@ -118,6 +129,7 @@ def test_available_tags_json() -> None:
 {
   "Formatter": {
     "!Sub": {
+      "eio_inner_type": null,
       "interpolates": "full",
       "lazy": null,
       "returns": "str",
@@ -126,20 +138,39 @@ def test_available_tags_json() -> None:
   },
   "Manipulator": {
     "!Del": {
+      "eio_inner_type": null,
       "interpolates": null,
       "lazy": "NOT_LAZY",
       "returns": "str",
       "type": "str"
     },
     "!Merge": {
+      "eio_inner_type": null,
       "interpolates": null,
       "lazy": null,
       "returns": "Configuration",
       "type": "list[Any]"
     }
   },
+  "Parser": {
+    "!EagerParseFile": {
+      "eio_inner_type": "EagerIOTextFile",
+      "interpolates": "reduced",
+      "lazy": null,
+      "returns": "Any",
+      "type": "str"
+    }
+  },
   "Typer": {
+    "!Func": {
+      "eio_inner_type": null,
+      "interpolates": "reduced",
+      "lazy": null,
+      "returns": "Callable",
+      "type": "str"
+    },
     "!UUID": {
+      "eio_inner_type": null,
       "interpolates": "reduced",
       "lazy": null,
       "returns": "UUID",
@@ -152,7 +183,7 @@ def test_available_tags_json() -> None:
 
 
 def test_available_tags_table() -> None:
-    output = call("available_tags", "table", ("!Del", "!UUID", "!Merge", "!Sub"))
+    output = call("available_tags", "table", TAGS_TO_TEST_WITH)
 
     print(output)
 
@@ -160,18 +191,20 @@ def test_available_tags_table() -> None:
     assert (
         output
         == """\
-category     tag     type       interpolates    lazy      returns
------------  ------  ---------  --------------  --------  -------------
-Formatter    !Sub    str        full                      str
-Manipulator  !Del    str                        NOT_LAZY  str
-Manipulator  !Merge  list[Any]                            Configuration
-Typer        !UUID   str        reduced                   UUID
+category     tag              type       interpolates    lazy      returns        eio_inner_type
+-----------  ---------------  ---------  --------------  --------  -------------  ----------------
+Formatter    !Sub             str        full                      str
+Manipulator  !Del             str                        NOT_LAZY  str
+Manipulator  !Merge           list[Any]                            Configuration
+Parser       !EagerParseFile  str        reduced                   Any            EagerIOTextFile
+Typer        !Func            str        reduced                   Callable
+Typer        !UUID            str        reduced                   UUID
 """
     )
 
 
 def test_table_missing() -> None:
-    tags = handlers.get_subset("!Del", "!UUID", "!Merge", "!Sub")
+    tags = handlers.get_subset(*TAGS_TO_TEST_WITH)
     output = AvailableTags(tags).table(_force_missing=True)
 
     print(output)
@@ -185,7 +218,7 @@ You can use the "printing" extra to install the needed dependencies"""
 
 
 def test_available_plugins_csv() -> None:
-    output = call("available_plugins", "csv", ("!Func", "!UUID", "!Merge", "!Sub", "!EagerParseFile"))
+    output = call("available_plugins", "csv", TAGS_TO_TEST_WITH)
 
     print(output)
 
@@ -194,6 +227,7 @@ def test_available_plugins_csv() -> None:
         == """\
 plugin,category,tag,handler,needs_root_condition,eager_io
 <gcl-built-in>,Formatter,!Sub,granular_configuration_language.yaml._tags._sub.tag,interpolation_needs_ref_condition,
+<gcl-built-in>,Manipulator,!Del,granular_configuration_language.yaml._tags._del.tag,,
 <gcl-built-in>,Manipulator,!Merge,granular_configuration_language.yaml._tags._merge.tag,,
 <gcl-built-in>,Parser,!EagerParseFile,granular_configuration_language.yaml._tags._eager_parse_file.tag,,eager_io_text_loader_interpolates
 <gcl-built-in>,Typer,!UUID,granular_configuration_language.yaml._tags._uuid.tag,,
@@ -203,7 +237,7 @@ official_extra,Typer,!Func,granular_configuration_language.yaml._tags.func_and_c
 
 
 def test_available_plugins_json() -> None:
-    output = call("available_plugins", "json", ("!Func", "!UUID", "!Merge", "!Sub", "!EagerParseFile"))
+    output = call("available_plugins", "json", TAGS_TO_TEST_WITH)
 
     print(output)
 
@@ -220,6 +254,11 @@ def test_available_plugins_json() -> None:
       }
     },
     "Manipulator": {
+      "!Del": {
+        "eager_io": null,
+        "handler": "granular_configuration_language.yaml._tags._del.tag",
+        "needs_root_condition": null
+      },
       "!Merge": {
         "eager_io": null,
         "handler": "granular_configuration_language.yaml._tags._merge.tag",
@@ -256,7 +295,7 @@ def test_available_plugins_json() -> None:
 
 
 def test_available_plugins_table() -> None:
-    output = call("available_plugins", "table", ("!Func", "!UUID", "!Merge", "!Sub", "!EagerParseFile"))
+    output = call("available_plugins", "table", TAGS_TO_TEST_WITH)
 
     print(output)
 
@@ -267,6 +306,7 @@ def test_available_plugins_table() -> None:
 plugin          category     tag              handler                      needs_root_condition    eager_io
 --------------  -----------  ---------------  ---------------------------  ----------------------  ----------
 <gcl-built-in>  Formatter    !Sub             <gcl>._sub.tag               ntrpl_needs_ref
+<gcl-built-in>  Manipulator  !Del             <gcl>._del.tag
 <gcl-built-in>  Manipulator  !Merge           <gcl>._merge.tag
 <gcl-built-in>  Parser       !EagerParseFile  <gcl>._eager_parse_file.tag                          text_ntrpl
 <gcl-built-in>  Typer        !UUID            <gcl>._uuid.tag
@@ -276,6 +316,145 @@ Shortenings:
 `<gcl>` = `granular_configuration_language.yaml._tags`
 `ntrpl_needs_ref` = `interpolation_needs_ref_condition`
 `text_ntrpl` = `eager_io_text_loader_interpolates`
+"""
+    )
+
+
+def test_available_plugins_table_long() -> None:
+    output = call("available_plugins", "table", TAGS_TO_TEST_WITH, "--long")
+
+    print(output)
+
+    assert can_table, "test with tabulate installed"
+    assert (
+        output
+        == """\
+plugin          category     tag              handler                                                           needs_root_condition               eager_io
+--------------  -----------  ---------------  ----------------------------------------------------------------  ---------------------------------  ---------------------------------
+<gcl-built-in>  Formatter    !Sub             granular_configuration_language.yaml._tags._sub.tag               interpolation_needs_ref_condition
+<gcl-built-in>  Manipulator  !Del             granular_configuration_language.yaml._tags._del.tag
+<gcl-built-in>  Manipulator  !Merge           granular_configuration_language.yaml._tags._merge.tag
+<gcl-built-in>  Parser       !EagerParseFile  granular_configuration_language.yaml._tags._eager_parse_file.tag                                     eager_io_text_loader_interpolates
+<gcl-built-in>  Typer        !UUID            granular_configuration_language.yaml._tags._uuid.tag
+official_extra  Typer        !Func            granular_configuration_language.yaml._tags.func_and_class.func_
+"""
+    )
+
+
+def test_available_tags_help() -> None:
+    config_env = dict(G_CONFIG_DISABLE_TAGS=",".join(map(op.attrgetter("tag"), handlers)))
+    output = subprocess.check_output(
+        [sys.executable, "-m", "granular_configuration_language.available_tags", "--help"],
+        env=config_env,
+    ).decode()
+
+    print(output)
+
+    assert (
+        output
+        == """\
+usage: available_tags.py [-h] [{csv,json,table}]
+
+Shows available tags
+
+positional arguments:
+  {csv,json,table}  Mode, default={table}
+
+options:
+  -h, --help        show this help message and exit
+
+The "table" option requires `tabulate` to be installed. You can use the
+"printing" extra to install the needed dependencies
+"""
+    )
+
+
+def test_available_plugins_help() -> None:
+    config_env = dict(G_CONFIG_DISABLE_TAGS=",".join(map(op.attrgetter("tag"), handlers)))
+    output = subprocess.check_output(
+        [sys.executable, "-m", "granular_configuration_language.available_plugins", "--help"],
+        env=config_env,
+    ).decode()
+    print(output)
+
+    assert (
+        output
+        == """\
+usage: available_plugins.py [-h] [--long] [{csv,json,table}]
+
+Shows available plugins
+
+positional arguments:
+  {csv,json,table}  Mode, default={table}
+
+options:
+  -h, --help        show this help message and exit
+  --long, -l        In "table" mode, use long names. "Shortenings" lookup will
+                    not print.
+
+The "table" option requires `tabulate` to be installed. You can use the
+"printing" extra to install the needed dependencies
+"""
+    )
+
+
+def test_available_tags_help_can_table_false() -> None:
+    config_env = dict(
+        G_CONFIG_DISABLE_TAGS=",".join(map(op.attrgetter("tag"), handlers)),
+        G_CONFIG_FORCE_CAN_TABLE_FALSE="TRUE",
+    )
+    output = subprocess.check_output(
+        [sys.executable, "-m", "granular_configuration_language.available_tags", "--help"],
+        env=config_env,
+    ).decode()
+
+    print(output)
+
+    assert (
+        output
+        == """\
+usage: available_tags.py [-h] [{csv,json}]
+
+Shows available tags
+
+positional arguments:
+  {csv,json}  Mode, default={csv}
+
+options:
+  -h, --help  show this help message and exit
+
+The "table" option requires `tabulate` to be installed. You can use the
+"printing" extra to install the needed dependencies
+"""
+    )
+
+
+def test_available_plugins_help_can_table_false() -> None:
+    config_env = dict(
+        G_CONFIG_DISABLE_TAGS=",".join(map(op.attrgetter("tag"), handlers)),
+        G_CONFIG_FORCE_CAN_TABLE_FALSE="TRUE",
+    )
+    output = subprocess.check_output(
+        [sys.executable, "-m", "granular_configuration_language.available_plugins", "--help"],
+        env=config_env,
+    ).decode()
+    print(output)
+
+    assert (
+        output
+        == """\
+usage: available_plugins.py [-h] [{csv,json}]
+
+Shows available plugins
+
+positional arguments:
+  {csv,json}  Mode, default={csv}
+
+options:
+  -h, --help  show this help message and exit
+
+The "table" option requires `tabulate` to be installed. You can use the
+"printing" extra to install the needed dependencies
 """
     )
 
