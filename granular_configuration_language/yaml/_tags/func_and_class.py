@@ -29,7 +29,7 @@ def get_func(func_path: str) -> tabc.Callable:
 @string_tag(Tag("!Class"), "Typer")
 @as_lazy
 @interpolate_value_without_ref
-def class_handler(value: str) -> tabc.Callable:
+def class_(value: str) -> tabc.Callable:
     class_type = get_func(value)
     if inspect.isclass(class_type):
         return class_type
@@ -40,7 +40,7 @@ def class_handler(value: str) -> tabc.Callable:
 @string_tag(Tag("!Func"), "Typer")
 @as_lazy
 @interpolate_value_without_ref
-def func_handler(value: str) -> tabc.Callable:
+def func_(value: str) -> tabc.Callable:
     func = get_func(value)
     if callable(func):
         return func

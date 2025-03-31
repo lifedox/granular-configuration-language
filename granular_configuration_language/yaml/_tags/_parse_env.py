@@ -54,12 +54,12 @@ def parse_input(tag: Tag, value: string_or_twople_tag.Type, options: LoadOptions
 @string_or_twople_tag(Tag("!ParseEnv"), "Parser")
 @as_lazy_with_root_and_load_options
 @with_tag
-def handler(tag: Tag, value: string_or_twople_tag.Type, root: Root, options: LoadOptions) -> typ.Any:
+def tag(tag: Tag, value: string_or_twople_tag.Type, root: Root, options: LoadOptions) -> typ.Any:
     return parse_input(tag, value, options, partial(load_from_file, options=options, root=root))
 
 
 @string_or_twople_tag(Tag("!ParseEnvSafe"), "Parser")
 @as_lazy_with_load_options
 @with_tag
-def handler_safe(tag: Tag, value: string_or_twople_tag.Type, options: LoadOptions) -> typ.Any:
+def safe(tag: Tag, value: string_or_twople_tag.Type, options: LoadOptions) -> typ.Any:
     return parse_input(tag, value, options, safe_load_from_file)

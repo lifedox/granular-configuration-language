@@ -5,5 +5,5 @@ from granular_configuration_language.yaml.decorators import Tag, as_not_lazy, st
 
 @string_tag(Tag("!Del"), "Manipulator")
 @as_not_lazy
-def handler(value: str) -> str:
+def tag(value: str) -> str:
     return value

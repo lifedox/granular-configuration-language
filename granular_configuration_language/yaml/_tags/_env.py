@@ -14,5 +14,5 @@ def load_env(env_name: str, default: str | None = None) -> str:
 
 @string_tag(Tag("!Env"), "Formatter")
 @as_lazy
-def handler(value: str) -> str:
+def tag(value: str) -> str:
     return ENV_PATTERN.sub(lambda x: load_env(**x.groupdict()), value)
