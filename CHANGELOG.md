@@ -6,7 +6,10 @@
 
 - Added `granular_configuration_language.yaml.file_ops` module
 - Added `granular_configuration_language.yaml.decorator.eagerio` module
-
+- Added `LazyLoadConfiguration.eager_load`
+- Added `granular_configuration_language.yaml.decorators.with_tag` decorator
+  - Rewrote tag attribute tracking to add support.
+  - `G_CONFIG_ENABLE_TAG_TRACKER` environment variable setting removed.
 - Added `!EagerParseFile` and `!EagerOptionalParseFile` Tags
 - Added Undocumented Tags:
   - `!LoadBindary` and `!EagerLoadBinary` Tag to test binary EagerIO
