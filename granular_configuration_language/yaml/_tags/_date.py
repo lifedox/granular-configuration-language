@@ -19,13 +19,13 @@ else:  # if sys.version_info
 @string_tag(Tag("!Date"), "Typer")
 @as_lazy
 @interpolate_value_without_ref
-def date_handler(value: str) -> date:
+def date_(value: str) -> date:
     return date_fromisoformat(value)
 
 
 @string_tag(Tag("!DateTime"), "Typer")
 @as_lazy
 @interpolate_value_without_ref
-def datetime_handler(value: str) -> date:
+def datetime_(value: str) -> date:
     dt = datetime_fromisoformat(value)
     return dt

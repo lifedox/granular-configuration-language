@@ -6,5 +6,5 @@ from granular_configuration_language.yaml.decorators import Tag, as_not_lazy, st
 
 @string_tag(Tag("!Placeholder"), "Manipulator")
 @as_not_lazy
-def handler(value: str) -> Placeholder:
+def tag(value: str) -> Placeholder:
     return Placeholder(value)

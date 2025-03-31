@@ -95,9 +95,59 @@ class AvailableBase:
     def get_rows(self) -> tabc.Iterator[RowType]:
         return map(self.__remove_keys, map(_make_row, sorted(self.tags, key=self.sort_keys)))
 
-    def table(self, *, _force_missing: bool = False) -> str:
+    def table(self, *, _force_missing: bool = False, shorten: bool = True) -> str:
+        rows = self.get_rows()
+        notes: set[tuple[str, str]] = set()
+
+        if shorten:
+
+            def shorten_row(row: RowType) -> RowType:
+                if ("handler" in row) and ("granular_configuration_language.yaml._tags" in row["handler"]):
+                    row["handler"] = row["handler"].replace("granular_configuration_language.yaml._tags", "<gcl>")
+                    notes.add(("<gcl>", "granular_configuration_language.yaml._tags"))
+
+                if ("eager_io" in row) and row["eager_io"]:
+                    value = (
+                        row["eager_io"]
+                        .replace("eager_io", "")
+                        .replace("_loader", "")
+                        .replace("interpolation", "ntrpl")
+                        .replace("interpolates", "ntrpl")
+                        .strip("_")
+                    )
+                    if value != row["eager_io"]:
+                        notes.add((value, row["eager_io"]))
+                        row["eager_io"] = value
+                    else:  # pragma: no cover
+                        pass
+
+                if ("needs_root_condition" in row) and row["needs_root_condition"]:
+                    value = (
+                        row["needs_root_condition"]
+                        .replace("_condition", "")
+                        .replace("interpolation", "ntrpl")
+                        .replace("interpolates", "ntrpl")
+                        .strip("_")
+                    )
+                    if value != row["needs_root_condition"]:
+                        notes.add((value, row["needs_root_condition"]))
+                        row["needs_root_condition"] = value
+                    else:  # pragma: no cover
+                        pass
+
+                return row
+
+            rows = iter(tuple(map(shorten_row, self.get_rows())))
+        else:  # pragma: no cover
+            pass
+
+        if notes:
+            suffix = "\n\nShortenings:\n" + "\n".join(itertools.starmap("`{}` = `{}`".format, sorted(notes)))
+        else:
+            suffix = ""
+
         if tabulate and not _force_missing:
-            return tabulate.tabulate(self.get_rows(), headers=OrderedDict(zip(self.headers, self.headers)))
+            return tabulate.tabulate(rows, headers=OrderedDict(zip(self.headers, self.headers))) + suffix
         else:
             return """\
 The "table" option requires `tabulate` to be installed.

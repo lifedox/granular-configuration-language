@@ -7,5 +7,5 @@ from granular_configuration_language.yaml.decorators import Tag, as_lazy, interp
 @string_tag(Tag("!Mask"), "Typer")
 @as_lazy
 @interpolate_value_without_ref
-def handler(value: str) -> Masked:
+def tag(value: str) -> Masked:
     return Masked(value)

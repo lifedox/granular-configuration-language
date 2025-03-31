@@ -19,7 +19,7 @@ from granular_configuration_language.yaml.file_ops.yaml import load_from_file
 @as_lazy_with_root_and_load_options
 @interpolate_value_with_ref
 @with_tag
-def handler(tag: Tag, value: str, root: Root, options: LoadOptions) -> typ.Any:
+def tag(tag: Tag, value: str, root: Root, options: LoadOptions) -> typ.Any:
     file = as_file_path(tag, value, options)
 
     return load_from_file(file, options, root)
@@ -29,7 +29,7 @@ def handler(tag: Tag, value: str, root: Root, options: LoadOptions) -> typ.Any:
 @as_lazy_with_root_and_load_options
 @interpolate_value_with_ref
 @with_tag
-def handler_optional(tag: Tag, value: str, root: Root, options: LoadOptions) -> typ.Any:
+def opt(tag: Tag, value: str, root: Root, options: LoadOptions) -> typ.Any:
     file = as_file_path(tag, value, options)
 
     if file.exists():

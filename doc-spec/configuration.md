@@ -92,25 +92,29 @@ pip install 'granular-configuration-language[printing]'
 #### Sample Output (using `table` mode)
 
 ```text
-category     tag                 type                   interpolates    lazy      returns
------------  ------------------  ---------------------  --------------  --------  -------------
-Formatter    !Env                str                                              str
-Formatter    !Sub                str                    full                      str
-Manipulator  !Del                str                                    NOT_LAZY  str
-Manipulator  !Merge              list[Any]                                        Configuration
-Manipulator  !Placeholder        str                                    NOT_LAZY  Placeholder
-Manipulator  !Ref                str                    full                      str
-Parser       !ParseEnv           str | tuple[str, Any]                            Any
-Parser       !ParseEnvSafe       str | tuple[str, Any]                            Any
-Parser       !ParseFile          str                    full                      Any
-Parser       !OptionalParseFile  str                    full                      Any
-Typer        !Class              str                    reduced                   Callable
-Typer        !Date               str                    reduced                   date
-Typer        !DateTime           str                    reduced                   date
-Typer        !Func               str                    reduced                   Callable
-Typer        !Mask               str                    reduced                   Masked
-Typer        !UUID               str                    reduced                   UUID
-Undoc-ed     !Dict               dict[Any, Any]                                   dict
+category     tag                      type                   interpolates    lazy      returns
+-----------  -----------------------  ---------------------  --------------  --------  -------------
+Formatter    !Env                     str                                              str
+Formatter    !Sub                     str                    full                      str
+Manipulator  !Del                     str                                    NOT_LAZY  str
+Manipulator  !Merge                   list[Any]                                        Configuration
+Manipulator  !Placeholder             str                                    NOT_LAZY  Placeholder
+Manipulator  !Ref                     str                    full                      Any
+Parser       !ParseEnv                str | tuple[str, Any]                            Any
+Parser       !ParseEnvSafe            str | tuple[str, Any]                            Any
+Parser       !ParseFile               str                    full                      Any
+Parser       !OptionalParseFile       str                    full                      Any
+Parser       !EagerParseFile          str                    reduced                   Any
+Parser       !EagerOptionalParseFile  str                    reduced                   Any
+Typer        !Class                   str                    reduced                   Callable
+Typer        !Date                    str                    reduced                   date
+Typer        !DateTime                str                    reduced                   date
+Typer        !Func                    str                    reduced                   Callable
+Typer        !Mask                    str                    reduced                   Masked
+Typer        !UUID                    str                    reduced                   UUID
+Undoc-ed     !Dict                    dict[Any, Any]                                   dict
+Undoc-ed     !EagerLoadBinary         str                    reduced                   bytes
+Undoc-ed     !LoadBinary              str                    reduced                   bytes
 ```
 
 (available_plugins)=
@@ -178,23 +182,33 @@ pip install 'granular-configuration-language[printing]'
 #### Sample Output (using `table` mode)
 
 ```text
-plugin          category     tag                 handler                                                                  needs_root_condition
---------------  -----------  ------------------  -----------------------------------------------------------------------  ---------------------------------
-<gcl-built-in>  Formatter    !Env                granular_configuration_language.yaml._tags._env.handler
-<gcl-built-in>  Formatter    !Sub                granular_configuration_language.yaml._tags._sub.handler                  interpolation_needs_ref_condition
-<gcl-built-in>  Manipulator  !Del                granular_configuration_language.yaml._tags._del.handler
-<gcl-built-in>  Manipulator  !Merge              granular_configuration_language.yaml._tags._merge.handler
-<gcl-built-in>  Manipulator  !Placeholder        granular_configuration_language.yaml._tags._placeholder.handler
-<gcl-built-in>  Manipulator  !Ref                granular_configuration_language.yaml._tags._ref.handler
-<gcl-built-in>  Parser       !ParseEnv           granular_configuration_language.yaml._tags._parse_env.handler
-<gcl-built-in>  Parser       !ParseEnvSafe       granular_configuration_language.yaml._tags._parse_env.handler_safe
-<gcl-built-in>  Parser       !ParseFile          granular_configuration_language.yaml._tags._parse_file.handler
-<gcl-built-in>  Parser       !OptionalParseFile  granular_configuration_language.yaml._tags._parse_file.handler_optional
-<gcl-built-in>  Typer        !Date               granular_configuration_language.yaml._tags._date.date_handler
-<gcl-built-in>  Typer        !DateTime           granular_configuration_language.yaml._tags._date.datetime_handler
-<gcl-built-in>  Typer        !Mask               granular_configuration_language.yaml._tags._mask.handler
-<gcl-built-in>  Typer        !UUID               granular_configuration_language.yaml._tags._uuid.handler
-<gcl-built-in>  Undoc-ed     !Dict               granular_configuration_language.yaml._tags._dict.handler
-official_extra  Typer        !Class              granular_configuration_language.yaml._tags.func_and_class.class_handler
-official_extra  Typer        !Func               granular_configuration_language.yaml._tags.func_and_class.func_handler
+plugin          category     tag                      handler                      needs_root_condition    eager_io
+--------------  -----------  -----------------------  ---------------------------  ----------------------  ------------
+<gcl-built-in>  Formatter    !Env                     <gcl>._env.tag
+<gcl-built-in>  Formatter    !Sub                     <gcl>._sub.tag               ntrpl_needs_ref
+<gcl-built-in>  Manipulator  !Del                     <gcl>._del.tag
+<gcl-built-in>  Manipulator  !Merge                   <gcl>._merge.tag
+<gcl-built-in>  Manipulator  !Placeholder             <gcl>._placeholder.tag
+<gcl-built-in>  Manipulator  !Ref                     <gcl>._ref.tag
+<gcl-built-in>  Parser       !ParseEnv                <gcl>._parse_env.tag
+<gcl-built-in>  Parser       !ParseEnvSafe            <gcl>._parse_env.safe
+<gcl-built-in>  Parser       !ParseFile               <gcl>._parse_file.tag
+<gcl-built-in>  Parser       !OptionalParseFile       <gcl>._parse_file.opt
+<gcl-built-in>  Parser       !EagerParseFile          <gcl>._eager_parse_file.tag                          text_ntrpl
+<gcl-built-in>  Parser       !EagerOptionalParseFile  <gcl>._eager_parse_file.opt                          text_ntrpl
+<gcl-built-in>  Typer        !Date                    <gcl>._date.date_
+<gcl-built-in>  Typer        !DateTime                <gcl>._date.datetime_
+<gcl-built-in>  Typer        !Mask                    <gcl>._mask.tag
+<gcl-built-in>  Typer        !UUID                    <gcl>._uuid.tag
+<gcl-built-in>  Undoc-ed     !Dict                    <gcl>._dict.tag
+<gcl-built-in>  Undoc-ed     !EagerLoadBinary         <gcl>._load_binary.eager_                            binary_ntrpl
+<gcl-built-in>  Undoc-ed     !LoadBinary              <gcl>._load_binary.tag
+official_extra  Typer        !Class                   <gcl>.func_and_class.class_
+official_extra  Typer        !Func                    <gcl>.func_and_class.func_
+
+Shortenings:
+`<gcl>` = `granular_configuration_language.yaml._tags`
+`binary_ntrpl` = `eager_io_binary_loader_interpolates`
+`ntrpl_needs_ref` = `interpolation_needs_ref_condition`
+`text_ntrpl` = `eager_io_text_loader_interpolates`
 ```

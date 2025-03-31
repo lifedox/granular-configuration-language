@@ -8,5 +8,5 @@ from granular_configuration_language.yaml.decorators import Tag, as_lazy, interp
 @string_tag(Tag("!UUID"), "Typer")
 @as_lazy
 @interpolate_value_without_ref
-def handler(value: str) -> UUID:
+def tag(value: str) -> UUID:
     return UUID(hex=value)
