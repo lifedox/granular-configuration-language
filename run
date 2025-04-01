@@ -111,7 +111,7 @@ test_many() {
 
     for version in ${python_versions}; do
         if [[ "${is_first}" == "TRUE" ]]; then
-            cov_arg="--cov-reset"
+            cov_arg=""
             is_first=FALSE
         else
             cov_arg="--cov-append"

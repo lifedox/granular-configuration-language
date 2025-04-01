@@ -15,7 +15,9 @@ if __name__ == "__main__":
         default = "table"
 
     parser = argparse.ArgumentParser(
-        description="Shows available plugins", epilog=AvailablePlugins(handlers).table(_force_missing=True)
+        prog="python -m granular_configuration_language.available_plugins",
+        description="Shows available plugins",
+        epilog=AvailablePlugins(handlers).table(_force_missing=True),
     )
     parser.add_argument("type", default=default, choices=choices, nargs="?", help=f"Mode, default={{{default}}}")
 
