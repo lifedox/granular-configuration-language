@@ -23,11 +23,13 @@
   - Added `eager_io` column
   - Added shorten name option for `handler`, `needs_root_condition`, and `eager_io`.
     - Defaults as enabled. `-l`, `--long` option disables.
-  - Improved `--help` message.
   - Changed internal Tag Function names to be shorter for `handler` column.
+  - Improved `--help` message.
+    - Help message uses  `python -m granular_configuration_language.available_plugins` instead of `available_plugins.py` _(Backported from 3.14)_
 - Changes to `available_tags`:
   - Added `eio_inner_type` column
   - Improved `--help` message.
+    - Help message uses  `python -m granular_configuration_language.available_tags` instead of `available_tags.py` _(Backported from 3.14)_
 
 ### Fixed
 

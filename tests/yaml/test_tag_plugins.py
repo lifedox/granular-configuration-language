@@ -353,7 +353,8 @@ def test_available_tags_help() -> None:
     assert (
         output
         == """\
-usage: available_tags.py [-h] [{csv,json,table}]
+usage: python -m granular_configuration_language.available_tags
+       [-h] [{csv,json,table}]
 
 Shows available tags
 
@@ -380,7 +381,8 @@ def test_available_plugins_help() -> None:
     assert (
         output
         == """\
-usage: available_plugins.py [-h] [--long] [{csv,json,table}]
+usage: python -m granular_configuration_language.available_plugins
+       [-h] [--long] [{csv,json,table}]
 
 Shows available plugins
 
@@ -413,7 +415,8 @@ def test_available_tags_help_can_table_false() -> None:
     assert (
         output
         == """\
-usage: available_tags.py [-h] [{csv,json}]
+usage: python -m granular_configuration_language.available_tags
+       [-h] [{csv,json}]
 
 Shows available tags
 
@@ -443,7 +446,8 @@ def test_available_plugins_help_can_table_false() -> None:
     assert (
         output
         == """\
-usage: available_plugins.py [-h] [{csv,json}]
+usage: python -m granular_configuration_language.available_plugins
+       [-h] [{csv,json}]
 
 Shows available plugins
 
