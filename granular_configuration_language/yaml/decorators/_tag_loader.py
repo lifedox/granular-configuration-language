@@ -75,9 +75,12 @@ def load_tags(
     disable_plugins |= frozenset(filter(None, map(str.strip, os.getenv("G_CONFIG_DISABLE_PLUGINS", "").split(","))))
     disable_tags |= frozenset(filter(None, map(str.strip, os.getenv("G_CONFIG_DISABLE_TAGS", "").split(","))))
 
+    def is_disable(tc: TagConstructor) -> bool:
+        return tc.tag in disable_tags
+
     return TagSet(
         filterfalse(
-            disable_tags.__contains__,
+            is_disable,
             chain.from_iterable(starmap(get_tags_in_module, get_all_tag_plugins(disable_plugin=disable_plugins))),
         )
     )
