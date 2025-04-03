@@ -49,16 +49,6 @@ class TagConstructor:
     def set_plugin(self, plugin: str) -> None:
         object.__setattr__(self, "plugin", plugin)
 
-    @override
-    def __eq__(self, value: object) -> bool:
-        return (isinstance(value, self.__class__) and self.tag == value.tag) or (
-            isinstance(value, str) and self.tag == value
-        )
-
-    @override
-    def __hash__(self) -> int:
-        return hash(self.tag)
-
     def __call__(self, constructor: type[SafeConstructor], state: StateHolder) -> None:
         return self.constructor(constructor, state)
 
