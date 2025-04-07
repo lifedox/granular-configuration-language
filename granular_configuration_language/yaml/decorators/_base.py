@@ -172,7 +172,7 @@ class TagDecoratorBase(typ.Generic[T], abc.ABC):
 
         .. code-block:: python
 
-            def scalar_node_type_check(self, value: Any) -> TypeGuard[float]:
+            def scalar_node_type_check(self, value: str) -> TypeGuard[float]:
                 try:
                     float(value)
                     return True

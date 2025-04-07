@@ -157,14 +157,15 @@ class float_tag(TagDecoratorBase[float]):
 
 The required portion of {py:class}`.TagDecoratorBase` is to set the Python type a Tag takes as input. You set it in the {py:class}`~typing.Generic` argument, and you implement the {py:meth}`~.TagDecoratorBase.user_friendly_type` property. The property is expected to match Generic argument, but to be as straightforward as possible. For example, {py:class}`.sequence_of_any_tag` uses `collections.abc.Sequence[typing.Any]` as Generic argument, but property just returns `list[Any]`.
 
-The `Type` {py:class}`~typing.TypeAlias` is just for nicety for users of your Tag Type Decorator. Case in point, `str | tuple[str, typing.Any]]` is more effort to type than `string_or_twople_tag.Type`.
+The {py:data}`~typing.TypeAlias`, `Type`, is just a nicety for users of your Tag Type Decorator. Case in point, `str | tuple[str, typing.Any]]` is more effort to type than `string_or_twople_tag.Type`.
 
 :::{admonition} Implementation Excuse
 :class: note
 :collapsible: closed
 
-While it is possible to implement {py:meth}`~.TagDecoratorBase.user_friendly_type` in the {py:class}`.TagDecoratorBase`. The properties required are not defined in PyRight, and it needs a lot of checks and special case handling, especially since I don't want `collections.abc.` or `typing.` Guaranteed to never break and handling all possible case, if author of the Tag Type Decorator just writes what they think is best.
+While it is possible to implement {py:meth}`~.TagDecoratorBase.user_friendly_type` in the {py:class}`.TagDecoratorBase`. The properties required are not defined in PyRight, and it needs a lot of checks and special case handling, especially since I don't want `collections.abc.` or `typing.`
 
+The guaranteed to never break and handling all possible cases solution is the author of the Tag Type Decorator just writing what they think is best.
 :::
 
 ### Configuring your Tag Type Decorator
@@ -177,13 +178,13 @@ class float_tag(TagDecoratorBase[float]):
     @typing.override  # Python 3.12+
     def scalar_node_type_check(
         self,
-        value: typing.Any,
+        value: str,
     ) -> typing.TypeGuard[float]:
         """"""  # Make undocumented
 
-        # As of Version 2.3.0, a `ValueError` raised 
+        # As of Version 2.3.0, a `ValueError` raised
         # during `type_check` or `transformers` will
-        # be converted into a properly messaged 
+        # be converted into a properly messaged
         # `TagHadUnsupportArgument`, so this method
         # could just be `return True`.
 
@@ -207,31 +208,31 @@ YAML Tags support Scalar, Sequence, and Mapping YAML types. These are {py:class}
 For each YAML type, there is an associated `type_check` method. These methods are called after the YAML type is checked. Use these to narrow the type of your Tag Type Decorator.
 
 - {py:meth}`~.TagDecoratorBase.scalar_node_type_check`
-  - Called if the `value` type is a `str`.
-  - Default is {py:data}`False`.
+  - Called if the type of `value` is {py:class}`str`.
+  - Default return is {py:data}`False`.
   - Return type is {py:data}`TypeGuard[T] <typing.TypeGuard>`, which is a {py:class}`bool` value.
 - {py:meth}`~.TagDecoratorBase.sequence_node_type_check`
-  - Called if the `value` type is a `collections.abc.Sequence[typing.Any]`.
-  - Default is {py:data}`False`.
+  - Called if the type of `value` is `collections.abc.Sequence[typing.Any]`.
+  - Default return is {py:data}`False`.
   - Return type is {py:data}`TypeGuard[T] <typing.TypeGuard>`, which is a {py:class}`bool` value.
 - {py:meth}`~.TagDecoratorBase.mapping_node_type_check`
-  - Called if the `value` type is a `collections.abc.Mapping[typing.Any, typing.Any]`.
-  - Default is {py:data}`False`.
+  - Called if the type of `value` is `collections.abc.Mapping[typing.Any, typing.Any]`.
+  - Default return is {py:data}`False`.
   - Return type is {py:data}`TypeGuard[T] <typing.TypeGuard>`, which is a {py:class}`bool` value.
 
-If you need to mutate the value from a YAML type to a different Python type, there are `transformer` methods. These methods are called after the `type_check` method.
+If you need to mutate `value` from a YAML type to a different Python type, there are `transformer` methods. These methods are called after the `type_check` method.
 
 - {py:meth}`~.TagDecoratorBase.scalar_node_transformer`
-  - Called if the `value` type is a `str`.
-  - Default is input (identity operation).
+  - Called if the type of `value` is {py:class}`str`.
+  - Default return is `value` (identity operation).
   - Return type is {py:class}`~.T`
 - {py:meth}`~.TagDecoratorBase.sequence_node_transformer`
-  - Called if the `value` type is a `collections.abc.Sequence[typing.Any]`.
-  - Default is input (identity operation).
+  - Called if the type of `value` is `collections.abc.Sequence[typing.Any]`.
+  - Default return is `value` (identity operation).
   - Return type is {py:class}`~.T`
 - {py:meth}`~.TagDecoratorBase.mapping_node_transformer`
-  - Called if the `value` type is a `collections.abc.Mapping[typing.Any, typing.Any]`.
-  - Default is input (identity operation).
+  - Called if the type of `value` is `collections.abc.Mapping[typing.Any, typing.Any]`.
+  - Default return is `value` (identity operation).
   - Return type is {py:class}`~.T`
 
 :::{tip}
