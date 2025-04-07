@@ -1,0 +1,7 @@
+example_config:
+  setting1: value1
+  setting2:
+    sub_setting1: sub1
+  example_of_codes:
+    400: Bad Request
+    404: Not Found

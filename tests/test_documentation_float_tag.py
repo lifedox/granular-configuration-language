@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import collections.abc as tabc
 import re
 import sys
@@ -8,11 +10,7 @@ import pytest
 
 from granular_configuration_language.exceptions import TagHadUnsupportArgument
 from granular_configuration_language.yaml import loads
-from granular_configuration_language.yaml.decorators import (
-    Tag,
-    TagDecoratorBase,
-    as_lazy,
-)
+from granular_configuration_language.yaml.decorators import Tag, TagDecoratorBase, as_lazy
 from granular_configuration_language.yaml.decorators._tag_set import TagSet
 
 if sys.version_info >= (3, 12):

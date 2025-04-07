@@ -17,6 +17,8 @@
   - `!LoadBindary` and `!EagerLoadBinary` Tag to test binary EagerIO
 - `TagHadUnsupportArgument` exception.
   - Inherits from `ValueError`, which was previously used.
+- Added Generic Type Parameters to `Configuration`
+  - Both default to `typing.Any`, so no behavior change.
 
 ### Changed
 
@@ -33,6 +35,7 @@
   - Improved `--help` message.
     - Help message uses `python -m granular_configuration_language.available_tags` instead of `available_tags.py` _(Backported from 3.14)_
 - A `ValueError` raised during the type check of `TagDecoratorBase` will be converted into a `TagHadUnsupportArgument`.
+- Changed `Configuration.get` signature to match Python 3.12 `Mapping.get` signature.
 
 ### Fixed
 

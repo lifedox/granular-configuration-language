@@ -265,7 +265,9 @@ class TagDecoratorBase(typ.Generic[T], abc.ABC):
                     else:
                         pass  # pragma: no cover
                 except ValueError:
-                    raise TagHadUnsupportArgument(f"`{tag}` supports: {user_friendly_type}. Got: `{repr(node)}`") from None
+                    raise TagHadUnsupportArgument(
+                        f"`{tag}` supports: {user_friendly_type}. Got: `{repr(node)}`"
+                    ) from None
 
                 # Fallback Exception
                 raise TagHadUnsupportArgument(f"`{tag}` supports: {user_friendly_type}. Got: `{repr(node)}`")
