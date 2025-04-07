@@ -15,6 +15,8 @@
 - Added `!EagerParseFile` and `!EagerOptionalParseFile` Tags
 - Added Undocumented Tags:
   - `!LoadBindary` and `!EagerLoadBinary` Tag to test binary EagerIO
+- `TagHadUnsupportArgument` exception.
+  - Inherits from `ValueError`, which was previously used.
 
 ### Changed
 
@@ -25,11 +27,12 @@
     - Defaults as enabled. `-l`, `--long` option disables.
   - Changed internal Tag Function names to be shorter for `handler` column.
   - Improved `--help` message.
-    - Help message uses  `python -m granular_configuration_language.available_plugins` instead of `available_plugins.py` _(Backported from 3.14)_
+    - Help message uses `python -m granular_configuration_language.available_plugins` instead of `available_plugins.py` _(Backported from 3.14)_
 - Changes to `available_tags`:
   - Added `eio_inner_type` column
   - Improved `--help` message.
-    - Help message uses  `python -m granular_configuration_language.available_tags` instead of `available_tags.py` _(Backported from 3.14)_
+    - Help message uses `python -m granular_configuration_language.available_tags` instead of `available_tags.py` _(Backported from 3.14)_
+- A `ValueError` raised during the type check of `TagDecoratorBase` will be converted into a `TagHadUnsupportArgument`.
 
 ### Fixed
 

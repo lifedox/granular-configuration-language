@@ -87,3 +87,11 @@ class RefMustStartFromRoot(Exception):
 
 class ReservedFileExtension(Exception):
     pass
+
+
+class TagHadUnsupportArgument(ValueError):
+    """
+    .. versionadded:: 2.3.0
+    """
+
+    pass

@@ -8,7 +8,7 @@ import typing as typ
 
 from ruamel.yaml import MappingNode, Node, SafeConstructor, ScalarNode, SequenceNode
 
-from granular_configuration_language.exceptions import ErrorWhileLoadingTags
+from granular_configuration_language.exceptions import ErrorWhileLoadingTags, TagHadUnsupportArgument
 from granular_configuration_language.yaml.classes import RT, StateHolder, T, Tag
 from granular_configuration_language.yaml.decorators._tag_tracker import HandlerAttributes, tracker
 from granular_configuration_language.yaml.load._constructors import construct_mapping, construct_sequence
@@ -19,7 +19,7 @@ elif typ.TYPE_CHECKING:
     from typing_extensions import override
 else:
 
-    def override(func: typ.Callable) -> typ.Callable:
+    def override(func: tabc.Callable) -> tabc.Callable:
         return func
 
 
@@ -249,23 +249,26 @@ class TagDecoratorBase(typ.Generic[T], abc.ABC):
         ) -> None:
             @tracker.wraps(handler)
             def type_handler(constructor: SafeConstructor, node: Node) -> RT:
-                if isinstance(node, ScalarNode):
-                    value = constructor.construct_scalar(node)
-                    if isinstance(value, str) and scalar_node_type_check(value):
-                        return handler(tag, scalar_node_transformer(value), state)
-                elif isinstance(node, SequenceNode):
-                    value = construct_sequence(state.options.sequence_func, constructor, node)
-                    if isinstance(value, tabc.Sequence) and sequence_node_type_check(value):
-                        return handler(tag, sequence_node_transformers(value), state)
-                elif isinstance(node, MappingNode):
-                    value = construct_mapping(state.options.obj_pairs_func, constructor, node)
-                    if isinstance(value, tabc.Mapping) and mapping_node_type_check(value):
-                        return handler(tag, mapping_node_transformer(value), state)
-                else:
-                    pass  # pragma: no cover
+                try:
+                    if isinstance(node, ScalarNode):
+                        value = constructor.construct_scalar(node)
+                        if isinstance(value, str) and scalar_node_type_check(value):
+                            return handler(tag, scalar_node_transformer(value), state)
+                    elif isinstance(node, SequenceNode):
+                        value = construct_sequence(state.options.sequence_func, constructor, node)
+                        if isinstance(value, tabc.Sequence) and sequence_node_type_check(value):
+                            return handler(tag, sequence_node_transformers(value), state)
+                    elif isinstance(node, MappingNode):
+                        value = construct_mapping(state.options.obj_pairs_func, constructor, node)
+                        if isinstance(value, tabc.Mapping) and mapping_node_type_check(value):
+                            return handler(tag, mapping_node_transformer(value), state)
+                    else:
+                        pass  # pragma: no cover
+                except ValueError:
+                    raise TagHadUnsupportArgument(f"`{tag}` supports: {user_friendly_type}. Got: `{repr(node)}`") from None
 
                 # Fallback Exception
-                raise ValueError(f"`{tag}` supports: {user_friendly_type}. Got: `{repr(node)}`")
+                raise TagHadUnsupportArgument(f"`{tag}` supports: {user_friendly_type}. Got: `{repr(node)}`")
 
             constructor.add_constructor(tag, type_handler)
 
