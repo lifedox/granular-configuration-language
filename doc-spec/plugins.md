@@ -51,6 +51,8 @@ def handler(value: str) -> Masked:  # Function Signature
     return Masked(getSecret(value)) # Tag Logic
 ```
 
+&nbsp;
+
 ### Function Signature
 
 - **Name**: Completely up to you. Only used for documentation and exception messages.
@@ -133,31 +135,132 @@ def handler(tag: Tag, value: str) -> Masked:  # Function Signature
 
 ## Creating your own Tag Type Decorator
 
-[Tag Type Decorators](#tag-type-decorator) are created by implementing {py:class}`.TagDecoratorBase`. See the doc-string.
+[Tag Type Decorators](#tag-type-decorator) are created by implementing {py:class}`.TagDecoratorBase`.
 
 [Real Examples](https://github.com/lifedox/granular-configuration-language/tree/main/granular_configuration_language/yaml/decorators/_type_checking.py)
+
+### Defining the Type of your Tag Type Decorator
+
+```python
+import typing
+from granular_configuration_language.yaml.decorators import (
+    TagDecoratorBase,
+)
+
+class float_tag(TagDecoratorBase[float]):
+    Type: typing.TypeAlias = float
+
+    @property
+    def user_friendly_type(self) -> str:
+        return "float"
+```
+
+The required portion of {py:class}`.TagDecoratorBase` is to set the Python type a Tag takes as input. You set it in the {py:class}`~typing.Generic` argument, and you implement the {py:meth}`~.TagDecoratorBase.user_friendly_type` property. The property is expected to match Generic argument, but to be as straightforward as possible. For example, {py:class}`.sequence_of_any_tag` uses `collections.abc.Sequence[typing.Any]` as Generic argument, but property just returns `list[Any]`.
+
+The `Type` {py:class}`~typing.TypeAlias` is just for nicety for users of your Tag Type Decorator. Case in point, `str | tuple[str, typing.Any]]` is more effort to type than `string_or_twople_tag.Type`.
+
+:::{admonition} Implementation Excuse
+:class: note
+:collapsible: closed
+
+While it is possible to implement {py:meth}`~.TagDecoratorBase.user_friendly_type` in the {py:class}`.TagDecoratorBase`. The properties required are not defined in PyRight, and it needs a lot of checks and special case handling, especially since I don't want `collections.abc.` or `typing.` Guaranteed to never break and handling all possible case, if author of the Tag Type Decorator just writes what they think is best.
+
+:::
+
+### Configuring your Tag Type Decorator
+
+```python
+class float_tag(TagDecoratorBase[float]):
+
+    # ...
+
+    @typing.override  # Python 3.12+
+    def scalar_node_type_check(
+        self,
+        value: typing.Any,
+    ) -> typing.TypeGuard[float]:
+        """"""  # Make undocumented
+
+        # As of Version 2.3.0, a `ValueError` raised 
+        # during `type_check` or `transformers` will
+        # be converted into a properly messaged 
+        # `TagHadUnsupportArgument`, so this method
+        # could just be `return True`.
+
+        try:
+            float(value)
+            return True
+        except ValueError:
+            return False
+
+    @typing.override  # Python 3.12+
+    def scalar_node_transformer(
+        self,
+        value: typing.Any,
+    ) -> float:
+        """"""  # Make undocumented
+        return float(value)
+```
+
+YAML Tags support Scalar, Sequence, and Mapping YAML types. These are {py:class}`str`, {py:class}`~collections.abc.Sequence`, and {py:class}`~collections.abc.Mapping` in Python.
+
+For each YAML type, there is an associated `type_check` method. These methods are called after the YAML type is checked. Use these to narrow the type of your Tag Type Decorator.
+
+- {py:meth}`~.TagDecoratorBase.scalar_node_type_check`
+  - Called if the `value` type is a `str`.
+  - Default is {py:data}`False`.
+  - Return type is {py:data}`TypeGuard[T] <typing.TypeGuard>`, which is a {py:class}`bool` value.
+- {py:meth}`~.TagDecoratorBase.sequence_node_type_check`
+  - Called if the `value` type is a `collections.abc.Sequence[typing.Any]`.
+  - Default is {py:data}`False`.
+  - Return type is {py:data}`TypeGuard[T] <typing.TypeGuard>`, which is a {py:class}`bool` value.
+- {py:meth}`~.TagDecoratorBase.mapping_node_type_check`
+  - Called if the `value` type is a `collections.abc.Mapping[typing.Any, typing.Any]`.
+  - Default is {py:data}`False`.
+  - Return type is {py:data}`TypeGuard[T] <typing.TypeGuard>`, which is a {py:class}`bool` value.
+
+If you need to mutate the value from a YAML type to a different Python type, there are `transformer` methods. These methods are called after the `type_check` method.
+
+- {py:meth}`~.TagDecoratorBase.scalar_node_transformer`
+  - Called if the `value` type is a `str`.
+  - Default is input (identity operation).
+  - Return type is {py:class}`~.T`
+- {py:meth}`~.TagDecoratorBase.sequence_node_transformer`
+  - Called if the `value` type is a `collections.abc.Sequence[typing.Any]`.
+  - Default is input (identity operation).
+  - Return type is {py:class}`~.T`
+- {py:meth}`~.TagDecoratorBase.mapping_node_transformer`
+  - Called if the `value` type is a `collections.abc.Mapping[typing.Any, typing.Any]`.
+  - Default is input (identity operation).
+  - Return type is {py:class}`~.T`
+
+:::{tip}
+
+If you generate documentation, it is recommended to override the doc-string with an empty string when you override a `type_check` or `transformer`, as these methods are implementation detail, not public interface.
+
+:::
 
 ---
 
 ## Plugin Compatibility Versioning Note
 
-```{admonition} Notice of Future Intent
+:::{admonition} Notice of Future Intent
 :class: note
 
 `20` in `granular_configuration_language_20_tag` represents 2.0 tag plugin compatibility, and not directly connected to library version. Additional groups will be added only if there is feature change to plugin support.
 
 - A minor plugin change (e.g. `21`) would represent an added feature that requires a structural change but not a change to the primary code.
   - A minor compatibility version bump deprecates any previous compatibility version (e.g. `20`).
-    - Both `20` and `21` would be supported, with `20` deprecated, using a compatibilty layer.
+    - Both `20` and `21` would be supported, with `20` deprecated, using a compatibility layer.
 - A major plugin change (e.g. `30`) would represent a breaking change to plugin, potentially requiring a complete code change.
   - A major compatibility version bump deprecates all previous compatibility versions (e.g. `20` and `21`).
     - If the library does not major version, then `20`, `21`, `30` would be all be supported, with `20` and `21` deprecated, using compatibility layers.
 - A major version bump to this library may or may not introduce a new plugin compatible.
   - It would remove any deprecated versions.
   - If there is no change to plugin compatibility, then only a non-zero minor plugin version would introduce to new major plugin version.
-    - If `21` and `22` were introduced within Version 2 of this library, then Version 3 removes `20` and `21`, keeps `22`, and adds `30` as a duplicate of `22`. Version 4 would remove `22`, keep `30`, and add `40` as deplicate of `30`
+    - If `21` and `22` were introduced within Version 2 of this library, then Version 3 removes `20` and `21`, keeps `22`, and adds `30` as a duplicate of `22`. Version 4 would remove `22`, keep `30`, and add `40` as duplicate of `30`
     - If only `20` exists, then `30` is introduced as a duplicate of `20`, but `20` is not deprecated until a minor or major change.
       - Adding `x0` for every non-breaking major version `x` is to reduce developer overhead. "Just match the major version of the minimum of your supported dependency range."
   - If there is a minor plugin change, then that version becomes the next major compatibility version.
   - If there is a major plugin change, all previously supported compatibility versions are removed.
-```
+    :::
