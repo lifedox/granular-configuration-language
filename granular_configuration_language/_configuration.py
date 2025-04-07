@@ -11,7 +11,7 @@ from weakref import ReferenceType, ref
 from granular_configuration_language._base_path import BasePathPart
 from granular_configuration_language._s import setter_secret
 from granular_configuration_language.exceptions import InvalidBasePathException, PlaceholderConfigurationError
-from granular_configuration_language.yaml.classes import RT, LazyEval, P, Placeholder, T
+from granular_configuration_language.yaml.classes import KT, RT, VT, LazyEval, P, Placeholder, T
 
 if sys.version_info >= (3, 12):
     from typing import override
@@ -88,7 +88,7 @@ class AttributeName(tabc.Iterable[str]):
 
 
 @dataclass_transform(frozen_default=True, eq_default=True, kw_only_default=True)
-class Configuration(tabc.Mapping[typ.Any, typ.Any]):
+class Configuration(typ.Generic[KT, VT], tabc.Mapping[KT, VT]):
     r"""
     This class represents an immutable :py:class:`~collections.abc.Mapping` of
     configuration.
@@ -100,51 +100,65 @@ class Configuration(tabc.Mapping[typ.Any, typ.Any]):
     With you typed class, you can cast a general :py:class:`.Configuration` to
     your subclass via :py:meth:`Configuration.as_typed`.
 
-    .. code-block:: python
+    .. admonition:: :py:meth:`!as_typed` Example
+        :class: hint
+        :collapsible: closed
 
-        class SubConfig(Configuration):
-            c: str
+        .. code-block:: python
 
-        class Config(Configuration):
-            a: int
-            b: SubConfig
+            class SubConfig(Configuration):
+                c: str
 
-        config = ... # A Configuration instance
-        typed = config.as_typed(Config)
+            class Config(Configuration):
+                a: int
+                b: SubConfig
 
-        assert typed.a == 101
-        assert typed.b.c == "test me"
-        assert typed["a"] == 101
+            config = ... # A Configuration instance
+            typed = config.as_typed(Config)
 
-        # Or loading with LazyLoadConfiguration
+            assert typed.a == 101
+            assert typed.b.c == "test me"
+            assert typed["a"] == 101
 
-        typed = LazyLoadConfiguration("config.yaml").as_typed(Config)
+            # Or loading with LazyLoadConfiguration
 
-    .. admonition:: Advisement
-        :class: tip
+            typed = LazyLoadConfiguration("config.yaml").as_typed(Config)
 
-        Consider using :py:meth:`LazyLoadConfiguration.as_typed` to load your
-        entire configuration as a typed :py:class:`.Configuration`.
+        .. admonition:: Advisement
+            :class: tip
 
-    .. [#f1]
+            Consider using :py:meth:`LazyLoadConfiguration.as_typed` to load your
+            entire configuration as a typed :py:class:`.Configuration`.
 
-        See :py:func:`~typing.dataclass_transform` → "on base class" for
-        implementation details
+    .. admonition:: Footnotes
+        :collapsible: closed
+
+        .. [#f1]
+
+            See :py:func:`~typing.dataclass_transform` → "on base class" for
+            implementation details
+
+    .. admonition:: Changes
+        :collapsible: closed
+
+        .. versionchanged:: 2.3.0
+            Added Generic Type Parameters, which default to :py:data:`~typing.Any`.
+
     """
 
     @typ.overload
     def __init__(self) -> None: ...
 
     @typ.overload
-    def __init__(self, mapping: tabc.Mapping[typ.Any, typ.Any]) -> None: ...
+    def __init__(self, mapping: tabc.Mapping[KT, VT], /) -> None: ...
 
     @typ.overload
-    def __init__(self, iterable: tabc.Iterable[tuple[typ.Any, typ.Any]]) -> None: ...
+    def __init__(self, iterable: tabc.Iterable[tuple[KT, VT]], /) -> None: ...
 
     @typ.overload
-    def __init__(self, **kwargs: typ.Any) -> None: ...
+    def __init__(self, **kwargs: VT) -> None: ...
 
-    def __init__(self, *arg: tabc.Mapping | tabc.Iterable[tuple[typ.Any, typ.Any]], **kwargs: typ.Any) -> None:
+    def __init__(self, *arg: tabc.Mapping[KT, VT] | tabc.Iterable[tuple[KT, VT]], **kwargs: VT) -> None:
         self.__data: dict[typ.Any, typ.Any] = dict(*arg, **kwargs)
         self.__attribute_name = AttributeName.as_root()
 
@@ -153,7 +167,7 @@ class Configuration(tabc.Mapping[typ.Any, typ.Any]):
     #################################################################
 
     @override
-    def __iter__(self) -> tabc.Iterator:
+    def __iter__(self) -> tabc.Iterator[KT]:
         return iter(self.__data)
 
     @override
@@ -161,7 +175,7 @@ class Configuration(tabc.Mapping[typ.Any, typ.Any]):
         return len(self.__data)
 
     @override
-    def __getitem__(self, name: typ.Any) -> typ.Any:
+    def __getitem__(self, name: KT) -> VT:
         try:
             value = self.__data[name]
         except KeyError:
@@ -189,7 +203,7 @@ class Configuration(tabc.Mapping[typ.Any, typ.Any]):
 
         if isinstance(value, Configuration):
             value.__attribute_name = self.__attribute_name.append_suffix(name)
-            return value
+            return value  # type: ignore  # instead of casting
         else:
             return value
 
@@ -201,17 +215,24 @@ class Configuration(tabc.Mapping[typ.Any, typ.Any]):
     def __contains__(self, key: typ.Any) -> bool:
         return key in self.__data
 
+    @typ.overload
+    def get(self, key: KT, /) -> VT | None: ...
+
+    @typ.overload
+    def get(self, key: KT, /, default: VT | T) -> VT | T: ...
+
     @override
-    def get(self, key: typ.Any, default: typ.Any = None) -> typ.Any:
+    def get(self, key: KT, default: VT | T | None = None) -> VT | T | None:
         """
         Return the value for key if key is in the :py:class:`Configuration`, else default.
 
-        Parameters:
-            key (~typing.Any): Key being fetched
-            default (~typing.Any, optional): Default value. Defaults to :py:data:`None`.
+        .. versionchanged:: 2.3.0
+            Added typing overload. ``key`` is typed as positional.
 
-        Returns:
-            ~typing.Any: Value
+        :param (KT) key: Key being fetched
+        :param (VT | T)  default: Default value. Defaults to :py:data:`None`.
+        :return: Fetched value or default
+        :rtype:  VT | T | None
         """
         return self[key] if self.exists(key) else default
 
@@ -223,14 +244,14 @@ class Configuration(tabc.Mapping[typ.Any, typ.Any]):
     def __repr__(self) -> str:
         return repr(self.__data)
 
-    def __deepcopy__(self, memo: dict[int, typ.Any]) -> Configuration:
-        other = Configuration()
+    def __deepcopy__(self, memo: dict[int, typ.Any]) -> Configuration[KT, VT]:
+        other: Configuration[KT, VT] = Configuration()
         memo[id(self)] = other
         other.__data = copy.deepcopy(self.__data, memo=memo)
         return other
 
-    def __copy__(self) -> Configuration:
-        other = Configuration()
+    def __copy__(self) -> Configuration[KT, VT]:
+        other: Configuration[KT, VT] = Configuration()
         other.__data = copy.copy(self.__data)
         return other
 
@@ -253,7 +274,7 @@ class Configuration(tabc.Mapping[typ.Any, typ.Any]):
     # Public interface methods
     #################################################################
 
-    def __getattr__(self, name: str) -> typ.Any:
+    def __getattr__(self, name: str) -> VT:
         """
         Provides a potentially cleaner path as an alternative to :py:meth:`~object.__getitem__`.
 
@@ -276,7 +297,7 @@ class Configuration(tabc.Mapping[typ.Any, typ.Any]):
         if name not in self:
             raise AttributeError(f"Request attribute `{self.__attribute_name.with_suffix(name)}` does not exist")
 
-        return self[name]
+        return self[name]  # type: ignore  # instead of casting
 
     def exists(self, key: typ.Any) -> bool:
         """
@@ -299,7 +320,7 @@ class Configuration(tabc.Mapping[typ.Any, typ.Any]):
             if isinstance(value, Configuration):
                 value.evaluate_all()
 
-    def as_dict(self) -> dict[typ.Any, typ.Any]:
+    def as_dict(self) -> dict[KT, VT]:
         """
         Returns this :py:class:`Configuration` as standard Python :py:class:`dict`.
         Nested :class:`Configuration` objects will also be converted.
@@ -313,12 +334,12 @@ class Configuration(tabc.Mapping[typ.Any, typ.Any]):
         :return: A shallow :py:class:`dict` copy
         :rtype: dict
         """
-        return dict(
-            starmap(
-                lambda key, value: (key, value.as_dict() if isinstance(value, Configuration) else value),
-                self.items(),
-            )
+        evalute_item: tabc.Callable[[tuple[KT, VT]], tuple[KT, VT]]
+        evalute_item = lambda key, value: (  # type: ignore   # instead of casting
+            key,
+            value.as_dict() if isinstance(value, Configuration) else value,
         )
+        return dict(starmap(evalute_item, self.items()))
 
     def as_json_string(self, *, default: tabc.Callable[[typ.Any], typ.Any] | None = None, **kwds: typ.Any) -> str:
         r"""
@@ -375,7 +396,7 @@ class Configuration(tabc.Mapping[typ.Any, typ.Any]):
         """
 
         try:
-            value = self[key]
+            value: typ.Any = self[key]
         except KeyError:
             if "default" in kwds:
                 return kwds["default"]
@@ -458,3 +479,6 @@ class MutableConfiguration(tabc.MutableMapping[typ.Any, typ.Any], Configuration)
 
 
 C = typ.TypeVar("C", bound=Configuration)
+"""
+Generic Type that must be :py:class:`.Configuration` or a subclass
+"""

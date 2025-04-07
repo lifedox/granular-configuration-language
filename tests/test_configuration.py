@@ -265,3 +265,13 @@ test:
 
     for _, value in test.test._raw_items():
         assert not isinstance(value, LazyEval)
+
+
+def test_typevar_default() -> None:
+    any_int = Configuration(a=1)
+    a: Configuration[str, int] = any_int
+    assert a
+
+    str_int = Configuration(dict(a=1))
+    b: Configuration[str, int] = str_int
+    assert b

@@ -152,16 +152,15 @@ example_config: # Example Base Path
 If you want code completion and typing checking, you can use {py:class}`.Configuration` like a {py:func}`dataclass <dataclasses.dataclass>` and {py:meth}`.LazyLoadConfiguration.as_typed` to apply your subclass.
 
 ```python
-from collections.abc import Mapping
 from granular_configuration_language import Configuration, LazyLoadConfiguration
 
 class Setting2Config(Configuration):
     sub_setting1: str
 
 class Config(Configuration):
-    setting1: string
+    setting1: str
     setting2: Setting2Config
-    example_of_codes: Mapping[int, str]
+    example_of_codes: Configuration[int, str]
 
 CONFIG = LazyLoadConfiguration(
   Path(__file___).parent / "config.yaml",
@@ -208,14 +207,14 @@ This does not apply any runtime checks, just enables static code analysis.
       .typed_get(str, "setting1")
     )
     (
-
       CONFIG.config
       .typed_get(Configuration, "setting2")
-      .typed_get(str, "sub_setting1"))
-    (
+      .typed_get(str, "sub_setting1")
+    )
+    val = Configuration[int, str]: (
       CONFIG.config
       .typed_get(
-        Mapping[int, str],
+        Configuration,
         "example_of_codes",
       )
     )

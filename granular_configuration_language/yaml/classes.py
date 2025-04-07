@@ -19,10 +19,36 @@ else:
         return func
 
 
+if sys.version_info >= (3, 13):
+    from typing import TypeVar
+
+    KT = TypeVar("KT", default=typ.Any)
+    VT = TypeVar("VT", default=typ.Any)
+elif typ.TYPE_CHECKING:
+    from typing_extensions import TypeVar
+
+    KT = TypeVar("KT", default=typ.Any)
+    VT = TypeVar("VT", default=typ.Any)
+else:
+    from typing import TypeVar
+
+    KT = TypeVar("KT")
+    VT = TypeVar("VT")
+
+
 P = typ.ParamSpec("P")
-T = typ.TypeVar("T")
-RT = typ.TypeVar("RT")
-IT = typ.TypeVar("IT")
+T = TypeVar("T")
+"""
+Generic Type
+"""
+RT = TypeVar("RT")
+"""
+Generic Return Type
+"""
+IT = TypeVar("IT")
+"""
+Generic Intermediate Type
+"""
 
 RootType = typ.NewType("RootType", tabc.Mapping)
 """
