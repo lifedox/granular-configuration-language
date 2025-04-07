@@ -33,7 +33,7 @@ class float_tag(TagDecoratorBase[float]):
     @override
     def scalar_node_type_check(
         self,
-        value: typing.Any,
+        value: str,
     ) -> typing.TypeGuard[float]:
         """"""  # Make undocumented
         try:
