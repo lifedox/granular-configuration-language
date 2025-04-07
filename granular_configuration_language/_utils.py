@@ -15,7 +15,7 @@ elif typ.TYPE_CHECKING:
     from typing_extensions import override
 else:
 
-    def override(func: typ.Callable) -> typ.Callable:
+    def override(func: tabc.Callable) -> tabc.Callable:
         return func
 
 
