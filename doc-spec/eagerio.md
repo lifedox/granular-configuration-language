@@ -1,4 +1,24 @@
-# EagerIO vs Laziness (`asyncio`)
+# IO blocking when using `asyncio` (EagerIO)
+
+:::{admonition} Unfinished Documentation
+:class: error
+Documentation for EagerIO is in-progress. Some sentences and paragraphs are incomplete.
+
+---
+
+The Code Specification is a complete:
+
+- {py:class}`.EagerIOConfigurationProxy`
+- {py:meth}`.LazyLoadConfiguration.eager_load`
+
+---
+
+EagerIO Tags are:
+
+- `!EagerParseFile`
+- `!EagerOptionalParseFile`
+
+:::
 
 :::{admonition} Philosophical Thought Process
 :class: note
@@ -6,7 +26,7 @@
 
 {py:mod}`asyncio` is an important tool for concurrency.
 
-While this library's interface is highly compatible with async code, since most of it is straightforward getting objects out of mappings. There are some places where the blocking code does exist.
+While this library's interface is highly compatible with async code, since most of it is straightforward getting objects out of mappings. There are some places where blocking code does exist.
 
 Namely:
 
@@ -43,3 +63,24 @@ Another question in implementation is optionality:
 - Force-In: Apps and end-users choose to use EagerIO for all Configurations.
 
 :::
+
+## TLDR
+
+EagerIO is an optional feature set that undoes the Laziness of the library's default behavior, so that Fetch calls are non-blocking (or, at least, minimally blocking).
+
+- EagerIO Tags run IO in a background thread
+  - The thread is launched at Load Time.
+  - Logic is run at Fetch.
+  - The performance cost of the thread due to the GIL is minimal.
+- {py:meth}`.LazyLoadConfiguration.eager_load` loads and build the configuration in a background thread.
+  - The thread is launched when {py:meth}`~.LazyLoadConfiguration.eager_load` is called.
+  - Load, Merge, and Build all occur in the thread.
+    - EagerIO Tags spawn at their thread from this thread.
+  - The performance cost of the thread due to the GIL is maximal.
+
+## Implementation Notes
+
+- All threads are managed using a {py:class}`~concurrent.futures.Future` from {py:class}`concurrent.futures.ThreadPoolExecutor` pools.
+  - There is no optimization to have a shared pool per {py:class}`.LazyLoadConfiguration` at this time.
+    - If EagerIO finds use shared pools can be requested.
+  - Pools have a max_worker count of 1, because each pool does one thing.

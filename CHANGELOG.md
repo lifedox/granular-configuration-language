@@ -7,15 +7,17 @@
 ### Added
 
 - Added `granular_configuration_language.yaml.file_ops` module
-- Added `granular_configuration_language.yaml.decorator.eagerio` module
-- Added `LazyLoadConfiguration.eager_load`
+  - Refactored from private modules.
+- Added EagerIO Feature Set
+  - Added `granular_configuration_language.yaml.decorator.eagerio` module
+  - Added `LazyLoadConfiguration.eager_load`
+  - Added `!EagerParseFile` and `!EagerOptionalParseFile` Tags
+  - Added Undocumented Tags:
+    - `!LoadBinary` and `!EagerLoadBinary` Tag to test binary EagerIO
 - Added `granular_configuration_language.yaml.decorators.with_tag` decorator
   - Rewrote tag attribute tracking to add support.
   - `G_CONFIG_ENABLE_TAG_TRACKER` environment variable setting removed.
-- Added `!EagerParseFile` and `!EagerOptionalParseFile` Tags
-- Added Undocumented Tags:
-  - `!LoadBindary` and `!EagerLoadBinary` Tag to test binary EagerIO
-- `TagHadUnsupportArgument` exception.
+- Added `TagHadUnsupportArgument` exception.
   - Inherits from `ValueError`, which was previously used.
 - Added Generic Type Parameters to `Configuration`
   - Both default to `typing.Any`, so no behavior change.
@@ -35,12 +37,13 @@
   - Improved `--help` message.
     - Help message uses `python -m granular_configuration_language.available_tags` instead of `available_tags.py` _(Backported from 3.14)_
 - A `ValueError` raised during the type check of `TagDecoratorBase` will be converted into a `TagHadUnsupportArgument`.
-- Changed `Configuration.get` signature to match Python 3.12 `Mapping.get` signature.
 
 ### Fixed
 
 - Made the function parameter for all decorators positional-only.
   - This is to enforce clearer usage in the unexpected case of not using `@`.
+- Changed `Configuration.get` type signature to match Python 3.12 `Mapping.get` signature.
+  - i.e. `key` is positional-only. (Runtime does not enforce.)
 
 ## 2.2.3
 
@@ -68,7 +71,7 @@
 ### Changed
 
 - `SafeConfigurationProxy` is now registered as a subclass of `Configuration`.
-- Updated many docstrings to improve generated documentation.
+- Updated many doc-strings to improve generated documentation.
 
 ## 2.2.0
 
