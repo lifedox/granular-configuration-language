@@ -42,15 +42,20 @@ class SafeConfigurationProxy(Mapping):
     Wraps a :py:class:`.LazyLoadConfiguration` instance to proxy all method and
     attribute calls to its :py:class:`.Configuration` instance.
 
-    Passes ``isinstance( ... , Configuration)`` checks, as this class is :py:meth:`~abc.ABCMeta.register`-ed as a subclass of :py:class:`.Configuration`.
+    Passes ``isinstance( ... , Configuration)`` checks, as this class is
+    :py:meth:`~abc.ABCMeta.register`-ed as a subclass of
+    :py:class:`.Configuration`.
 
     .. admonition:: Implementation Reasoning
         :collapsible: closed
 
-        Wrapping :py:class:`.LazyLoadConfiguration` maintains all laziness build
-        into :py:class:`.LazyLoadConfiguration`, while exposing all of :py:class:`.Configuration`
+        Wrapping :py:class:`.LazyLoadConfiguration` maintains all laziness
+        build into :py:class:`.LazyLoadConfiguration`, while exposing all
+        of :py:class:`.Configuration`
 
-        This class is used behind :py:func:`typing.cast` in :py:meth:`.LazyLoadConfiguration.as_typed` so it is not exposed explicitly.
+        This class is used behind a :py:func:`typing.cast` in
+        :py:meth:`.LazyLoadConfiguration.as_typed`, so it is not exposed
+        explicitly.
 
     :param LazyLoadConfiguration llc:
         :py:class:`.LazyLoadConfiguration` instance to be wrapped
@@ -105,20 +110,19 @@ class EagerIOConfigurationProxy(Mapping):
     Wraps a :py:class:`.LazyLoadConfiguration` instance to proxy all method and
     attribute calls to its :py:class:`.Configuration` instance.
 
-    Passes ``isinstance( ... , Configuration)`` checks, as this class is :py:meth:`~abc.ABCMeta.register`-ed as a subclass of :py:class:`.Configuration`.
+    Passes ``isinstance( ... , Configuration)`` checks, as this class is
+    :py:meth:`~abc.ABCMeta.register`-ed as a subclass of
+    :py:class:`.Configuration`.
 
     .. admonition:: Part of the EagerIO feature set
         :class: caution
 
-        This immediately spawns a thread to load and build the Configuration in the background.
+        This immediately spawns a thread to load and build the Configuration in
+        the background, so that future calls are non-/minimally blocking.
 
-    .. admonition:: Implementation Reasoning
-        :collapsible: closed
-
-        Wrapping :py:class:`.LazyLoadConfiguration` maintains all laziness build
-        into :py:class:`.LazyLoadConfiguration`, while exposing all of :py:class:`.Configuration`
-
-        This class is used behind :py:func:`typing.cast` in :py:meth:`.LazyLoadConfiguration.eager_load` so it is not exposed explicitly.
+        This class is used behind a :py:func:`typing.cast` in
+        :py:meth:`.LazyLoadConfiguration.eager_load`, so it is not exposed
+        explicitly.
 
     :param LazyLoadConfiguration llc:
         :py:class:`.LazyLoadConfiguration` instance to be wrapped
@@ -171,13 +175,15 @@ class EagerIOConfigurationProxy(Mapping):
 
 class LazyLoadConfiguration(Mapping):
     r"""
-    Provides a lazy interface for loading Configuration from file paths on first access.
+    Provides a lazy interface for loading Configuration from file paths on
+    first access.
 
     You can optionally enable pull locations from an environment variable.
 
     See :py:meth:`LazyLoadConfiguration.as_typed` for type annotated usage.
 
-    ``inject_before`` and ``inject_after`` allow you to inject Python-created settings into you configuration without use a file.
+    ``inject_before`` and ``inject_after`` allow you to inject Python-created
+    settings into you configuration without use a file.
 
     .. admonition:: :py:meth:`!as_typed` Example
         :class: hint
@@ -250,10 +256,12 @@ class LazyLoadConfiguration(Mapping):
         Defines the subsection of the configuration file to use. See Examples for usage options.
     :param bool, optional use_env_location:
         - Enabled to use the default environment variable location.
-        - Setting to :py:data:`True` is only required if you don't change ``env_location_var_name`` from its default value.
+        - Setting to :py:data:`True` is only required if you don't change
+          ``env_location_var_name`` from its default value.
     :param str, optional env_location_var_name:
         - Specify what environment variable to check for additional file paths.
-        - The Environment Variable is read as a comma-delimited list of configuration path that will be appended to ``load_order_location`` list.
+        - The Environment Variable is read as a comma-delimited list of
+          configuration path that will be appended to ``load_order_location`` list.
         - Setting the Environment Variable is always optional.
         - *Default*: ``G_CONFIG_LOCATION``
     :param Configuration, optional inject_before:
@@ -359,9 +367,11 @@ class LazyLoadConfiguration(Mapping):
 
     def as_typed(self, typed_base: type[C]) -> C:
         """
-        Create a proxy that is cast to provide :py:class:`Configuration` subclass with typed annotated attributes.
+        Create a proxy that is cast to provide :py:class:`Configuration`
+        subclass with typed annotated attributes.
 
-        This proxy ensures laziness is preserved and is fully compatible with :py:class:`Configuration`.
+        This proxy ensures laziness is preserved and is fully compatible with
+        :py:class:`Configuration`.
 
         .. admonition:: Example
             :class: hint
@@ -386,15 +396,22 @@ class LazyLoadConfiguration(Mapping):
             :class: note
             :collapsible: closed
 
-            This method uses :py:func:`typing.cast` to return a :py:class:`.SafeConfigurationProxy` of this instance
+            This method uses :py:func:`typing.cast` to return a
+            :py:class:`.SafeConfigurationProxy` of this instance
             as the requested :py:class:`Configuration` subclass.
-            This enables typing checking and typed attributes with minimal a runtime cost.
-            It is limited to just improving developer experience.
 
-            Use ``Pydantic``, or some like it, if you require runtime type checking.
+            This enables typing checking and typed attributes with minimal a
+            runtime cost, but it is limited to just improving developer
+            experience.
 
-        :param type[C] typed_base: Subclass of :py:class:`Configuration` to assume
-        :return: :py:class:`.SafeConfigurationProxy` instance that has been cast to the provided type.
+            Use ``Pydantic``, or some like it, if you require runtime type
+            checking.
+
+        :param type[C] typed_base:
+            Subclass of :py:class:`Configuration` to assume
+        :return:
+            :py:class:`.SafeConfigurationProxy` instance that has been cast to
+            the provided type.
         :rtype: C
         """
         return typ.cast(C, SafeConfigurationProxy(self))
@@ -403,19 +420,27 @@ class LazyLoadConfiguration(Mapping):
         """
         .. versionadded:: 2.3.0
 
-        This will eagerly load this instance, so that there is minimum IO load on future.
+        This will eagerly load this instance, so that there is minimum IO load
+        on future.
 
-        This is intended to play well with :py:mod:`asyncio`, by avoiding blocking the main thread on IO calls, without introducing an ``await`` paradigm just for a few one-time calls.
+        This is intended to play well with :py:mod:`asyncio`, by avoiding
+        blocking the main thread on IO calls, without introducing an ``await``
+        paradigm just for a few one-time calls.
 
         .. admonition:: Part of the EagerIO feature set
             :class: caution
 
-            Using :py:meth:`eager_load` causes immediate loading of this instance in a background thread.
+            Using :py:meth:`eager_load` causes immediate loading of this
+            instance in a background thread, so that future calls are
+            non-/minimally blocking.
 
         Behaves like :py:meth:`.as_typed` otherwise.
 
-        :param type[C] typed_base: Subclass of :py:class:`Configuration` to assume
-        :return: :py:class:`.EagerIOConfigurationProxy` instance that has been cast to the provided type.
+        :param type[C] typed_base:
+            Subclass of :py:class:`Configuration` to assume
+        :return:
+            :py:class:`.EagerIOConfigurationProxy` instance that has been cast
+            to the provided type.
         :rtype: C
         """
         return typ.cast(C, EagerIOConfigurationProxy(self))
@@ -423,7 +448,8 @@ class LazyLoadConfiguration(Mapping):
 
 class MutableLazyLoadConfiguration(LazyLoadConfiguration, MutableMapping):
     r"""
-    Provides a lazy interface for loading Configuration from file paths on first access.
+    Provides a lazy interface for loading Configuration from file paths on
+    first access.
 
     You can optionally enable pull locations from an environment variable.
 
@@ -437,13 +463,17 @@ class MutableLazyLoadConfiguration(LazyLoadConfiguration, MutableMapping):
     :param ~pathlib.Path | str | os.PathLike load_order_location:
             File path to configuration file
     :param str | ~collections.abc.Sequence[str], optional base_path:
-        Defines the subsection of the configuration file to use. See Examples for usage options.
+        Defines the subsection of the configuration file to use.
+        See Examples for usage options.
     :param bool, optional use_env_location:
         - Enabled to use the default environment variable location.
-        - Setting to :py:data:`True` is only required if you don't change ``env_location_var_name`` from its default value.
+        - Setting to :py:data:`True` is only required if you don't change
+          ``env_location_var_name`` from its default value.
     :param str, optional env_location_var_name:
         - Specify what environment variable to check for additional file paths.
-        - The Environment Variable is read as a comma-delimited list of configuration path that will be appended to ``load_order_location`` list.
+        - The Environment Variable is read as a comma-delimited list of
+          configuration path that will be appended to ``load_order_location``
+          list.
         - Setting the Environment Variable is always optional.
         - *Default*: ``G_CONFIG_LOCATION``
 
@@ -483,7 +513,9 @@ class MutableLazyLoadConfiguration(LazyLoadConfiguration, MutableMapping):
     @property
     @override
     def config(self) -> MutableConfiguration:
-        """Load and fetch the configuration. Configuration is cached for subsequent calls.
+        """
+        Load and fetch the configuration. Configuration is cached for
+        subsequent calls.
 
         .. admonition:: Thread-safe
             :class: tip
@@ -506,7 +538,7 @@ class MutableLazyLoadConfiguration(LazyLoadConfiguration, MutableMapping):
     @override
     def as_typed(self, typed_base: type[C]) -> typ.NoReturn:
         """
-        :py:meth:`as_typed` is not supported for :py:class:`MutableLazyLoadConfiguration`.
+        Not supported for :py:class:`MutableLazyLoadConfiguration`.
         Use :py:class:`LazyLoadConfiguration`.
         """
         raise NotImplementedError(
@@ -516,7 +548,7 @@ class MutableLazyLoadConfiguration(LazyLoadConfiguration, MutableMapping):
     @override
     def eager_load(self, typed_base: type[C]) -> typ.NoReturn:
         """
-        :py:meth:`eager_load` is not supported for :py:class:`MutableLazyLoadConfiguration`.
+        Not supported for :py:class:`MutableLazyLoadConfiguration`.
         Use :py:class:`LazyLoadConfiguration`.
         """
         raise NotImplementedError(
