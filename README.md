@@ -37,7 +37,7 @@
 | granular\_configuration\_language/yaml/\_tags/\_sub.py                                            |        8 |        0 |        0 |        0 |     100.00% |           |
 | granular\_configuration\_language/yaml/\_tags/\_uuid.py                                           |        8 |        0 |        0 |        0 |     100.00% |           |
 | granular\_configuration\_language/yaml/\_tags/func\_and\_class.py                                 |       34 |        0 |        4 |        0 |     100.00% |           |
-| granular\_configuration\_language/yaml/classes.py                                                 |      103 |        0 |        4 |        0 |     100.00% |           |
+| granular\_configuration\_language/yaml/classes.py                                                 |      104 |        0 |        4 |        0 |     100.00% |           |
 | granular\_configuration\_language/yaml/decorators/\_\_init\_\_.py                                 |        7 |        0 |        0 |        0 |     100.00% |           |
 | granular\_configuration\_language/yaml/decorators/\_base.py                                       |       89 |        0 |       12 |        0 |     100.00% |           |
 | granular\_configuration\_language/yaml/decorators/\_lazy.py                                       |       39 |        0 |        4 |        0 |     100.00% |           |
@@ -53,7 +53,7 @@
 | granular\_configuration\_language/yaml/decorators/eager\_io/\_funcs.py                            |       16 |        0 |        0 |        0 |     100.00% |           |
 | granular\_configuration\_language/yaml/decorators/interpolate/\_\_init\_\_.py                     |        2 |        0 |        0 |        0 |     100.00% |           |
 | granular\_configuration\_language/yaml/decorators/interpolate/\_env\_var\_parser.py               |       23 |        0 |        4 |        0 |     100.00% |           |
-| granular\_configuration\_language/yaml/decorators/interpolate/\_interpolate.py                    |       74 |        0 |       18 |        0 |     100.00% |           |
+| granular\_configuration\_language/yaml/decorators/interpolate/\_interpolate.py                    |       77 |        0 |       18 |        0 |     100.00% |           |
 | granular\_configuration\_language/yaml/decorators/ref/\_\_init\_\_.py                             |        2 |        0 |        0 |        0 |     100.00% |           |
 | granular\_configuration\_language/yaml/decorators/ref/\_ref.py                                    |       39 |        0 |       14 |        0 |     100.00% |           |
 | granular\_configuration\_language/yaml/file\_ops/\_\_init\_\_.py                                  |        5 |        0 |        0 |        0 |     100.00% |           |
@@ -70,7 +70,7 @@
 | granular\_configuration\_language/yaml/load/\_load\_file.py                                       |       24 |        0 |        4 |        0 |     100.00% |           |
 | granular\_configuration\_language/yaml/load/\_load\_yaml\_string.py                               |       23 |        0 |        4 |        0 |     100.00% |           |
 | granular\_configuration\_language/yaml/load/\_loads.py                                            |       18 |        0 |        4 |        0 |     100.00% |           |
-|                                                                                         **TOTAL** | **1887** |    **0** |  **276** |    **0** | **100.00%** |           |
+|                                                                                         **TOTAL** | **1891** |    **0** |  **276** |    **0** | **100.00%** |           |
 
 
 ## Setup coverage badge
