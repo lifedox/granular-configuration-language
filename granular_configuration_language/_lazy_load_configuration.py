@@ -190,9 +190,11 @@ class LazyLoadConfiguration(Mapping):
             class SubConfig(Configuration):
                 c: str
 
+
             class Config(Configuration):
                 a: int
                 b: SubConfig
+
 
             typed = LazyLoadConfiguration("config.yaml").as_typed(Config)
 
@@ -234,10 +236,10 @@ class LazyLoadConfiguration(Mapping):
                         today=date.today().isoformat(),
                     ),
                     LOOKUP_KEY="value made available to `!Sub`",
-                )
+                ),
             )
 
-            CONFIG.today           # Today's date as a constant string.
+            CONFIG.today  # Today's date as a constant string.
             CONFIG.data.as_dict()  # Data defined with a reusable library defined value.
 
         .. admonition:: Attention
@@ -270,10 +272,12 @@ class LazyLoadConfiguration(Mapping):
     :examples:
         .. code-block:: python
 
-            # Base Path Examples
-            LazyLoadConfiguration(..., base_path="base_path")  # Single Key
-            LazyLoadConfiguration(..., base_path="/base/path")  # JSON Pointer (strings only)
-            LazyLoadConfiguration(..., base_path=("base", "path"))  # List of keys
+            # Base Path - Single Key
+            LazyLoadConfiguration(..., base_path="base_path")
+            # Base Path - JSON Pointer (strings only)
+            LazyLoadConfiguration(..., base_path="/base/path")
+            # Base Path - List of keys
+            LazyLoadConfiguration(..., base_path=("base", "path"))
 
             # Use Environment Variable: "CONFIG_LOC"
             LazyLoadConfiguration(..., env_location_var_name="CONFIG_LOC")
@@ -282,7 +286,7 @@ class LazyLoadConfiguration(Mapping):
             LazyLoadConfiguration(..., use_env_location=True)
 
             # With a typed `Configuration`
-            LazyLoadConfiguration( ... ).as_typed(TypedConfig)
+            LazyLoadConfiguration(...).as_typed(TypedConfig)
     """
 
     def __init__(
@@ -377,9 +381,11 @@ class LazyLoadConfiguration(Mapping):
                 class SubConfig(Configuration):
                     c: str
 
+
                 class Config(Configuration):
                     a: int
                     b: SubConfig
+
 
                 typed = LazyLoadConfiguration("config.yaml").as_typed(Config)
 
@@ -475,10 +481,12 @@ class MutableLazyLoadConfiguration(LazyLoadConfiguration, MutableMapping):
     :examples:
         .. code-block:: python
 
-            # Base Path Examples
-            MutableLazyLoadConfiguration(..., base_path="base_path")  # Single Key
-            MutableLazyLoadConfiguration(..., base_path="/base/path")  # JSON Pointer (strings only)
-            MutableLazyLoadConfiguration(..., base_path=("base", "path"))  # List of keys
+            # Base Path - Single Key
+            MutableLazyLoadConfiguration(..., base_path="base_path")
+            # Base Path - JSON Pointer (strings only)
+            MutableLazyLoadConfiguration(..., base_path="/base/path")
+            # Base Path - List of keys
+            MutableLazyLoadConfiguration(..., base_path=("base", "path"))
 
             # Use Environment Variable: "CONFIG_LOC"
             MutableLazyLoadConfiguration(..., env_location_var_name="CONFIG_LOC")

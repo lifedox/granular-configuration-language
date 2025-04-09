@@ -26,8 +26,7 @@ def as_lazy(func: tabc.Callable[[T], RT], /) -> tabc.Callable[[Tag, T, StateHold
 
             @string_tag(Tag("!Tag"))
             @as_lazy
-            def tag(value: str) -> Any:
-                ...
+            def tag(value: str) -> Any: ...
     """
 
     @tracker.wraps(func)
@@ -58,8 +57,7 @@ def as_lazy_with_load_options(
 
             @string_tag(Tag("!Tag"))
             @as_lazy_with_load_options
-            def tag(value: str, options: LoadOptions) -> Any:
-                ...
+            def tag(value: str, options: LoadOptions) -> Any: ...
     """
 
     @tracker.wraps(func)
@@ -109,10 +107,9 @@ def as_lazy_with_root(
                 # Uses as: ``@as_lazy_with_root``
                 @overload
                 def as_lazy_with_root(
-                    func: Callable[[T, Root], RT]
-                ) -> Callable[
-                    [Tag, T, StateHolder], LazyEval[RT]
-                ]: ...
+                    func: Callable[[T, Root], RT],
+                ) -> Callable[[Tag, T, StateHolder], LazyEval[RT]]: ...
+
 
                 # Decorator Factory
                 # Uses as: ``@as_lazy_with_root(needs_root_condition=condition)``
@@ -120,7 +117,8 @@ def as_lazy_with_root(
                 def as_lazy_with_root(
                     *, needs_root_condition: Callable[[T], bool]
                 ) -> Callable[
-                    [Callable[[T, Root], RT]], Callable[[Tag, T, StateHolder], LazyEval[RT]]
+                    [Callable[[T, Root], RT]],
+                    Callable[[Tag, T, StateHolder], LazyEval[RT]],
                 ]: ...
 
     :param ~collections.abc.Callable[[T, Root], RT] func:
@@ -144,15 +142,14 @@ def as_lazy_with_root(
             # Typical usage
             @string_tag(Tag("!Tag"))
             @as_lazy_with_root
-            def tag(value: str, root: Root) -> Any:
-                ...
+            def tag(value: str, root: Root) -> Any: ...
+
 
             # Using `needs_root_condition`
             @string_tag(Tag("!Tag"))
             @as_lazy_with_root(needs_root_condition=interpolation_needs_ref_condition)
             @interpolate_value_with_ref
-            def tag(value: str, root: Root) -> Any:
-                ...
+            def tag(value: str, root: Root) -> Any: ...
     """
 
     def decorator_generator(
@@ -197,8 +194,7 @@ def as_lazy_with_root_and_load_options(
 
             @string_tag(Tag("!Tag"))
             @as_lazy_with_root_and_load_options
-            def tag(value: str, root: Root, options: LoadOptions) -> Any:
-                ...
+            def tag(value: str, root: Root, options: LoadOptions) -> Any: ...
     """
 
     @tracker.wraps(func)

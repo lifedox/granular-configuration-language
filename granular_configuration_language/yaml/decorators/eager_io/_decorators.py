@@ -43,8 +43,7 @@ def as_eager_io(
 
             @string_tag(Tag("!Tag"))
             @as_eager_io(eager_io_text_loader_interpolates)
-            def tag(value: EagerIOTextFile) -> Any:
-                ...
+            def tag(value: EagerIOTextFile) -> Any: ...
     """
 
     def decorator_factory(
@@ -102,8 +101,7 @@ def as_eager_io_with_root_and_load_options(
 
             @string_tag(Tag("!Tag"))
             @as_eager_io(eager_io_text_loader_interpolates)
-            def tag(value: EagerIOTextFile, root: Root, options: LoadOptions) -> Any:
-                ...
+            def tag(value: EagerIOTextFile, root: Root, options: LoadOptions) -> Any: ...
     """
 
     def decorator_factory(

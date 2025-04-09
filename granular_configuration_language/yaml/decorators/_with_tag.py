@@ -26,8 +26,7 @@ def with_tag(func: tabc.Callable[typ.Concatenate[Tag, P], RT], /) -> tabc.Callab
             @as_lazy
             @interpolate_value_without_ref
             @with_tag
-            def tag(tag: Tag, value: str) -> Any:
-                ...
+            def tag(tag: Tag, value: str) -> Any: ...
     """
 
     @tracker.wraps(func)

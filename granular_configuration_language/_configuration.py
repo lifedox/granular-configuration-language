@@ -111,11 +111,13 @@ class Configuration(typ.Generic[KT, VT], tabc.Mapping[KT, VT]):
             class SubConfig(Configuration):
                 c: str
 
+
             class Config(Configuration):
                 a: int
                 b: SubConfig
 
-            config = ... # A Configuration instance
+
+            config = ...  # A Configuration instance
             typed = config.as_typed(Config)
 
             assert typed.a == 101

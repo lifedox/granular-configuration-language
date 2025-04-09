@@ -141,6 +141,10 @@ line-length = 120
 target-version = "py310"
 fix = false
 
+[tool.ruff.format]
+docstring-code-format = true
+docstring-code-line-length = 80
+
 [tool.ruff.lint]
 select = [
   # pycodestyle
@@ -168,7 +172,7 @@ select = [
   # flake8-slots
   "SLOT",
   "C90",
-  
+
 ]
 ignore = [
   # Long Strings

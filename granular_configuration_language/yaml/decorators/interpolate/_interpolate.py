@@ -146,14 +146,13 @@ def interpolate_value_with_ref(
             @string_tag(Tag("!Tag"))
             @as_lazy_with_root
             @interpolate_value_with_ref
-            def tag(value: str, root: Root) -> Any:
-                ...
+            def tag(value: str, root: Root) -> Any: ...
+
 
             @string_tag(Tag("!Tag"))
             @as_lazy_with_root_and_load_options
             @interpolate_value_with_ref
-            def tag_with_options(value: str, root: Root, options: LoadOptions) -> Any:
-                ...
+            def tag_with_options(value: str, root: Root, options: LoadOptions) -> Any: ...
     """
 
     @tracker.wraps(func, is_with_ref=True)
@@ -189,15 +188,13 @@ def interpolate_value_without_ref(
             @string_tag(Tag("!Tag"))
             @as_lazy
             @interpolate_value_with_ref
-            def tag(value: str) -> Any:
-                ...
+            def tag(value: str) -> Any: ...
 
 
             @string_tag(Tag("!Tag"))
             @as_lazy_with_load_options
             @interpolate_value_with_ref
-            def tag_with_options(value: str, options: LoadOptions) -> Any:
-                ...
+            def tag_with_options(value: str, options: LoadOptions) -> Any: ...
 
     """
 
