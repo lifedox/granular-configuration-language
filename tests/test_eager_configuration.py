@@ -1,12 +1,16 @@
 from __future__ import annotations
 
 import copy
+import gc
+import threading
+import weakref
 from pathlib import Path
 
 from granular_configuration_language import Configuration, LazyLoadConfiguration
 from granular_configuration_language.proxy import EagerIOConfigurationProxy
 
 ASSET_DIR = (Path(__file__).parent / "assets" / "test_typed_configuration").resolve()
+EAGER_DIR = (Path(__file__).parent / "assets" / "test_eager_parse_file").resolve()
 
 
 class SubConfig(Configuration):
@@ -56,3 +60,21 @@ def test_construction() -> None:
     assert typed.a == 101
     assert typed.b.c == "test me"
     assert typed["a"] == 101
+
+
+def test_SimpleFuture_deconstructs_when_result_is_not_used() -> None:
+    config = LazyLoadConfiguration(EAGER_DIR / "parsefile1.yaml").eager_load(Config)
+
+    assert threading.active_count() > 1
+
+    config_wref = weakref.ref(config)
+    future_wref = weakref.ref(config._EagerIOConfigurationProxy__future)
+
+    del config
+
+    gc.collect()
+
+    assert config_wref() is None
+    assert future_wref() is None
+
+    assert threading.active_count() == 1

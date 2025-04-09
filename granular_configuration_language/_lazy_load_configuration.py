@@ -6,13 +6,13 @@ import os
 import sys
 import typing as typ
 from collections.abc import Mapping, MutableMapping
-from concurrent.futures import ThreadPoolExecutor
 from functools import cached_property
 from itertools import chain
 
 from granular_configuration_language._cache import NoteOfIntentToRead, prepare_to_load_configuration
 from granular_configuration_language._configuration import C, Configuration, MutableConfiguration
 from granular_configuration_language._locations import Locations, PathOrStr
+from granular_configuration_language._simple_future import SimpleFuture
 from granular_configuration_language.exceptions import ErrorWhileLoadingConfig
 
 if sys.version_info >= (3, 12):
@@ -129,17 +129,14 @@ class EagerIOConfigurationProxy(Mapping):
     """
 
     def __init__(self, llc: LazyLoadConfiguration) -> None:
-        self.__executor = ThreadPoolExecutor(1)
-        self.__future = self.__executor.submit(_eagerio_load, llc)
+        self.__future = SimpleFuture(_eagerio_load, llc)
 
     @cached_property
     def __config(self) -> Configuration:
         try:
-            return self.__future.result()
+            return self.__future.result
         finally:
             del self.__future
-            self.__executor.shutdown()
-            del self.__executor
 
     def __getattr__(self, name: str) -> typ.Any:
         return getattr(self.__config, name)

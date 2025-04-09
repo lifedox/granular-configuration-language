@@ -1,8 +1,8 @@
 from __future__ import annotations
 
 import collections.abc as tabc
-from concurrent.futures import ThreadPoolExecutor
 
+from granular_configuration_language._simple_future import SimpleFuture
 from granular_configuration_language.yaml.classes import IT, RT, LazyEval, StateHolder, T
 from granular_configuration_language.yaml.decorators import LoadOptions, Root, Tag
 from granular_configuration_language.yaml.decorators._lazy_eval import LazyEvalBasic, LazyEvalWithRoot
@@ -54,13 +54,10 @@ def as_eager_io(
         @tracker.wraps(func, eager_io=eager_io_preprocessor)
         def lazy_wrapper(tag: Tag, value: T, state: StateHolder) -> LazyEvalBasic[RT]:
 
-            eager_io_executer = ThreadPoolExecutor(1)
-            eager_io_thread = eager_io_executer.submit(eager_io_preprocessor, value, tag, state.options)
+            eager_io_future = SimpleFuture(eager_io_preprocessor, value, tag, state.options)
 
             def lazy_evaluator() -> RT:
-                new_value = eager_io_thread.result()
-                eager_io_executer.shutdown()
-                return func(new_value)
+                return func(eager_io_future.result)
 
             return LazyEvalBasic(tag, lazy_evaluator)
 
@@ -118,13 +115,10 @@ def as_eager_io_with_root_and_load_options(
         def lazy_wrapper(tag: Tag, value: T, state: StateHolder) -> LazyEvalWithRoot[RT]:
             options = state.options
 
-            eager_io_executer = ThreadPoolExecutor(1)
-            eager_io_thread = eager_io_executer.submit(eager_io_preprocessor, value, tag, options)
+            eager_io_future = SimpleFuture(eager_io_preprocessor, value, tag, options)
 
             def lazy_evaluator(root: Root) -> RT:
-                new_value = eager_io_thread.result()
-                eager_io_executer.shutdown()
-                return func(new_value, root, options)
+                return func(eager_io_future.result, root, options)
 
             return LazyEvalWithRoot(tag, state.lazy_root_obj, lazy_evaluator)
 
