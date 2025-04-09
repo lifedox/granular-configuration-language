@@ -15,11 +15,11 @@ class Config(Configuration):
 
 
 def test_loads_bytes_from_file() -> None:
-    assert LazyLoadConfiguration(ASSET_DIR / "binary.yaml").as_typed(Config).data == "hello".encode()
+    assert LazyLoadConfiguration(ASSET_DIR / "binary.yaml").as_typed(Config).data == b"hello"
 
 
 def test_eager_loads_bytes_from_file() -> None:
-    assert LazyLoadConfiguration(ASSET_DIR / "eager.yaml").as_typed(Config).data == "hello".encode()
+    assert LazyLoadConfiguration(ASSET_DIR / "eager.yaml").as_typed(Config).data == b"hello"
 
 
 def test_eager_loading_missing_file() -> None:

@@ -39,27 +39,24 @@ def test_redirect_loading() -> None:
 
 
 def test_redirect_loading_with_sub_syntax() -> None:
-    assert (
-        loads(
-            """
+    assert loads(
+        """
 file: parsefile1.yaml
 contents: !ParseFile ${/file}
 "data": "From parse_redirct.yaml"
 "base": {"b": "From parse_redirct.yaml"}
 """,
-            file_path=ASSET_DIR / "dummy.yaml",
-        ).as_dict()
-        == {
-            "file": "parsefile1.yaml",
-            "contents": {
-                "base": {"a": "from parsefile2.yaml", "b": "From parse_redirct.yaml"},
-                "data": "From parsefile1.yaml",
-                "reach_in": "From parse_redirct.yaml",
-            },
-            "data": "From parse_redirct.yaml",
-            "base": {"b": "From parse_redirct.yaml"},
-        }
-    )
+        file_path=ASSET_DIR / "dummy.yaml",
+    ).as_dict() == {
+        "file": "parsefile1.yaml",
+        "contents": {
+            "base": {"a": "from parsefile2.yaml", "b": "From parse_redirct.yaml"},
+            "data": "From parsefile1.yaml",
+            "reach_in": "From parse_redirct.yaml",
+        },
+        "data": "From parse_redirct.yaml",
+        "base": {"b": "From parse_redirct.yaml"},
+    }
 
 
 def test_failing_when_creating_a_loop_of_one() -> None:

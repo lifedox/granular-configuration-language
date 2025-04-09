@@ -21,7 +21,6 @@ class Config(Configuration):
 
 
 def test_with_Configuration() -> None:
-
     config: Configuration = loads(
         """
 a: 101
@@ -61,7 +60,7 @@ def test_proxy_acts_mapping() -> None:
     config = LazyLoadConfiguration(ASSET_DIR / "config.yaml").as_typed(Config)
     expected = config.as_dict()
 
-    for key1, key2 in zip(config.keys(), expected.keys()):
+    for key1, key2 in zip(config.keys(), expected.keys(), strict=True):
         assert key1 == key2
         assert key2 in config
 

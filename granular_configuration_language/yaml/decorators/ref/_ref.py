@@ -32,9 +32,7 @@ def _resolve_pointer(query: str, root: tabc.Mapping) -> typ.Any:
 
     except RecursionError:
         raise RecursionError(
-            (
-                f"JSON Pointer `{query}` caused a recursion error. Please check your configuration for a self-referencing loop."
-            )
+            f"JSON Pointer `{query}` caused a recursion error. Please check your configuration for a self-referencing loop."
         ) from None
 
 
@@ -51,9 +49,7 @@ def _resolve_path(query: str, root: tabc.Mapping) -> typ.Any:
 
     except RecursionError:
         raise RecursionError(
-            (
-                f"JSON Path `{query}` caused a recursion error. Please check your configuration for a self-referencing loop."
-            )
+            f"JSON Path `{query}` caused a recursion error. Please check your configuration for a self-referencing loop."
         ) from None
 
 

@@ -74,7 +74,6 @@ def halve(value: float) -> float:
 
 @patch("granular_configuration_language.yaml._tags.handlers", TagSet((double, halve)))
 class TestPatched:
-
     def test_double_tag_can_double_4_25_to_8_5(self) -> None:
         assert loads("!Double 4.25") == 8.5
 

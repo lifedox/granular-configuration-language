@@ -53,7 +53,6 @@ def as_eager_io(
     ) -> tabc.Callable[[Tag, T, StateHolder], LazyEval[RT]]:
         @tracker.wraps(func, eager_io=eager_io_preprocessor)
         def lazy_wrapper(tag: Tag, value: T, state: StateHolder) -> LazyEvalBasic[RT]:
-
             eager_io_future = SimpleFuture(eager_io_preprocessor, value, tag, state.options)
 
             def lazy_evaluator() -> RT:

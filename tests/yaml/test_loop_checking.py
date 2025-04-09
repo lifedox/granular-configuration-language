@@ -35,7 +35,6 @@ def test_parsefile_and_parseenv_can_fail_together_in_a_loop_starting_with_a_var(
     )
     with patch.dict(os.environ, values=env):
         with pytest.raises(ParsingTriedToCreateALoop):
-
             config = LazyLoadConfiguration(ASSET_DIR / "parsefile_chain" / "up/1.yaml").config
             config.next.next.bad_env
 

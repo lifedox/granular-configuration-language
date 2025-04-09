@@ -4,6 +4,7 @@ import collections.abc as tabc
 import re
 import typing as typ
 import warnings
+from functools import partial
 from html import unescape
 
 from granular_configuration_language._utils import get_environment_variable
@@ -20,7 +21,7 @@ def _get_ref_string(root: Root, contents: str) -> str:
     value = resolve_json_ref(contents, root)
     if isinstance(value, str):
         return value
-    elif isinstance(value, (tabc.Mapping, tabc.Sequence)):
+    elif isinstance(value, tabc.Mapping | tabc.Sequence):
         return repr(value)
     else:
         return str(value)
@@ -59,7 +60,7 @@ def curly_sub(root: Root, *, contents: str) -> str:
 
 
 def round_sub(root: Root, *, contents: str) -> str:
-    warnings.warn("`!Sub $()` is reserved", InterpolationWarning)
+    warnings.warn("`!Sub $()` is reserved", InterpolationWarning, stacklevel=1)
     return "$(" + contents + ")"
 
 
@@ -69,9 +70,13 @@ SUB_PATTERNS: typ.Final[tabc.Sequence[tuple[tabc.Callable, re.Pattern[str]]]] = 
 )
 
 
+def _replacer(sub: tabc.Callable, root: Root, match: re.Match[str]) -> str:
+    return sub(root, **match.groupdict())
+
+
 def interpolate(value: str, root: Root) -> str:
     for sub, pat in SUB_PATTERNS:
-        value = pat.sub(lambda x: sub(root, **x.groupdict()), value)
+        value = pat.sub(partial(_replacer, sub, root), value)
     return value
 
 

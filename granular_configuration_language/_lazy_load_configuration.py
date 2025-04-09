@@ -296,7 +296,6 @@ class LazyLoadConfiguration(Mapping):
         disable_caching: bool = False,
         **kwargs: typ.Any,
     ) -> None:
-
         self.__receipt: NoteOfIntentToRead | None = prepare_to_load_configuration(
             locations=_read_locations(load_order_location, use_env_location, env_location_var_name),
             base_path=base_path,
@@ -347,7 +346,7 @@ class LazyLoadConfiguration(Mapping):
         """Loads the configuration."""
         # load_configuration existed prior to config, being a cached_property.
         # Now that logic is in the cached_property, so this legacy/clear code just calls the property
-        self.config
+        self.config  # noqa: B018
 
     @override
     def __getitem__(self, key: typ.Any) -> typ.Any:

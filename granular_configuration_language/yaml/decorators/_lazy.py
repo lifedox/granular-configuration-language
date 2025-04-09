@@ -161,7 +161,6 @@ def as_lazy_with_root(
     ) -> tabc.Callable[[Tag, T, StateHolder], LazyEval[RT]]:
         @tracker.wraps(func, needs_root_condition=needs_root_condition)
         def lazy_wrapper(tag: Tag, value: T, state: StateHolder) -> LazyEval[RT]:
-
             if (needs_root_condition is None) or needs_root_condition(value):
                 return LazyEvalWithRoot(tag, state.lazy_root_obj, lambda root: func(value, root))
             else:

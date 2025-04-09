@@ -81,6 +81,8 @@ class Masked(str):
         Does not alter text or prevent :py:func:`print` from display the string value.
     """
 
+    __slots__ = ()
+
     @override
     def __repr__(self) -> str:
         return "'<****>'"
@@ -124,7 +126,7 @@ class LazyRoot:
         return self.__root
 
     @staticmethod
-    def with_root(root: tabc.Mapping | Root) -> "LazyRoot":
+    def with_root(root: tabc.Mapping | Root) -> LazyRoot:
         lazy_root = LazyRoot()
         lazy_root._set_root(root)
         return lazy_root

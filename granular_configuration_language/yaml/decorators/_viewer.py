@@ -157,7 +157,7 @@ class AvailableBase:
             suffix = ""
 
         if tabulate and not _force_missing:
-            return tabulate.tabulate(rows, headers=OrderedDict(zip(self.headers, self.headers))) + suffix
+            return tabulate.tabulate(rows, headers=OrderedDict(zip(self.headers, self.headers, strict=True))) + suffix
         else:
             return """\
 The "table" option requires `tabulate` to be installed.

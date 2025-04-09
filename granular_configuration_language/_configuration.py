@@ -31,7 +31,9 @@ if sys.version_info >= (3, 11):
         predicate: tabc.Callable[[typ.Any], typ.TypeGuard[T]]
 
 elif typ.TYPE_CHECKING:
-    from typing_extensions import Generic, TypedDict, Unpack, dataclass_transform
+    from typing import Generic
+
+    from typing_extensions import TypedDict, Unpack, dataclass_transform
 
     class Kwords_typed_get(Generic[T], TypedDict, total=False):
         default: T
@@ -465,14 +467,14 @@ class MutableConfiguration(tabc.MutableMapping[typ.Any, typ.Any], Configuration)
         other = MutableConfiguration()
         memo[id(self)] = other
         # Use setattr to avoid mypy and pylance being confused
-        setattr(other, "_Configuration__data", copy.deepcopy(self._Configuration__data, memo=memo))
+        setattr(other, "_Configuration__data", copy.deepcopy(self._Configuration__data, memo=memo))  # noqa: B010
         return other
 
     @override
     def __copy__(self) -> MutableConfiguration:
         other = MutableConfiguration()
         # Use setattr to avoid mypy and pylance being confused
-        setattr(other, "_Configuration__data", copy.copy(self._Configuration__data))
+        setattr(other, "_Configuration__data", copy.copy(self._Configuration__data))  # noqa: B010
         return other
 
     copy = __copy__

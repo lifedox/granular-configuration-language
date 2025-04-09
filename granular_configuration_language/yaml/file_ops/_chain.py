@@ -33,7 +33,7 @@ else:
     def walkup(file: Path, relative_to: Path) -> Path:
         # Modified from the 3.12 pathlib.PurePath.relative_to implementation
 
-        for step, path in enumerate([relative_to] + list(relative_to.parents)):
+        for step, path in enumerate([relative_to] + list(relative_to.parents)):  # noqa: B007
             if file.is_relative_to(path):
                 break
             elif path.name == "..":  # pragma: no cover

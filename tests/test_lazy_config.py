@@ -46,7 +46,7 @@ def test_laziness(
     creator: tabc.Callable[[tabc.Iterable[Path]], LazyLoadConfiguration | Configuration],
     mutable: bool,
 ) -> None:
-    with (build_configuration_pach() as bc_mock,):
+    with build_configuration_pach() as bc_mock:
         files = [ASSET_DIR / "test_env_config.yaml"]
 
         config = creator(files)

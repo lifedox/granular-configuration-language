@@ -142,12 +142,17 @@ python -m granular_configuration_language.available_plugins
 
 #### Options
 
-- `csv`: Output is formatted as a CSV table.
-  - Default, if `table` is not available.
-- `json`: Output is JSON-mapping.
-- `table`: Output is pretty table.
-  - Requires [tabulate](https://pypi.org/project/tabulate/) to be available. Default, if available.
-  - Use a terminal width of at least 160 characters for best viewing.
+- Positional
+  - `csv`: Output is formatted as a CSV table.
+    - Default, if `table` is not available.
+  - `json`: Output is JSON-mapping.
+  - `table`: Output is pretty table.
+    - Requires [tabulate](https://pypi.org/project/tabulate/) to be available. Default, if available.
+    - Use a terminal width of at least 160 characters for best viewing.
+- Options
+  - `--long`, `-l`: Use long names in table instead of short names.
+    - Requires [tabulate](https://pypi.org/project/tabulate/) to be available.
+    - _Added_: 2.3.0
 
 #### Usage
 

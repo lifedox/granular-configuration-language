@@ -50,7 +50,7 @@ def json_default(value: typ.Any) -> typ.Any:
         return value.config.as_dict()
     elif isinstance(value, UUID):
         return str(value)
-    elif isinstance(value, (date, datetime)):
+    elif isinstance(value, date | datetime):
         return value.isoformat()
     elif inspect.isclass(value):
         return get_name(value)

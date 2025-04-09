@@ -4,11 +4,11 @@ import collections.abc as tabc
 
 
 class BasePathPart(str):
-    pass
+    __slots__ = ()
 
 
 class BasePath(tuple[BasePathPart]):
-    pass
+    __slots__ = ()
 
 
 def read_base_path(base_path: str | tabc.Sequence[str] | None) -> BasePath:

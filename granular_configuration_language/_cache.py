@@ -31,13 +31,13 @@ class SharedConfigurationReference:
         while self.__notes:
             note = self.__notes.pop()
             if note is not caller:
-                note._config
+                note._config  # noqa: B018
 
     def build(self, caller: NoteOfIntentToRead) -> Configuration:
         # Making cached_property thread-safe
         if self.__lock:
             with self.__lock:
-                self.__config
+                self.__config  # noqa: B018
                 self.__lock = None
                 self.__clear_notes(caller)
 

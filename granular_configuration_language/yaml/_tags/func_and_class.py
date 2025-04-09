@@ -23,7 +23,7 @@ def get_func(func_path: str) -> tabc.Callable:
         func: tabc.Callable = getattr(importlib.import_module(mod_name), func_name)
         return func
     except (ImportError, AttributeError):
-        raise DoesNotExist(f"Could not load {func_path}")
+        raise DoesNotExist(f"Could not load {func_path}") from None
 
 
 @string_tag(Tag("!Class"), "Typer")

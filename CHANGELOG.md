@@ -45,6 +45,7 @@
   - This is to enforce clearer usage in the unexpected case of not using `@`.
 - Changed `Configuration.get` type signature to match Python 3.12 `Mapping.get` signature.
   - i.e. `key` is positional-only. (Runtime does not enforce.)
+- Minor correctness issues caught by Ruff that still past their tests before and after.
 
 ## 2.2.3
 
