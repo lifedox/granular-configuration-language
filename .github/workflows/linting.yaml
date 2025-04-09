@@ -7,7 +7,7 @@ on:
 
 jobs:
   lint:
-    name: Lint[black, isort, flake8, bandit]
+    name: Lint[ruff isort, ruff, bandit]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4

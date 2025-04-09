@@ -10,6 +10,8 @@ _main.py
 new-docs/
 docs/
 
+.ruff_cache
+
 #####################################
 # Generate from gitignore.io
 #####################################
