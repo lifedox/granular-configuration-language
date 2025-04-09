@@ -9,6 +9,7 @@
 - Added `granular_configuration_language.yaml.file_ops` module
   - Refactored from private modules.
 - Added EagerIO Feature Set
+  - (_internal detail_) Added `SimpleFuture` to wrap `ThreadPoolExecutor` setup and teardown.
   - Added `granular_configuration_language.yaml.decorator.eagerio` module
   - Added `LazyLoadConfiguration.eager_load`
   - Added `!EagerParseFile` and `!EagerOptionalParseFile` Tags
