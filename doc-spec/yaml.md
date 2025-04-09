@@ -108,6 +108,29 @@
 <br><!--Looks good in GitHub-->
 <a id="interpolates-reduced"></a>ⁱ: Supports reduced interpolation syntax of [`!Sub`](#sub) without JSON Path and JSON Pointer syntax.
 
+## EagerIO Tag Table
+
+See [EagerIO documentation](eagerio.md#) for more details on EagerIO.
+
+:::{list-table}
+:header-rows: 1
+:width: 100%
+
+- - Category
+  - Tag&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+  - Argument
+  - Usage
+- - [**Parsers**](#parsers)
+  - [`!EagerParseFile`](#parsefile--optionalparsefile) [ⁱ](#interpolates-reduced)
+  - `str`
+  - `!EagerParseFile relative/path.yaml`
+- -
+  - [`!EagerOptionalParseFile`](#parsefile--optionalparsefile) [ⁱ](#interpolates-reduced)
+  - `str`
+  - `!EagerOptionalParseFile optional.yaml`
+
+:::
+
 ---
 
 ## Formatters
@@ -369,6 +392,10 @@ file_may_exist: !ParseFile relative/path/to/optional/file.yaml
   - `!OptionalParseFile` is intended to be used with [`!Merge`](#merge), where nulls are filtered out.
   - _(Since 2.1.0)_ `!ParseFile` detects file loading loops and throws {py:class}`.ParsingTriedToCreateALoop` when trying to load a file already part of the chain.
     - See [Loading Loops](concepts.md#loading-loops) for an explanation with examples.
+- EagerIO Versions:
+  - `!EagerParsefile` and `!EagerOptionalParseFile` work the same as their original counterparts.
+    - Files are read at Load Time and parsed at Fetch Time.
+      - Because of this, EagerIO Tags only support the _Reduced Interpolation Syntax_.
 
 ---
 

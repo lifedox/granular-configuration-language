@@ -47,7 +47,6 @@ class SafeConfigurationProxy(Mapping):
     :py:class:`.Configuration`.
 
     .. admonition:: Implementation Reasoning
-        :collapsible: closed
 
         Wrapping :py:class:`.LazyLoadConfiguration` maintains all laziness
         build into :py:class:`.LazyLoadConfiguration`, while exposing all
