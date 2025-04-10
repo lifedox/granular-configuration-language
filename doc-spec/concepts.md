@@ -111,7 +111,7 @@ See [Merge Equivalency](#merge-equivalency) for examples using merge.
 
 :::
 
-Code:
+**Code:**
 
 ```python
 CONFIG = LazyLoadConfiguration("First-in.yaml", "Next-in.yaml")
@@ -125,6 +125,7 @@ CONFIG = LazyLoadConfiguration("merge.yaml")
 - !ParseFile First-in.yaml
 - !ParseFile Next-in.yaml
 ```
+<br>
 
 #### As Explicit Examples
 
@@ -416,7 +417,6 @@ assert config.as_dict() == {
     "ref": "I came from 3.yaml",
 }
 ```
-
 <br>
 
 In the {py:func}`.merge` case, merging works as expected. However, the three `!Ref /ref` ended up referencing three different Roots.
@@ -455,6 +455,7 @@ This does not prevent the same source load being loaded more than once if it is 
 ```shell
 VAR=!ParseFile 2.yaml
 ```
+<br>
 
 **Configuration:**
 
@@ -483,6 +484,7 @@ CONFIG = LoadLazyConfiguration("1.yaml")
 assert CONFIG.chain1.key == "value"  # 1.yaml→#VAR→2.yaml
 assert CONFIG.chain2.key == "value"  # 1.yaml→#VAR→2.yaml
 ```
+<br>
 
 Sources `$VAR` and `2.yaml` are loaded twice. Once for `CONFIG.chain1` and once for `CONFIG.chain2`.
 
@@ -499,6 +501,7 @@ VAR1=!ParseEnv VAR2
 VAR2=!ParseEnv VAR3
 VAR3=!ParseEnv VAR1
 ```
+<br>
 
 **Configuration:**
 
@@ -506,6 +509,7 @@ VAR3=!ParseEnv VAR1
 # config.yaml
 setting1: !ParseEnv VAR1
 ```
+<br>
 
 **Code:**
 
@@ -517,6 +521,7 @@ CONFIG.setting1 # Would cause an infinite loop without detection.
                 #       instance is created every load.
                 #       You would be waiting to run out of memory or stack.
 ```
+<br>
 
 ### Looping Example with Files
 
@@ -562,3 +567,4 @@ CONFIG.next.next.next.next           # 1.yaml→2.yaml→3.yaml→1.yaml→2.yam
 CONFIG.next.next.next.next.next      # 1.yaml→2.yaml→3.yaml→1.yaml→2.yaml→3.yaml
 CONFIG.next.next.next.next.next.next # 1.yaml→2.yaml→3.yaml→1.yaml→2.yaml→3.yaml→1.yaml
 ```
+<br>

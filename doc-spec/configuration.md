@@ -44,15 +44,18 @@ This script is affected by [`G_CONFIG_DISABLE_PLUGINS`](#environment-variables) 
 ```shell
 python -m granular_configuration_language.available_tags
 ```
+<br>
 
 #### Options
 
-- `csv`: Output is formatted as a CSV table.
-  - Default, if `table` is not available.
-- `json`: Output is JSON-mapping.
-- `table`: Output is pretty table.
-  - Requires [tabulate](https://pypi.org/project/tabulate/) to be available. Default, if available.
-  - Use a terminal width of at least 100 characters for best viewing.
+- Positional:
+  - _Mode_:
+    - `csv`: Output is formatted as a CSV table.
+      - Default, if `table` is not available.
+    - `json`: Output is JSON-mapping.
+    - `table`: Output is pretty table.
+      - Requires [tabulate](https://pypi.org/project/tabulate/) to be available. Default, if available.
+      - Use a terminal width of at least 120 characters for best viewing.
 
 #### Usage
 
@@ -78,24 +81,28 @@ When [tabulate](https://pypi.org/project/tabulate/) is installed, the default op
 ```shell
 pip install 'granular-configuration-language[printing]'
 ```
+<br>
 
 #### Headers
 
-- `category`: Category of the Tag
-  - Value comes from {py:meth}`.TagDecoratorBase.__init__`→`category`
+- `category`: Category of the Tag.
+  - Value comes from {py:meth}`.TagDecoratorBase.__init__`→`category`.
 - `tag`: Name of the Tag
-  - Value comes from {py:meth}`.TagDecoratorBase.__init__`→`tag`
-- `type`: Argument type of the Tag
+  - Value comes from {py:meth}`.TagDecoratorBase.__init__`→`tag`.
+- `type`: Argument type of the Tag.
   - Value comes from {py:meth}`TagDecoratorBase.user_friendly_type <granular_configuration_language.yaml.decorators.TagDecoratorBase.user_friendly_type>`.
-- `interpolates`: Specifies if the tags interpolates
-  - `full` - Tags uses {py:func}`.interpolate_value_with_ref`
-  - `reduced` - Tags uses {py:func}`.interpolate_value_without_ref`
+- `interpolates`: Specifies if the tags interpolates.
+  - `full` - Tags uses {py:func}`.interpolate_value_with_ref`.
+  - `reduced` - Tags uses {py:func}`.interpolate_value_without_ref`.
 - `lazy` - Specifies if the tags are lazy.
-  - `NOT_LAZY` - Tags uses {py:func}`.as_not_lazy`
-- `returns` - Type annotation of the return of function that implements the Tag
+  - `NOT_LAZY` - Tags uses {py:func}`.as_not_lazy`.
+  - `EAGER_IO` - Tags uses {py:func}`.as_eager_io` or {py:func}`.as_eager_io_with_root_and_load_options`.
+    - _Added_: 2.3.0
+- `returns` - Type annotation of the return of function that implements the Tag.
 - `eio_inner_type` - EagerIO inner type.
-  - This is the type Tag Logic takes and the type the EagerIO Preprocessor returns.
+  - This is the type the function that implements the Tag takes and the type the EagerIO Preprocessor returns.
   - Value comes from the type annotation of the return of the EagerIO Preprocessor.
+  - Only applicable to EagerIO Tags.
   - _Added_: 2.3.0
 
 #### Sample Output (using `table` mode)
@@ -113,8 +120,8 @@ Parser       !ParseEnv                str | tuple[str, Any]                     
 Parser       !ParseEnvSafe            str | tuple[str, Any]                            Any
 Parser       !ParseFile               str                    full                      Any
 Parser       !OptionalParseFile       str                    full                      Any
-Parser       !EagerParseFile          str                    reduced                   Any            EagerIOTextFile
-Parser       !EagerOptionalParseFile  str                    reduced                   Any            EagerIOTextFile
+Parser       !EagerParseFile          str                    reduced         EAGER_IO  Any            EagerIOTextFile
+Parser       !EagerOptionalParseFile  str                    reduced         EAGER_IO  Any            EagerIOTextFile
 Typer        !Class                   str                    reduced                   Callable
 Typer        !Date                    str                    reduced                   date
 Typer        !DateTime                str                    reduced                   date
@@ -122,7 +129,7 @@ Typer        !Func                    str                    reduced            
 Typer        !Mask                    str                    reduced                   Masked
 Typer        !UUID                    str                    reduced                   UUID
 Undoc-ed     !Dict                    dict[Any, Any]                                   dict
-Undoc-ed     !EagerLoadBinary         str                    reduced                   bytes          EagerIOBinaryFile
+Undoc-ed     !EagerLoadBinary         str                    reduced         EAGER_IO  bytes          EagerIOBinaryFile
 Undoc-ed     !LoadBinary              str                    reduced                   bytes
 ```
 
@@ -139,17 +146,19 @@ This script is affected by [`G_CONFIG_DISABLE_PLUGINS`](#environment-variables) 
 ```shell
 python -m granular_configuration_language.available_plugins
 ```
+<br>
 
 #### Options
 
-- Positional
-  - `csv`: Output is formatted as a CSV table.
-    - Default, if `table` is not available.
-  - `json`: Output is JSON-mapping.
-  - `table`: Output is pretty table.
-    - Requires [tabulate](https://pypi.org/project/tabulate/) to be available. Default, if available.
-    - Use a terminal width of at least 160 characters for best viewing.
-- Options
+- Positional:
+  - _Mode_:
+    - `csv`: Output is formatted as a CSV table.
+      - Default, if `table` is not available.
+    - `json`: Output is JSON-mapping.
+    - `table`: Output is pretty table.
+      - Requires [tabulate](https://pypi.org/project/tabulate/) to be available. Default, if available.
+      - Use a terminal width of at least 120 characters for best viewing.
+- Flags:
   - `--long`, `-l`: Use long names in table instead of short names.
     - Requires [tabulate](https://pypi.org/project/tabulate/) to be available.
     - _Added_: 2.3.0
@@ -180,16 +189,17 @@ When [tabulate](https://pypi.org/project/tabulate/) is installed, the default op
 ```shell
 pip install 'granular-configuration-language[printing]'
 ```
+<br>
 
 #### Headers
 
-- `plugin`: Name of Plugin
-  - Value comes from `[project.entry-points."granular_configuration_language_20_tag"]`
-  - `<gcl-built-in>` represents internal tags
-- `category`: Category of the Tag
-  - Value comes from {py:meth}`.TagDecoratorBase.__init__`→`category`
-- `tag`: Name of the Tag
-  - Value comes from {py:meth}`.TagDecoratorBase.__init__`→`tag`
+- `plugin`: Name of Plugin.
+  - Value comes from `[project.entry-points."granular_configuration_language_20_tag"]`.
+  - `<gcl-built-in>` represents internal tags.
+- `category`: Category of the Tag.
+  - Value comes from {py:meth}`.TagDecoratorBase.__init__`→`category`.
+- `tag`: Name of the Tag.
+  - Value comes from {py:meth}`.TagDecoratorBase.__init__`→`tag`.
 - `handler`: Function that implements the Tag.
 - `needs_root_condition`: Name of the "needs_root_condition" function.
   - Comes from {py:func}`.as_lazy_with_root`
