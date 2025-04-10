@@ -6,7 +6,7 @@ Originally {py:class}`.Configuration` sought to be a drop-in replacement for {py
 
 As such, {py:class}`.Configuration` and {py:class}`.LazyLoadConfiguration` were changed from {py:class}`~collections.abc.MutableMapping` to {py:class}`~collections.abc.Mapping` and loaded YAML sequences from changed from {py:class}`list` to {py:class}`tuple`/{py:class}`~collections.abc.Sequence` by default. Immutability makes them thread-safe, as well.
 
-For compatibility, mutable configuration support was added explicitly, as {py:class}`.MutableConfiguration` and {py:class}`.MutableLazyLoadConfiguration`, both just adding {py:class}`~collections.abc.MutableMapping`. In mutable-mode, YAML sequences are loaded as {py:class}`list`/{py:class}`~collections.abc.MutableSequence` and caching is disabled. Modifying a {py:class}`.MutableConfiguration` is not thread-safe. Documentation will reference {py:class}`.Configuration` or {py:class}`.LazyLoadConfiguration`, but all concepts apply to their mutable counterparts, use noted in the [Code Specification](spec)
+For compatibility, mutable configuration support was added explicitly, as {py:class}`.MutableConfiguration` and {py:class}`.MutableLazyLoadConfiguration`, both just adding {py:class}`~collections.abc.MutableMapping`. In mutable-mode, YAML sequences are loaded as {py:class}`list`/{py:class}`~collections.abc.MutableSequence` and caching is disabled. Modifying a {py:class}`.MutableConfiguration` is not thread-safe. Documentation will reference {py:class}`.Configuration` or {py:class}`.LazyLoadConfiguration`, but all concepts apply to their mutable counterparts, unless noted in the [Code Specification](spec)
 
 You should highly consider using the immutable configuration in you code.
 
@@ -243,7 +243,7 @@ The following options result is the same Configuration:
     - `"file1.yaml"` and `"file2.yaml"` are read during the "Load Time" of the "First Fetch".
     - The merged occurs before the "Merge Time" merge.
       - The [`!Merge`](yaml.md#merge) must be evaluated fully, in order to be merged into the final configuration.
-    - This is less efficient merging with {py:class}`.LazyLoadConfiguration`.
+    - This is less efficient than merging with {py:class}`.LazyLoadConfiguration`.
 - - ```python
     CONFIG = merge(
         "file1.yaml",
@@ -253,7 +253,7 @@ The following options result is the same Configuration:
   - {py:func}`.merge`
     - `"file1.yaml"` and `"file2.yaml"` are read immediately.
     - `"file1.yaml"` and `"file2.yaml"` are loaded as separate {py:class}`.LazyLoadConfiguration` with individual Load Boundaries.
-    - This is far less efficient merging with {py:class}`.LazyLoadConfiguration`
+    - This is far less efficient than merging with {py:class}`.LazyLoadConfiguration`
     - Exists for merging a framework configuration with a library-specific configuration.
       - The explicit case was for a `pytest` sub-plugin that was a part of a framework plugin.
       - Using {py:func}`.merge` allows users to set settings in the framework configuration without requiring

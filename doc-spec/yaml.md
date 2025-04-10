@@ -396,6 +396,7 @@ file_may_exist: !ParseFile relative/path/to/optional/file.yaml
   - `!EagerParsefile` and `!EagerOptionalParseFile` work the same as their original counterparts.
     - Files are read at Load Time and parsed at Fetch Time.
       - Because of this, EagerIO Tags only support the _Reduced Interpolation Syntax_.
+      - _Added_: 2.3.0
 
 ---
 
