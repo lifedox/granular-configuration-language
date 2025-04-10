@@ -1,5 +1,14 @@
 /* Adding arrow to collapsible */
 
+.rst-content table.docutils td,
+.rst-content table.docutils th,
+.rst-content table.field-list td,
+.rst-content table.field-list th,
+.wy-table td,
+.wy-table {
+  padding: 8px 10px; /* Down from 8px 16px */
+}
+
 /* url = chevron-down-solid.svg */
 summary::after {
   content: "";
