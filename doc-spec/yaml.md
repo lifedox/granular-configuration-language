@@ -78,28 +78,28 @@
   - `str`
   - `!OptionalParseFile optional.yaml`
 * - [**Typers**](#typers)
-  - [`!Class`](#class) [ⁱ](#interpolates-reduced){.abbr title="Supports reduced interpolation syntax (without JSON Path and JSON Pointer syntax)"}
+  - [`!Class`](#class) [ⁱ](#interpolates-reduced){.abbr title="Supports reduced interpolation syntax (without JSON Path or JSON Pointer syntax)"}
   - `str`
   - `!Class uuid.UUID`
 * -
-  - [`!Date`](#date) [ⁱ](#interpolates-reduced){.abbr title="Supports reduced interpolation syntax (without JSON Path and JSON Pointer syntax)"}
+  - [`!Date`](#date) [ⁱ](#interpolates-reduced){.abbr title="Supports reduced interpolation syntax (without JSON Path or JSON Pointer syntax)"}
   - `str`
   - `!Date 1988-12-28`
 * -
-  - [`!DateTime`](#datetime) [ⁱ](#interpolates-reduced){.abbr title="Supports reduced interpolation syntax (without JSON Path and JSON Pointer syntax)"}
+  - [`!DateTime`](#datetime) [ⁱ](#interpolates-reduced){.abbr title="Supports reduced interpolation syntax (without JSON Path or JSON Pointer syntax)"}
   - `str`
   - `!Date 1988-12-28T23:38:00-0600` <br>
     `!Date 2019-18-17T16:15:14`
 * -
-  - [`!Func`](#func) [ⁱ](#interpolates-reduced){.abbr title="Supports reduced interpolation syntax (without JSON Path and JSON Pointer syntax)"}
+  - [`!Func`](#func) [ⁱ](#interpolates-reduced){.abbr title="Supports reduced interpolation syntax (without JSON Path or JSON Pointer syntax)"}
   - `str`
   - `!Func functools.reduce`
 * -
-  - [`!Mask`](#mask) [ⁱ](#interpolates-reduced){.abbr title="Supports reduced interpolation syntax (without JSON Path and JSON Pointer syntax)"}
+  - [`!Mask`](#mask) [ⁱ](#interpolates-reduced){.abbr title="Supports reduced interpolation syntax (without JSON Path or JSON Pointer syntax)"}
   - `str`
   - `!Mask ${SECRET}`
 * -
-  - [`!UUID`](#uuid) [ⁱ](#interpolates-reduced){.abbr title="Supports reduced interpolation syntax (without JSON Path and JSON Pointer syntax)"}
+  - [`!UUID`](#uuid) [ⁱ](#interpolates-reduced){.abbr title="Supports reduced interpolation syntax (without JSON Path or JSON Pointer syntax)"}
   - `str`
   - `!UUID 9d7130a6-{...}-29f0b765be9e`
 ````
@@ -117,11 +117,11 @@ See [EagerIO documentation](eagerio.md#) for more details on EagerIO.
   - Argument
   - Usage
 - - [**Parsers**](#parsers)
-  - [`!EagerParseFile`](#parsefile--optionalparsefile) [ⁱ](#interpolates-reduced){.abbr title="Supports reduced interpolation syntax (without JSON Path and JSON Pointer syntax)"}
+  - [`!EagerParseFile`](#parsefile--optionalparsefile) [ⁱ](#interpolates-reduced){.abbr title="Supports reduced interpolation syntax (without JSON Path or JSON Pointer syntax)"}
   - `str`
   - `!EagerParseFile relative/path.yaml`
 - -
-  - [`!EagerOptionalParseFile`](#parsefile--optionalparsefile) [ⁱ](#interpolates-reduced){.abbr title="Supports reduced interpolation syntax (without JSON Path and JSON Pointer syntax)"}
+  - [`!EagerOptionalParseFile`](#parsefile--optionalparsefile) [ⁱ](#interpolates-reduced){.abbr title="Supports reduced interpolation syntax (without JSON Path or JSON Pointer syntax)"}
   - `str`
   - `!EagerOptionalParseFile optional.yaml`
 
@@ -131,7 +131,7 @@ See [EagerIO documentation](eagerio.md#) for more details on EagerIO.
 
 [ⁱ⁺]{#interpolates-full}: Supports full interpolation syntax of [`!Sub`](#sub).
 <br><!--Looks good in GitHub-->
-[ⁱ]{#interpolates-reduced}: Supports reduced interpolation syntax of [`!Sub`](#sub) without JSON Path and JSON Pointer syntax.
+[ⁱ]{#interpolates-reduced}: Supports reduced interpolation syntax of [`!Sub`](#sub) without JSON Path or JSON Pointer syntax.
 
 ---
 
