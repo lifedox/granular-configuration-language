@@ -14,10 +14,8 @@ You should highly consider using the immutable configuration in you code.
 
 ## Lifecycle
 
-<sup>\*</sup> "identical immutable configurations" means using {py:class}`.LazyLoadConfiguration` with the same set of possible input files, and not using `inject_after` or `inject_before`.
-
 1. **Import Time**: {py:class}`.LazyLoadConfiguration`'s are defined (`CONFIG = LazyLoadConfiguration(...)`).
-   - So long as the next step does not occur, all "identical immutable configurations"<sup>\*</sup> are marked as using the same configuration cache.
+   - So long as the next step does not occur, all "identical immutable configurations"[^iic] are marked as using the same configuration cache.
      - Loading a configuration clears its marks from the cache, meaning if another identical immutable configuration is created, it will be loaded separately.
 2. **First Fetch**: Configuration is fetched for the first time (through `CONFIG.value`, `CONFIG["value"]`, `CONFIG.config`, and such)
    1. **Load Time**:
@@ -46,6 +44,8 @@ You should highly consider using the immutable configuration in you code.
 3. **Fetching a Lazy Tag**:
    1. Upon first get of the {py:class}`.LazyEval` object, the underlying function is called.
    2. The result replaces the {py:class}`.LazyEval` in the Configuration, so the {py:class}`.LazyEval` runs exactly once.
+
+[^iic]: "identical immutable configurations" means using {py:class}`.LazyLoadConfiguration` with the same set of possible input files, and not using `inject_after` or `inject_before`.
 
 ---
 

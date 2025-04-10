@@ -32,6 +32,7 @@ extensions = [
 ]
 myst_enable_extensions = [
     "colon_fence",
+    "attrs_inline",
 ]
 
 # Napoleon settings
@@ -58,13 +59,13 @@ html_static_path = ["doc-spec/_static"]
 default_dark_mode = False
 
 intersphinx_mapping = {"python": ("https://docs.python.org/3", None)}
-suppress_warnings = ["myst.xref_missing"]
 
 autodoc_type_aliases = {
     "Root": "Root",
     "granular_configuration_language.yaml.classes.Root": "Root",
 }
 myst_heading_anchors = 7
+myst_footnote_sort = False
 
 nitpicky = True
 nitpick_ignore = [
