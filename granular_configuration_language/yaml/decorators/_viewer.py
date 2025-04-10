@@ -19,6 +19,7 @@ except ImportError:  # pragma: no cover
 
 
 Imode = typ.Literal["full"] | typ.Literal["reduced"] | typ.Literal[""]
+LazyMode = typ.Literal["NOT_LAZY"] | typ.Literal["EAGER_IO"] | typ.Literal[""]
 
 
 class RowType(typ.TypedDict, total=False):
@@ -27,7 +28,7 @@ class RowType(typ.TypedDict, total=False):
     tag: str
     type: str
     interpolates: Imode
-    lazy: typ.Literal["NOT_LAZY"] | typ.Literal[""]
+    lazy: LazyMode
     returns: str
     handler: str
     needs_root_condition: str
@@ -40,9 +41,9 @@ NULLIFY_JSON = ("interpolates", "lazy", "needs_root_condition", "eager_io", "eio
 
 def _interpolates(tc: TagConstructor) -> Imode:
     if tc.attributes.is_with_ref:
-        return "full"  # pragma: no cover  # coverage shown by test output
+        return "full"
     elif tc.attributes.is_without_ref:
-        return "reduced"  # pragma: no cover  # coverage shown by test output
+        return "reduced"
     else:
         return ""
 
@@ -50,7 +51,7 @@ def _interpolates(tc: TagConstructor) -> Imode:
 def _needs_root_condition(tc: TagConstructor) -> str:
     condition = tc.attributes.needs_root_condition
     if condition:
-        return condition.__name__  # pragma: no cover  # coverage shown by test output
+        return condition.__name__
     else:
         return ""
 
@@ -58,15 +59,24 @@ def _needs_root_condition(tc: TagConstructor) -> str:
 def _eager_io(tc: TagConstructor) -> str:
     eager_io = tc.attributes.eager_io
     if eager_io:
-        return eager_io.__name__  # pragma: no cover  # coverage shown by test output
+        return eager_io.__name__
     else:
         return ""
 
 
 def _eager_io_type(tc: TagConstructor) -> str:
     eager_io = tc.attributes.eager_io
-    if eager_io:  # pragma: no cover  # coverage shown by test output
+    if eager_io:
         return str(inspect.signature(eager_io).return_annotation).removeprefix("typ.").removeprefix("tabc.")
+    else:
+        return ""
+
+
+def _lazy_row(tc: TagConstructor) -> LazyMode:
+    if tc.attributes.is_not_lazy:
+        return "NOT_LAZY"
+    elif tc.attributes.eager_io:
+        return "EAGER_IO"
     else:
         return ""
 
@@ -78,7 +88,7 @@ def _make_row(tc: TagConstructor) -> RowType:
         tag=tc.tag,
         type=tc.friendly_type,
         interpolates=_interpolates(tc),
-        lazy="NOT_LAZY" if tc.attributes.is_not_lazy else "",
+        lazy=_lazy_row(tc),
         returns=str(inspect.signature(tc.constructor).return_annotation).removeprefix("typ.").removeprefix("tabc."),
         handler=tc.constructor.__module__ + "." + tc.constructor.__name__,
         needs_root_condition=_needs_root_condition(tc),

@@ -111,7 +111,7 @@ category,tag,type,interpolates,lazy,returns,eio_inner_type
 Formatter,!Sub,str,full,,str,
 Manipulator,!Del,str,,NOT_LAZY,str,
 Manipulator,!Merge,list[Any],,,Configuration,
-Parser,!EagerParseFile,str,reduced,,Any,EagerIOTextFile
+Parser,!EagerParseFile,str,reduced,EAGER_IO,Any,EagerIOTextFile
 Typer,!Func,str,reduced,,Callable,
 Typer,!UUID,str,reduced,,UUID,
 """
@@ -156,7 +156,7 @@ def test_available_tags_json() -> None:
     "!EagerParseFile": {
       "eio_inner_type": "EagerIOTextFile",
       "interpolates": "reduced",
-      "lazy": null,
+      "lazy": "EAGER_IO",
       "returns": "Any",
       "type": "str"
     }
@@ -196,7 +196,7 @@ category     tag              type       interpolates    lazy      returns      
 Formatter    !Sub             str        full                      str
 Manipulator  !Del             str                        NOT_LAZY  str
 Manipulator  !Merge           list[Any]                            Configuration
-Parser       !EagerParseFile  str        reduced                   Any            EagerIOTextFile
+Parser       !EagerParseFile  str        reduced         EAGER_IO  Any            EagerIOTextFile
 Typer        !Func            str        reduced                   Callable
 Typer        !UUID            str        reduced                   UUID
 """
