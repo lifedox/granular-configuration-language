@@ -1,5 +1,7 @@
 # YAML Tags
 
+<!-- markdownlint-disable-file MD051 -->
+
 - **Argument** and **Return** use Python primitive type as common reference.
   - To convert to YAML node definitions:
     - {py:data}`~typing.Any` is any type.
@@ -153,7 +155,7 @@ $: !Sub ${$}
 
 - **Argument:** _str_
 - **Returns:** {py:class}`str` ‒ string produced by the interpolation syntax.
-- Interpolations:
+- [Interpolations]{#interpolations}:
   - `${ENVIRONMENT_VARIABLE}`: Replaced with the specified Environment Variable.
     - If the variable does not exist, raises {py:class}`.EnvironmentVaribleNotFound`
     - Use `::` to escape colons in environment variable names.
@@ -233,7 +235,7 @@ copy2: *common_setting
 
 !Del setting_with_tag: !UUID &user_id 83e3c814-2cdf-4fe6-b703-89b0a379759e
 user: *user_id
-# Loads as: UUID("83e3c814-2cdf-4fe6-b703-89b0a379759e")
+# Loads as: {"user": UUID("83e3c814-2cdf-4fe6-b703-89b0a379759e")}
 ```
 
 - **Argument:** _str_.
@@ -326,7 +328,7 @@ json_path: !Ref $.json.path.expression
 ```
 
 - **Argument:** _str_.
-  - _Supports Full Interpolation Syntax_
+  - _Supports Full Interpolation [Syntax](#interpolations)_
 - **Returns:** {py:data}`~typing.Any` ‒ Object referenced in absolute JSON Path or JSON Pointer syntax.
 - Notes:
   - Must begin with either `$` for JSON Path or `/` for JSON Pointer. Otherwise, a {py:class}`.RefMustStartFromRoot` exception is thrown.
@@ -384,7 +386,7 @@ file_may_exist: !ParseFile relative/path/to/optional/file.yaml
 ```
 
 - **Argument:** _str_
-  - _Supports Full Interpolation Syntax_
+  - _Supports Full Interpolation [Syntax](#interpolations)_
 - **Returns:** {py:data}`~typing.Any` ‒ Result of loading the specified file.
   - When the file does not exist:
     - `!ParseFile` throws {py:class}`FileNotFoundError`.
@@ -397,7 +399,7 @@ file_may_exist: !ParseFile relative/path/to/optional/file.yaml
 - EagerIO Versions:
   - `!EagerParsefile` and `!EagerOptionalParseFile` work the same as their original counterparts.
     - Files are read at Load Time and parsed at Fetch Time.
-      - Because of this, EagerIO Tags only support the _Reduced Interpolation Syntax_.
+      - Because of this, EagerIO Tags only support the _Reduced Interpolation [Syntax](#interpolations)_.
       - _Added_: 2.3.0
 
 ---
@@ -413,7 +415,7 @@ class_type: !Class uuid.UUID
 ```
 
 - **Argument:** _str_
-  - _Supports Reduced Interpolation Syntax_
+  - _Supports Reduced Interpolation [Syntax](#interpolations)_
 - **Returns:** {py:class}`type` ‒ Specified the class.
 - Notes:
   - The current working directory is added prior to importing the specified module.
@@ -428,7 +430,7 @@ date: !Date 1988-12-28
 ```
 
 - **Argument:** _str_
-  - _Supports Reduced Interpolation Syntax_
+  - _Supports Reduced Interpolation [Syntax](#interpolations)_
 - **Returns:** {py:class}`~datetime.date` ‒ String parsed as ISO 8601 in a Python {py:class}`datetime.date`.
 - Notes:
   - For Python 3.11+, {py:meth}`date.fromisoformat() <datetime.date.fromisoformat>` is used.
@@ -444,7 +446,7 @@ without_time_zone: !DateTime "2012-10-31T13:12:09"
 ```
 
 - **Argument:** _str_
-  - _Supports Reduced Interpolation Syntax_
+  - _Supports Reduced Interpolation [Syntax](#interpolations)_
 - **Returns:** {py:class}`~datetime.datetime` ‒ String parsed as ISO 8601 in a Python {py:class}`datetime.datetime`.
 - Notes:
   - For Python 3.11+, {py:meth}`datetime.fromisoformat() <datetime.datetime.fromisoformat>` is used.
@@ -459,7 +461,7 @@ function: !Func functools.reduce
 ```
 
 - **Argument:** _str_
-  - _Supports Reduced Interpolation Syntax_
+  - _Supports Reduced Interpolation [Syntax](#interpolations)_
 - **Returns:** {py:class}`~collections.abc.Callable` ‒ Specified function.
 - Notes:
   - The current working directory is added prior to importing the specified module.
@@ -476,7 +478,7 @@ function: !Mask ${SECRET}
 ```
 
 - **Argument:** _str_
-  - _Supports Reduced Interpolation Syntax_
+  - _Supports Reduced Interpolation [Syntax](#interpolations)_
 - **Returns:** {py:class}`.Masked` ‒ The string as a {py:class}`.Masked`
 - Notes:
   - {py:class}`.Masked` inherits from {py:class}`str`, with the {py:meth}`~object.__repr__` overridden to always return the same constant literal `'<****>'`.
@@ -492,5 +494,5 @@ id: !UUID 9d7130a6-192f-41e6-88ce-29f0b765be9e
 ```
 
 - **Argument:** _str_
-  - _Supports Reduced Interpolation Syntax_
+  - _Supports Reduced Interpolation [Syntax](#interpolations)_
 - **Returns:** {py:class}`~uuid.UUID` ‒ The string parsed by Python {py:class}`uuid.UUID`,

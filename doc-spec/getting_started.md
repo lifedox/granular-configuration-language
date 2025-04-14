@@ -121,7 +121,7 @@ example_config: # Example Base Path
   setting2:
     sub_setting1: value
   example_of_codes:
-    # This becomes Mapping[int, str]
+    # This becomes Configuration[int, str]
     200: Success
     404: Not Found
 ```
@@ -131,13 +131,15 @@ example_config: # Example Base Path
 ### Things to bear in mind
 
 - Take a look at the [YAML Tags](yaml.md) for options.
+  - [`!Sub`](yaml.md#sub) can pull in environment variables and more.
   - Use [`!PlaceHolder`](yaml.md#placeholder) to specify values the user need to provide.
 - Setting names should be compatible with Python attribute names.
   - This lets you use {py:meth}`~.Configuration.__getattr__` and type annotations.
   - In this vein, do **not** use names starting with two underscores (e.g. `__name`) or double-underscored names (e.g. `__name__`), as {py:meth}`~.object.__getattr__` treats these names with special behavior.
 - Use subsections to organize settings.
 - Avoid using non-string lookup keys.
-  - `status_message_lookup: Mapping[int, str] = CONFIG.example_of_codes` is probably clearer than `success_message: str = CONFIG.example_of_codes[200]`
+  - `status_message_lookup: Configuration[int, str] = CONFIG.example_of_codes` is probably clearer to use than `success_message: str = CONFIG.example_of_codes[200]`
+    - [Type annotating your configuration](#type-annotating-your-configuration) makes both cases clearer, as you don't need to redefine the default {py:data}`~typing.Any` type annotations.
 - A {py:class}`base_path <.LazyLoadConfiguration>` can be useful for making configuration identifiable by contents and for enabling the library to join a shared configuration without requiring a breaking change.
 - Don't be afraid to comment your configuration when desired.
   - You may want your documentation to just point at your embedded configuration file.

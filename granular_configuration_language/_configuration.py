@@ -295,7 +295,7 @@ class Configuration(typ.Generic[KT, VT], tabc.Mapping[KT, VT]):
                 config["a"]["b"]["c"] # Using `__getitem__`
         :param str name: Attribute name
         :return: Fetched value
-        :rtype:  ~typing.Any
+        :rtype:  VT
         :raises AttributeError: When an attribute is not present.
         """
         if name not in self:
