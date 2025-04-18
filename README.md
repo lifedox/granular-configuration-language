@@ -20,7 +20,7 @@ pip install granular-configuration-language
 
 ## Why does this exist?
 
-This library exists to allow your code use YAML as a configuration language for internal and external parties, allowing configuration to be crafted from multiple sources and merged just before use, with added [YAML Tags](https://lifedox.github.io/granular-configuration-language/doc-spec/yaml.html) that run lazily for added functionality, and plugin support for creating custom YAML Tags.
+This library exists to allow your code using YAML as a configuration language for internal and external parties, allowing configuration to be crafted from multiple sources and merged just before use, with added [YAML Tags](https://lifedox.github.io/granular-configuration-language/doc-spec/yaml.html) that run lazily for added functionality, and plugin support for creating custom YAML Tags.
 
 Some use cases:
 
@@ -58,6 +58,29 @@ Some use cases:
             user: !Mask ${DB_USERNAME}
             password: !Mask ${DB_PASSWORD}
       ```
+    - Library Code with type annotations:
+      ```python
+      class CommonSettings(Configuration):
+          use_decimal: bool
+          encryption_type: str
+      #
+      class DatabaseSettings:
+          location: str
+          user: str
+          password: str
+      #
+      class Settings(Configuration):
+          common_settings: CommonSettings
+          databases: Configuration[str, DatabaseSettings]
+      #
+      CONFIG = LazyLoadConfiguration(
+          Path(__file___).parent / "config.yaml",
+          "./database-util-config.yaml",
+          "~/configs/database-util-config.yaml",
+          base_path="database-util",
+          env_location_var_name="ORG_COMMON_CONFIG_LOCATIONS",
+      ).as_typed(Settings)
+      ```
 - You are deploying an application that has multiple deployment types with specific settings.
   - Conceptual Example:
     - Library Code:
@@ -88,7 +111,7 @@ Some use cases:
       app:
         log_to: !Sub file://var/log/${$.app.log_as}.log
       ```
-- You are writing a [`pytest`](https://docs.pytest.org/en/stable/) plugin that create test data using named fixtures configured by the user.
+- You are writing a [`pytest`](https://docs.pytest.org/en/stable/) plugin that creates test data using named fixtures configured by the user.
   - Conceptual Examples:
     - Library Code:
       ```python
