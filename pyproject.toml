@@ -179,12 +179,8 @@ ignore = [
   "E501", # Line too long
 
   # Disagree with (clarity requires rejection)
-  "E731",   # lambda are one line functions
+  "E731",   # Do not assign a `lambda` expression
   "SIM108", # Use ternary operator
-  "SIM118", # Use `key in dict` instead of `key in dict.keys()`
-
-  # Why change
-  "UP011", # Unnecessary parentheses to `functools.lru_cache`
 ]
 unfixable = [
   "ERA", # do not autoremove commented out code

@@ -70,7 +70,7 @@ class HandlerTracker(tabc.Iterable[HandlerAttributes]):
         if attributes.pop("fake_tag", None):
             attrs.set_tag(Tag("!Faker"))
 
-        for attribute in attributes.keys():
+        for attribute in attributes:
             setattr(attrs, attribute, True)
 
         if needs_root_condition:

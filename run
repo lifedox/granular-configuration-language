@@ -124,11 +124,11 @@ test_many() {
 
 usage+=("  $0 lint - Runs linting (isort, black, flake8, bandit) checks; non-zero exit status on failure")
 lint() {
-    _run_cmd ./run _lint
+    _run_cmd ./run _lint "$@"
 }
 _lint() {
-    _logit Running ruff check
-    poetry run ruff check
+    _logit Running ruff check "$@"
+    poetry run ruff check "$@"
     _logit Running bandit
     bandit -c pyproject.toml -r .
 }

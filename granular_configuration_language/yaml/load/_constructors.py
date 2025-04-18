@@ -13,7 +13,7 @@ def construct_mapping(cls: type, constructor: SafeConstructor, node: MappingNode
 
     value: tabc.Mapping = cls(constructor.construct_mapping(node, deep=False))
 
-    for key in value.keys():
+    for key in value:
         if isinstance(key, LazyEval):
             raise TypeError("Lazy Tags are not allowed as keys to mappings.")
 
