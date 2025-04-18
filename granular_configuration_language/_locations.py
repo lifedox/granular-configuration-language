@@ -24,7 +24,7 @@ else:
 PathOrStr = Path | str | os.PathLike
 
 
-@lru_cache
+@lru_cache(maxsize=32)
 def _resolve_path(path: Path) -> Path:
     return path.expanduser().resolve()
 
@@ -106,7 +106,7 @@ SUFFIX_CONFIG: typ.Final[dict[str, tabc.Sequence[str]]] = {
 }
 
 
-@lru_cache
+@lru_cache(maxsize=32)
 def _convert_to_location(path: Path) -> BaseLocation:
     if path.suffix in SUFFIX_CONFIG:
         return PrioritizedLocations(tuple(map(path.with_suffix, SUFFIX_CONFIG[path.suffix])))
