@@ -2,6 +2,8 @@
 
 :::{admonition} Unfinished Documentation
 :class: error
+:collapsible: closed
+
 Documentation for EagerIO is in-progress. Some sentences and paragraphs are incomplete.
 
 ---
@@ -65,9 +67,9 @@ The point of Laziness was for pruning, having many libraries share one configura
 
 The direction of EagerIO I've chosen seems to be one where intent matters.
 
-Option 2 is the simplest to implement and is closest to the idea of doing all the loading during the import phase, so the cost at execution is minimal (though that is a Cloud costing optimization).
+Option 2 is the simplest to implement and is closest to the idea of doing all the loading during the import phase, so the cost at execution is minimal (though that is a cloud-cost optimization).
 
-Option 1 has very behind-the-scene magic.
+Option 1 has very behind-the-scenes magic.
 
 With EagerIO being more an exploration at the point in time, Option 2 is more worth the time than Option 1.
 
@@ -91,14 +93,14 @@ Fundamentally, "Opt-In" is the lowest risk:
 EagerIO is an optional feature set that undoes some of the laziness of the library's default behavior, so that Fetch calls are non-blocking (or, at least, minimally blocking).
 
 - **EagerIO Tags** run IO in a background thread.
-  - Link to [EagerIO Tag Table](yaml.md#eagerio-tag-table).
+  - Available EagerIO Tags are found in the [EagerIO Tag Table](yaml.md#eagerio-tag-table).
   - The thread is launched at Load Time.
-    - Because of this, EagerIO Tags can at most support the _Reduced Interpolation Syntax_ for IO operators.
-  - Logic is run at Fetch.
+    - Because of this, EagerIO Tags can at most support the _Reduced Interpolation Syntax_ for IO operations.
+  - Logic is still run at Fetch.
   - The performance cost of the thread due to the GIL is minimal.
   - Currently, EagerIO Tags run their IO regardless of pruning.
 - **EagerIO Loading** loads and build the configuration in a background thread.
-  - Call {py:meth}`.LazyLoadConfiguration.eager_load` to use .
+  - Call {py:meth}`.LazyLoadConfiguration.eager_load` to use EagerIO Loading.
   - The thread is launched when {py:meth}`~.LazyLoadConfiguration.eager_load` is called.
   - Load, Merge, and Build all occur in the thread.
     - EagerIO Tags spawn at their thread from this thread.
@@ -116,15 +118,67 @@ EagerIO is not required with {py:mod}`asyncio`, but is an option to avoid IO blo
 
 ## Using EagerIO Tags
 
-TODO
+There is no outward difference between using a Lazy Tag vs. EagerIO Tag.
 
-> User experience is the same as normal tag.
+The following examples return the same data with the same interface:
+
+````{list-table}
+:header-rows: 1
+:width: 75%
+:widths: 1 1
+:align: center
+
+* - Lazy Tag
+  - EagerIO Tag
+* - ```yaml
+    data: !ParseFile data.yaml
+    ```
+  - ```yaml
+    data: !EagerParseFile data.yaml
+    ```
+````
+
+- In the background, [`!EagerParseFile`](yaml.md#parsefile--optionalparsefile) loads `data.yaml` into memory, as soon as the configuration is loaded. Whereas, [`!ParseFile`](yaml.md#parsefile--optionalparsefile) waits until the `data` setting is fetched to load `data.yaml`.
+- Both [`!ParseFile`](yaml.md#parsefile--optionalparsefile) and [`!EagerParseFile`](yaml.md#parsefile--optionalparsefile) parse `data.yaml` when the `data` setting is fetched.
 
 ## Using EagerIO Loading
 
-TODO
+There is no interface difference between using {py:meth}`.LazyLoadConfiguration.as_typed` and {py:meth}`.LazyLoadConfiguration.eager_load`.
 
-> User experience with {py:meth}`.LazyLoadConfiguration.eager_load` is the same as {py:meth}`.LazyLoadConfiguration.as_typed`, but with a background thread.
+:::{note}
+If you want EagerIO Loading without type annotations, just past {py:class}`.Configuration` to {py:meth}`~.LazyLoadConfiguration.eager_load`.
+:::
+
+The following examples are used identically:
+
+````{list-table}
+:header-rows: 1
+:width: 75%
+:widths: 1 1
+:align: center
+
+* - Lazy Loading
+  - EagerIO Loading
+* - ```python
+    class Settings(Configuration):
+      ...
+
+    CONFIG = LazyLoadConfiguration(
+      ...
+    ).as_typed(Settings)
+    ```
+  - ```python
+    class Settings(Configuration):
+      ...
+
+    CONFIG = LazyLoadConfiguration(
+      ...
+    ).eager_load(Settings)
+    ```
+````
+
+- {py:meth}`~.LazyLoadConfiguration.eager_load` will immediately start loading and building the configuration in the background, taking away some immediate performance, due to the GIL, but once complete has no performance impact.
+- {py:meth}`~.LazyLoadConfiguration.as_typed` will wait until an attribute is first fetched, before loading and building the configuration.
 
 ---
 
