@@ -45,7 +45,7 @@ optional = true
 
 [tool.poetry.group.pyright.dependencies]
 python-dateutil = ">=2.9.0.post0"
-pyright = { version = ">=1.1.399", extras = ["nodejs"] }
+pyright = { version = ">=1.1.400", extras = ["nodejs"] }
 
 [tool.poetry.group.docs]
 optional = true
