@@ -1,5 +1,5 @@
-Code Specification
-==================
+Code Specification (``module``)
+===============================
 
 .. toctree::
     :glob:

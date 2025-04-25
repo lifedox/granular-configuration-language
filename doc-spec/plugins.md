@@ -50,6 +50,7 @@ from granular_configuration_language.yaml.decorators import (
 def handler(value: str) -> Masked:  # Function Signature
     return Masked(getSecret(value)) # Tag Logic
 ```
+
 <br>
 
 ### Function Signature
@@ -110,7 +111,8 @@ def handler(value: str) -> Masked:  # Function Signature
 ### With Attribute Decorator
 
 - Currently, only {py:func}`.with_tag` is available, if you need your tag.
-- With the {py:func}`.with_tag` decorator, prepend a {py:class}`.Tag` parameter before your `value`.
+- With the {py:func}`.with_tag` decorator, a {py:class}`.Tag` parameter is prepended before the `value` parameter.
+  - The {py:func}`.with_tag` decorator removes the {py:class}`.Tag` parameter from the function signature, so that it invisibly works with the functionality decorators.
 
 **Example:**
 
@@ -153,6 +155,7 @@ class float_tag(TagDecoratorBase[float]):
     def user_friendly_type(self) -> str:
         return "float"
 ```
+
 <br>
 
 The required portion of {py:class}`.TagDecoratorBase` is to set the Python type a Tag takes as input. You set it in the {py:class}`~typing.Generic` argument, and you implement the {py:meth}`~.TagDecoratorBase.user_friendly_type` property. The property is expected to match Generic argument, but to be as straightforward as possible. For example, {py:class}`.sequence_of_any_tag` uses `collections.abc.Sequence[typing.Any]` as Generic argument, but property just returns `list[Any]`.
@@ -202,6 +205,7 @@ class float_tag(TagDecoratorBase[float]):
         """"""  # Make undocumented
         return float(value)
 ```
+
 <br>
 
 YAML Tags support Scalar, Sequence, and Mapping YAML types. These are {py:class}`str`, {py:class}`~collections.abc.Sequence`, and {py:class}`~collections.abc.Mapping` in Python.
