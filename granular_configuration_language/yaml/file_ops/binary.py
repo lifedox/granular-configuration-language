@@ -20,7 +20,7 @@ class EagerIOBinaryFile:
     """
     :py:data:`True`, if the file exists, else :py:data:`False`
     """
-    data: bytes
+    data: bytes = dataclasses.field(repr=False, hash=False)
     """
     Contents of the file, if the file exists, else an empty :py:class:`bytes`
     """

@@ -20,7 +20,7 @@ class EagerIOTextFile:
     """
     :py:data:`True`, if the file exists, else :py:data:`False`
     """
-    data: str
+    data: str = dataclasses.field(repr=False, hash=False)
     """
     Contents of the file, if the file exists, else an empty :py:class:`str`
     """

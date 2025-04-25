@@ -2,6 +2,12 @@
 
 <!-- markdownlint-disable-file MD024 -->
 
+## 2.3.1 (next)
+
+### Fixed
+
+- `EagerIOBinaryFile`, `EagerIOTextFile`: Excluding `data` from `repr` and `hash`.
+
 ## 2.3.0
 
 ### Added
