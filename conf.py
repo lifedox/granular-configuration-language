@@ -67,6 +67,15 @@ autodoc_type_aliases = {
 myst_heading_anchors = 7
 myst_footnote_sort = False
 
+# Looks better that single wrapping, but how line length calculation is obtuse and aggressive.
+#
+# 90 seems like the HTML width, but
+# 61 gets `granular_configuration_language.yaml.file_ops.EagerIOTextFile` to multi-line, but
+# `Configuration.__getattr__` wraps even at 80
+python_maximum_signature_line_length = 61
+
+# add_module_names = False
+
 nitpicky = True
 nitpick_ignore = [
     ("py:class", "optional"),

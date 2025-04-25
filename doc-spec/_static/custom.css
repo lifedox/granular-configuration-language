@@ -1,13 +1,10 @@
-/* Adding arrow to collapsible */
+/*
+==========================================================
+Adding arrow to collapsible
+==========================================================
 
-.rst-content table.docutils td,
-.rst-content table.docutils th,
-.rst-content table.field-list td,
-.rst-content table.field-list th,
-.wy-table td,
-.wy-table {
-  padding: 8px 10px; /* Down from 8px 16px */
-}
+Why: Because the current theme doesn't handle collapsible.
+*/
 
 /* url = chevron-down-solid.svg */
 summary::after {
@@ -29,9 +26,14 @@ details[open] summary:after {
   float: right;
 }
 
-/* override table width restrictions 
+/*
+==========================================================
+Override table width restrictions 
+==========================================================
+
 From: https://github.com/readthedocs/sphinx_rtd_theme/issues/117
 */
+
 .wy-table-responsive table td,
 .wy-table-responsive table th {
   /* !important prevents the common CSS stylesheets from
@@ -40,10 +42,65 @@ From: https://github.com/readthedocs/sphinx_rtd_theme/issues/117
 }
 
 /*
+==========================================================
+Shrink table cell padding
+==========================================================
+
+Why: To fit more inside, before line wrapping occurs
+*/
+
+.rst-content table.docutils td,
+.rst-content table.docutils th,
+.rst-content table.field-list td,
+.rst-content table.field-list th,
+.wy-table td,
+.wy-table {
+  padding: 8px 10px; /* Down from 8px 16px */
+}
+
+/*
+==========================================================
 Decrease margin around code blocks
+==========================================================
+
+Why: To make code block look better in tables
 */
 
 .rst-content div[class^="highlight"],
 .rst-content pre.literal-block {
   margin: 1px 0 5px;
+}
+
+/*
+==========================================================
+Decrease margin-bottom around multi-line parameters in signature
+==========================================================
+
+Why: Otherwise there is an extra line of spacing that is unreadable
+*/
+
+.rst-content .sig-object dl dd {
+  margin-bottom: 0;
+}
+
+.rst-content .sig-object dl {
+  margin-bottom: 0;
+}
+
+/*
+==========================================================
+Stretch the signature box to the full width
+==========================================================
+
+Why: Different size for overrides is distracting, and it provides a section boundary
+*/
+
+html.writer-html4 .rst-content dl:not(.docutils) > dt,
+html.writer-html5
+  .rst-content
+  dl[class]:not(.option-list):not(.field-list):not(.footnote):not(
+    .citation
+  ):not(.glossary):not(.simple)
+  > dt {
+  display: block;
 }
