@@ -6,6 +6,7 @@
 
 ### Fixed
 
+- For Documentation baked into artifact: Corrected grammar in Project description and Readme.
 - `EagerIOBinaryFile`, `EagerIOTextFile`: Excluding `data` from `repr` and `hash`.
 
 ## 2.3.0

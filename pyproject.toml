@@ -10,7 +10,7 @@ classifiers = [
   "Typing :: Typed",
 ]
 packages = [{ include = "granular_configuration_language" }]
-requires-poetry = ">=2.0"
+requires-poetry = ">=2.1"
 
 [project.urls]
 homepage = "https://lifedox.github.io/granular-configuration-language/README.html"
@@ -19,8 +19,8 @@ documentation = "https://lifedox.github.io/granular-configuration-language/READM
 
 [project]
 name = "granular-configuration-language"
-version = "2.3.0"
-description = "This general purpose configuration utility library allows your code use YAML as a configuration language for internal and external parties, allowing configuration to be crafted from multiple sources and merged just before use, with added YAML Tags that run lazily for added functionality."
+version = "2.3.1"
+description = "This general purpose configuration utility library allows your code to use YAML as a configuration language for internal and external parties, allowing configuration to be crafted from multiple sources and merged just before use, using YAML Tags for additional functionality."
 license = { text = "MIT" }
 authors = [{ name = "Eric Jensen", email = "eric.jensen42@gmail.com" }]
 readme = "README.md"

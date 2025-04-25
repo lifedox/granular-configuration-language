@@ -20,7 +20,7 @@ pip install granular-configuration-language
 
 ## Why does this exist?
 
-This library exists to allow your code using YAML as a configuration language for internal and external parties, allowing configuration to be crafted from multiple sources and merged just before use, with added [YAML Tags](https://lifedox.github.io/granular-configuration-language/doc-spec/yaml.html) that run lazily for added functionality, and plugin support for creating custom YAML Tags.
+This library exists to allow your code to use YAML as a configuration language for internal and external parties, allowing configuration to be crafted from multiple sources and merged just before use, using [YAML Tags](https://lifedox.github.io/granular-configuration-language/doc-spec/yaml.html) for additional functionality, and plugin support for creating custom YAML Tags.
 
 Some use cases:
 
