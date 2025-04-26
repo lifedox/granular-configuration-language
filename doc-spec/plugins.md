@@ -269,4 +269,5 @@ If you generate documentation, it is recommended to override the doc-string with
       - Adding `x0` for every non-breaking major version `x` is to reduce developer overhead. "Just match the major version of the minimum of your supported dependency range."
   - If there is a minor plugin change, then that version becomes the next major compatibility version.
   - If there is a major plugin change, all previously supported compatibility versions are removed.
-    :::
+
+:::
