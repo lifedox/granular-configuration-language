@@ -22,17 +22,17 @@ else:
 if sys.version_info >= (3, 13):
     from typing import TypeVar
 
-    KT = TypeVar("KT", default=typ.Any)
+    KT = TypeVar("KT", bound=tabc.Hashable, default=typ.Any)
     VT = TypeVar("VT", default=typ.Any)
 elif typ.TYPE_CHECKING:
     from typing_extensions import TypeVar
 
-    KT = TypeVar("KT", default=typ.Any)
+    KT = TypeVar("KT", bound=tabc.Hashable, default=typ.Any)
     VT = TypeVar("VT", default=typ.Any)
 else:
     from typing import TypeVar
 
-    KT = TypeVar("KT")
+    KT = TypeVar("KT", bound=tabc.Hashable)
     VT = TypeVar("VT")
 
 
