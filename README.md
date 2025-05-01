@@ -8,7 +8,7 @@
 | granular\_configuration\_language/\_base\_path.py                                                 |       14 |        0 |        6 |        0 |     100.00% |           |
 | granular\_configuration\_language/\_build.py                                                      |       45 |        0 |       16 |        0 |     100.00% |           |
 | granular\_configuration\_language/\_cache.py                                                      |       67 |        0 |       12 |        0 |     100.00% |           |
-| granular\_configuration\_language/\_configuration.py                                              |      152 |        0 |       22 |        0 |     100.00% |           |
+| granular\_configuration\_language/\_configuration.py                                              |      156 |        0 |       22 |        0 |     100.00% |           |
 | granular\_configuration\_language/\_json.py                                                       |       34 |        0 |       18 |        0 |     100.00% |           |
 | granular\_configuration\_language/\_lazy\_load\_configuration.py                                  |      123 |        0 |        2 |        0 |     100.00% |           |
 | granular\_configuration\_language/\_locations.py                                                  |       78 |        0 |        6 |        0 |     100.00% |           |
@@ -70,7 +70,7 @@
 | granular\_configuration\_language/yaml/load/\_load\_file.py                                       |       24 |        0 |        4 |        0 |     100.00% |           |
 | granular\_configuration\_language/yaml/load/\_load\_yaml\_string.py                               |       23 |        0 |        4 |        0 |     100.00% |           |
 | granular\_configuration\_language/yaml/load/\_loads.py                                            |       18 |        0 |        4 |        0 |     100.00% |           |
-|                                                                                         **TOTAL** | **1904** |    **0** |  **290** |    **0** | **100.00%** |           |
+|                                                                                         **TOTAL** | **1908** |    **0** |  **290** |    **0** | **100.00%** |           |
 
 
 ## Setup coverage badge
