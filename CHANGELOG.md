@@ -4,10 +4,21 @@
 
 ## 2.3.1 (next)
 
+### Added
+
+- Added doc-strings to `Configuration.copy` and `MutableConfiguration.copy` methods.
+- Added parameters to `Configuration.__init__` and `MutableConfiguration.__init__` documentation
+- Duplicated overloads to improve `MutableConfiguration` documentation.
+
 ### Fixed
 
-- For Documentation baked into artifact: Corrected grammar in Project description and Readme.
-- `EagerIOBinaryFile`, `EagerIOTextFile`: Excluding `data` from `repr` and `hash`.
+- Baked-In Documentation: Corrected grammar in Project description and Readme.
+- `EagerIOBinaryFile`, `EagerIOTextFile`: Updated to exclude `data` from `repr` and `hash`.
+- Added Generic Type Parameters to `MutableConfiguration`
+  - Both default to `typing.Any`, so no behavior change.
+  - Should have been updated alongside `Configuration`.
+- `KT` is now bound to `collections.abc.Hashable`
+  - Allows type checking to catch what is runtime error.
 
 ## 2.3.0
 

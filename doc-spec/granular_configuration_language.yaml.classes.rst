@@ -34,7 +34,7 @@ Internal Typing Variables
 
     Type of the **Key** on Mappings
     
-    alias of TypeVar('KT', default= :py:class:`~typing.Any`)
+    alias of TypeVar('KT', bound= :py:class:`~collections.abc.Hashable`, default= :py:class:`~typing.Any`)
 
 .. py:class:: VT
     

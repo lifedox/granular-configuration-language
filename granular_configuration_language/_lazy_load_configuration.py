@@ -455,7 +455,6 @@ class MutableLazyLoadConfiguration(LazyLoadConfiguration, MutableMapping):
     Used to define a **mutable** Configuration from file paths
     that lazily loads on first access.
 
-    
     **Options:**
         -  Using ``env_location_var_name``, you can enable pulling locations
            from an environment variable.

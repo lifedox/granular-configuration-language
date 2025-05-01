@@ -3,6 +3,7 @@ from __future__ import annotations
 import collections.abc as tabc
 import copy
 import json
+import operator as op
 import sys
 import typing as typ
 from itertools import starmap
@@ -148,6 +149,14 @@ class Configuration(typ.Generic[KT, VT], tabc.Mapping[KT, VT]):
         .. versionchanged:: 2.3.0
             Added Generic Type Parameters, which default to :py:data:`~typing.Any`.
 
+    :param ~collections.abc.Mapping[KT, VT] mapping:
+        Constructs a :py:class:`.Configuration` by shallow copying initiating mapping.
+    :param ~collections.abc.Iterable[tuple[KT, VT]] iterable:
+        Constructs a :py:class:`.Configuration` from an iterable of key-value pairs.
+    :param VT \*\*kwargs:
+        Constructs a :py:class:`.Configuration` via keyword arguments.
+        (Due to a limitation of defaults, :py:class:`.KT` is inferred to be
+        :py:data:`~typing.Any`, instead of :py:class:`str`.)
     """
 
     @typ.overload
@@ -260,6 +269,19 @@ class Configuration(typ.Generic[KT, VT], tabc.Mapping[KT, VT]):
         return other
 
     copy = __copy__
+    """
+    Returns a shallow copy of this instance. (Matches :py:meth:`dict.copy` interface.)
+
+    .. caution::
+
+        :py:class:`.LazyEval` do not make copies. If you have not evaluated all tags,
+        you should called :py:meth:`evaluate_all` before calling this method.
+
+    .. tip::
+
+        :py:class:`.Configuration` is immutable, so you do not need to make a copy to protect it.
+
+    """
 
     #################################################################
     # Internal methods
@@ -441,16 +463,66 @@ class Configuration(typ.Generic[KT, VT], tabc.Mapping[KT, VT]):
         return typ.cast(C, self)
 
 
-class MutableConfiguration(tabc.MutableMapping[typ.Any, typ.Any], Configuration):
-    """
-    This class represents an :py:class:`~collections.abc.MutableMapping` of the configuration. Inherits from :py:class:`Configuration`
+_private_data_getter: tabc.Callable[[Configuration], dict[typ.Any, typ.Any]] = op.attrgetter("_Configuration__data")
+
+
+class MutableConfiguration(typ.Generic[KT, VT], tabc.MutableMapping[KT, VT], Configuration[KT, VT]):
+    r"""
+    This class represents an :py:class:`~collections.abc.MutableMapping` of the
+    configuration. Inherits from :py:class:`Configuration`
+
+    .. tip::
+
+        Consider using :py:class:`Configuration` in you code to reduce
+        unexpected side-effects.
+
+    :param ~collections.abc.Mapping[KT, VT] mapping:
+        Constructs a :py:class:`.MutableConfiguration` by shallow copying initiating mapping.
+    :param ~collections.abc.Iterable[tuple[KT, VT]] iterable:
+        Constructs a :py:class:`.MutableConfiguration` from an iterable of key-value pairs.
+    :param VT \*\*kwargs:
+        Constructs a :py:class:`.MutableConfiguration` via keyword arguments.
+        (Due to a limitation of defaults, :py:class:`.KT` is inferred to be
+        :py:data:`~typing.Any`, instead of :py:class:`str`.)
     """
 
     if typ.TYPE_CHECKING:
-        # For Pylance. Until 3.10 is removed
+        # For Pylance and sphinx.
 
-        def __init__(self, *arg: tabc.Mapping | tabc.Iterable[tuple[typ.Any, typ.Any]], **kwargs: typ.Any) -> None:
+        @typ.overload
+        def __init__(self) -> None: ...
+
+        @typ.overload
+        def __init__(self, mapping: tabc.Mapping[KT, VT], /) -> None: ...
+
+        @typ.overload
+        def __init__(self, iterable: tabc.Iterable[tuple[KT, VT]], /) -> None: ...
+
+        @typ.overload
+        def __init__(self, **kwargs: VT) -> None: ...
+
+        def __init__(self, *arg: tabc.Mapping[KT, VT] | tabc.Iterable[tuple[KT, VT]], **kwargs: VT) -> None:
             super().__init__(*arg, **kwargs)
+
+        @typ.overload
+        def typed_get(self, type: type[T], key: typ.Any) -> T: ...
+
+        @typ.overload
+        def typed_get(self, type: type[T], key: typ.Any, *, default: T) -> T: ...
+
+        @typ.overload
+        def typed_get(
+            self, type: type[T], key: typ.Any, *, predicate: tabc.Callable[[typ.Any], typ.TypeGuard[T]]
+        ) -> T: ...
+
+        @typ.overload
+        def typed_get(
+            self, type: type[T], key: typ.Any, *, default: T, predicate: tabc.Callable[[typ.Any], typ.TypeGuard[T]]
+        ) -> T: ...
+
+        @override
+        def typed_get(self, type: type[T], key: typ.Any, **kwds: Unpack[Kwords_typed_get[T]]) -> T:
+            return super().typed_get(type, key, **kwds)
 
     # Remember `Configuration.__data` is really `Configuration._Configuration__data`
     # Type checkers do ignore this fact, because this is something to be avoided.
@@ -458,28 +530,36 @@ class MutableConfiguration(tabc.MutableMapping[typ.Any, typ.Any], Configuration)
 
     @override
     def __delitem__(self, key: typ.Any) -> None:
-        del self._Configuration__data[key]
+        del _private_data_getter(self)[key]
 
     @override
-    def __setitem__(self, key: typ.Any, value: typ.Any) -> None:
-        self._Configuration__data[key] = value
+    def __setitem__(self, key: KT, value: VT) -> None:
+        _private_data_getter(self)[key] = value
 
     @override
     def __deepcopy__(self, memo: dict[int, typ.Any]) -> MutableConfiguration:
-        other = MutableConfiguration()
+        other: MutableConfiguration[KT, VT] = MutableConfiguration()
         memo[id(self)] = other
         # Use setattr to avoid mypy and pylance being confused
-        setattr(other, "_Configuration__data", copy.deepcopy(self._Configuration__data, memo=memo))  # noqa: B010
+        setattr(other, "_Configuration__data", copy.deepcopy(_private_data_getter(self), memo=memo))  # noqa: B010
         return other
 
     @override
     def __copy__(self) -> MutableConfiguration:
-        other = MutableConfiguration()
+        other: MutableConfiguration[KT, VT] = MutableConfiguration()
         # Use setattr to avoid mypy and pylance being confused
-        setattr(other, "_Configuration__data", copy.copy(self._Configuration__data))  # noqa: B010
+        setattr(other, "_Configuration__data", copy.copy(_private_data_getter(self)))  # noqa: B010
         return other
 
     copy = __copy__
+    """
+    Returns a shallow copy of this instance. (Matches :py:meth:`dict.copy` interface.)
+
+    .. caution::
+
+        :py:class:`.LazyEval` do not make copies. If you have not evaluated all tags,
+        you should called :py:meth:`evaluate_all` before calling this method.
+    """
 
 
 C = typ.TypeVar("C", bound=Configuration)
