@@ -11,7 +11,7 @@ from granular_configuration_language.yaml.decorators import Tag, as_lazy, interp
 
 
 def add_cwd_to_path() -> None:
-    cwd = os.getcwd()
+    cwd = os.getcwd()  # noqa: PTH109  # We need the str version
     if sys.path[0] != cwd:  # pragma: no cover
         sys.path.insert(0, cwd)
 
