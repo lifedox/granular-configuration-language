@@ -8,7 +8,7 @@ As such, {py:class}`.Configuration` and {py:class}`.LazyLoadConfiguration` were 
 
 For compatibility, mutable configuration support was added explicitly, as {py:class}`.MutableConfiguration` and {py:class}`.MutableLazyLoadConfiguration`, both just adding {py:class}`~collections.abc.MutableMapping`. In mutable-mode, YAML sequences are loaded as {py:class}`list`/{py:class}`~collections.abc.MutableSequence` and caching is disabled. Modifying a {py:class}`.MutableConfiguration` is not thread-safe. Documentation will reference {py:class}`.Configuration` or {py:class}`.LazyLoadConfiguration`, but all concepts apply to their mutable counterparts, unless noted in the [Code Specification](spec)
 
-You should highly consider using the immutable configuration in you code.
+You should highly consider using an immutable configuration in you code.
 
 ---
 

@@ -171,15 +171,12 @@ class EagerIOConfigurationProxy(Mapping):
 
 class LazyLoadConfiguration(Mapping):
     r"""
-    Provides a lazy interface for loading Configuration from file paths on
-    first access.
+    The entry point for defining an immutable Configuration from file paths that lazily loads on first access.
 
-    You can optionally enable pull locations from an environment variable.
-
-    See :py:meth:`LazyLoadConfiguration.as_typed` for type annotated usage.
-
-    ``inject_before`` and ``inject_after`` allow you to inject Python-created
-    settings into you configuration without use a file.
+    **Options:**
+        -  Using ``env_location_var_name``, you can enable pulling locations from an environment variable.
+        -  See :py:meth:`LazyLoadConfiguration.as_typed` for type annotated usage.
+        -  ``inject_before`` and ``inject_after`` allow you to inject Python-created settings into you configuration without use a file.
 
     .. admonition:: :py:meth:`!as_typed` Example
         :class: hint
@@ -209,7 +206,10 @@ class LazyLoadConfiguration(Mapping):
           - Injections must use :py:class:`.Configuration` for all mappings.
 
             - Otherwise, they will be treated as a normal value and not merged.
-          - Inject occurs before ``base_path`` is applied.
+          - Injection occurs before ``base_path`` is applied.
+
+            - I.e. You must include the ``base_path`` in the injected :py:class:`.Configuration`.
+          - Using injections disables "identical immutable configurations" caching.
           - This is only available for :py:class:`.LazyLoadConfiguration`
 
             - As :py:class:`.MutableLazyLoadConfiguration` doesn't required this.
@@ -248,7 +248,7 @@ class LazyLoadConfiguration(Mapping):
             - :py:class:`dict` does not act as :py:class:`.Configuration`.
             - :py:class:`dict` instances are values that do not merge.
 
-    :param ~pathlib.Path | str | os.PathLike load_order_location:
+    :param ~pathlib.Path | str | os.PathLike \*load_order_location:
             File path to configuration file
     :param str | ~collections.abc.Sequence[str], optional base_path:
         Defines the subsection of the configuration file to use. See Examples for usage options.
@@ -262,12 +262,15 @@ class LazyLoadConfiguration(Mapping):
           configuration path that will be appended to ``load_order_location`` list.
         - Setting the Environment Variable is always optional.
         - *Default*: ``G_CONFIG_LOCATION``
+
+          - Setting ``use_env_location=True`` is required to use the default value.
     :param Configuration, optional inject_before:
         Inject a runtime :py:class:`.Configuration` instance, as if it were the first loaded file.
     :param Configuration, optional inject_after:
         Inject a runtime :py:class:`.Configuration` instance, as if it were the last loaded file.
     :param bool, optional disable_caching:
-        When :py:data:`True`, caching of "identical immutable configurations" is disabled.
+        When :py:data:`True`, this instance will not participate in the caching of "identical immutable configurations".
+    :param ~typing.Any \*\*kwargs: There are no public-facing supported extra parameters.
 
     :examples:
         .. code-block:: python
@@ -425,7 +428,7 @@ class LazyLoadConfiguration(Mapping):
         on future.
 
         This is intended to play well with :py:mod:`asyncio`, by avoiding
-        blocking the main thread on IO calls, without introducing an ``await``
+        blocking the main thread/event loop on IO calls, without introducing an ``await``
         paradigm just for a few one-time calls.
 
         .. admonition:: Part of the EagerIO feature set
@@ -449,10 +452,19 @@ class LazyLoadConfiguration(Mapping):
 
 class MutableLazyLoadConfiguration(LazyLoadConfiguration, MutableMapping):
     r"""
-    Provides a lazy interface for loading Configuration from file paths on
-    first access.
+    Used to define a **mutable** Configuration from file paths
+    that lazily loads on first access.
 
-    You can optionally enable pull locations from an environment variable.
+    
+    **Options:**
+        -  Using ``env_location_var_name``, you can enable pulling locations
+           from an environment variable.
+
+    .. tip::
+
+        Consider using an immutable configuration with
+        :py:class:`.LazyLoadConfiguration` in you code to reduce unexpected
+        side-effects.
 
     .. admonition:: Classes used for mutability
         :class: note
@@ -461,7 +473,7 @@ class MutableLazyLoadConfiguration(LazyLoadConfiguration, MutableMapping):
         - :py:class:`.MutableConfiguration` for mappings
         - :py:class:`list` for sequences
 
-    :param ~pathlib.Path | str | os.PathLike load_order_location:
+    :param ~pathlib.Path | str | os.PathLike \*load_order_location:
             File path to configuration file
     :param str | ~collections.abc.Sequence[str], optional base_path:
         Defines the subsection of the configuration file to use.
@@ -477,6 +489,9 @@ class MutableLazyLoadConfiguration(LazyLoadConfiguration, MutableMapping):
           list.
         - Setting the Environment Variable is always optional.
         - *Default*: ``G_CONFIG_LOCATION``
+
+          - Setting ``use_env_location=True`` is required to use the default
+            value.
 
     :examples:
         .. code-block:: python
