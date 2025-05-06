@@ -7,6 +7,8 @@ from pathlib import Path
 @dataclasses.dataclass(frozen=True)
 class EagerIOTextFile:
     """
+    Type: frozen :py:func:`dataclass <dataclasses.dataclass>`
+
     .. versionadded:: 2.3.0
 
     Encapsulates a file that has been read as text.

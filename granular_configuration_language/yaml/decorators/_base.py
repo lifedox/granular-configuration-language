@@ -31,6 +31,8 @@ FriendlyType = typ.NewType("FriendlyType", str)
 @dataclasses.dataclass(frozen=True, eq=False, slots=True, repr=False)
 class TagConstructor:
     """
+    Type: frozen :py:func:`dataclass <dataclasses.dataclass>`
+
     Links the YAML Constructor to the Tag Logic
     """
 
