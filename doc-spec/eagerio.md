@@ -1,26 +1,4 @@
-# IO blocking when using `asyncio` (EagerIO)
-
-:::{admonition} Unfinished Documentation
-:class: error
-:collapsible: closed
-
-Documentation for EagerIO is in-progress. Some sentences and paragraphs are incomplete.
-
----
-
-The Code Specification is a complete:
-
-- {py:class}`.EagerIOConfigurationProxy`
-- {py:meth}`.LazyLoadConfiguration.eager_load`
-
----
-
-EagerIO Tags are:
-
-- [`!EagerParseFile`](yaml.md#parsefile--optionalparsefile)
-- [`!EagerOptionalParseFile`](yaml.md#parsefile--optionalparsefile)
-
-:::
+# Avoiding IO blocking when using `asyncio` (EagerIO)
 
 :::{admonition} Philosophical Thought Process
 :class: note
@@ -92,14 +70,14 @@ Fundamentally, "Opt-In" is the lowest risk:
 
 EagerIO is an optional feature set that undoes some of the laziness of the library's default behavior, so that Fetch calls are non-blocking (or, at least, minimally blocking).
 
-- **EagerIO Tags** run IO in a background thread.
+- [**EagerIO Tags**](#using-eagerio-tags) run IO in a background thread.
   - Available EagerIO Tags are found in the [EagerIO Tag Table](yaml.md#eagerio-tag-table).
   - The thread is launched at Load Time.
     - Because of this, EagerIO Tags can at most support the _Reduced Interpolation Syntax_ for IO operations.
   - Logic is still run at Fetch.
   - The performance cost of the thread due to the GIL is minimal.
   - Currently, EagerIO Tags run their IO regardless of pruning.
-- **EagerIO Loading** loads and build the configuration in a background thread.
+- [**EagerIO Loading**](#using-eagerio-loading) loads and build the configuration in a background thread.
   - Call {py:meth}`.LazyLoadConfiguration.eager_load` to use EagerIO Loading.
   - The thread is launched when {py:meth}`~.LazyLoadConfiguration.eager_load` is called.
   - Load, Merge, and Build all occur in the thread.
@@ -189,7 +167,95 @@ The following examples are used identically:
 
 ## Creating Custom EagerIO Tags
 
-TODO
+Creating an EagerIO Tag follows the [standard custom tag creation](plugins.md#writing-your-own-tag), but replaces the Laziness Decorator and doesn't support Interpolate Decorator.
+
+### Example
+
+```python
+import typing
+
+from granular_configuration_language.yaml.decorators import (
+    LoadOptions,
+    Root,
+    Tag,
+    string_tag,
+)
+from granular_configuration_language.yaml.decorators.eager_io import (
+    EagerIOBinaryFile,
+    EagerIOTextFile,
+    as_eager_io,
+    as_eager_io_with_root_and_load_options,
+    eager_io_binary_loader_interpolates,
+    eager_io_text_loader_interpolates,
+)
+from granular_configuration_language.yaml.file_ops.binary import read_binary_data
+from granular_configuration_language.yaml.file_ops.yaml import load_from_file
+
+
+@string_tag(Tag("!EagerParseFile"))             # Tag Type Decorator
+@as_eager_io_with_root_and_load_options(        # EagerIO Decorator
+  eager_io_text_loader_interpolates
+)
+# @with_tag                                     # (Optional) With Attribute Decorator
+def tag(                                        # Function Signature
+  value: EagerIOTextFile,
+  root: Root,
+  options: LoadOptions
+) -> typing.Any:
+    return load_from_file(value, options, root) # Tag Logic
+
+
+@string_tag(Tag("!EagerLoadBinary"))              # Tag Type Decorator
+@as_eager_io(eager_io_binary_loader_interpolates) # EagerIO Decorator
+# @with_tag                                       # (Optional) With Attribute Decorator
+def eager(file: EagerIOBinaryFile) -> bytes:     # Function Signature
+    return read_binary_data(file)                 # Tag Logic
+```
+
+<br>
+
+See standard custom tag document for the following:
+
+- [](plugins.md#function-signature)
+- [](plugins.md#tag-type-decorator)
+- [](plugins.md#with-attribute-decorator)
+
+### EagerIO Decorator
+
+:::{caution}
+
+Cannot be used with [](plugins.md#laziness-decorator) or [Interpolate Decorator](plugins.md#interpolate-decorator).
+
+:::
+
+- Defines the tag to be an EagerIO tag and defines the required positional parameters.
+- The EagerIO Decorator is always a decorator factory.
+  - EagerIO Decorator takes in the Preprocessor Function that will be run eagerly.
+  - _Positional Parameters_ - `(value: ..., tag: Tag, options: LoadOptions)`
+    - `value` of the Preprocessor Function type is determined by [Tag Type Decorator](plugins.md#tag-type-decorator).
+- The `value` of the Function Signature is determined by the output of Preprocessor Function.
+- Provided Preprocessor Functions:
+  - Loading a text file eagerly:
+    - {py:func}`.eager_io_text_loader`
+      - Supports: {py:class}`.string_tag`
+      - Outputs: {py:class}`.EagerIOTextFile`
+    - {py:func}`.eager_io_text_loader_interpolates`
+      - Supports: {py:class}`.string_tag`
+      - Outputs: {py:class}`.EagerIOTextFile`
+      - Applies _Reduced Interpolation Syntax_ to {py:class}`str` parameter.
+  - Loading a binary file eagerly:
+    - {py:func}`.eager_io_binary_loader`
+      - Supports: {py:class}`.string_tag`
+      - Outputs: {py:class}`.EagerIOBinaryFile`
+    - {py:func}`.eager_io_binary_loader_interpolates`
+      - Supports: {py:class}`.string_tag`
+      - Outputs: {py:class}`.EagerIOBinaryFile`
+      - Applies _Reduced Interpolation Syntax_ to {py:class}`str` parameter.
+- Provides EagerIO Decorators:
+  - {py:func}`.as_eager_io`
+    - _Positional Parameters_ - `(value: ... )`
+  - {py:func}`.as_eager_io_with_root_and_load_options`
+    - _Positional Parameters_ - `value: ..., root: Root, options: LoadOptions`
 
 ---
 
