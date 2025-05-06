@@ -20,7 +20,7 @@ def as_environment_variable_path(tag: Tag, variable_name: str, options: LoadOpti
 
     .. note::
 
-        Uses a reversed file extension.
+        Uses a reserved file extension.
 
     :param Tag tag: Tag doing this, used for error reporting.
     :param str variable_name: Name of the environment variable being loaded

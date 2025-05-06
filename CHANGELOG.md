@@ -2,7 +2,7 @@
 
 <!-- markdownlint-disable-file MD024 -->
 
-## 2.3.1 (next)
+## 2.3.1
 
 ### Added
 
@@ -18,7 +18,7 @@
   - Both default to `typing.Any`, so no behavior change.
   - Should have been updated alongside `Configuration`.
 - `KT` is now bound to `collections.abc.Hashable`
-  - Allows type checking to catch what is runtime error.
+  - Allows type checking to catch what is a runtime error.
 
 ## 2.3.0
 

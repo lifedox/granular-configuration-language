@@ -83,7 +83,7 @@ EagerIO is an optional feature set that undoes some of the laziness of the libra
   - Load, Merge, and Build all occur in the thread.
     - EagerIO Tags spawn at their thread from this thread.
   - The performance cost of the thread due to the GIL is maximal.
-    - Python will interlace configuration loading with the main thread until the load is complete.
+    - Python will interlace configuration loading with the main thread until loading is complete.
 - You can use EagerIO Tags and EagerIO Loading independently or together.
 
 :::{note}
@@ -230,11 +230,11 @@ Cannot be used with [](plugins.md#laziness-decorator) or [Interpolate Decorator]
 
 - Defines the tag to be an EagerIO tag and defines the required positional parameters.
 - The EagerIO Decorator is always a decorator factory.
-  - EagerIO Decorator takes in the Preprocessor Function that will be run eagerly.
+  - EagerIO Decorator takes in an EagerIO Preprocessor that will be run eagerly.
   - _Positional Parameters_ - `(value: ..., tag: Tag, options: LoadOptions)`
-    - `value` of the Preprocessor Function type is determined by [Tag Type Decorator](plugins.md#tag-type-decorator).
-- The `value` of the Function Signature is determined by the output of Preprocessor Function.
-- Provided Preprocessor Functions:
+    - `value` of the EagerIO Preprocessor's type is determined by [Tag Type Decorator](plugins.md#tag-type-decorator).
+- The `value` of the Function Signature's type is determined by the output of EagerIO Preprocessor.
+- Provided EagerIO Preprocessors:
   - Loading a text file eagerly:
     - {py:func}`.eager_io_text_loader`
       - Supports: {py:class}`.string_tag`
@@ -251,7 +251,7 @@ Cannot be used with [](plugins.md#laziness-decorator) or [Interpolate Decorator]
       - Supports: {py:class}`.string_tag`
       - Outputs: {py:class}`.EagerIOBinaryFile`
       - Applies _Reduced Interpolation Syntax_ to {py:class}`str` parameter.
-- Provides EagerIO Decorators:
+- Provided EagerIO Decorators:
   - {py:func}`.as_eager_io`
     - _Positional Parameters_ - `(value: ... )`
   - {py:func}`.as_eager_io_with_root_and_load_options`
