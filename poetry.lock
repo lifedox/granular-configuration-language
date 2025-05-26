@@ -598,21 +598,21 @@ files = [
 
 [[package]]
 name = "nodejs-wheel-binaries"
-version = "22.15.1"
+version = "22.16.0"
 description = "unoffical Node.js package"
 optional = false
 python-versions = ">=3.7"
 groups = ["pyright"]
 files = [
-    {file = "nodejs_wheel_binaries-22.15.1-py2.py3-none-macosx_11_0_arm64.whl", hash = "sha256:e153dbeed992f31da8b3013e7e3ae62d066d4b9e129d67e745858403ffc47d41"},
-    {file = "nodejs_wheel_binaries-22.15.1-py2.py3-none-macosx_11_0_x86_64.whl", hash = "sha256:712d9533c0978b16d3e27e388cac2f9b9f8b92f713d63f59698a65c2f121d0aa"},
-    {file = "nodejs_wheel_binaries-22.15.1-py2.py3-none-manylinux_2_17_aarch64.manylinux2014_aarch64.whl", hash = "sha256:3cc62b389cd32984f6e9c171dd4c5c5d761a95d405adfb335699ad505545485d"},
-    {file = "nodejs_wheel_binaries-22.15.1-py2.py3-none-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:8bac50293aadcddf54854255acd732e6a5ea3f1b091388cc785bb02ec62fa12b"},
-    {file = "nodejs_wheel_binaries-22.15.1-py2.py3-none-musllinux_1_2_aarch64.whl", hash = "sha256:611638320ee22fc59f67bc402ed673a700287e574ecbdb74c27aa83c15885f27"},
-    {file = "nodejs_wheel_binaries-22.15.1-py2.py3-none-musllinux_1_2_x86_64.whl", hash = "sha256:6157e621d41e7f717b1ca3c31c251f0b8e2aa710f93bf6479268fead1dce5ef0"},
-    {file = "nodejs_wheel_binaries-22.15.1-py2.py3-none-win_amd64.whl", hash = "sha256:bc1e1717eaff84d3cdbec2de71a505b3d6d7750b874f8d292e18f215dc5d7f7e"},
-    {file = "nodejs_wheel_binaries-22.15.1-py2.py3-none-win_arm64.whl", hash = "sha256:d1509e90c2bc593d6f43dd917fb91eec0b3ea690884028002d4798e7811fdff4"},
-    {file = "nodejs_wheel_binaries-22.15.1.tar.gz", hash = "sha256:3825fb01887d2848904fbb62807e67d75dbe13f8fce3f0dd5a1d127b3afb854b"},
+    {file = "nodejs_wheel_binaries-22.16.0-py2.py3-none-macosx_11_0_arm64.whl", hash = "sha256:986b715a96ed703f8ce0c15712f76fc42895cf09067d72b6ef29e8b334eccf64"},
+    {file = "nodejs_wheel_binaries-22.16.0-py2.py3-none-macosx_11_0_x86_64.whl", hash = "sha256:4ae3cf22138891cb44c3ee952862a257ce082b098b29024d7175684a9a77b0c0"},
+    {file = "nodejs_wheel_binaries-22.16.0-py2.py3-none-manylinux_2_17_aarch64.manylinux2014_aarch64.whl", hash = "sha256:71f2de4dc0b64ae43e146897ce811f80ac4f9acfbae6ccf814226282bf4ef174"},
+    {file = "nodejs_wheel_binaries-22.16.0-py2.py3-none-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:dbfccbcd558d2f142ccf66d8c3a098022bf4436db9525b5b8d32169ce185d99e"},
+    {file = "nodejs_wheel_binaries-22.16.0-py2.py3-none-musllinux_1_2_aarch64.whl", hash = "sha256:447ad796850eb52ca20356ad39b2d296ed8fef3f214921f84a1ccdad49f2eba1"},
+    {file = "nodejs_wheel_binaries-22.16.0-py2.py3-none-musllinux_1_2_x86_64.whl", hash = "sha256:7f526ca6a132b0caf633566a2a78c6985fe92857e7bfdb37380f76205a10b808"},
+    {file = "nodejs_wheel_binaries-22.16.0-py2.py3-none-win_amd64.whl", hash = "sha256:2fffb4bf1066fb5f660da20819d754f1b424bca1b234ba0f4fa901c52e3975fb"},
+    {file = "nodejs_wheel_binaries-22.16.0-py2.py3-none-win_arm64.whl", hash = "sha256:2728972d336d436d39ee45988978d8b5d963509e06f063e80fe41b203ee80b28"},
+    {file = "nodejs_wheel_binaries-22.16.0.tar.gz", hash = "sha256:d695832f026df3a0cf9a089d222225939de9d1b67f8f0a353b79f015aabbe7e2"},
 ]
 
 [[package]]
@@ -996,14 +996,14 @@ files = [
 
 [[package]]
 name = "setuptools"
-version = "80.7.1"
+version = "80.8.0"
 description = "Easily download, build, install, upgrade, and uninstall Python packages"
 optional = false
 python-versions = ">=3.9"
 groups = ["dev"]
 files = [
-    {file = "setuptools-80.7.1-py3-none-any.whl", hash = "sha256:ca5cc1069b85dc23070a6628e6bcecb3292acac802399c7f8edc0100619f9009"},
-    {file = "setuptools-80.7.1.tar.gz", hash = "sha256:f6ffc5f0142b1bd8d0ca94ee91b30c0ca862ffd50826da1ea85258a06fd94552"},
+    {file = "setuptools-80.8.0-py3-none-any.whl", hash = "sha256:95a60484590d24103af13b686121328cc2736bee85de8936383111e421b9edc0"},
+    {file = "setuptools-80.8.0.tar.gz", hash = "sha256:49f7af965996f26d43c8ae34539c8d99c5042fbff34302ea151eaa9c207cd257"},
 ]
 
 [package.extras]
