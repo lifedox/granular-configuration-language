@@ -1,6 +1,3 @@
-# Main docker compose file
-# version: "3.8"
-
 x-base: &base
   build: &build
     context: .
@@ -14,7 +11,8 @@ x-base: &base
 services:
   build:
     <<: *base
+    image: "${COMPOSE_PROJECT_NAME:?error}-${PYTHON_VERSION:?error}"
     build:
       <<: *build
       args:
-        PYTHON_VERSION: "${PYTHON_VERSION}"
+        PYTHON_VERSION: "${PYTHON_VERSION:?error}"
