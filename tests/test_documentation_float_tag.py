@@ -3,7 +3,7 @@ from __future__ import annotations
 import collections.abc as tabc
 import re
 import sys
-import typing
+import typing  # noqa: ICN001
 from unittest.mock import patch
 
 import pytest
@@ -51,7 +51,7 @@ class float_tag(TagDecoratorBase[float]):
         return float(value)
 
 
-class float_tag_varient(float_tag):
+class float_tag_variant(float_tag):
     @override
     def scalar_node_type_check(
         self,
@@ -66,7 +66,7 @@ def double(value: float) -> float:
     return value * 2.0
 
 
-@float_tag_varient(Tag("!Halve"), "Typer")
+@float_tag_variant(Tag("!Halve"), "Typer")
 @as_lazy
 def halve(value: float) -> float:
     return value / 2.0

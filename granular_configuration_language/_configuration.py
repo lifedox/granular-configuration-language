@@ -6,7 +6,6 @@ import json
 import operator as op
 import sys
 import typing as typ
-from itertools import starmap
 from weakref import ReferenceType, ref
 
 from granular_configuration_language._base_path import BasePathPart
@@ -360,12 +359,7 @@ class Configuration(typ.Generic[KT, VT], tabc.Mapping[KT, VT]):
         :return: A shallow :py:class:`dict` copy
         :rtype: dict
         """
-        evalute_item: tabc.Callable[[tuple[KT, VT]], tuple[KT, VT]]
-        evalute_item = lambda key, value: (  # type: ignore   # instead of casting
-            key,
-            value.as_dict() if isinstance(value, Configuration) else value,
-        )
-        return dict(starmap(evalute_item, self.items()))
+        return {key: value.as_dict() if isinstance(value, Configuration) else value for key, value in self.items()}  # type: ignore
 
     def as_json_string(self, *, default: tabc.Callable[[typ.Any], typ.Any] | None = None, **kwds: typ.Any) -> str:
         r"""

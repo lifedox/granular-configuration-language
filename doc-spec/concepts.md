@@ -419,9 +419,9 @@ assert config.as_dict() == {
 ```
 <br>
 
-In the {py:func}`.merge` case, merging works as expected. However, the three `!Ref /ref` ended up referencing three different Roots.
+In the {py:func}`.merge` case, merging works as expected. However, the three `!Ref /ref` ended up referencing three different Roots, which is unexpected when using [`!Ref`](yaml.md#ref).
 
-In the {py:class}`.LazyLoadConfiguration` case, the three `!Ref /ref` reference the same Root, as is generally desired.
+In the {py:class}`.LazyLoadConfiguration` case, the three `!Ref /ref` reference the same Root, as is generally desired and expected of [`!Ref`](yaml.md#ref).
 
 For completeness’ sake, merging with [`!Merge`](yaml.md#merge) has the same result as the {py:class}`.LazyLoadConfiguration` case.
 

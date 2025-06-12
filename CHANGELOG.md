@@ -2,6 +2,12 @@
 
 <!-- markdownlint-disable-file MD024 -->
 
+## Next
+
+### Refactored
+
+- Refactored `as_dict` to use dict comprehension.
+
 ## 2.3.1
 
 ### Added

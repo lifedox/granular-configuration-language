@@ -175,7 +175,10 @@ select = [
   "C90",
   # flake8-use-pathlib
   "PTH",
-
+  # flake8-import-conventions
+  "ICN",
+  # Perflint
+  "PERF",
 ]
 ignore = [
   # Long Strings
