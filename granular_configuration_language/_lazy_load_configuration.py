@@ -404,7 +404,7 @@ class LazyLoadConfiguration(Mapping):
             :py:class:`.SafeConfigurationProxy` of this instance
             as the requested :py:class:`Configuration` subclass.
 
-            This enables typing checking and typed attributes with minimal a
+            This enables typing checking and typed attributes with minimal
             runtime cost, but it is limited to just improving developer
             experience.
 

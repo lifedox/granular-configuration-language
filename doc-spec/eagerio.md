@@ -167,7 +167,7 @@ The following examples are used identically:
 
 ## Creating Custom EagerIO Tags
 
-Creating an EagerIO Tag follows the [standard custom tag creation](plugins.md#writing-your-own-tag), but replaces the Laziness Decorator and doesn't support Interpolate Decorator.
+Creating an EagerIO Tag follows the [standard custom tag creation](plugins.md#writing-your-own-tag), but replaces the Laziness Decorator and does not support Interpolate Decorators.
 
 ### Example
 
@@ -232,7 +232,8 @@ Cannot be used with [](plugins.md#laziness-decorator) or [Interpolate Decorator]
 - The EagerIO Decorator is always a decorator factory.
   - EagerIO Decorator takes in an EagerIO Preprocessor that will be run eagerly.
   - _Positional Parameters_ - `(value: ..., tag: Tag, options: LoadOptions)`
-    - `value` of the EagerIO Preprocessor's type is determined by [Tag Type Decorator](plugins.md#tag-type-decorator).
+    - `value` of the EagerIO Preprocessor's type bounds the type of [Tag Type Decorator](plugins.md#tag-type-decorator).
+    - When creating an EagerIO Preprocessor, interpolation of raw `value` can be added using {py:func}`.interpolate_value_eager_io`.
 - The `value` of the Function Signature's type is determined by the output of EagerIO Preprocessor.
 - Provided EagerIO Preprocessors:
   - Loading a text file eagerly:
@@ -242,7 +243,7 @@ Cannot be used with [](plugins.md#laziness-decorator) or [Interpolate Decorator]
     - {py:func}`.eager_io_text_loader_interpolates`
       - Supports: {py:class}`.string_tag`
       - Outputs: {py:class}`.EagerIOTextFile`
-      - Applies _Reduced Interpolation Syntax_ to {py:class}`str` parameter.
+      - Applies _Reduced Interpolation Syntax_ to the `value` parameter, before loading the file.
   - Loading a binary file eagerly:
     - {py:func}`.eager_io_binary_loader`
       - Supports: {py:class}`.string_tag`
@@ -250,7 +251,7 @@ Cannot be used with [](plugins.md#laziness-decorator) or [Interpolate Decorator]
     - {py:func}`.eager_io_binary_loader_interpolates`
       - Supports: {py:class}`.string_tag`
       - Outputs: {py:class}`.EagerIOBinaryFile`
-      - Applies _Reduced Interpolation Syntax_ to {py:class}`str` parameter.
+      - Applies _Reduced Interpolation Syntax_ to the `value` parameter, before loading the file.
 - Provided EagerIO Decorators:
   - {py:func}`.as_eager_io`
     - _Positional Parameters_ - `(value: ... )`
