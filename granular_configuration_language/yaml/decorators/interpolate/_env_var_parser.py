@@ -20,7 +20,7 @@ def _get_mode(value: str, index: int) -> str | None:
         return None
 
 
-def get_parser_from_index(value: str, start_index: int) -> ParsedEnvironmentVariableSyntax:
+def _get_parser_from_index(value: str, start_index: int) -> ParsedEnvironmentVariableSyntax:
     colon_index = value.find(":", start_index)
 
     if colon_index < 0:
@@ -35,9 +35,9 @@ def get_parser_from_index(value: str, start_index: int) -> ParsedEnvironmentVari
 
 
 def parse_environment_variable_syntax(contents: str) -> ParsedEnvironmentVariableSyntax:
-    parser = get_parser_from_index(contents, 0)
+    parser = _get_parser_from_index(contents, 0)
 
     while parser.mode == ":":
-        parser = get_parser_from_index(contents, parser.next)
+        parser = _get_parser_from_index(contents, parser.next)
 
     return parser

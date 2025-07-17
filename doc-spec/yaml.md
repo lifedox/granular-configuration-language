@@ -231,11 +231,12 @@ with_a_default: !Env "{{ENVIRONMENT_VARIABLE_MIGHT_NOT_EXIST:some default value}
 !Del hidden: &common_setting Some Value
 copy1: *common_setting
 copy2: *common_setting
-# Loads as: {"copy1: "Some Value", "copy2": "Some Value"}
+# Loads as: {"copy1": "Some Value", "copy2": "Some Value"}
 
-!Del setting_with_tag: !UUID &user_id 83e3c814-2cdf-4fe6-b703-89b0a379759e
+!Del setting_with_tag: &user_id !UUID 83e3c814-2cdf-4fe6-b703-89b0a379759e
 user: *user_id
 # Loads as: {"user": UUID("83e3c814-2cdf-4fe6-b703-89b0a379759e")}
+# `&user_id !UUID` and `!UUID &user_id` worked the same.
 ```
 
 - **Argument:** _str_.
@@ -417,6 +418,9 @@ class_type: !Class uuid.UUID
 - **Argument:** _str_
   - _Supports Reduced Interpolation [Syntax](#interpolations)_
 - **Returns:** {py:class}`type` ‒ Specified the class.
+- Throws:
+  - {py:class}`.DoesNotExist`: if the class does not exist.
+  - {py:class}`.IsNotAClass`: if the class is not callable.
 - Notes:
   - The current working directory is added prior to importing the specified module.
   - Returned object must pass {py:func}`inspect.isclass` as {py:data}`True`.
@@ -463,6 +467,9 @@ function: !Func functools.reduce
 - **Argument:** _str_
   - _Supports Reduced Interpolation [Syntax](#interpolations)_
 - **Returns:** {py:class}`~collections.abc.Callable` ‒ Specified function.
+- Throws:
+  - {py:class}`.DoesNotExist`: if the function does not exist.
+  - {py:class}`.IsNotCallable`: if the function is not callable.
 - Notes:
   - The current working directory is added prior to importing the specified module.
   - Returned object must pass {py:func}`callable` as {py:data}`True`.

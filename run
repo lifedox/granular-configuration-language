@@ -22,9 +22,6 @@ dir="$(cd "$(dirname "$0")" && pwd)"
 cd "$dir"
 
 # Env Vars defaults
-export ROOT_DIR=$dir
-export G_CONFIG_LOCATION="$dir/configs/localdev.yaml"
-export DOCKER_MAKE=${DOCKER_MAKE:-true}
 export IN_DOCKER=${IN_DOCKER:-false}
 
 usage=()
@@ -58,7 +55,7 @@ _run_docker_cmd() {
 }
 
 _run_cmd() {
-    if [ "$DOCKER_MAKE" == 'true' ] && [ "$IN_DOCKER" != 'true' ]; then
+    if [ "$IN_DOCKER" != 'true' ]; then
         _run_docker_cmd "$@"
     else
         "$@"
@@ -200,7 +197,7 @@ lock() {
 
 usage+=("  $0 build - Build docker container")
 build() {
-    if [ "$DOCKER_MAKE" == 'true' ] && [ "$IN_DOCKER" != 'true' ]; then
+    if [ "$IN_DOCKER" != 'true' ]; then
         # shellcheck disable=SC2086
         docker compose ${docker_compose_args} build
     else
