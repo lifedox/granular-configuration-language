@@ -75,7 +75,7 @@ class Masked(str):
     - Inherits from :py:class:`str`.
     - Replaces the standard :py:meth:`~object.__repr__` result with the
       constant literal ``'<****>'``.
-    - Used by :ref:`tag-mask` tag
+    - Used by ``!Mask`` tag (:ref:`ref <tag-mask>`).
 
     Note:
         Does not alter text or prevent :py:func:`print` from display the string value.
@@ -90,7 +90,7 @@ class Masked(str):
 
 class Placeholder:
     """
-    Representation of :ref:`tag-placeholder` tag.
+    Representation of ``!Placeholder`` tag (:ref:`ref <tag-placeholder>`).
 
     Holds the ``!Placeholder`` message.
     """

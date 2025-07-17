@@ -236,7 +236,7 @@ copy2: *common_setting
 !Del setting_with_tag: &user_id !UUID 83e3c814-2cdf-4fe6-b703-89b0a379759e
 user: *user_id
 # Loads as: {"user": UUID("83e3c814-2cdf-4fe6-b703-89b0a379759e")}
-# `&user_id !UUID` and `!UUID &user_id` worked the same.
+# `&user_id !UUID` and `!UUID &user_id` work the same.
 ```
 
 - **Argument:** _str_.
