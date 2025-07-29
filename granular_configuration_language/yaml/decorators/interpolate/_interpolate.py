@@ -18,13 +18,13 @@ from granular_configuration_language.yaml.decorators.ref import resolve_json_ref
 
 
 def _get_ref_string(root: Root, contents: str) -> str:
-    value = resolve_json_ref(contents, root)
-    if isinstance(value, str):
-        return value
-    elif isinstance(value, tabc.Mapping | tabc.Sequence):
-        return repr(value)
-    else:
-        return str(value)
+    match resolve_json_ref(contents, root):
+        case str(value):
+            return value
+        case tabc.Mapping() | tabc.Sequence() as value:
+            return repr(value)
+        case value:
+            return str(value)
 
 
 def _get_env_var_string(root: Root, contents: str) -> str:

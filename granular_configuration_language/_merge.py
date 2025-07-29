@@ -60,15 +60,18 @@ def merge(
             if isinstance(config, LazyEval):
                 config = config.result
 
-            if isinstance(config, Configuration):
-                yield config
-            elif isinstance(config, LazyLoadConfiguration):
-                yield config.config
-            elif isinstance(config, PathLike):
-                if mutable:
-                    yield MutableLazyLoadConfiguration(config).config
-                else:
-                    yield LazyLoadConfiguration(config).config
+            match config:
+                case Configuration():
+                    yield config
+                case LazyLoadConfiguration():
+                    yield config.config
+                case PathLike():
+                    if mutable:
+                        yield MutableLazyLoadConfiguration(config).config
+                    else:
+                        yield LazyLoadConfiguration(config).config
+                case _:
+                    continue
 
     configuration_type = obj_pairs_func(mutable)
     base_config = configuration_type()

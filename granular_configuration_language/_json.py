@@ -1,10 +1,9 @@
 from __future__ import annotations
 
 import collections.abc as tabc
-import inspect
 import json
 import typing as typ
-from collections.abc import Mapping, Sequence
+from collections.abc import Callable, Mapping, Sequence
 from datetime import date, datetime
 from functools import partial, update_wrapper
 from uuid import UUID
@@ -13,9 +12,14 @@ from granular_configuration_language import Configuration, LazyLoadConfiguration
 
 
 def get_name(value: tabc.Callable) -> str:
-    try:
-        return f"<{value.__module__}.{value.__name__}>"
-    except Exception:  # pragma: no cover
+    name: str | None = getattr(value, "__name__", None)
+    class_type: type | None = getattr(value, "__class__", None)
+
+    if name:
+        return f"<{getattr(value, '__module__', '')}.{name}>"
+    elif class_type:
+        return f"<{class_type.__module__}.{class_type.__name__}()>"
+    else:  # pragma: no cover
         return f"<{repr(value)}>"
 
 
@@ -43,27 +47,27 @@ def json_default(value: typ.Any) -> typ.Any:
     :raises TypeError: When an incompatible is provided, as required by :py:class:`~json.JSONEncoder`
 
     """
-
-    if isinstance(value, Configuration):
-        return value.as_dict()
-    elif isinstance(value, LazyLoadConfiguration):
-        return value.config.as_dict()
-    elif isinstance(value, UUID):
-        return str(value)
-    elif isinstance(value, date | datetime):
-        return value.isoformat()
-    elif inspect.isclass(value):
-        return get_name(value)
-    elif isinstance(value, partial):
-        return f"<{repr(value)}>"
-    elif callable(value):
-        return get_name(value)
-    elif isinstance(value, Mapping):
-        return dict(value)
-    elif isinstance(value, Sequence) and not isinstance(value, str):
-        return tuple(value)
-    else:
-        return json.JSONEncoder().default(value)
+    match value:
+        case Configuration():
+            return value.as_dict()
+        case LazyLoadConfiguration():
+            return value.config.as_dict()
+        case UUID():
+            return str(value)
+        case date() | datetime():
+            return value.isoformat()
+        case type():
+            return f"<{value.__module__}.{value.__name__}>"
+        case partial():
+            return f"<{repr(value)}>"
+        case Callable():  # type: ignore[misc]  # mypy doesn't consider Callable to be a class, but it is
+            return get_name(value)
+        case Mapping():
+            return dict(value)
+        case Sequence():
+            return tuple(value)
+        case _:
+            return json.JSONEncoder().default(value)
 
 
 dumps = update_wrapper(partial(json.dumps, default=json_default), json.dumps)

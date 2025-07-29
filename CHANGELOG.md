@@ -7,6 +7,7 @@
 ### Refactored
 
 - Refactored `as_dict` to use dict comprehension.
+- Refactored `_get_ref_string`, `json_default`, and `merge` to use `match` for `isinstance` checks for improve clarity and `MatchNotExhaustive` linting.
 
 ## 2.3.1
 
