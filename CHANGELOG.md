@@ -124,7 +124,7 @@
 
 - YAML Version 1.2 is the default supported version.
   - Reason: Switched from `PyYAML` to `ruamel.yaml`, because `PyYAML` is very dead.
-  - `yes/no`, `y/n`, `on/off` is no longer `bool`
+  - `yes/no`, `y/n`, `on/off` are no longer `bool`
   - Octal support is clearer: `010` means 10, `0o10` means 8.
   - Mitigation: YAML 1.1 support can be explicit enabled by using the `%YAML 1.1 ---` directive
 - `jsonpath-rw` cannot be installed aside this library.
@@ -163,12 +163,12 @@
 - Switched from `PyYAML` to `ruamel.yaml`
   - Note: `PyYAML` is very dead
   - This primarily means YAML Version 1.2 is the default supported version.
-    - `yes/no`, `y/n`, `on/off` is no longer `bool`
+    - `yes/no`, `y/n`, `on/off` are no longer `bool`
     - Octal support is clearer: `010` means 10, `0o10` means 8.
   - YAML 1.1 support can be explicit enabled by using the `%YAML 1.1 ---` directive
 - Switched from `jsonpath-rw` to `python-jsonpath`
   - Note: `jsonpath-rw` is very dead
-  - Important: Both `jsonpath-rw` and `python-jsonpath` cannot be installed. `jsonpath-rw` controls `jsonpath_rw` and `jsonpath` modules (despite not explicitly needing the latter). `python-jsonpath` also controls `jsonpath`, but losses in `jsonpath-rw`.
+  - Important: Both `jsonpath-rw` and `python-jsonpath` cannot be installed. `jsonpath-rw` controls `jsonpath_rw` and `jsonpath` modules (despite not explicitly needing the latter). `python-jsonpath` also controls `jsonpath`, but loses to `jsonpath-rw`.
     - `ImportError` occur on the `jsonpath` modules when both are installed.
 - Renamed `granular_configuration.yaml_handler` module to `granular_configuration.yaml`
 - Configuration no longer fakes being a subclass of `dict`.
