@@ -67,7 +67,7 @@ pytest-cov = "6.2.1"
 coverage = "7.10.1"
 # Linting
 ruff = "0.12.7"
-mypy = "1.17.0"
+mypy = "1.17.1"
 bandit = "1.8.6"
 
 [project.entry-points."granular_configuration_language_20_tag"]
