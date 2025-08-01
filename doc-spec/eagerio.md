@@ -71,7 +71,7 @@ Fundamentally, "Opt-In" is the lowest risk:
 EagerIO is an optional feature set that undoes some of the laziness of the library's default behavior, so that Fetch calls are non-blocking (or, at least, minimally blocking).
 
 - [**EagerIO Tags**](#using-eagerio-tags) run IO in a background thread.
-  - Available EagerIO Tags are found in the [EagerIO Tag Table](yaml.md#eagerio-tag-table).
+  - Available EagerIO Tags are found in the [](yaml.md#table-of-eagerio-tags).
   - The thread is launched at Load Time.
     - Because of this, EagerIO Tags can at most support the _Reduced Interpolation Syntax_ for IO operations.
   - Logic is still run at Fetch.

@@ -116,6 +116,10 @@
 
 &nbsp;
 
+<!--old anchor-->
+
+(eagerio-tag-table)=
+
 ## Table of EagerIO Tags
 
 See [EagerIO documentation](eagerio.md#) for more details on EagerIO.
