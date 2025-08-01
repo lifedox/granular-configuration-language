@@ -16,7 +16,15 @@
 - YAML Tags provided by this library are lazy (running when the value is request, not load time) unless noted.
 - YAML Tags that are lazy do not support being used as keys to mappings.
 
-## Summary Table
+<!--old anchor-->
+
+(summary-table)=
+
+## Table of Tags
+
+[{sup}`i+`]{#interpolates-full} : Supports full [interpolation syntax](#interpolations) of [`!Sub`](#sub).
+<br><!--Looks good on doc site-->
+[{sup}`i-`]{#interpolates-reduced} : Supports reduced [interpolation syntax](#interpolations) of [`!Sub`](#sub) without JSON Path or JSON Pointer syntax.
 
 <!-- Non-breaking space on "Tag" Header forces horzontal scrollbar to be appear before tags become unreadable on a narrow view -->
 
@@ -106,7 +114,9 @@
   - `!UUID 9d7130a6-{...}-29f0b765be9e`
 ````
 
-## EagerIO Tag Table
+&nbsp;
+
+## Table of EagerIO Tags
 
 See [EagerIO documentation](eagerio.md#) for more details on EagerIO.
 
@@ -131,11 +141,55 @@ See [EagerIO documentation](eagerio.md#) for more details on EagerIO.
 
 &nbsp;
 
-[{sup}`i+`]{#interpolates-full} : Supports full [interpolation syntax](#interpolations) of [`!Sub`](#sub).
-<br><!--Looks good in GitHub-->
-[{sup}`i-`]{#interpolates-reduced} : Supports reduced [interpolation syntax](#interpolations) of [`!Sub`](#sub) without JSON Path or JSON Pointer syntax.
+## Table of `!Sub` Interpolations
+
+- See the [Interpolations Section](#interpolations) of [`!Sub`](#sub) for more details.
+- Interpolations are defined within `${` and `}` anchors.
+  - Not shown in the table, but is shown in the detailed section.
+- Use `::` to escape colons in environment variable names.
+
+:::{list-table}
+:header-rows: 1
+:width: 100%
+
+- - Name
+  - Mode Selector
+  - Usage&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+  - Notes
+- - Environment Variable (Null mode)
+  - None
+  - `ENVIRONMENT_VARIABLE`
+  - Raises an exception, if the variable does not exist.
+- - Environment Variable - Default mode
+  - `:-`
+  - `ENV_VAR:-default_value`
+  - The provided default string is used, if the variable does not exist.
+- - Environment Variable - Nesting mode
+  - `:+`
+  - `ENV_VAR:+<nested_expr>`
+  - The interpolation of the nested expression is used, if the variable does not exist.
+- - JSON Pointer
+  - N/A
+  - `/json/pointer`
+  - Must start with `/`.
+- - JSON Path
+  - N/A
+  - `$.json.path`
+  - Must start with `$`.<br> _(Not available in reduced syntax.)_
+- - Dollar Sign Literal
+  - N/A
+  - `$`
+  - Must only be `$`.<br> _(Not available in reduced syntax.)_
+- - HTML Decode
+  - N/A
+  - `&#x24;`
+  - Must start with `&` and end with `;`.
+
+:::
 
 ---
+
+&nbsp;
 
 ## Formatters
 
