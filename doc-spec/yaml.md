@@ -131,9 +131,9 @@ See [EagerIO documentation](eagerio.md#) for more details on EagerIO.
 
 &nbsp;
 
-[{sup}`i+`]{#interpolates-full} : Supports full interpolation syntax of [`!Sub`](#sub).
+[{sup}`i+`]{#interpolates-full} : Supports full [interpolation syntax](#interpolations) of [`!Sub`](#sub).
 <br><!--Looks good in GitHub-->
-[{sup}`i-`]{#interpolates-reduced} : Supports reduced interpolation syntax of [`!Sub`](#sub) without JSON Path or JSON Pointer syntax.
+[{sup}`i-`]{#interpolates-reduced} : Supports reduced [interpolation syntax](#interpolations) of [`!Sub`](#sub) without JSON Path or JSON Pointer syntax.
 
 ---
 
@@ -163,7 +163,9 @@ $: !Sub ${$}
     - If variable does not exist, use the text after `:-`.
     - Note: specifier is `:-`.
   - `${ENVIRONMENT_VARIABLE:+<nested_interpolation_spec>}`: Replaced with the specified Environment Variable.
-    - If variable does not exist, use the text after `:+` to interpolate a result.
+    - If variable does not exist, use the text after `:+` is used as a fresh interpolation.
+      - Example 1:`${ENVIRONMENT_VARIABLE1:+ENVIRONMENT_VARIABLE2:-default value}`
+      - Example 2:`${ENVIRONMENT_VARIABLE:+/json/pointer/expression}`
     - Note: specifier is `:+`.
   - `${/json/pointer/expression}`: Replaced by the object in the configuration specified in JSON Pointer syntax.
     - Paths must start at full root of the configuration, using `/` as the first character.
@@ -172,6 +174,7 @@ $: !Sub ${$}
         - Paths that return a {py:class}`~collections.abc.Mapping` or {py:class}`~collections.abc.Sequence` will be {py:func}`repr`-ed.
         - Other objects will be {py:class}`str`-ed.
       - Paths that do not exist raise {py:class}`.JSONPointerQueryFailed`.
+    - _Not available in reduced interpolation syntax._
   - `${$.json.path.expression}`: Replaced by the object in the configuration specified in JSON Path syntax.
     - Paths must start at full root of the configuration, using `$` as the first character.
     - JSON Pointer is recommended over JSON Path.
@@ -181,6 +184,7 @@ $: !Sub ${$}
         - Paths that return a {py:class}`~collections.abc.Mapping` or {py:class}`~collections.abc.Sequence` will be {py:func}`repr`-ed.
         - Other objects will be {py:class}`str`-ed.
       - Paths that do not exist raise {py:class}`.JSONPathQueryFailed`.
+    - _Not available in reduced interpolation syntax._
   - `${$}`: Replaced with `$`.
     - `!Sub ${$}{}` produces `${}`
   - `${&...;}`: Replaced by the results of {py:func}`html.unescape`.
@@ -190,9 +194,11 @@ $: !Sub ${$}
   - Reserved Syntax:
     - Modes other than `:-` and `:+` are reserved and throw {py:class}`.InterpolationSyntaxError`.
       - Use `::` to escape colons in environment variable names.
-    - `$(...)` is reserved future for use and will warn with {py:class}`.InterpolationWarning` if used.
-- Notes:
-  - `${...}` is greedy and does not support nesting (i.e. `!Sub ${${}}` sees `${` as the inner expression).
+    - The `$(...)` anchor is reserved for future use and will warn with {py:class}`.InterpolationWarning` if used.
+  - Notes on Interpolations:
+    - The `${...}` anchor is greedy and does not support nested anchors (i.e. `!Sub ${${}}` sees `${` as the inner expression).
+    - `${` and `}` are beginning and ending anchors of a single interpolation. Their repeated use in this section is illustrative. Nested interpolations are a part of their parent interpolation; thus, a nested interpolation (i.e. the `<nested_interpolation_spec>` of `:+` mode) does not include its own anchors.
+- Notes on `!Sub`:
   - `!Sub` checks if there is an JSON Path or JSON Pointer expression before keeping a reference to the root of the configuration.
 
 ```{admonition} Recursion Possible
@@ -233,7 +239,7 @@ copy1: *common_setting
 copy2: *common_setting
 # Loads as: {"copy1": "Some Value", "copy2": "Some Value"}
 
-!Del setting_with_tag: &user_id !UUID 83e3c814-2cdf-4fe6-b703-89b0a379759e
+!Del setting_with_tag: !UUID &user_id 83e3c814-2cdf-4fe6-b703-89b0a379759e
 user: *user_id
 # Loads as: {"user": UUID("83e3c814-2cdf-4fe6-b703-89b0a379759e")}
 # `&user_id !UUID` and `!UUID &user_id` work the same.
