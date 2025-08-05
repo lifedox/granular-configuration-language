@@ -4,9 +4,9 @@ import pytest
 
 from granular_configuration_language import Configuration
 from granular_configuration_language.exceptions import (
-    JSONPathOnlyWorksOnMappings,
     JSONPathQueryFailed,
     JSONPointerQueryFailed,
+    ReferencingRootOnlyWorksOnMappings,
     RefMustStartFromRoot,
 )
 from granular_configuration_language.yaml import loads
@@ -87,7 +87,7 @@ def test_scalar_ref_throws_exception() -> None:
     test_data = """
 !Ref $.no_data.here
 """
-    with pytest.raises(JSONPathOnlyWorksOnMappings):
+    with pytest.raises(ReferencingRootOnlyWorksOnMappings):
         loads(test_data)
 
 

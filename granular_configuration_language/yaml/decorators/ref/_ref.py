@@ -8,9 +8,9 @@ import typing as typ
 import jsonpath
 
 from granular_configuration_language.exceptions import (
-    JSONPathOnlyWorksOnMappings,
     JSONPathQueryFailed,
     JSONPointerQueryFailed,
+    ReferencingRootOnlyWorksOnMappings,
     RefMustStartFromRoot,
 )
 from granular_configuration_language.yaml.classes import LazyEval
@@ -70,7 +70,7 @@ def resolve_json_ref(query: str, root: Root) -> typ.Any:
         - Starts with ``/`` for a JSON Pointer
     :param Root root:
         :py:class:`~collections.abc.Mapping` being queried
-    :raises JSONPathOnlyWorksOnMappings: Raised if ``root`` is not a :py:class:`~collections.abc.Mapping`
+    :raises ReferencingRootOnlyWorksOnMappings: Raised if ``root`` is not a :py:class:`~collections.abc.Mapping`
     :raises RefMustStartFromRoot: Raised if the ``query`` does not start with ``$`` or ``/``.
     :return: Result of the query
     :rtype: ~typing.Any
@@ -81,7 +81,7 @@ def resolve_json_ref(query: str, root: Root) -> typ.Any:
             f"JSON Query `{query}` attempted recursion. Please check your configuration for a self-referencing loop."
         )
     elif not isinstance(root, tabc.Mapping):
-        raise JSONPathOnlyWorksOnMappings(f"JSONPath `{query}` was tried on `{repr(root)}`")
+        raise ReferencingRootOnlyWorksOnMappings(f"Query `{query}` was tried on `{repr(root)}`")
     elif query.startswith("$"):
         return _resolve_path(query, root)
     elif query.startswith("/"):

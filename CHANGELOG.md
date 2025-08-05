@@ -2,7 +2,17 @@
 
 <!-- markdownlint-disable-file MD024 -->
 
-## Next
+## Next (2.4.0)
+
+### Changed
+
+- Changed from using `JSONPathOnlyWorksOnMappings` exception to new `ReferencingRootOnlyWorksOnMappings` exception, because scenario is not specific to JSON Path.
+  - `ReferencingRootOnlyWorksOnMappings` inherits from `JSONPathOnlyWorksOnMappings`, as to not break compatible, though to is a showstopping scenario.
+
+### Removed
+
+- Removed unused exceptions: `IniKeyExistAsANonMapping`, `IniTryToReplaceExistingKey`, `GetConfigReadBeforeSetException`
+  - Exceptions were solely used by features removed in 2.0.0 releases.
 
 ### Refactored
 

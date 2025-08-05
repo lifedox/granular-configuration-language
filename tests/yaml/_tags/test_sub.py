@@ -11,8 +11,8 @@ from granular_configuration_language.exceptions import (
     EnvironmentVaribleNotFound,
     InterpolationSyntaxError,
     InterpolationWarning,
-    JSONPathOnlyWorksOnMappings,
     JSONPathQueryFailed,
+    ReferencingRootOnlyWorksOnMappings,
 )
 from granular_configuration_language.yaml import loads
 
@@ -68,7 +68,7 @@ b: c
 
 def test_jsonpath_on_a_scalar_value_makes_no_sense_and_must_fail() -> None:
     test_data = "!Sub ${$.no_data.here}"
-    with pytest.raises(JSONPathOnlyWorksOnMappings):
+    with pytest.raises(ReferencingRootOnlyWorksOnMappings):
         loads(test_data)
 
 

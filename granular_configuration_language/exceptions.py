@@ -21,23 +21,11 @@ class ErrorWhileLoadingTags(Exception):
     pass
 
 
-class GetConfigReadBeforeSetException(Exception):
-    pass
-
-
 class InterpolationWarning(Warning):
     pass
 
 
 class InterpolationSyntaxError(Exception):
-    pass
-
-
-class IniKeyExistAsANonMapping(Exception):
-    pass
-
-
-class IniTryToReplaceExistingKey(Exception):
     pass
 
 
@@ -58,6 +46,11 @@ class IsNotCallable(ValueError):
 
 
 class JSONPathOnlyWorksOnMappings(Exception):
+    """
+    .. deprecated:: 2.3.2
+        Use :py:class:`.ReferencingRootOnlyWorksOnMappings`
+    """
+
     pass
 
 
@@ -82,6 +75,14 @@ class PlaceholderConfigurationError(Exception):
 
 
 class RefMustStartFromRoot(Exception):
+    pass
+
+
+class ReferencingRootOnlyWorksOnMappings(JSONPathOnlyWorksOnMappings):
+    """
+    .. versionadded:: 2.4.0
+    """
+
     pass
 
 
