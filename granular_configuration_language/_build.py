@@ -6,16 +6,15 @@ from functools import partial
 from pathlib import Path
 
 from granular_configuration_language import Configuration
+from granular_configuration_language._configuration import C
 from granular_configuration_language._s import setter_secret
 from granular_configuration_language._utils import consume
 from granular_configuration_language.yaml import LazyRoot
 from granular_configuration_language.yaml.file_ops.text import load_text_file
 from granular_configuration_language.yaml.load import load_file, obj_pairs_func
 
-_C = typ.TypeVar("_C", bound=Configuration)
 
-
-def _merge_into_base(configuration_type: type[_C], base_dict: _C, from_dict: _C) -> None:
+def _merge_into_base(configuration_type: type[C], base_dict: C, from_dict: C) -> None:
     for key, value in from_dict._raw_items():
         if isinstance(value, configuration_type) and (key in base_dict):
             if base_dict.exists(key):
@@ -30,17 +29,17 @@ def _merge_into_base(configuration_type: type[_C], base_dict: _C, from_dict: _C)
         base_dict._private_set(key, value, setter_secret)
 
 
-def _merge(configuration_type: type[_C], base_config: _C, configs: tabc.Iterable[_C]) -> _C:
+def _merge(configuration_type: type[C], base_config: C, configs: tabc.Iterable[C]) -> C:
     consume(map(partial(_merge_into_base, configuration_type, base_config), configs))
     return base_config
 
 
 def _load_configs_from_locations(
-    configuration_type: type[_C], locations: tabc.Iterable[Path], lazy_root: LazyRoot, mutable: bool
-) -> tabc.Iterator[_C]:
+    configuration_type: type[C], locations: tabc.Iterable[Path], lazy_root: LazyRoot, mutable: bool
+) -> tabc.Iterator[C]:
     def configuration_only(
-        configs: tabc.Iterable[_C | typ.Any],
-    ) -> tabc.Iterator[_C]:
+        configs: tabc.Iterable[C | typ.Any],
+    ) -> tabc.Iterator[C]:
         for config in configs:
             if isinstance(config, configuration_type):
                 yield config
@@ -50,18 +49,18 @@ def _load_configs_from_locations(
 
 
 def _inject_configs(
-    configs: tabc.Iterator[_C],
+    configs: tabc.Iterator[C],
     *,
     before: Configuration | None,
     after: Configuration | None,
-) -> tabc.Iterator[_C]:
+) -> tabc.Iterator[C]:
     if before and isinstance(before, Configuration):
-        yield typ.cast(_C, before)
+        yield typ.cast(C, before)
 
     yield from configs
 
     if after and isinstance(after, Configuration):
-        yield typ.cast(_C, after)
+        yield typ.cast(C, after)
 
 
 def build_configuration(
