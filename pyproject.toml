@@ -19,7 +19,7 @@ documentation = "https://lifedox.github.io/granular-configuration-language/READM
 
 [project]
 name = "granular-configuration-language"
-version = "2.3.1"
+version = "2.4.0"
 description = "This general purpose configuration utility library allows your code to use YAML as a configuration language for internal and external parties, allowing configuration to be crafted from multiple sources and merged just before use, using YAML Tags for additional functionality."
 license = { text = "MIT" }
 authors = [{ name = "Eric Jensen", email = "eric.jensen42@gmail.com" }]
