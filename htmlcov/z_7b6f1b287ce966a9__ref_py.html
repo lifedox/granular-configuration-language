@@ -67,7 +67,7 @@
             <a id="nextFileLink" class="nav" href="z_c88b7cf12b83975e___init___py.html">&#xbb; next</a>
             &nbsp; &nbsp; &nbsp;
             <a class="nav" href="https://coverage.readthedocs.io/en/7.10.4">coverage.py v7.10.4</a>,
-            created at 2025-08-22 11:50 +0000
+            created at 2025-08-22 22:52 +0000
         </p>
         <aside class="hidden">
             <button type="button" class="button_next_chunk" data-shortcut="j"></button>
@@ -92,9 +92,9 @@
     <p class="run"><span class="n"><a id="t8" href="#t8">8</a></span><span class="t"><span class="key">import</span> <span class="nam">jsonpath</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t9" href="#t9">9</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t10" href="#t10">10</a></span><span class="t"><span class="key">from</span> <span class="nam">granular_configuration_language</span><span class="op">.</span><span class="nam">exceptions</span> <span class="key">import</span> <span class="op">(</span>&nbsp;</span><span class="r"></span></p>
-    <p class="run run2"><span class="n"><a id="t11" href="#t11">11</a></span><span class="t">    <span class="nam">JSONPathOnlyWorksOnMappings</span><span class="op">,</span>&nbsp;</span><span class="r"></span></p>
-    <p class="run run2"><span class="n"><a id="t12" href="#t12">12</a></span><span class="t">    <span class="nam">JSONPathQueryFailed</span><span class="op">,</span>&nbsp;</span><span class="r"></span></p>
-    <p class="run run2"><span class="n"><a id="t13" href="#t13">13</a></span><span class="t">    <span class="nam">JSONPointerQueryFailed</span><span class="op">,</span>&nbsp;</span><span class="r"></span></p>
+    <p class="run run2"><span class="n"><a id="t11" href="#t11">11</a></span><span class="t">    <span class="nam">JSONPathQueryFailed</span><span class="op">,</span>&nbsp;</span><span class="r"></span></p>
+    <p class="run run2"><span class="n"><a id="t12" href="#t12">12</a></span><span class="t">    <span class="nam">JSONPointerQueryFailed</span><span class="op">,</span>&nbsp;</span><span class="r"></span></p>
+    <p class="run run2"><span class="n"><a id="t13" href="#t13">13</a></span><span class="t">    <span class="nam">ReferencingRootOnlyWorksOnMappings</span><span class="op">,</span>&nbsp;</span><span class="r"></span></p>
     <p class="run run2"><span class="n"><a id="t14" href="#t14">14</a></span><span class="t">    <span class="nam">RefMustStartFromRoot</span><span class="op">,</span>&nbsp;</span><span class="r"></span></p>
     <p class="run run2"><span class="n"><a id="t15" href="#t15">15</a></span><span class="t"><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t16" href="#t16">16</a></span><span class="t"><span class="key">from</span> <span class="nam">granular_configuration_language</span><span class="op">.</span><span class="nam">yaml</span><span class="op">.</span><span class="nam">classes</span> <span class="key">import</span> <span class="nam">LazyEval</span>&nbsp;</span><span class="r"></span></p>
@@ -154,7 +154,7 @@
     <p class="pln"><span class="n"><a id="t70" href="#t70">70</a></span><span class="t"><span class="str">        - Starts with ``/`` for a JSON Pointer</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t71" href="#t71">71</a></span><span class="t"><span class="str">    :param Root root:</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t72" href="#t72">72</a></span><span class="t"><span class="str">        :py:class:`~collections.abc.Mapping` being queried</span>&nbsp;</span><span class="r"></span></p>
-    <p class="pln"><span class="n"><a id="t73" href="#t73">73</a></span><span class="t"><span class="str">    :raises JSONPathOnlyWorksOnMappings: Raised if ``root`` is not a :py:class:`~collections.abc.Mapping`</span>&nbsp;</span><span class="r"></span></p>
+    <p class="pln"><span class="n"><a id="t73" href="#t73">73</a></span><span class="t"><span class="str">    :raises ReferencingRootOnlyWorksOnMappings: Raised if ``root`` is not a :py:class:`~collections.abc.Mapping`</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t74" href="#t74">74</a></span><span class="t"><span class="str">    :raises RefMustStartFromRoot: Raised if the ``query`` does not start with ``$`` or ``/``.</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t75" href="#t75">75</a></span><span class="t"><span class="str">    :return: Result of the query</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t76" href="#t76">76</a></span><span class="t"><span class="str">    :rtype: ~typing.Any</span>&nbsp;</span><span class="r"></span></p>
@@ -165,7 +165,7 @@
     <p class="run run2"><span class="n"><a id="t81" href="#t81">81</a></span><span class="t">            <span class="fst">f"</span><span class="fst">JSON Query `</span><span class="op">{</span><span class="nam">query</span><span class="op">}</span><span class="fst">` attempted recursion. Please check your configuration for a self-referencing loop.</span><span class="fst">"</span>&nbsp;</span><span class="r"></span></p>
     <p class="run run2"><span class="n"><a id="t82" href="#t82">82</a></span><span class="t">        <span class="op">)</span>&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t83" href="#t83">83</a></span><span class="t">    <span class="key">elif</span> <span class="key">not</span> <span class="nam">isinstance</span><span class="op">(</span><span class="nam">root</span><span class="op">,</span> <span class="nam">tabc</span><span class="op">.</span><span class="nam">Mapping</span><span class="op">)</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
-    <p class="run"><span class="n"><a id="t84" href="#t84">84</a></span><span class="t">        <span class="key">raise</span> <span class="nam">JSONPathOnlyWorksOnMappings</span><span class="op">(</span><span class="fst">f"</span><span class="fst">JSONPath `</span><span class="op">{</span><span class="nam">query</span><span class="op">}</span><span class="fst">` was tried on `</span><span class="op">{</span><span class="nam">repr</span><span class="op">(</span><span class="nam">root</span><span class="op">)</span><span class="op">}</span><span class="fst">`</span><span class="fst">"</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
+    <p class="run"><span class="n"><a id="t84" href="#t84">84</a></span><span class="t">        <span class="key">raise</span> <span class="nam">ReferencingRootOnlyWorksOnMappings</span><span class="op">(</span><span class="fst">f"</span><span class="fst">Query `</span><span class="op">{</span><span class="nam">query</span><span class="op">}</span><span class="fst">` was tried on `</span><span class="op">{</span><span class="nam">repr</span><span class="op">(</span><span class="nam">root</span><span class="op">)</span><span class="op">}</span><span class="fst">`</span><span class="fst">"</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t85" href="#t85">85</a></span><span class="t">    <span class="key">elif</span> <span class="nam">query</span><span class="op">.</span><span class="nam">startswith</span><span class="op">(</span><span class="str">"$"</span><span class="op">)</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t86" href="#t86">86</a></span><span class="t">        <span class="key">return</span> <span class="nam">_resolve_path</span><span class="op">(</span><span class="nam">query</span><span class="op">,</span> <span class="nam">root</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t87" href="#t87">87</a></span><span class="t">    <span class="key">elif</span> <span class="nam">query</span><span class="op">.</span><span class="nam">startswith</span><span class="op">(</span><span class="str">"/"</span><span class="op">)</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
@@ -181,7 +181,7 @@
             <a class="nav" href="z_c88b7cf12b83975e___init___py.html">&#xbb; next</a>
             &nbsp; &nbsp; &nbsp;
             <a class="nav" href="https://coverage.readthedocs.io/en/7.10.4">coverage.py v7.10.4</a>,
-            created at 2025-08-22 11:50 +0000
+            created at 2025-08-22 22:52 +0000
         </p>
     </div>
 </footer>
