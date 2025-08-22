@@ -179,6 +179,24 @@ class LazyLoadConfiguration(Mapping):
             disable_cache=disable_caching,
         )
 
+    if sys.version_info >= (3, 11):
+
+        @override
+        def __getstate__(self) -> typ.Any:
+            self.config  # noqa: B018  # Run to get rid of the RLock and before ruining this instance with pickling_error_occur
+            return super().__getstate__()
+
+    else:
+
+        def __getstate__(self) -> typ.Any:
+            self.config  # noqa: B018  # Run to get rid of the RLock and before ruining this instance with pickling_error_occur
+            return self.__dict__
+
+    def __setstate__(self, state: dict[str, typ.Any]) -> None:
+        # custom __getattr__ requires custom __setstate__
+        for attr, value in state.items():
+            object.__setattr__(self, attr, value)
+
     def __getattr__(self, name: str) -> typ.Any:
         """Loads (if not loaded) and fetches from the underlying `Configuration` object
 

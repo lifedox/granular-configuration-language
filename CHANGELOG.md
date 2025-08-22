@@ -6,6 +6,7 @@
 
 ### Changed
 
+- Made the core classes (`LazyEval`, `Configuration`, `LazyLoadConfiguration`) `pickle`-able by running lazy logic just prior to pickling to remove the un-`pickle`-able locks.
 - Changed from using `JSONPathOnlyWorksOnMappings` exception to new `ReferencingRootOnlyWorksOnMappings` exception, because scenario is not specific to JSON Path.
   - `ReferencingRootOnlyWorksOnMappings` inherits from `JSONPathOnlyWorksOnMappings`, as to not break compatible, though to is a showstopping scenario.
 

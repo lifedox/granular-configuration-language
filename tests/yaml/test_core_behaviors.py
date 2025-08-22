@@ -168,11 +168,9 @@ def test_LazyEval_result_runs_once() -> None:
 
 def test_LazyEval_keys_throw_errors() -> None:
     with pytest.raises(TypeError, match="keys to mappings"):
-        loads(
-            """
+        loads("""
 !Date 20121031: date
-"""
-        )
+""")
 
 
 def test_interpolatations_starting_with_slash_without_root_error_with_env_var() -> None:

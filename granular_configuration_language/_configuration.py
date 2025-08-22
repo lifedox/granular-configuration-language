@@ -158,6 +158,8 @@ class Configuration(typ.Generic[KT, VT], tabc.Mapping[KT, VT]):
         :py:data:`~typing.Any`, instead of :py:class:`str`.)
     """
 
+    __slots__ = ("__data", "__attribute_name")
+
     @typ.overload
     def __init__(self) -> None: ...
 
@@ -298,6 +300,11 @@ class Configuration(typ.Generic[KT, VT], tabc.Mapping[KT, VT]):
     #################################################################
     # Public interface methods
     #################################################################
+
+    def __setstate__(self, state: tuple[None, dict[str, typ.Any]]) -> None:
+        # custom __getattr__ requires custom __setstate__
+        for attr, value in state[1].items():
+            object.__setattr__(self, attr, value)
 
     def __getattr__(self, name: str) -> VT:
         """

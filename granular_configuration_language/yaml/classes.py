@@ -200,6 +200,19 @@ class LazyEval(abc.ABC, typ.Generic[RT]):
         # Don't copy `LazyEval` instances
         return self
 
+    if sys.version_info >= (3, 11):
+
+        @override
+        def __getstate__(self) -> typ.Any:
+            self.result  # noqa: B018  # Run to get rid of the RLock
+            return super().__getstate__()
+
+    else:
+
+        def __getstate__(self) -> typ.Any:
+            self.result  # noqa: B018  # Run to get rid of the RLock
+            return self.__dict__
+
 
 @dataclass(frozen=True, kw_only=True, slots=True)
 class LoadOptions:
