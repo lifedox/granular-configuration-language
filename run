@@ -68,13 +68,10 @@ _logit() {
     echo '--------------------------------------------------------------------------------'
 }
 
-################################################################################################
-# Standard Run Commands
-# From: https://granular.atlassian.net/wiki/spaces/GE/pages/1085112977/Backend+project+high-level+tooling
-################################################################################################
 usage+=("")
-usage+=("Standard Commands:")
-usage+=("  $0 tests - Run tests in docker using Python ${PYTHON_VERSION}")
+usage+=("Testing Commands:")
+usage+=("  $0 _tests - Run tests locally.")
+usage+=("  $0 tests - Run tests in Docker using Python ${PYTHON_VERSION}")
 tests() {
     _run_cmd poetry run ./run _tests "$@"
 }
@@ -119,6 +116,10 @@ test_many() {
     done
 }
 
+usage+=("")
+usage+=("Linting and Formatting Commands (prepend '_' to run locally):")
+
+
 usage+=("  $0 lint - Runs linting (isort, black, flake8, bandit) checks; non-zero exit status on failure")
 lint() {
     _run_cmd ./run _lint "$@"
@@ -141,7 +142,7 @@ _mypy() {
     done
 }
 
-usage+=("  $0 mypy - Runs pyright checks using all Python version modes; non-zero exit status on failure")
+usage+=("  $0 pyright - Runs pyright checks using all Python version modes; non-zero exit status on failure")
 pyright() {
     _run_cmd ./run _pyright
 }
@@ -152,7 +153,7 @@ _pyright() {
     done
 }
 
-usage+=("  $0 refmt - Run black and isort")
+usage+=("  $0 refmt - Format code")
 refmt() {
     _run_cmd ./run _refmt
 }
@@ -161,6 +162,84 @@ _refmt() {
     ruff check --select I --fix
     _logit Running ruff format
     poetry run ruff format
+}
+
+##################################################################################################
+# Additional Run Commands
+##################################################################################################
+usage+=("")
+usage+=("Building Commands")
+usage+=("  $0 dev - Run poetry shell in Docker using Python ${PYTHON_VERSION}")
+dev() {
+    _run_cmd poetry shell
+}
+
+usage+=("  $0 build - Build docker container")
+build() {
+    if [ "$IN_DOCKER" != 'true' ]; then
+        # shellcheck disable=SC2086
+        echo docker compose ${docker_compose_args} build
+        docker compose ${docker_compose_args} build
+    else
+        echo "Already in the container"
+    fi
+}
+
+usage+=("  $0 stop - Stop all docker containers")
+stop() {
+    _logit "stopping all docker containers"
+    # shellcheck disable=SC2086
+    docker compose ${docker_compose_args} down
+}
+
+usage+=("")
+usage+=("Package Commands")
+
+usage+=("  $0 _package - Build package locally")
+usage+=("  $0 package - Build package in Docker using Python ${PYTHON_VERSION}")
+package() {
+    _run_cmd ./run _package "$@"
+}
+_package() {
+    _logit Building package
+    poetry build "$@"
+}
+
+usage+=("")
+usage+=("Documentation Commands")
+
+usage+=("  $0 docs - Generates sphinx documentation site in Docker using Python ${PYTHON_VERSION}")
+usage+=("  $0 _docs - Generates sphinx documentation site locally")
+docs() {
+    _run_cmd poetry run ./run _docs
+}
+_docs() {
+    _logit 'Running _docs'
+    sphinx-build \
+        -M html . docs \
+        --fail-on-warning
+}
+usage+=("  $0 _docn - Clears the terminate and removes the ./docs/ directory, before calling $0 _docs")
+_docn() {
+    clear
+    rm -rf docs/
+
+    _docs 3>&2 2>&1 1>&3-
+}
+# For Dark Reader to make local viewing bearable
+usage+=("  $0 _doch - Calls $0 _docs and then launches the doc site locally on localhost:9999")
+_doch() {
+    _docs
+    pushd docs/html
+    poetry run python -m http.server 9999
+    popd
+}
+usage+=("  $0 _dochn - Calls $0 _docn and then launches the doc site locally on localhost:9999")
+_dochn() {
+    _docn
+    pushd docs/html
+    poetry run python -m http.server 9999
+    popd
 }
 
 usage+=("  $0 cleanup - Cleans up any auto-started project environment")
@@ -181,84 +260,24 @@ _cleanup() {
 }
 
 ##################################################################################################
-# Additional Run Commands
+# poetry shortcuts
 ##################################################################################################
-usage+=("")
-usage+=("Repo Specific Commands")
-usage+=("  $0 dev - Run poetry shell")
-dev() {
-    _run_cmd poetry shell
-}
 
-usage+=("  $0 lock - Run poetry lock")
+usage+=("")
+usage+=("peotry shortcuts")
+
+usage+=("  $0 lock - Run poetry lock locally")
 lock() {
     poetry lock
 }
 
-usage+=("  $0 build - Build docker container")
-build() {
-    if [ "$IN_DOCKER" != 'true' ]; then
-        # shellcheck disable=SC2086
-        docker compose ${docker_compose_args} build
-    else
-        echo "Already in the container"
-    fi
-}
-
-usage+=("  $0 stop - Stop all docker containers")
-stop() {
-    _logit "stopping all docker containers"
-    # shellcheck disable=SC2086
-    docker compose ${docker_compose_args} down
-}
-
-usage+=("  $0 package - Build package")
-package() {
-    _run_cmd ./run _package "$@"
-}
-_package() {
-    _logit Building package
-    poetry build "$@"
-}
-
-usage+=("  $0 docs - Generates sphinx documentation site")
-docs() {
-    _run_cmd poetry run ./run _docs
-}
-_docs() {
-    _logit 'Running _docs'
-    sphinx-build \
-        -M html . docs \
-        --fail-on-warning
-}
-_docn() {
-    clear
-    rm -rf docs/
-
-    _docs 3>&2 2>&1 1>&3-
-}
-# For Dark Reader to make local viewing bearable
-_doch() {
-    _docs
-    pushd docs/html
-    poetry run python -m http.server 9999
-    popd
-}
-_dochn() {
-    _docn
-    pushd docs/html
-    poetry run python -m http.server 9999
-    popd
-}
-
-##################################################################################################
-# poetry shortcuts
-##################################################################################################
-
+usage+=("  $0 sync - Run poetry sync locally with all groups and extras")
 sync() {
     echo poetry sync --all-extras --all-groups
     poetry sync --all-extras --all-groups
 }
+
+usage+=("  $0 install - Run poetry install locally with all groups and extras")
 install() {
     echo poetry install --all-extras --all-groups
     poetry install --all-extras --all-groups
