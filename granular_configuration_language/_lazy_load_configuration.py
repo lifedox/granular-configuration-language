@@ -194,8 +194,7 @@ class LazyLoadConfiguration(Mapping):
 
     def __setstate__(self, state: dict[str, typ.Any]) -> None:
         # custom __getattr__ requires custom __setstate__
-        for attr, value in state.items():
-            object.__setattr__(self, attr, value)
+        self.__dict__.update(state)
 
     def __getattr__(self, name: str) -> typ.Any:
         """Loads (if not loaded) and fetches from the underlying `Configuration` object

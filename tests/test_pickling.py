@@ -24,7 +24,10 @@ a: !Sub ${ENV_VAR}
     with patch.dict(os.environ, values={"ENV_VAR": "text"}):
         a: Configuration = loads(test)
         le: LazyEval = next(a._raw_items())[1]
-        transformed: LazyEval = pickle.loads(pickle.dumps(le))
+        serialized = pickle.dumps(le)
+
+    with patch.dict(os.environ, values={"ENV_VAR": "test that cached_property was serialized"}):
+        transformed: LazyEval = pickle.loads(serialized)
         assert transformed.result == "text"
 
 
@@ -38,7 +41,10 @@ a: !Sub ${ENV_VAR}
 """
 
     with patch.dict(os.environ, values={"ENV_VAR": "text"}):
-        assert pickle.loads(pickle.dumps(loads(test))).as_dict() == {"a": "text"}
+        serialized = pickle.dumps(loads(test))
+
+    with patch.dict(os.environ, values={"ENV_VAR": "test that cached_property was serialized"}):
+        assert pickle.loads(serialized).as_dict() == {"a": "text"}
 
 
 def test_Configuration_is_pickable_with_root_lazy_eval() -> None:
@@ -61,14 +67,20 @@ a: !Sub ${ENV_VAR}
 """
 
     with patch.dict(os.environ, values={"ENV_VAR": "text"}):
-        assert pickle.loads(pickle.dumps(loads(test, mutable=True))).as_dict() == {"a": "text"}
+        serialized = pickle.dumps(loads(test, mutable=True))
+
+    with patch.dict(os.environ, values={"ENV_VAR": "test that cached_property was serialized"}):
+        assert pickle.loads(serialized).as_dict() == {"a": "text"}
 
 
 def test_LazyLoadConfiguration_is_pickable() -> None:
     llc = LazyLoadConfiguration(ASSET_DIR / "test.yaml")
 
     with patch.dict(os.environ, values={"ENV_VAR": "text"}):
-        transformed: LazyLoadConfiguration = pickle.loads(pickle.dumps(llc))
+        serialized = pickle.dumps(llc)
+
+    with patch.dict(os.environ, values={"ENV_VAR": "test that cached_property was serialized"}):
+        transformed: LazyLoadConfiguration = pickle.loads(serialized)
 
         assert transformed.config.as_dict() == {"a": "text"}
 
@@ -77,6 +89,9 @@ def test_MutableLazyLoadConfiguration_is_pickable() -> None:
     llc = MutableLazyLoadConfiguration(ASSET_DIR / "test.yaml")
 
     with patch.dict(os.environ, values={"ENV_VAR": "text"}):
-        transformed: MutableLazyLoadConfiguration = pickle.loads(pickle.dumps(llc))
+        serialized = pickle.dumps(llc)
+
+    with patch.dict(os.environ, values={"ENV_VAR": "test that cached_property was serialized"}):
+        transformed: MutableLazyLoadConfiguration = pickle.loads(serialized)
 
         assert transformed.config.as_dict() == {"a": "text"}

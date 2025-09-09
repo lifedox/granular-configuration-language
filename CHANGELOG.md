@@ -2,6 +2,12 @@
 
 <!-- markdownlint-disable-file MD024 -->
 
+## next (2.4.1)
+
+### Refactored
+
+- Refactored `LazyLoadConfiguration.__setstate__` to use `self.__dict__.update(state)` to mimic documentation.
+
 ## 2.4.0
 
 ### Changed
