@@ -768,14 +768,14 @@ six = ">=1.5"
 
 [[package]]
 name = "python-jsonpath"
-version = "2.0.0"
+version = "2.0.1"
 description = "JSONPath, JSON Pointer and JSON Patch for Python."
 optional = false
 python-versions = ">=3.8"
 groups = ["main", "renovate_main"]
 files = [
-    {file = "python_jsonpath-2.0.0-py3-none-any.whl", hash = "sha256:8b8711e5dd30944c0adaf1a8c861b3c332126a82ae77384e1425dcd55340d31c"},
-    {file = "python_jsonpath-2.0.0.tar.gz", hash = "sha256:f74026aa038be10b575951793aadb512f3f48876fad684895aa2634183e89b5a"},
+    {file = "python_jsonpath-2.0.1-py3-none-any.whl", hash = "sha256:ebd518b7c883acc5b976518d76b6c96288405edec7d9ef838641869c1e1a5eb7"},
+    {file = "python_jsonpath-2.0.1.tar.gz", hash = "sha256:32a84ebb2dc0ec1b42a6e165b0f9174aef8310bad29154ad9aee31ac37cca18f"},
 ]
 
 [package.extras]
@@ -1365,4 +1365,4 @@ printing = ["tabulate"]
 [metadata]
 lock-version = "2.1"
 python-versions = ">=3.10"
-content-hash = "d70b9499fdd7538f1ebae0aec25e8acd2371b6a9e8ae2c92fee555d0bb9d473f"
+content-hash = "b3655b0369eb724b6d4b957cd628ccf1dd8cb3a1365a1f9d975fa1734ed6330c"
