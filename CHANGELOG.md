@@ -2,11 +2,12 @@
 
 <!-- markdownlint-disable-file MD024 -->
 
-## next (2.4.1)
+## 2.4.1
 
 ### Refactored
 
 - Refactored `LazyLoadConfiguration.__setstate__` to use `self.__dict__.update(state)` to mimic documentation.
+- Updating package to include Python 3.14 (and formally adding it to CI pipelines).
 
 ## 2.4.0
 
