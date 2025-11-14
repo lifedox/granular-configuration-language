@@ -66,7 +66,7 @@ pytest = "9.0.1"
 pytest-cov = "7.0.0"
 coverage = "7.11.3"
 # Linting
-ruff = "0.14.4"
+ruff = "0.14.5"
 mypy = "1.18.2"
 bandit = "1.8.6"
 
