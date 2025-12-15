@@ -72,7 +72,7 @@
 | granular\_configuration\_language/yaml/load/\_load\_file.py                                       |       24 |        0 |        4 |        0 |     100.00% |           |
 | granular\_configuration\_language/yaml/load/\_load\_yaml\_string.py                               |       23 |        0 |        4 |        0 |     100.00% |           |
 | granular\_configuration\_language/yaml/load/\_loads.py                                            |       18 |        0 |        4 |        0 |     100.00% |           |
-|                                                                                         **TOTAL** | **1971** |    **0** |  **298** |    **0** | **100.00%** |           |
+| **TOTAL**                                                                                         | **1971** |    **0** |  **298** |    **0** | **100.00%** |           |
 
 
 ## Setup coverage badge
