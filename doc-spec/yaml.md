@@ -175,7 +175,7 @@ See [EagerIO documentation](eagerio.md#) for more details on EagerIO.
 - - JSON Pointer
   - N/A
   - `/json/pointer`
-  - Must start with `/`.
+  - Must start with `/`.<br> _(Not available in reduced syntax.)_
 - - JSON Path
   - N/A
   - `$.json.path`
@@ -183,7 +183,7 @@ See [EagerIO documentation](eagerio.md#) for more details on EagerIO.
 - - Dollar Sign Literal
   - N/A
   - `$`
-  - Must only be `$`.<br> _(Not available in reduced syntax.)_
+  - Must only be `$`.
 - - HTML Decode
   - N/A
   - `&#x24;`
