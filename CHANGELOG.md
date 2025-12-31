@@ -2,6 +2,12 @@
 
 <!-- markdownlint-disable-file MD024 -->
 
+## next (2.4.2)
+
+### Refactored
+
+- Removed `type: ignore[misc]`, because `mypy` fixed its issue.
+
 ## 2.4.1
 
 ### Refactored
