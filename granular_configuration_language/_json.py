@@ -60,7 +60,7 @@ def json_default(value: typ.Any) -> typ.Any:
             return f"<{value.__module__}.{value.__name__}>"
         case partial():
             return f"<{repr(value)}>"
-        case Callable():  # type: ignore[misc]  # mypy doesn't consider Callable to be a class, but it is
+        case Callable():
             return get_name(value)
         case Mapping():
             return dict(value)
