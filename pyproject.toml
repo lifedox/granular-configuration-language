@@ -51,7 +51,7 @@ pyright = { version = ">=1.1.408", extras = ["nodejs"] }
 optional = true
 
 [tool.poetry.group.docs.dependencies]
-sphinx = { version = ">=8.2.3", python = ">=3.12" }
+sphinx = { version = ">=9.1.0", python = ">=3.12" }
 sphinx_rtd_theme = { version = ">=3.1.0", python = ">=3.12" }
 myst-parser = { version = ">=5.0.0", python = ">=3.12" }
 sphinx-copybutton = { version = ">=0.5.2", python = ">=3.12" }
