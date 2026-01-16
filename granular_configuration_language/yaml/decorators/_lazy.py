@@ -92,35 +92,6 @@ def as_lazy_with_root(
         1. (:py:class:`~granular_configuration_language.yaml.classes.T`) -- YAML value
         2. (:py:type:`~granular_configuration_language.yaml.classes.Root`) -- Configuration Root
 
-    .. admonition:: Documentation Issue
-        :class: caution
-
-        ``sphinx.ext.autodoc`` isn't exposing the :py:func:`typing.overload`. See the example for a clearer type signatures
-
-        .. admonition:: Typing Stub
-            :class: note
-            :collapsible: closed
-
-            .. code-block:: python
-
-                # Decorator
-                # Uses as: ``@as_lazy_with_root``
-                @overload
-                def as_lazy_with_root(
-                    func: Callable[[T, Root], RT],
-                ) -> Callable[[Tag, T, StateHolder], LazyEval[RT]]: ...
-
-
-                # Decorator Factory
-                # Uses as: ``@as_lazy_with_root(needs_root_condition=condition)``
-                @overload
-                def as_lazy_with_root(
-                    *, needs_root_condition: Callable[[T], bool]
-                ) -> Callable[
-                    [Callable[[T, Root], RT]],
-                    Callable[[Tag, T, StateHolder], LazyEval[RT]],
-                ]: ...
-
     :param ~collections.abc.Callable[[T, Root], RT] func:
         Function to be wrapped
     :param ~collections.abc.Callable[[T], bool], optional needs_root_condition:

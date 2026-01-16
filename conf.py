@@ -91,7 +91,7 @@ nitpick_ignore = [
     ("py:class", "v, remove specified key and return the corresponding value."),
 ]
 
-# Patching that makes sphinx 8.2.0 and 8.2.1 work
+# Patching that makes sphinx 8.2.0 - 9.1.0 work
 # Done weirding to hide the evil from pyright and mypy
 import importlib  # noqa: E402
 
