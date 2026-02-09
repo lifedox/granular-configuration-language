@@ -16,7 +16,7 @@ Namely:
 
 I believe it is allowable to ignore the CPU-bound case. No Tag is inherently complex (users are in control) and the GIL exists. That leaves two categories for IO-bound cases.
 
----
+<hr>
 
 Starting with IO-bound Tags, the biggest thing to bear in mind is that tags are optional, most tags act on in memory data (environment variables and configuration data), and all tags run-once and are cached immediately afterward.
 
@@ -26,7 +26,7 @@ So, instead of using {py:mod}`asyncio` that leaves meeting {py:mod}`asyncio` in 
 
 The only challenge is when to run the IO of the EagerIO Tags. It needs to be compatible with synchronous and asynchronous code, able to handle users not doing a step, and libraries. In the end, the simplest, most maintainable option was to start the IO at load time, so there was no behavioral or interface change. User opts into EagerIO by using an EagerIO Tag.
 
----
+<hr>
 
 That leaves the question of the initial load. With not using `await` for Tags, the same solution of pushing IO into threads is the direction for loading.
 
@@ -51,7 +51,7 @@ Option 1 has very behind-the-scenes magic.
 
 With EagerIO being more an exploration at the point in time, Option 2 is more worth the time than Option 1.
 
----
+<hr>
 
 Another question in implementation is optionality:
 
