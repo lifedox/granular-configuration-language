@@ -68,7 +68,7 @@ coverage = "7.13.4"
 # Linting
 ruff = "0.15.2"
 mypy = "1.19.1"
-bandit = "1.9.3"
+bandit = "1.9.4"
 
 [project.entry-points."granular_configuration_language_20_tag"]
 "official_extra" = "granular_configuration_language.yaml._tags.func_and_class"
