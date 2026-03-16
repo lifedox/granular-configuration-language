@@ -38,9 +38,10 @@ class float_tag(TagDecoratorBase[float]):
         """"""  # Make undocumented
         try:
             float(value)
-            return True
         except ValueError:
             return False
+        else:
+            return True
 
     @override
     def scalar_node_transformer(

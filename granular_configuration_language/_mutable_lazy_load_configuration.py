@@ -113,7 +113,7 @@ class MutableLazyLoadConfiguration(LazyLoadConfiguration, MutableMapping):
             configuration is loaded to prevent duplicative processing and data
 
         """
-        return typ.cast(MutableConfiguration, super().config)
+        return typ.cast("MutableConfiguration", super().config)
 
     @override
     def __delitem__(self, key: typ.Any) -> None:

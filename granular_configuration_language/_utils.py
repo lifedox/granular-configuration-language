@@ -19,7 +19,7 @@ else:
         return func
 
 
-consume = typ.cast(tabc.Callable[[tabc.Iterable], None], partial(deque, maxlen=0))
+consume = typ.cast("tabc.Callable[[tabc.Iterable[typ.Any]], None]", partial(deque, maxlen=0))
 
 _T = typ.TypeVar("_T")
 

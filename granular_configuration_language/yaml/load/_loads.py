@@ -31,7 +31,7 @@ def loads(
     result = load_yaml_string(config_str, state)
 
     if lazy_root is None:
-        state.lazy_root_obj._set_root(result)
+        state.lazy_root_obj._set_root(result)  # noqa: SLF001
 
     if isinstance(result, LazyEval):
         return result.result

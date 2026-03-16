@@ -185,7 +185,7 @@ class LazyEval(abc.ABC, typ.Generic[RT]):
         """
         result = self.__run()
         while isinstance(result, LazyEval):
-            result = result.__run()
+            result = result.__run()  # noqa: SLF001
         return result
 
     @override

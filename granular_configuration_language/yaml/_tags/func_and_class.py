@@ -20,8 +20,7 @@ def get_func(func_path: str) -> tabc.Callable:
     add_cwd_to_path()
     mod_name, func_name = func_path.rsplit(".", 1)
     try:
-        func: tabc.Callable = getattr(importlib.import_module(mod_name), func_name)
-        return func
+        return getattr(importlib.import_module(mod_name), func_name)
     except (ImportError, AttributeError):
         raise DoesNotExist(f"Could not load {func_path}") from None
 

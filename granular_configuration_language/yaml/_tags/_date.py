@@ -27,5 +27,4 @@ def date_(value: str) -> date:
 @as_lazy
 @interpolate_value_without_ref
 def datetime_(value: str) -> date:
-    dt = datetime_fromisoformat(value)
-    return dt
+    return datetime_fromisoformat(value)

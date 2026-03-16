@@ -15,7 +15,7 @@ from granular_configuration_language.yaml.load import load_file, obj_pairs_func
 
 
 def _merge_into_base(configuration_type: type[C], base_dict: C, from_dict: C) -> None:
-    for key, value in from_dict._raw_items():
+    for key, value in from_dict._raw_items():  # noqa: SLF001
         if isinstance(value, configuration_type) and (key in base_dict):
             if base_dict.exists(key):
                 new_dict = base_dict[key]
@@ -26,7 +26,7 @@ def _merge_into_base(configuration_type: type[C], base_dict: C, from_dict: C) ->
                 _merge_into_base(configuration_type, new_dict, value)
                 value = new_dict
 
-        base_dict._private_set(key, value, setter_secret)
+        base_dict._private_set(key, value, setter_secret)  # noqa: SLF001
 
 
 def _merge(configuration_type: type[C], base_config: C, configs: tabc.Iterable[C]) -> C:
@@ -55,12 +55,12 @@ def _inject_configs(
     after: Configuration | None,
 ) -> tabc.Iterator[C]:
     if before and isinstance(before, Configuration):
-        yield typ.cast(C, before)
+        yield typ.cast("C", before)
 
     yield from configs
 
     if after and isinstance(after, Configuration):
-        yield typ.cast(C, after)
+        yield typ.cast("C", after)
 
 
 def build_configuration(
@@ -79,6 +79,5 @@ def build_configuration(
         before=inject_before,
         after=inject_after,
     )
-    merged_config = _merge(configuration_type, base_config, valid_configs)
 
-    return merged_config
+    return _merge(configuration_type, base_config, valid_configs)

@@ -302,7 +302,7 @@ class LazyLoadConfiguration(Mapping):
             the provided type.
         :rtype: C
         """
-        return typ.cast(C, SafeConfigurationProxy(self))
+        return typ.cast("C", SafeConfigurationProxy(self))
 
     def eager_load(self, typed_base: type[C]) -> C:
         """
@@ -331,4 +331,4 @@ class LazyLoadConfiguration(Mapping):
             to the provided type.
         :rtype: C
         """
-        return typ.cast(C, EagerIOConfigurationProxy(self))
+        return typ.cast("C", EagerIOConfigurationProxy(self))

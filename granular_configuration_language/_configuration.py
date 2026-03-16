@@ -216,7 +216,7 @@ class Configuration(typ.Generic[KT, VT], tabc.Mapping[KT, VT]):
             )
 
         if isinstance(value, Configuration):
-            value.__attribute_name = self.__attribute_name.append_suffix(name)
+            value.__attribute_name = self.__attribute_name.append_suffix(name)  # noqa: SLF001
             return value  # type: ignore  # instead of casting
         else:
             return value
@@ -461,7 +461,7 @@ class Configuration(typ.Generic[KT, VT], tabc.Mapping[KT, VT]):
         :return: This instance
         :rtype: C
         """
-        return typ.cast(C, self)
+        return typ.cast("C", self)
 
 
 _private_data_getter: tabc.Callable[[Configuration], dict[typ.Any, typ.Any]] = op.attrgetter("_Configuration__data")
