@@ -7,7 +7,8 @@
   "recreateWhen": "always",
   "rangeStrategy": "update-lockfile",
   "enabledManagers": [
-    "poetry"
+    "poetry",
+    "github-actions"
   ],
   "lockFileMaintenance": {
     "enabled": true,
