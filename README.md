@@ -6,7 +6,7 @@
 |-------------------------------------------------------------------------------------------------- | -------: | -------: | -------: | -------: | ----------: | --------: |
 | granular\_configuration\_language/\_\_init\_\_.py                                                 |        7 |        0 |        0 |        0 |     100.00% |           |
 | granular\_configuration\_language/\_base\_path.py                                                 |       14 |        0 |        6 |        0 |     100.00% |           |
-| granular\_configuration\_language/\_build.py                                                      |       45 |        0 |       16 |        0 |     100.00% |           |
+| granular\_configuration\_language/\_build.py                                                      |       44 |        0 |       16 |        0 |     100.00% |           |
 | granular\_configuration\_language/\_cache.py                                                      |       67 |        0 |       12 |        0 |     100.00% |           |
 | granular\_configuration\_language/\_configuration.py                                              |      158 |        0 |       24 |        0 |     100.00% |           |
 | granular\_configuration\_language/\_json.py                                                       |       39 |        0 |       20 |        0 |     100.00% |           |
@@ -24,7 +24,7 @@
 | granular\_configuration\_language/proxy/\_proxy.py                                                |       68 |        0 |        0 |        0 |     100.00% |           |
 | granular\_configuration\_language/yaml/\_\_init\_\_.py                                            |        3 |        0 |        0 |        0 |     100.00% |           |
 | granular\_configuration\_language/yaml/\_tags/\_\_init\_\_.py                                     |        4 |        0 |        0 |        0 |     100.00% |           |
-| granular\_configuration\_language/yaml/\_tags/\_date.py                                           |       22 |        0 |        2 |        0 |     100.00% |           |
+| granular\_configuration\_language/yaml/\_tags/\_date.py                                           |       21 |        0 |        2 |        0 |     100.00% |           |
 | granular\_configuration\_language/yaml/\_tags/\_del.py                                            |        6 |        0 |        0 |        0 |     100.00% |           |
 | granular\_configuration\_language/yaml/\_tags/\_dict.py                                           |        7 |        0 |        0 |        0 |     100.00% |           |
 | granular\_configuration\_language/yaml/\_tags/\_eager\_parse\_file.py                             |       15 |        0 |        2 |        0 |     100.00% |           |
@@ -38,7 +38,7 @@
 | granular\_configuration\_language/yaml/\_tags/\_ref.py                                            |        9 |        0 |        0 |        0 |     100.00% |           |
 | granular\_configuration\_language/yaml/\_tags/\_sub.py                                            |        8 |        0 |        0 |        0 |     100.00% |           |
 | granular\_configuration\_language/yaml/\_tags/\_uuid.py                                           |        8 |        0 |        0 |        0 |     100.00% |           |
-| granular\_configuration\_language/yaml/\_tags/func\_and\_class.py                                 |       34 |        0 |        4 |        0 |     100.00% |           |
+| granular\_configuration\_language/yaml/\_tags/func\_and\_class.py                                 |       33 |        0 |        4 |        0 |     100.00% |           |
 | granular\_configuration\_language/yaml/classes.py                                                 |      112 |        0 |        6 |        0 |     100.00% |           |
 | granular\_configuration\_language/yaml/decorators/\_\_init\_\_.py                                 |        7 |        0 |        0 |        0 |     100.00% |           |
 | granular\_configuration\_language/yaml/decorators/\_base.py                                       |       89 |        0 |       12 |        0 |     100.00% |           |
@@ -72,7 +72,7 @@
 | granular\_configuration\_language/yaml/load/\_load\_file.py                                       |       24 |        0 |        4 |        0 |     100.00% |           |
 | granular\_configuration\_language/yaml/load/\_load\_yaml\_string.py                               |       23 |        0 |        4 |        0 |     100.00% |           |
 | granular\_configuration\_language/yaml/load/\_loads.py                                            |       18 |        0 |        4 |        0 |     100.00% |           |
-| **TOTAL**                                                                                         | **1971** |    **0** |  **298** |    **0** | **100.00%** |           |
+| **TOTAL**                                                                                         | **1968** |    **0** |  **298** |    **0** | **100.00%** |           |
 
 
 ## Setup coverage badge

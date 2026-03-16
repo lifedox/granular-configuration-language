@@ -67,7 +67,7 @@
             <a id="nextFileLink" class="nav" href="z_d275e51b3985ad7b__json_py.html">&#xbb; next</a>
             &nbsp; &nbsp; &nbsp;
             <a class="nav" href="https://coverage.readthedocs.io/en/7.13.1">coverage.py v7.13.1</a>,
-            created at 2026-03-16 01:34 +0000
+            created at 2026-03-16 01:38 +0000
         </p>
         <aside class="hidden">
             <button type="button" class="button_next_chunk" data-shortcut="j"></button>
@@ -300,7 +300,7 @@
     <p class="run run2"><span class="n"><a id="t216" href="#t216">216</a></span><span class="t">            <span class="op">)</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t217" href="#t217">217</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t218" href="#t218">218</a></span><span class="t">        <span class="key">if</span> <span class="nam">isinstance</span><span class="op">(</span><span class="nam">value</span><span class="op">,</span> <span class="nam">Configuration</span><span class="op">)</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
-    <p class="run"><span class="n"><a id="t219" href="#t219">219</a></span><span class="t">            <span class="nam">value</span><span class="op">.</span><span class="nam">__attribute_name</span> <span class="op">=</span> <span class="nam">self</span><span class="op">.</span><span class="nam">__attribute_name</span><span class="op">.</span><span class="nam">append_suffix</span><span class="op">(</span><span class="nam">name</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
+    <p class="run"><span class="n"><a id="t219" href="#t219">219</a></span><span class="t">            <span class="nam">value</span><span class="op">.</span><span class="nam">__attribute_name</span> <span class="op">=</span> <span class="nam">self</span><span class="op">.</span><span class="nam">__attribute_name</span><span class="op">.</span><span class="nam">append_suffix</span><span class="op">(</span><span class="nam">name</span><span class="op">)</span>  <span class="com"># noqa: SLF001</span>&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t220" href="#t220">220</a></span><span class="t">            <span class="key">return</span> <span class="nam">value</span>  <span class="com"># type: ignore  # instead of casting</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t221" href="#t221">221</a></span><span class="t">        <span class="key">else</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t222" href="#t222">222</a></span><span class="t">            <span class="key">return</span> <span class="nam">value</span>&nbsp;</span><span class="r"></span></p>
@@ -545,7 +545,7 @@
     <p class="pln"><span class="n"><a id="t461" href="#t461">461</a></span><span class="t"><span class="str">        :return: This instance</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t462" href="#t462">462</a></span><span class="t"><span class="str">        :rtype: C</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t463" href="#t463">463</a></span><span class="t"><span class="str">        """</span>&nbsp;</span><span class="r"></span></p>
-    <p class="run"><span class="n"><a id="t464" href="#t464">464</a></span><span class="t">        <span class="key">return</span> <span class="nam">typ</span><span class="op">.</span><span class="nam">cast</span><span class="op">(</span><span class="nam">C</span><span class="op">,</span> <span class="nam">self</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
+    <p class="run"><span class="n"><a id="t464" href="#t464">464</a></span><span class="t">        <span class="key">return</span> <span class="nam">typ</span><span class="op">.</span><span class="nam">cast</span><span class="op">(</span><span class="str">"C"</span><span class="op">,</span> <span class="nam">self</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t465" href="#t465">465</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t466" href="#t466">466</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t467" href="#t467">467</a></span><span class="t"><span class="nam">_private_data_getter</span><span class="op">:</span> <span class="nam">tabc</span><span class="op">.</span><span class="nam">Callable</span><span class="op">[</span><span class="op">[</span><span class="nam">Configuration</span><span class="op">]</span><span class="op">,</span> <span class="nam">dict</span><span class="op">[</span><span class="nam">typ</span><span class="op">.</span><span class="nam">Any</span><span class="op">,</span> <span class="nam">typ</span><span class="op">.</span><span class="nam">Any</span><span class="op">]</span><span class="op">]</span> <span class="op">=</span> <span class="nam">op</span><span class="op">.</span><span class="nam">attrgetter</span><span class="op">(</span><span class="str">"_Configuration__data"</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
@@ -660,7 +660,7 @@
             <a class="nav" href="z_d275e51b3985ad7b__json_py.html">&#xbb; next</a>
             &nbsp; &nbsp; &nbsp;
             <a class="nav" href="https://coverage.readthedocs.io/en/7.13.1">coverage.py v7.13.1</a>,
-            created at 2026-03-16 01:34 +0000
+            created at 2026-03-16 01:38 +0000
         </p>
     </div>
 </footer>
