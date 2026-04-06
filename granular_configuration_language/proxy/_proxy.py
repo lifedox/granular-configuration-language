@@ -116,11 +116,21 @@ class EagerIOConfigurationProxy(Mapping):
         self.__future = SimpleFuture(_eagerio_load, llc)
 
     @cached_property
-    def __config(self) -> Configuration:
+    def __config_or_error(self) -> Configuration | Exception:
         try:
             return self.__future.result
+        except Exception as e:
+            return e
         finally:
             del self.__future
+
+    @cached_property
+    def __config(self) -> Configuration:
+        config = self.__config_or_error
+        if isinstance(config, Exception):
+            raise config
+        else:
+            return config
 
     def __getattr__(self, name: str) -> typ.Any:
         return getattr(self.__config, name)

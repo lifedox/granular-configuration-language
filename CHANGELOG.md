@@ -2,6 +2,12 @@
 
 <!-- markdownlint-disable-file MD024 -->
 
+## 2.4.3
+
+### Fixed
+
+- Fixed a bug where accessing a `EagerIOConfigurationProxy` attribute after a previously suppressed load error caused an infinite wait instead of the exception replaying.
+
 ## 2.4.2
 
 ### Refactored

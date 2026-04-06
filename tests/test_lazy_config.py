@@ -152,6 +152,16 @@ def test_loading_bad_yaml_causes_error() -> None:
         LazyLoadConfiguration(ASSET_DIR / "bad.txt").config
 
 
+def test_reloading_an_error_does_not_infinite_loop() -> None:
+    config = LazyLoadConfiguration(ASSET_DIR / "bad.txt")
+
+    with pytest.raises(ErrorWhileLoadingFileOccurred):
+        config.as_dict()
+
+    with pytest.raises(ErrorWhileLoadingFileOccurred):
+        config.as_dict()
+
+
 def test_loading_ini_causes_error() -> None:
     with pytest.raises(IniUnsupportedError):
         LazyLoadConfiguration(ASSET_DIR / "dummy.ini").config

@@ -3,11 +3,15 @@ from __future__ import annotations
 import copy
 from pathlib import Path
 
+import pytest
+
 from granular_configuration_language import Configuration, LazyLoadConfiguration
+from granular_configuration_language.exceptions import ErrorWhileLoadingFileOccurred
 from granular_configuration_language.proxy import SafeConfigurationProxy
 from granular_configuration_language.yaml import loads
 
 ASSET_DIR = (Path(__file__).parent / "assets" / "test_typed_configuration").resolve()
+LAZY_DIR = (Path(__file__).parent / "assets" / "test_lazy_config").resolve()
 
 
 class SubConfig(Configuration):
@@ -73,3 +77,13 @@ def test_construction() -> None:
     assert typed.a == 101
     assert typed.b.c == "test me"
     assert typed["a"] == 101
+
+
+def test_reloading_an_error_does_not_infinite_loop() -> None:
+    config = LazyLoadConfiguration(LAZY_DIR / "bad.txt").as_typed(Configuration)
+
+    with pytest.raises(ErrorWhileLoadingFileOccurred):
+        config.as_dict()
+
+    with pytest.raises(ErrorWhileLoadingFileOccurred):
+        config.as_dict()

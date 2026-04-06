@@ -6,11 +6,15 @@ import threading
 import weakref
 from pathlib import Path
 
+import pytest
+
 from granular_configuration_language import Configuration, LazyLoadConfiguration
+from granular_configuration_language.exceptions import ErrorWhileLoadingFileOccurred
 from granular_configuration_language.proxy import EagerIOConfigurationProxy
 
 ASSET_DIR = (Path(__file__).parent / "assets" / "test_typed_configuration").resolve()
 EAGER_DIR = (Path(__file__).parent / "assets" / "test_eager_parse_file").resolve()
+LAZY_DIR = (Path(__file__).parent / "assets" / "test_lazy_config").resolve()
 
 
 class SubConfig(Configuration):
@@ -78,3 +82,13 @@ def test_SimpleFuture_deconstructs_when_result_is_not_used() -> None:
     assert future_wref() is None
 
     assert threading.active_count() == 1
+
+
+def test_reloading_an_error_does_not_infinite_loop() -> None:
+    config = LazyLoadConfiguration(LAZY_DIR / "bad.txt").eager_load(Configuration)
+
+    with pytest.raises(ErrorWhileLoadingFileOccurred):
+        config.as_dict()
+
+    with pytest.raises(ErrorWhileLoadingFileOccurred):
+        config.as_dict()
