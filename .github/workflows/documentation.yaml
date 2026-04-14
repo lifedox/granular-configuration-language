@@ -17,7 +17,7 @@ jobs:
       - run: poetry install --with=docs
       - run: poetry run ./run _docs
 
-      - uses: actions/upload-pages-artifact@v4
+      - uses: actions/upload-pages-artifact@v5
         with:
           path: docs/html
           retention-days: 1
