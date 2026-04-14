@@ -8,6 +8,7 @@ from dataclasses import dataclass
 from functools import cached_property
 from pathlib import Path
 from threading import RLock
+from typing import Final  # autodoc didn't like typ.Final on a class attribute, so import Final
 
 if sys.version_info >= (3, 12):
     from typing import override
@@ -137,7 +138,7 @@ class LazyEval(abc.ABC, typ.Generic[RT]):
     Base class for handling the output of a Tag that needs to be run just-in-time.
     """
 
-    tag: typ.Final[Tag]
+    tag: Final[Tag]
     """
     Tag that created this instance
     """
