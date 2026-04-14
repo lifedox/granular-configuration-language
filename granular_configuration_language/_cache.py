@@ -5,6 +5,7 @@ import dataclasses
 import operator as op
 import typing as typ
 from collections import deque
+from contextlib import suppress
 from functools import cached_property, reduce
 from threading import Lock
 from weakref import WeakValueDictionary
@@ -74,7 +75,8 @@ class NoteOfIntentToRead:
         except Exception as e:
             return e
         finally:
-            del self._config_ref
+            with suppress(AttributeError):
+                del self._config_ref
 
 
 store: typ.Final[WeakValueDictionary[Locations, SharedConfigurationReference]] = WeakValueDictionary()

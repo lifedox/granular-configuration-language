@@ -2,6 +2,12 @@
 
 <!-- markdownlint-disable-file MD024 -->
 
+## 2.4.4
+
+### Fixed
+
+- Fixed a race condition on `LazyEval`
+
 ## 2.4.3
 
 ### Fixed

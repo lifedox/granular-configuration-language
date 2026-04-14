@@ -144,8 +144,7 @@ class LazyEval(abc.ABC, typ.Generic[RT]):
 
     def __init__(self, tag: Tag) -> None:
         self.tag = tag
-        self.__done = False
-        self.__lock = RLock()
+        self.__lock: RLock | None = RLock()
 
     @abc.abstractmethod
     def _run(self) -> RT:
@@ -168,15 +167,13 @@ class LazyEval(abc.ABC, typ.Generic[RT]):
         return self._run()
 
     def __run(self) -> RT:
-        if self.__done:
+        if self.__lock is None:
             return self.__result
         else:
             with self.__lock:
                 result = self.__result
-                self.__done = True
-
-            del self.__lock
-            return result
+                self.__lock = None
+                return result
 
     @cached_property
     def result(self) -> RT | typ.Any:

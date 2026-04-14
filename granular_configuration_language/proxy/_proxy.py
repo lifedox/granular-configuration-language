@@ -5,6 +5,7 @@ import copy
 import sys
 import typing as typ
 from collections.abc import Mapping
+from contextlib import suppress
 from functools import cached_property
 
 import granular_configuration_language  # Avoid circular imports in type signatures
@@ -122,7 +123,8 @@ class EagerIOConfigurationProxy(Mapping):
         except Exception as e:
             return e
         finally:
-            del self.__future
+            with suppress(AttributeError):
+                del self.__future
 
     @cached_property
     def __config(self) -> Configuration:
