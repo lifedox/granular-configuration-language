@@ -5,6 +5,8 @@
 
 from __future__ import annotations
 
+import re
+
 # -- Project information -----------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#project-information
 project = "granular-configuration-language"
@@ -80,15 +82,26 @@ nitpicky = True
 nitpick_ignore = [
     ("py:class", "optional"),
     # From from collections.abc
-    ("py:class", "(k, v), remove and return some (key, value) pair"),
-    ("py:class", "a set-like object providing a view on D's items"),
-    ("py:class", "a set-like object providing a view on D's keys"),
-    ("py:class", "an object providing a view on D's values"),
-    ("py:class", "D.get(k,d), also set D[k]=d if k not in D"),
-    ("py:class", "D[k] if k in D, else d.  d defaults to None."),
-    ("py:class", "None.  Remove all items from D."),
-    ("py:class", "None.  Update D from mapping/iterable E and F."),
-    ("py:class", "v, remove specified key and return the corresponding value."),
+    # ("py:class", "(k, v), remove and return some (key, value) pair"),
+    # ("py:class", "a set-like object providing a view on D's items"),
+    # ("py:class", "a set-like object providing a view on D's keys"),
+    # ("py:class", "an object providing a view on D's values"),
+    # ("py:class", "D.get(k,d), also set D[k]=d if k not in D"),
+    # ("py:class", "D[k] if k in D, else d.  d defaults to None."),
+    # ("py:class", "None.  Remove all items from D."),
+    # ("py:class", "None.  Update D from mapping/iterable E and F."),
+    # ("py:class", "v, remove specified key and return the corresponding value."),
+    # ("py:class", "v, remove specified key and return the corresponding"),
+]
+nitpick_ignore_regex = [
+    # From from collections.abc
+    ("py:class", re.escape("v, remove") + r".*"),
+    ("py:class", re.escape("None. ") + r".*"),
+    ("py:class", re.escape("a set-like") + r".*"),
+    ("py:class", re.escape("(k, v)") + r".*"),
+    ("py:class", re.escape("an object") + r".*"),
+    ("py:class", re.escape("D.get(") + r".*"),
+    ("py:class", re.escape("D[k]") + r".*"),
 ]
 
 # Patching that makes sphinx 8.2.0 - 9.1.0 work

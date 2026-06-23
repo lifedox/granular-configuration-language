@@ -231,14 +231,14 @@ usage+=("  $0 _doch - Calls $0 _docs and then launches the doc site locally on l
 _doch() {
     _docs
     pushd docs/html
-    poetry run python -m http.server 9999
+    poetry run python -m http.server "${PORT:-9999}"
     popd
 }
 usage+=("  $0 _dochn - Calls $0 _docn and then launches the doc site locally on localhost:9999")
 _dochn() {
     _docn
     pushd docs/html
-    poetry run python -m http.server 9999
+    poetry run python -m http.server "${PORT:-9999}"
     popd
 }
 
