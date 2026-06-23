@@ -9,7 +9,7 @@
 | granular\_configuration\_language/\_build.py                                                      |       44 |        0 |       16 |        0 |     100.00% |           |
 | granular\_configuration\_language/\_cache.py                                                      |       69 |        0 |       12 |        0 |     100.00% |           |
 | granular\_configuration\_language/\_configuration.py                                              |      158 |        0 |       24 |        0 |     100.00% |           |
-| granular\_configuration\_language/\_json.py                                                       |       39 |        0 |       20 |        0 |     100.00% |           |
+| granular\_configuration\_language/\_json.py                                                       |       42 |        0 |       22 |        0 |     100.00% |           |
 | granular\_configuration\_language/\_lazy\_load\_configuration.py                                  |       62 |        0 |        4 |        0 |     100.00% |           |
 | granular\_configuration\_language/\_locations.py                                                  |       78 |        0 |        6 |        0 |     100.00% |           |
 | granular\_configuration\_language/\_merge.py                                                      |       27 |        0 |       12 |        0 |     100.00% |           |
@@ -25,6 +25,7 @@
 | granular\_configuration\_language/yaml/\_\_init\_\_.py                                            |        3 |        0 |        0 |        0 |     100.00% |           |
 | granular\_configuration\_language/yaml/\_tags/\_\_init\_\_.py                                     |        4 |        0 |        0 |        0 |     100.00% |           |
 | granular\_configuration\_language/yaml/\_tags/\_date.py                                           |       21 |        0 |        2 |        0 |     100.00% |           |
+| granular\_configuration\_language/yaml/\_tags/\_decimal.py                                        |        8 |        0 |        0 |        0 |     100.00% |           |
 | granular\_configuration\_language/yaml/\_tags/\_del.py                                            |        6 |        0 |        0 |        0 |     100.00% |           |
 | granular\_configuration\_language/yaml/\_tags/\_dict.py                                           |        7 |        0 |        0 |        0 |     100.00% |           |
 | granular\_configuration\_language/yaml/\_tags/\_eager\_parse\_file.py                             |       15 |        0 |        2 |        0 |     100.00% |           |
@@ -72,7 +73,7 @@
 | granular\_configuration\_language/yaml/load/\_load\_file.py                                       |       24 |        0 |        4 |        0 |     100.00% |           |
 | granular\_configuration\_language/yaml/load/\_load\_yaml\_string.py                               |       23 |        0 |        4 |        0 |     100.00% |           |
 | granular\_configuration\_language/yaml/load/\_loads.py                                            |       18 |        0 |        4 |        0 |     100.00% |           |
-| **TOTAL**                                                                                         | **1979** |    **0** |  **300** |    **0** | **100.00%** |           |
+| **TOTAL**                                                                                         | **1990** |    **0** |  **302** |    **0** | **100.00%** |           |
 
 
 ## Setup coverage badge
