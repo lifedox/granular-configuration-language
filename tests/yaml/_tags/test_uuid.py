@@ -6,7 +6,7 @@ from granular_configuration_language._json import dumps
 from granular_configuration_language.yaml import loads
 
 
-def test_date() -> None:
+def test() -> None:
     uuid = uuid4()
     output = loads(f"!UUID {uuid}")
 

@@ -101,6 +101,10 @@
   - `!Date 1988-12-28T23:38:00-0600` <br>
     `!Date 2019-18-17T16:15:14`
 * -
+  - [`!Decimal`](#decimal) [{sup}`i-`](#interpolates-reduced){.abbr title="Supports reduced interpolation syntax (without JSON Path or JSON Pointer syntax)"}
+  - `str`
+  - `!Decimal 3.14`
+* -
   - [`!Func`](#func) [{sup}`i-`](#interpolates-reduced){.abbr title="Supports reduced interpolation syntax (without JSON Path or JSON Pointer syntax)"}
   - `str`
   - `!Func functools.reduce`
@@ -378,7 +382,7 @@ setting1: !Placeholder message to user
 
 - **Argument:** _str_.
 - **Action:** `!Placeholder` marks a value as needing to be overridden.
-  - If the `!Placeholder` is still present when the value is fetched, a {py:class}`.PlaceholderConfigurationError` is thrown. The exception message includes the attribute name and provided message (e.g. `` !Placeholder at `$.setting1` was not overwritten. Message: "message to user" ``)
+  - If the `!Placeholder` is still present when the value is fetched, a {py:class}`.PlaceholderConfigurationError` is thrown. The exception message includes the attribute name and provided message (e.g. ``!Placeholder at `$.setting1` was not overwritten. Message: "message to user"``)
 - Note:
   - The {py:class}`.Placeholder` object is created at Load Time. The exception is thrown when Fetched.
   - {py:class}`.PlaceholderConfigurationError` is thrown by the {py:class}`.Configuration` class. `!Placeholder` as a scalar or sequence will just return a {py:class}`.Placeholder` instance.
@@ -519,6 +523,20 @@ without_time_zone: !DateTime "2012-10-31T13:12:09"
 - Notes:
   - For Python 3.11+, {py:meth}`datetime.fromisoformat() <datetime.datetime.fromisoformat>` is used.
   - For Python 3.10, `dateutil.parser.parse(value, yearfirst=True, dayfirst=False)` is used.
+
+---
+
+### `!Decimal`
+
+```yaml
+number: !Decimal 3.14
+```
+
+- **Argument:** _str_
+  - _Supports Reduced Interpolation [Syntax](#interpolations)_
+- **Returns:** {py:class}`~decimal.Decimal` ‒ String parsed as a Python {py:class}`decimal.Decimal`.
+- Note:
+  - YAML Tags are not supported on numbers, so quoting is not required, because the tag makes it parsed as a YAML String.
 
 ---
 

@@ -44,6 +44,7 @@ This script is affected by [`G_CONFIG_DISABLE_PLUGINS`](#environment-variables) 
 ```shell
 python -m granular_configuration_language.available_tags
 ```
+
 <br>
 
 #### Options
@@ -81,6 +82,7 @@ When [tabulate](https://pypi.org/project/tabulate/) is installed, the default op
 ```shell
 pip install 'granular-configuration-language[printing]'
 ```
+
 <br>
 
 #### Headers
@@ -125,6 +127,7 @@ Parser       !EagerOptionalParseFile  str                    reduced         EAG
 Typer        !Class                   str                    reduced                   Callable
 Typer        !Date                    str                    reduced                   date
 Typer        !DateTime                str                    reduced                   date
+Typer        !Decimal                 str                    reduced                   Decimal
 Typer        !Func                    str                    reduced                   Callable
 Typer        !Mask                    str                    reduced                   Masked
 Typer        !UUID                    str                    reduced                   UUID
@@ -146,6 +149,7 @@ This script is affected by [`G_CONFIG_DISABLE_PLUGINS`](#environment-variables) 
 ```shell
 python -m granular_configuration_language.available_plugins
 ```
+
 <br>
 
 #### Options
@@ -189,6 +193,7 @@ When [tabulate](https://pypi.org/project/tabulate/) is installed, the default op
 ```shell
 pip install 'granular-configuration-language[printing]'
 ```
+
 <br>
 
 #### Headers
@@ -227,6 +232,7 @@ plugin          category     tag                      handler                   
 <gcl-built-in>  Parser       !EagerOptionalParseFile  <gcl>._eager_parse_file.opt                          text_ntrpl
 <gcl-built-in>  Typer        !Date                    <gcl>._date.date_
 <gcl-built-in>  Typer        !DateTime                <gcl>._date.datetime_
+<gcl-built-in>  Typer        !Decimal                 <gcl>._decimal.tag
 <gcl-built-in>  Typer        !Mask                    <gcl>._mask.tag
 <gcl-built-in>  Typer        !UUID                    <gcl>._uuid.tag
 <gcl-built-in>  Undoc-ed     !Dict                    <gcl>._dict.tag

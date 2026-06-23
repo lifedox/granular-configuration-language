@@ -2,6 +2,12 @@
 
 <!-- markdownlint-disable-file MD024 -->
 
+## 2.5.0
+
+### Added
+
+- Added `!Decimal`
+
 ## 2.4.4
 
 ### Fixed

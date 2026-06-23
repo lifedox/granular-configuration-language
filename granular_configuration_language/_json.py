@@ -5,6 +5,7 @@ import json
 import typing as typ
 from collections.abc import Callable, Mapping, Sequence
 from datetime import date, datetime
+from decimal import Decimal
 from functools import partial, update_wrapper
 from uuid import UUID
 
@@ -23,7 +24,7 @@ def get_name(value: tabc.Callable) -> str:
         return f"<{repr(value)}>"
 
 
-def json_default(value: typ.Any) -> typ.Any:
+def json_default(value: typ.Any) -> typ.Any:  # noqa: C901
     """A factory function to be used by the :py:func:`json.dump` family of functions.
 
     Provides serialization for types produced by this library's Tags.
@@ -53,6 +54,8 @@ def json_default(value: typ.Any) -> typ.Any:
         case LazyLoadConfiguration():
             return value.config.as_dict()
         case UUID():
+            return str(value)
+        case Decimal():
             return str(value)
         case date() | datetime():
             return value.isoformat()
