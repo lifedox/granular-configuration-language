@@ -1026,14 +1026,14 @@ six = ">=1.5"
 
 [[package]]
 name = "python-jsonpath"
-version = "2.2.0"
+version = "2.2.1"
 description = "JSONPath, JSON Pointer and JSON Patch for Python."
 optional = false
 python-versions = ">=3.8"
 groups = ["main", "renovate-main"]
 files = [
-    {file = "python_jsonpath-2.2.0-py3-none-any.whl", hash = "sha256:c805f8b85084f02bef40cde58952f4b507584a39cbb1ade76a5f21cdd23ea262"},
-    {file = "python_jsonpath-2.2.0.tar.gz", hash = "sha256:82769b77edbd1b28f8de21e0c15bb9ace02983b560740bdfb8336d71a7e3b419"},
+    {file = "python_jsonpath-2.2.1-py3-none-any.whl", hash = "sha256:ff3a65df52336fec13e2728612d6e2a76221264762a1b5385fac5dd21ae6f40e"},
+    {file = "python_jsonpath-2.2.1.tar.gz", hash = "sha256:3de7862cbc56566b61c2c25fe5a398bbba9466e972c1069a4c82cb60a8034dc5"},
 ]
 
 [package.extras]
