@@ -66,8 +66,8 @@
             <a id="indexLink" class="nav" href="index.html">&Hat; index</a> &nbsp; &nbsp;
             <a id="nextFileLink" class="nav" href="z_2e07e1b98efb25cd___init___py.html">&#xbb; next</a>
             &nbsp; &nbsp; &nbsp;
-            <a class="nav" href="https://coverage.readthedocs.io/en/7.15.2">coverage.py v7.15.2</a>,
-            created at 2026-08-07 18:56 +0000
+            <a class="nav" href="https://coverage.readthedocs.io/en/7.15.4">coverage.py v7.15.4</a>,
+            created at 2026-08-09 21:52 +0000
         </p>
         <aside class="hidden">
             <button type="button" class="button_next_chunk" data-shortcut="j"></button>
@@ -91,8 +91,8 @@
     <p class="run"><span class="n"><a id="t7" href="#t7">7</a></span><span class="t"><span class="key">from</span> <span class="nam">granular_configuration_language</span><span class="op">.</span><span class="nam">yaml</span><span class="op">.</span><span class="nam">file_ops</span><span class="op">.</span><span class="nam">text</span> <span class="key">import</span> <span class="nam">EagerIOTextFile</span><span class="op">,</span> <span class="nam">load_text_file</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t8" href="#t8">8</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t9" href="#t9">9</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
-    <p class="run"><span class="n"><a id="t10" href="#t10">10</a></span><span class="t"><span class="key">def</span> <span class="nam">eager_io_text_loader</span><span class="op">(</span><span class="nam">value</span><span class="op">:</span> <span class="nam">str</span><span class="op">,</span> <span class="nam">tag</span><span class="op">:</span> <span class="nam">Tag</span><span class="op">,</span> <span class="nam">options</span><span class="op">:</span> <span class="nam">LoadOptions</span><span class="op">)</span> <span class="op">-></span> <span class="nam">EagerIOTextFile</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
-    <p class="pln"><span class="n"><a id="t11" href="#t11">11</a></span><span class="t">    <span class="str">"""</span>&nbsp;</span><span class="r"></span></p>
+    <p class="run"><span class="n"><a id="t10" href="#t10">10</a></span><span class="t"><span class="key">def</span> <span class="nam">eager_io_text_loader</span><span class="op">(</span><span class="nam">value</span><span class="op">:</span> <span class="nam">str</span><span class="op">,</span> <span class="nam">tag</span><span class="op">:</span> <span class="nam">Tag</span><span class="op">,</span> <span class="nam">options</span><span class="op">:</span> <span class="nam">LoadOptions</span><span class="op">)</span> <span class="op">-&gt;</span> <span class="nam">EagerIOTextFile</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
+    <p class="pln"><span class="n"><a id="t11" href="#t11">11</a></span><span class="t">    <span class="str">&quot;&quot;&quot;</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t12" href="#t12">12</a></span><span class="t"><span class="str">    .. versionadded:: 2.3.0</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t13" href="#t13">13</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t14" href="#t14">14</a></span><span class="t"><span class="str">    Used by EagerIO Decorators to eagerly load a text file.</span>&nbsp;</span><span class="r"></span></p>
@@ -111,14 +111,14 @@
     <p class="pln"><span class="n"><a id="t27" href="#t27">27</a></span><span class="t"><span class="str">    :param LoadOptions options: options from the Tag doing this action, used for tracking chains.</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t28" href="#t28">28</a></span><span class="t"><span class="str">    :return: Loaded File</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t29" href="#t29">29</a></span><span class="t"><span class="str">    :rtype: EagerIOTextFile</span>&nbsp;</span><span class="r"></span></p>
-    <p class="pln"><span class="n"><a id="t30" href="#t30">30</a></span><span class="t"><span class="str">    """</span>&nbsp;</span><span class="r"></span></p>
+    <p class="pln"><span class="n"><a id="t30" href="#t30">30</a></span><span class="t"><span class="str">    &quot;&quot;&quot;</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t31" href="#t31">31</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t32" href="#t32">32</a></span><span class="t">    <span class="key">return</span> <span class="nam">load_text_file</span><span class="op">(</span><span class="nam">as_file_path</span><span class="op">(</span><span class="nam">tag</span><span class="op">,</span> <span class="nam">value</span><span class="op">,</span> <span class="nam">options</span><span class="op">)</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t33" href="#t33">33</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t34" href="#t34">34</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t35" href="#t35">35</a></span><span class="t"><span class="op">@</span><span class="nam">interpolate_value_eager_io</span>&nbsp;</span><span class="r"></span></p>
-    <p class="run"><span class="n"><a id="t36" href="#t36">36</a></span><span class="t"><span class="key">def</span> <span class="nam">eager_io_text_loader_interpolates</span><span class="op">(</span><span class="nam">value</span><span class="op">:</span> <span class="nam">str</span><span class="op">,</span> <span class="nam">tag</span><span class="op">:</span> <span class="nam">Tag</span><span class="op">,</span> <span class="nam">options</span><span class="op">:</span> <span class="nam">LoadOptions</span><span class="op">)</span> <span class="op">-></span> <span class="nam">EagerIOTextFile</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
-    <p class="pln"><span class="n"><a id="t37" href="#t37">37</a></span><span class="t">    <span class="str">"""</span>&nbsp;</span><span class="r"></span></p>
+    <p class="run"><span class="n"><a id="t36" href="#t36">36</a></span><span class="t"><span class="key">def</span> <span class="nam">eager_io_text_loader_interpolates</span><span class="op">(</span><span class="nam">value</span><span class="op">:</span> <span class="nam">str</span><span class="op">,</span> <span class="nam">tag</span><span class="op">:</span> <span class="nam">Tag</span><span class="op">,</span> <span class="nam">options</span><span class="op">:</span> <span class="nam">LoadOptions</span><span class="op">)</span> <span class="op">-&gt;</span> <span class="nam">EagerIOTextFile</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
+    <p class="pln"><span class="n"><a id="t37" href="#t37">37</a></span><span class="t">    <span class="str">&quot;&quot;&quot;</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t38" href="#t38">38</a></span><span class="t"><span class="str">    .. versionadded:: 2.3.0</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t39" href="#t39">39</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t40" href="#t40">40</a></span><span class="t"><span class="str">    Used by EagerIO Decorators to eagerly load a text file.</span>&nbsp;</span><span class="r"></span></p>
@@ -140,12 +140,12 @@
     <p class="pln"><span class="n"><a id="t56" href="#t56">56</a></span><span class="t"><span class="str">    :param LoadOptions options: options from the Tag doing this action, used for tracking chains.</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t57" href="#t57">57</a></span><span class="t"><span class="str">    :return: Loaded File</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t58" href="#t58">58</a></span><span class="t"><span class="str">    :rtype: EagerIOTextFile</span>&nbsp;</span><span class="r"></span></p>
-    <p class="pln"><span class="n"><a id="t59" href="#t59">59</a></span><span class="t"><span class="str">    """</span>&nbsp;</span><span class="r"></span></p>
+    <p class="pln"><span class="n"><a id="t59" href="#t59">59</a></span><span class="t"><span class="str">    &quot;&quot;&quot;</span>&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t60" href="#t60">60</a></span><span class="t">    <span class="key">return</span> <span class="nam">eager_io_text_loader</span><span class="op">(</span><span class="nam">value</span><span class="op">,</span> <span class="nam">tag</span><span class="op">,</span> <span class="nam">options</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t61" href="#t61">61</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t62" href="#t62">62</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
-    <p class="run"><span class="n"><a id="t63" href="#t63">63</a></span><span class="t"><span class="key">def</span> <span class="nam">eager_io_binary_loader</span><span class="op">(</span><span class="nam">value</span><span class="op">:</span> <span class="nam">str</span><span class="op">,</span> <span class="nam">tag</span><span class="op">:</span> <span class="nam">Tag</span><span class="op">,</span> <span class="nam">options</span><span class="op">:</span> <span class="nam">LoadOptions</span><span class="op">)</span> <span class="op">-></span> <span class="nam">EagerIOBinaryFile</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
-    <p class="pln"><span class="n"><a id="t64" href="#t64">64</a></span><span class="t">    <span class="str">"""</span>&nbsp;</span><span class="r"></span></p>
+    <p class="run"><span class="n"><a id="t63" href="#t63">63</a></span><span class="t"><span class="key">def</span> <span class="nam">eager_io_binary_loader</span><span class="op">(</span><span class="nam">value</span><span class="op">:</span> <span class="nam">str</span><span class="op">,</span> <span class="nam">tag</span><span class="op">:</span> <span class="nam">Tag</span><span class="op">,</span> <span class="nam">options</span><span class="op">:</span> <span class="nam">LoadOptions</span><span class="op">)</span> <span class="op">-&gt;</span> <span class="nam">EagerIOBinaryFile</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
+    <p class="pln"><span class="n"><a id="t64" href="#t64">64</a></span><span class="t">    <span class="str">&quot;&quot;&quot;</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t65" href="#t65">65</a></span><span class="t"><span class="str">    .. versionadded:: 2.3.0</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t66" href="#t66">66</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t67" href="#t67">67</a></span><span class="t"><span class="str">    Used by EagerIO Decorators to eagerly load a binary file.</span>&nbsp;</span><span class="r"></span></p>
@@ -164,14 +164,14 @@
     <p class="pln"><span class="n"><a id="t80" href="#t80">80</a></span><span class="t"><span class="str">    :param LoadOptions options: options from the Tag doing this action, used for tracking chains.</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t81" href="#t81">81</a></span><span class="t"><span class="str">    :return: Loaded File</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t82" href="#t82">82</a></span><span class="t"><span class="str">    :rtype: EagerIOBinaryFile</span>&nbsp;</span><span class="r"></span></p>
-    <p class="pln"><span class="n"><a id="t83" href="#t83">83</a></span><span class="t"><span class="str">    """</span>&nbsp;</span><span class="r"></span></p>
+    <p class="pln"><span class="n"><a id="t83" href="#t83">83</a></span><span class="t"><span class="str">    &quot;&quot;&quot;</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t84" href="#t84">84</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t85" href="#t85">85</a></span><span class="t">    <span class="key">return</span> <span class="nam">load_binary_file</span><span class="op">(</span><span class="nam">as_file_path</span><span class="op">(</span><span class="nam">tag</span><span class="op">,</span> <span class="nam">value</span><span class="op">,</span> <span class="nam">options</span><span class="op">)</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t86" href="#t86">86</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t87" href="#t87">87</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t88" href="#t88">88</a></span><span class="t"><span class="op">@</span><span class="nam">interpolate_value_eager_io</span>&nbsp;</span><span class="r"></span></p>
-    <p class="run"><span class="n"><a id="t89" href="#t89">89</a></span><span class="t"><span class="key">def</span> <span class="nam">eager_io_binary_loader_interpolates</span><span class="op">(</span><span class="nam">value</span><span class="op">:</span> <span class="nam">str</span><span class="op">,</span> <span class="nam">tag</span><span class="op">:</span> <span class="nam">Tag</span><span class="op">,</span> <span class="nam">options</span><span class="op">:</span> <span class="nam">LoadOptions</span><span class="op">)</span> <span class="op">-></span> <span class="nam">EagerIOBinaryFile</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
-    <p class="pln"><span class="n"><a id="t90" href="#t90">90</a></span><span class="t">    <span class="str">"""</span>&nbsp;</span><span class="r"></span></p>
+    <p class="run"><span class="n"><a id="t89" href="#t89">89</a></span><span class="t"><span class="key">def</span> <span class="nam">eager_io_binary_loader_interpolates</span><span class="op">(</span><span class="nam">value</span><span class="op">:</span> <span class="nam">str</span><span class="op">,</span> <span class="nam">tag</span><span class="op">:</span> <span class="nam">Tag</span><span class="op">,</span> <span class="nam">options</span><span class="op">:</span> <span class="nam">LoadOptions</span><span class="op">)</span> <span class="op">-&gt;</span> <span class="nam">EagerIOBinaryFile</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
+    <p class="pln"><span class="n"><a id="t90" href="#t90">90</a></span><span class="t">    <span class="str">&quot;&quot;&quot;</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t91" href="#t91">91</a></span><span class="t"><span class="str">    .. versionadded:: 2.3.0</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t92" href="#t92">92</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t93" href="#t93">93</a></span><span class="t"><span class="str">    Used by EagerIO Decorators to eagerly load a binary file.</span>&nbsp;</span><span class="r"></span></p>
@@ -193,7 +193,7 @@
     <p class="pln"><span class="n"><a id="t109" href="#t109">109</a></span><span class="t"><span class="str">    :param LoadOptions options: options from the Tag doing this action, used for tracking chains.</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t110" href="#t110">110</a></span><span class="t"><span class="str">    :return: Loaded File</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t111" href="#t111">111</a></span><span class="t"><span class="str">    :rtype: EagerIOBinaryFile</span>&nbsp;</span><span class="r"></span></p>
-    <p class="pln"><span class="n"><a id="t112" href="#t112">112</a></span><span class="t"><span class="str">    """</span>&nbsp;</span><span class="r"></span></p>
+    <p class="pln"><span class="n"><a id="t112" href="#t112">112</a></span><span class="t"><span class="str">    &quot;&quot;&quot;</span>&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t113" href="#t113">113</a></span><span class="t">    <span class="key">return</span> <span class="nam">eager_io_binary_loader</span><span class="op">(</span><span class="nam">value</span><span class="op">,</span> <span class="nam">tag</span><span class="op">,</span> <span class="nam">options</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
 </main>
 <footer>
@@ -203,8 +203,8 @@
             <a class="nav" href="index.html">&Hat; index</a> &nbsp; &nbsp;
             <a class="nav" href="z_2e07e1b98efb25cd___init___py.html">&#xbb; next</a>
             &nbsp; &nbsp; &nbsp;
-            <a class="nav" href="https://coverage.readthedocs.io/en/7.15.2">coverage.py v7.15.2</a>,
-            created at 2026-08-07 18:56 +0000
+            <a class="nav" href="https://coverage.readthedocs.io/en/7.15.4">coverage.py v7.15.4</a>,
+            created at 2026-08-09 21:52 +0000
         </p>
     </div>
 </footer>
