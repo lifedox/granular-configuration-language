@@ -3,7 +3,6 @@ from __future__ import annotations
 import collections.abc as tabc
 import copy
 import json
-import operator as op
 import sys
 import typing as typ
 from weakref import ReferenceType, ref
@@ -274,6 +273,18 @@ class TypedConfiguration(typ.Generic[KT, VT], tabc.Mapping[KT, VT]):
             self.__data[key] = value
         else:
             raise TypeError("`_private_set` is private and not for external use")
+
+    def _private_del(self, key: typ.Any, secret: object) -> None:
+        if secret is setter_secret:
+            del self.__data[key]
+        else:
+            raise TypeError("`_private_del` is private and not for external use")
+
+    def _private_get(self, key: typ.Any, secret: object) -> typ.Any:
+        if secret is setter_secret:
+            return self.__data[key]
+        else:
+            raise TypeError("`_private_get` is private and not for external use")
 
     def _raw_items(self) -> tabc.Iterator[tuple[typ.Any, typ.Any]]:
         return map(lambda key: (key, self.__data[key]), self)
@@ -564,9 +575,7 @@ class Configuration(typ.Generic[KT, VT], TypedConfiguration[KT, VT]):
         return super().__getattr__(name)  # type: ignore
 
     def __copy__(self) -> Configuration[KT, VT]:
-        other: Configuration[KT, VT] = self.__class__()
-        other.__data = copy.copy(self.__data)
-        return other
+        return super().__copy__()  # type: ignore
 
     copy = __copy__
     """
@@ -584,9 +593,7 @@ class Configuration(typ.Generic[KT, VT], TypedConfiguration[KT, VT]):
     """
 
 
-_private_data_getter: tabc.Callable[[TypedConfiguration], dict[typ.Any, typ.Any]] = op.attrgetter(
-    "_TypedConfiguration__data"
-)
+_DATA_ATTRIBUTE = "_TypedConfiguration__data"
 
 
 class MutableConfiguration(typ.Generic[KT, VT], tabc.MutableMapping[KT, VT], Configuration[KT, VT]):
@@ -653,25 +660,25 @@ class MutableConfiguration(typ.Generic[KT, VT], tabc.MutableMapping[KT, VT], Con
 
     @override
     def __delitem__(self, key: typ.Any) -> None:
-        del _private_data_getter(self)[key]
+        self._private_del(key, setter_secret)
 
     @override
     def __setitem__(self, key: KT, value: VT) -> None:
-        _private_data_getter(self)[key] = value
+        self._private_set(key, value, setter_secret)
 
     @override
     def __deepcopy__(self, memo: dict[int, typ.Any]) -> MutableConfiguration:
         other: MutableConfiguration[KT, VT] = MutableConfiguration()
         memo[id(self)] = other
         # Use setattr to avoid mypy and pylance being confused
-        setattr(other, "_TypedConfiguration__data", copy.deepcopy(_private_data_getter(self), memo=memo))  # noqa: B010
+        setattr(other, _DATA_ATTRIBUTE, copy.deepcopy(getattr(self, _DATA_ATTRIBUTE), memo=memo))  # noqa: B010
         return other
 
     @override
     def __copy__(self) -> MutableConfiguration:
         other: MutableConfiguration[KT, VT] = MutableConfiguration()
         # Use setattr to avoid mypy and pylance being confused
-        setattr(other, "_TypedConfiguration__data", copy.copy(_private_data_getter(self)))  # noqa: B010
+        setattr(other, _DATA_ATTRIBUTE, copy.copy(getattr(self, _DATA_ATTRIBUTE)))  # noqa: B010
         return other
 
     copy = __copy__

@@ -7,5 +7,6 @@ Code Specification (``module``)
 
     granular_configuration_language
     granular_configuration_language.exceptions
+    granular_configuration_language.mock
     granular_configuration_language.proxy
     toc-granular_configuration_language.yaml

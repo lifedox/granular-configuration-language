@@ -1,0 +1,1 @@
+key: !Sub ${ENV_VAR_DOES_NOT_EXIST}
