@@ -192,24 +192,22 @@ from granular_configuration_language.yaml.file_ops.binary import read_binary_dat
 from granular_configuration_language.yaml.file_ops.yaml import load_from_file
 
 
-@string_tag(Tag("!EagerParseFile"))             # Tag Type Decorator
-@as_eager_io_with_root_and_load_options(        # EagerIO Decorator
-  eager_io_text_loader_interpolates
+@string_tag(Tag("!EagerParseFile"))  # Tag Type Decorator
+@as_eager_io_with_root_and_load_options(  # EagerIO Decorator
+    eager_io_text_loader_interpolates
 )
 # @with_tag                                     # (Optional) With Attribute Decorator
-def tag(                                        # Function Signature
-  value: EagerIOTextFile,
-  root: Root,
-  options: LoadOptions
+def tag(  # Function Signature
+    value: EagerIOTextFile, root: Root, options: LoadOptions
 ) -> typing.Any:
-    return load_from_file(value, options, root) # Tag Logic
+    return load_from_file(value, options, root)  # Tag Logic
 
 
-@string_tag(Tag("!EagerLoadBinary"))              # Tag Type Decorator
-@as_eager_io(eager_io_binary_loader_interpolates) # EagerIO Decorator
+@string_tag(Tag("!EagerLoadBinary"))  # Tag Type Decorator
+@as_eager_io(eager_io_binary_loader_interpolates)  # EagerIO Decorator
 # @with_tag                                       # (Optional) With Attribute Decorator
-def eager(file: EagerIOBinaryFile) -> bytes:     # Function Signature
-    return read_binary_data(file)                 # Tag Logic
+def eager(file: EagerIOBinaryFile) -> bytes:  # Function Signature
+    return read_binary_data(file)  # Tag Logic
 ```
 
 <br>

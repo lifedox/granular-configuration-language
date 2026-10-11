@@ -6,6 +6,17 @@
 
 ### Added
 
+- Added `TypedConfiguration`, as a way to not expose the `__getattr__` that returned `typing.Any` to typing system.
+  - It is identical to `Configuration`. `Configuration` is a subclass of `TypedConfiguration` and continues to expose the `__getattr__`
+
+### Removed
+
+- Removed Python 3.10 supported
+
+## 2.5.0
+
+### Added
+
 - Added `!Decimal`
 
 ## 2.4.4

@@ -13,6 +13,9 @@
     :member-order: groupwise
     :inherited-members:
 
+.. autoclass:: granular_configuration_language.TypedConfiguration
+    :show-inheritance:
+
 .. autoclass:: granular_configuration_language.MutableLazyLoadConfiguration
     :members:
     :show-inheritance:
@@ -29,7 +32,7 @@
     :imported-members:
     :members:
     :show-inheritance:
-    :exclude-members: Configuration, MutableConfiguration, LazyLoadConfiguration, MutableLazyLoadConfiguration, Masked, Placeholder
+    :exclude-members: Configuration, MutableConfiguration, LazyLoadConfiguration, MutableLazyLoadConfiguration, Masked, Placeholder, TypedConfiguration
     :member-order: groupwise
 
 Made available from :py:mod:`.yaml.classes <granular_configuration_language.yaml.classes>`

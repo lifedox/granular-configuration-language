@@ -8,7 +8,7 @@ from pathlib import Path
 
 import pytest
 
-from granular_configuration_language import Configuration, LazyLoadConfiguration
+from granular_configuration_language import Configuration, LazyLoadConfiguration, TypedConfiguration
 from granular_configuration_language.exceptions import ErrorWhileLoadingFileOccurred
 from granular_configuration_language.proxy import EagerIOConfigurationProxy
 
@@ -17,11 +17,11 @@ EAGER_DIR = (Path(__file__).parent / "assets" / "test_eager_parse_file").resolve
 LAZY_DIR = (Path(__file__).parent / "assets" / "test_lazy_config").resolve()
 
 
-class SubConfig(Configuration):
+class SubConfig(TypedConfiguration):
     c: str
 
 
-class Config(Configuration):
+class Config(TypedConfiguration):
     a: int
     b: SubConfig
     config: str
@@ -41,9 +41,9 @@ def test_with_LazyLoadConfiguration() -> None:
 def test_proxy_copies_Configuration() -> None:
     config = LazyLoadConfiguration(ASSET_DIR / "config.yaml").eager_load(Config)
 
-    assert isinstance(copy.copy(config), Configuration)
-    assert isinstance(copy.deepcopy(config), Configuration)
-    assert isinstance(config, Configuration)
+    assert isinstance(copy.copy(config), TypedConfiguration)
+    assert isinstance(copy.deepcopy(config), TypedConfiguration)
+    assert isinstance(config, TypedConfiguration)
     assert isinstance(config, EagerIOConfigurationProxy)
 
 
@@ -72,7 +72,7 @@ def test_SimpleFuture_deconstructs_when_result_is_not_used() -> None:
     assert threading.active_count() > 1
 
     config_wref = weakref.ref(config)
-    future_wref = weakref.ref(config._EagerIOConfigurationProxy__future)
+    future_wref = weakref.ref(config._EagerIOConfigurationProxy__future)  # type: ignore
 
     del config
 
@@ -92,3 +92,9 @@ def test_reloading_an_error_does_not_infinite_loop() -> None:
 
     with pytest.raises(ErrorWhileLoadingFileOccurred):
         config.as_dict()
+
+
+def test_bad_eagerio_does_not_error_during_deconstruction() -> None:
+    config = LazyLoadConfiguration(EAGER_DIR / "bad_file.yaml").eager_load(Configuration)
+    del config
+    gc.collect()

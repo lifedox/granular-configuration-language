@@ -1,0 +1,1 @@
+a: !EagerParseFile ${ENV_VAR_NOT_FOUND}.yaml

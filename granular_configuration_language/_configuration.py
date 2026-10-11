@@ -23,29 +23,9 @@ else:
         return func
 
 
-if sys.version_info >= (3, 11):
-    from typing import Generic, TypedDict, Unpack, dataclass_transform
-
-    class Kwords_typed_get(Generic[T], TypedDict, total=False):
-        default: T
-        predicate: tabc.Callable[[typ.Any], typ.TypeGuard[T]]
-
-elif typ.TYPE_CHECKING:
-    from typing import Generic
-
-    from typing_extensions import TypedDict, Unpack, dataclass_transform
-
-    class Kwords_typed_get(Generic[T], TypedDict, total=False):
-        default: T
-        predicate: tabc.Callable[[typ.Any], typ.TypeGuard[T]]
-
-else:
-
-    def dataclass_transform(**kwargs: typ.Any) -> typ.Callable[[typ.Callable[P, RT]], typ.Callable[P, RT]]:
-        def identity(func: typ.Callable[P, RT]) -> typ.Callable[P, RT]:
-            return func
-
-        return identity
+class Kwords_typed_get(typ.Generic[T], typ.TypedDict, total=False):
+    default: T
+    predicate: tabc.Callable[[typ.Any], typ.TypeGuard[T]]
 
 
 class AttributeName(tabc.Iterable[str]):
@@ -89,18 +69,33 @@ class AttributeName(tabc.Iterable[str]):
         return ".".join(self)
 
 
-@dataclass_transform(frozen_default=True, eq_default=True, kw_only_default=True)
-class Configuration(typ.Generic[KT, VT], tabc.Mapping[KT, VT]):
+@typ.dataclass_transform(frozen_default=True, eq_default=True, kw_only_default=True)
+class TypedConfiguration(typ.Generic[KT, VT], tabc.Mapping[KT, VT]):
     r"""
-    This class represents an immutable :py:class:`~collections.abc.Mapping` of
-    configuration.
+    .. versionadded:: 2.5.0
 
-    You can create type annotated subclasses of :py:class:`Configuration` to
+    Use this class to create type annotated subclasses to
     enable type checking and code completion, as if your subclass was a
     :py:func:`dataclass <dataclasses.dataclass>` [#f1]_.
 
-    With you typed class, you can cast a general :py:class:`.Configuration` to
+    With your typed class, you can cast a general :py:class:`.Configuration` to
     your subclass via :py:meth:`Configuration.as_typed`.
+
+    .. admonition:: Use subclasses of :py:class:`.TypedConfiguration` for annotations
+        :class: note
+        :collapsible: closed
+
+        In order to improve type checking, :py:class:`.TypedConfiguration` was
+        added for use with type annotations. :py:class:`.TypedConfiguration`
+        does not expose `__getattr__` to typing check, and thus type checkers
+        do not assume dynamic attributes are allowed.
+
+        :py:class:`.Configuration` is now a subclass :py:class:`.TypedConfiguration`
+        and continues to exposes `__getattr__` to the type system, as before.
+
+        You should use subclasses of :py:class:`.TypedConfiguration` for
+        annotating attributes on a configuration and use
+        :py:class:`.Configuration` for construction.
 
     .. admonition:: :py:meth:`!as_typed` Example
         :class: hint
@@ -108,16 +103,16 @@ class Configuration(typ.Generic[KT, VT], tabc.Mapping[KT, VT]):
 
         .. code-block:: python
 
-            class SubConfig(Configuration):
+            class SubConfig(TypedConfiguration):
                 c: str
 
 
-            class Config(Configuration):
+            class Config(TypedConfiguration):
                 a: int
                 b: SubConfig
 
 
-            config = ...  # A Configuration instance
+            config = ...  # A TypedConfiguration instance
             typed = config.as_typed(Config)
 
             assert typed.a == 101
@@ -132,7 +127,7 @@ class Configuration(typ.Generic[KT, VT], tabc.Mapping[KT, VT]):
             :class: tip
 
             Consider using :py:meth:`LazyLoadConfiguration.as_typed` to load your
-            entire configuration as a typed :py:class:`.Configuration`.
+            entire configuration as a typed :py:class:`.TypedConfiguration`.
 
     .. admonition:: Footnotes
         :collapsible: closed
@@ -142,20 +137,6 @@ class Configuration(typ.Generic[KT, VT], tabc.Mapping[KT, VT]):
             See :py:func:`~typing.dataclass_transform` → "on base class" for
             implementation details
 
-    .. admonition:: Changes
-        :collapsible: closed
-
-        .. versionchanged:: 2.3.0
-            Added Generic Type Parameters, which default to :py:data:`~typing.Any`.
-
-    :param ~collections.abc.Mapping[KT, VT] mapping:
-        Constructs a :py:class:`.Configuration` by shallow copying initiating mapping.
-    :param ~collections.abc.Iterable[tuple[KT, VT]] iterable:
-        Constructs a :py:class:`.Configuration` from an iterable of key-value pairs.
-    :param VT \*\*kwargs:
-        Constructs a :py:class:`.Configuration` via keyword arguments.
-        (Due to a limitation of defaults, :py:class:`.KT` is inferred to be
-        :py:data:`~typing.Any`, instead of :py:class:`str`.)
     """
 
     __slots__ = ("__data", "__attribute_name")
@@ -215,7 +196,7 @@ class Configuration(typ.Generic[KT, VT], tabc.Mapping[KT, VT]):
                 f'!Placeholder at `{self.__attribute_name.with_suffix(name)}` was not overwritten. Message: "{value}"'
             )
 
-        if isinstance(value, Configuration):
+        if isinstance(value, TypedConfiguration):
             value.__attribute_name = self.__attribute_name.append_suffix(name)  # noqa: SLF001
             return value  # type: ignore  # instead of casting
         else:
@@ -258,14 +239,14 @@ class Configuration(typ.Generic[KT, VT], tabc.Mapping[KT, VT]):
     def __repr__(self) -> str:
         return repr(self.__data)
 
-    def __deepcopy__(self, memo: dict[int, typ.Any]) -> Configuration[KT, VT]:
-        other: Configuration[KT, VT] = Configuration()
+    def __deepcopy__(self, memo: dict[int, typ.Any]) -> TypedConfiguration[KT, VT]:
+        other: TypedConfiguration[KT, VT] = self.__class__()
         memo[id(self)] = other
         other.__data = copy.deepcopy(self.__data, memo=memo)
         return other
 
-    def __copy__(self) -> Configuration[KT, VT]:
-        other: Configuration[KT, VT] = Configuration()
+    def __copy__(self) -> TypedConfiguration[KT, VT]:
+        other: TypedConfiguration[KT, VT] = self.__class__()
         other.__data = copy.copy(self.__data)
         return other
 
@@ -306,30 +287,13 @@ class Configuration(typ.Generic[KT, VT], tabc.Mapping[KT, VT]):
         for attr, value in state[1].items():
             object.__setattr__(self, attr, value)
 
-    def __getattr__(self, name: str) -> VT:
-        """
-        Provides a potentially cleaner path as an alternative to :py:meth:`~object.__getitem__`.
+    if not typ.TYPE_CHECKING:
 
-        .. admonition:: Comparing to :py:meth:`~object.__getitem__`
+        def __getattr__(self, name: str) -> VT:
+            if name not in self:
+                raise AttributeError(f"Request attribute `{self.__attribute_name.with_suffix(name)}` does not exist")
 
-            - Three less characters
-            - Only accepts :py:class:`str`
-            - Throws :py:exc:`AttributeError` instead of :py:exc:`KeyError`
-
-        :example:
-            .. code-block:: python
-
-                config.a.b.c          # Using `__getattr__`
-                config["a"]["b"]["c"] # Using `__getitem__`
-        :param str name: Attribute name
-        :return: Fetched value
-        :rtype:  VT
-        :raises AttributeError: When an attribute is not present.
-        """
-        if name not in self:
-            raise AttributeError(f"Request attribute `{self.__attribute_name.with_suffix(name)}` does not exist")
-
-        return self[name]  # type: ignore  # instead of casting
+            return self[name]  # type: ignore  # instead of casting
 
     def exists(self, key: typ.Any) -> bool:
         """
@@ -349,7 +313,7 @@ class Configuration(typ.Generic[KT, VT], tabc.Mapping[KT, VT]):
         """
 
         for value in self.values():
-            if isinstance(value, Configuration):
+            if isinstance(value, TypedConfiguration):
                 value.evaluate_all()
 
     def as_dict(self) -> dict[KT, VT]:
@@ -366,7 +330,7 @@ class Configuration(typ.Generic[KT, VT], tabc.Mapping[KT, VT]):
         :return: A shallow :py:class:`dict` copy
         :rtype: dict
         """
-        return {key: value.as_dict() if isinstance(value, Configuration) else value for key, value in self.items()}  # type: ignore
+        return {key: value.as_dict() if isinstance(value, TypedConfiguration) else value for key, value in self.items()}  # type: ignore
 
     def as_json_string(self, *, default: tabc.Callable[[typ.Any], typ.Any] | None = None, **kwds: typ.Any) -> str:
         r"""
@@ -403,7 +367,7 @@ class Configuration(typ.Generic[KT, VT], tabc.Mapping[KT, VT]):
         self, type: type[T], key: typ.Any, *, default: T, predicate: tabc.Callable[[typ.Any], typ.TypeGuard[T]]
     ) -> T: ...
 
-    def typed_get(self, type: type[T], key: typ.Any, **kwds: Unpack[Kwords_typed_get[T]]) -> T:
+    def typed_get(self, type: type[T], key: typ.Any, **kwds: typ.Unpack[Kwords_typed_get[T]]) -> T:
         r"""
         Provides a typed-checked :py:meth:`get` option
 
@@ -437,7 +401,7 @@ class Configuration(typ.Generic[KT, VT], tabc.Mapping[KT, VT]):
 
     def as_typed(self, typed_base: type[C]) -> C:
         """
-        Cast this :py:class:`Configuration` instance into subclass of :py:class:`Configuration` with typed annotated attributes
+        Cast this instance into a subclass of :py:class:`TypedConfiguration` with typed annotated attributes
 
         .. admonition:: Advisement
             :class: tip
@@ -451,20 +415,178 @@ class Configuration(typ.Generic[KT, VT], tabc.Mapping[KT, VT]):
             :collapsible: closed
 
             This method uses :py:func:`typing.cast` to return this instance, unmodified,
-            as the requested :py:class:`Configuration` subclass.
+            as the requested :py:class:`TypedConfiguration` subclass.
             This enables typing checking and typed attributes with minimal a runtime cost.
             It is limited to just improving developer experience.
 
             Use ``Pydantic``, or some like it, if you require runtime type checking.
 
-        :param type[C] typed_base: Subclass of :py:class:`Configuration` to assume
+        :param type[C] typed_base: Subclass of :py:class:`TypedConfiguration` to assume
         :return: This instance
         :rtype: C
         """
         return typ.cast("C", self)
 
 
-_private_data_getter: tabc.Callable[[Configuration], dict[typ.Any, typ.Any]] = op.attrgetter("_Configuration__data")
+@typ.dataclass_transform(frozen_default=True, eq_default=True, kw_only_default=True)
+class Configuration(typ.Generic[KT, VT], TypedConfiguration[KT, VT]):
+    r"""
+
+    This class represents an immutable :py:class:`~collections.abc.Mapping` of
+    configuration.
+
+    You can create type annotated subclasses of :py:class:`TypedConfiguration` to
+    enable type checking and code completion, as if your subclass was a
+    :py:func:`dataclass <dataclasses.dataclass>` [#f1]_.
+
+    .. admonition:: Use :py:class:`.Configuration` for construction.
+        :class: note
+        :collapsible: closed
+
+        In order to improve type checking, :py:class:`.TypedConfiguration` was
+        added for use with type annotations. :py:class:`.TypedConfiguration`
+        does not expose `__getattr__` to typing check, and thus type checkers
+        do not assume dynamic attributes are allowed.
+
+        :py:class:`.Configuration` is now a subclass :py:class:`.TypedConfiguration`
+        and continues to exposes `__getattr__` to the type system, as before.
+
+        You should use subclasses of :py:class:`.TypedConfiguration` for
+        annotating attributes on a configuration and use
+        :py:class:`.Configuration` for construction.
+
+    .. admonition:: :py:meth:`!as_typed` Example
+        :class: hint
+        :collapsible: closed
+
+        .. code-block:: python
+
+            class SubConfig(TypedConfiguration):
+                c: str
+
+
+            class Config(TypedConfiguration):
+                a: int
+                b: SubConfig
+
+
+            config = ...  # A Configuration instance
+            typed = config.as_typed(Config)
+
+            assert typed.a == 101
+            assert typed.b.c == "test me"
+            assert typed["a"] == 101
+
+            # Or loading with LazyLoadConfiguration
+
+            typed = LazyLoadConfiguration("config.yaml").as_typed(Config)
+
+        .. admonition:: Advisement
+            :class: tip
+
+            Consider using :py:meth:`LazyLoadConfiguration.as_typed` to load your
+            entire configuration as a typed :py:class:`.TypedConfiguration`.
+
+    .. admonition:: Changes
+        :collapsible: closed
+
+        .. versionchanged:: 2.3.0
+            Added Generic Type Parameters, which default to :py:data:`~typing.Any`.
+
+    :param ~collections.abc.Mapping[KT, VT] mapping:
+        Constructs a :py:class:`.Configuration` by shallow copying initiating mapping.
+    :param ~collections.abc.Iterable[tuple[KT, VT]] iterable:
+        Constructs a :py:class:`.Configuration` from an iterable of key-value pairs.
+    :param VT \*\*kwargs:
+        Constructs a :py:class:`.Configuration` via keyword arguments.
+        (Due to a limitation of defaults, :py:class:`.KT` is inferred to be
+        :py:data:`~typing.Any`, instead of :py:class:`str`.)
+    """
+
+    if typ.TYPE_CHECKING:
+        # For Pylance and sphinx.
+
+        @typ.overload
+        def __init__(self) -> None: ...
+
+        @typ.overload
+        def __init__(self, mapping: tabc.Mapping[KT, VT], /) -> None: ...
+
+        @typ.overload
+        def __init__(self, iterable: tabc.Iterable[tuple[KT, VT]], /) -> None: ...
+
+        @typ.overload
+        def __init__(self, **kwargs: VT) -> None: ...
+
+        def __init__(self, *arg: tabc.Mapping[KT, VT] | tabc.Iterable[tuple[KT, VT]], **kwargs: VT) -> None:
+            super().__init__(*arg, **kwargs)
+
+        @typ.overload
+        def typed_get(self, type: type[T], key: typ.Any) -> T: ...
+
+        @typ.overload
+        def typed_get(self, type: type[T], key: typ.Any, *, default: T) -> T: ...
+
+        @typ.overload
+        def typed_get(
+            self, type: type[T], key: typ.Any, *, predicate: tabc.Callable[[typ.Any], typ.TypeGuard[T]]
+        ) -> T: ...
+
+        @typ.overload
+        def typed_get(
+            self, type: type[T], key: typ.Any, *, default: T, predicate: tabc.Callable[[typ.Any], typ.TypeGuard[T]]
+        ) -> T: ...
+
+        @override
+        def typed_get(self, type: type[T], key: typ.Any, **kwds: typ.Unpack[Kwords_typed_get[T]]) -> T:
+            return super().typed_get(type, key, **kwds)
+
+    def __getattr__(self, name: str) -> VT:
+        """
+        Provides a potentially cleaner path as an alternative to :py:meth:`~object.__getitem__`.
+
+        .. admonition:: Comparing to :py:meth:`~object.__getitem__`
+
+            - Three less characters
+            - Only accepts :py:class:`str`
+            - Throws :py:exc:`AttributeError` instead of :py:exc:`KeyError`
+
+        :example:
+            .. code-block:: python
+
+                config.a.b.c          # Using `__getattr__`
+                config["a"]["b"]["c"] # Using `__getitem__`
+        :param str name: Attribute name
+        :return: Fetched value
+        :rtype:  VT
+        :raises AttributeError: When an attribute is not present.
+        """
+        return super().__getattr__(name)  # type: ignore
+
+    def __copy__(self) -> Configuration[KT, VT]:
+        other: Configuration[KT, VT] = self.__class__()
+        other.__data = copy.copy(self.__data)
+        return other
+
+    copy = __copy__
+    """
+    Returns a shallow copy of this instance. (Matches :py:meth:`dict.copy` interface.)
+
+    .. caution::
+
+        :py:class:`.LazyEval` do not make copies. If you have not evaluated all tags,
+        you should called :py:meth:`evaluate_all` before calling this method.
+
+    .. tip::
+
+        :py:class:`.Configuration` is immutable, so you do not need to make a copy to protect it.
+
+    """
+
+
+_private_data_getter: tabc.Callable[[TypedConfiguration], dict[typ.Any, typ.Any]] = op.attrgetter(
+    "_TypedConfiguration__data"
+)
 
 
 class MutableConfiguration(typ.Generic[KT, VT], tabc.MutableMapping[KT, VT], Configuration[KT, VT]):
@@ -522,10 +644,10 @@ class MutableConfiguration(typ.Generic[KT, VT], tabc.MutableMapping[KT, VT], Con
         ) -> T: ...
 
         @override
-        def typed_get(self, type: type[T], key: typ.Any, **kwds: Unpack[Kwords_typed_get[T]]) -> T:
+        def typed_get(self, type: type[T], key: typ.Any, **kwds: typ.Unpack[Kwords_typed_get[T]]) -> T:
             return super().typed_get(type, key, **kwds)
 
-    # Remember `Configuration.__data` is really `Configuration._Configuration__data`
+    # Remember `Configuration.__data` is really `Configuration._TypedConfiguration__data`
     # Type checkers do ignore this fact, because this is something to be avoided.
     # I want to continue to use self.__data to avoid people being tempted to reach in.
 
@@ -542,14 +664,14 @@ class MutableConfiguration(typ.Generic[KT, VT], tabc.MutableMapping[KT, VT], Con
         other: MutableConfiguration[KT, VT] = MutableConfiguration()
         memo[id(self)] = other
         # Use setattr to avoid mypy and pylance being confused
-        setattr(other, "_Configuration__data", copy.deepcopy(_private_data_getter(self), memo=memo))  # noqa: B010
+        setattr(other, "_TypedConfiguration__data", copy.deepcopy(_private_data_getter(self), memo=memo))  # noqa: B010
         return other
 
     @override
     def __copy__(self) -> MutableConfiguration:
         other: MutableConfiguration[KT, VT] = MutableConfiguration()
         # Use setattr to avoid mypy and pylance being confused
-        setattr(other, "_Configuration__data", copy.copy(_private_data_getter(self)))  # noqa: B010
+        setattr(other, "_TypedConfiguration__data", copy.copy(_private_data_getter(self)))  # noqa: B010
         return other
 
     copy = __copy__
@@ -563,7 +685,7 @@ class MutableConfiguration(typ.Generic[KT, VT], tabc.MutableMapping[KT, VT], Con
     """
 
 
-C = typ.TypeVar("C", bound=Configuration)
+C = typ.TypeVar("C", bound=TypedConfiguration)
 """
 Generic Type that must be :py:class:`.Configuration` or a subclass
 """

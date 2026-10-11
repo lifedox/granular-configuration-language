@@ -1,7 +1,7 @@
 # isort:skip_file
 # Order Matters
 from granular_configuration_language.yaml import Masked, Placeholder
-from granular_configuration_language._configuration import Configuration, MutableConfiguration
+from granular_configuration_language._configuration import TypedConfiguration, MutableConfiguration, Configuration
 import granular_configuration_language.proxy
 from granular_configuration_language._lazy_load_configuration import (
     LazyLoadConfiguration,

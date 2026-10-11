@@ -298,9 +298,7 @@ Cases discussed included:
   ```python
   # Getting the deployed setting
   LazyLoadConfiguration(
-      "config.yaml",
-      base_path="/common_base_path/settings",
-      env_location_var_name="CONFIG_LOCATION"
+      "config.yaml", base_path="/common_base_path/settings", env_location_var_name="CONFIG_LOCATION"
   ).config.setting1
   ```
 
@@ -319,10 +317,7 @@ Cases discussed included:
 
   ```python
   # Getting the deployed setting
-  LazyLoadConfiguration(
-      "config.yaml",
-      base_path="/common_base_path/settings"
-  ).config.setting1
+  LazyLoadConfiguration("config.yaml", base_path="/common_base_path/settings").config.setting1
   ```
 
 In order to not create a doubly-linked structure or lose `base_path` ability to dereference settings that are fenced out, it was decided to use root-orient syntax.
@@ -516,10 +511,10 @@ setting1: !ParseEnv VAR1
 ```python
 CONFIG = LoadLazyConfiguration("config.yaml")
 
-CONFIG.setting1 # Would cause an infinite loop without detection.
-                # Note: This is not recursion, because a new LazyEval
-                #       instance is created every load.
-                #       You would be waiting to run out of memory or stack.
+CONFIG.setting1  # Would cause an infinite loop without detection.
+# Note: This is not recursion, because a new LazyEval
+#       instance is created every load.
+#       You would be waiting to run out of memory or stack.
 ```
 <br>
 
@@ -556,15 +551,15 @@ The following is an example of a loop, using [`!ParseFile`](yaml.md#parsefile--o
 ```python
 CONFIG = LoadLazyConfiguration("1.yaml")
 
-CONFIG.safe           # "1.yaml"
-CONFIG.next.safe      # "2.yaml"
-CONFIG.next.next.safe # "3.yaml"
-CONFIG.next.next.next # Would load `1.yaml` again without detection.
+CONFIG.safe  # "1.yaml"
+CONFIG.next.safe  # "2.yaml"
+CONFIG.next.next.safe  # "3.yaml"
+CONFIG.next.next.next  # Would load `1.yaml` again without detection.
 
 # Without detection, `.next` could be appended endlessly
-CONFIG.next.next.next                # 1.yaml→2.yaml→3.yaml→1.yaml
-CONFIG.next.next.next.next           # 1.yaml→2.yaml→3.yaml→1.yaml→2.yaml
-CONFIG.next.next.next.next.next      # 1.yaml→2.yaml→3.yaml→1.yaml→2.yaml→3.yaml
-CONFIG.next.next.next.next.next.next # 1.yaml→2.yaml→3.yaml→1.yaml→2.yaml→3.yaml→1.yaml
+CONFIG.next.next.next  # 1.yaml→2.yaml→3.yaml→1.yaml
+CONFIG.next.next.next.next  # 1.yaml→2.yaml→3.yaml→1.yaml→2.yaml
+CONFIG.next.next.next.next.next  # 1.yaml→2.yaml→3.yaml→1.yaml→2.yaml→3.yaml
+CONFIG.next.next.next.next.next.next  # 1.yaml→2.yaml→3.yaml→1.yaml→2.yaml→3.yaml→1.yaml
 ```
 <br>

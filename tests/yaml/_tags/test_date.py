@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import os
-from datetime import date, datetime, timedelta, timezone
+from datetime import UTC, date, datetime, timedelta, timezone
 from unittest.mock import patch
 
 from granular_configuration_language._json import dumps
@@ -46,14 +46,14 @@ def test_datetime_tz_less_compressed() -> None:
 def test_datetime_utc() -> None:
     output = loads("!DateTime 2012-10-31T13:12:09Z")
 
-    assert output == datetime(2012, 10, 31, 13, 12, 9, tzinfo=timezone.utc)
+    assert output == datetime(2012, 10, 31, 13, 12, 9, tzinfo=UTC)
     assert dumps(output) == '"2012-10-31T13:12:09+00:00"'
 
 
 def test_datetime_utc_compressed() -> None:
     output = loads("!DateTime 20121031T131209Z")
 
-    assert output == datetime(2012, 10, 31, 13, 12, 9, tzinfo=timezone.utc)
+    assert output == datetime(2012, 10, 31, 13, 12, 9, tzinfo=UTC)
     assert dumps(output) == '"2012-10-31T13:12:09+00:00"'
 
 

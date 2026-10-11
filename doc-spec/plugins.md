@@ -38,17 +38,15 @@ Everything you need is importable from {py:mod}`granular_configuration_language.
 ```python
 from credstash import getSecret
 from granular_configuration_language.yaml.classes import Masked
-from granular_configuration_language.yaml.decorators import (
-    Tag, as_lazy, interpolate_value_without_ref, string_tag
-)
+from granular_configuration_language.yaml.decorators import Tag, as_lazy, interpolate_value_without_ref, string_tag
 
 
-@string_tag(Tag("!Credstash"))      # Tag Type Decorator
-@as_lazy                            # Laziness Decorator
-@interpolate_value_without_ref      # (Optional) Interpolate Decorator
+@string_tag(Tag("!Credstash"))  # Tag Type Decorator
+@as_lazy  # Laziness Decorator
+@interpolate_value_without_ref  # (Optional) Interpolate Decorator
 # @with_tag                         # (Optional) With Attribute Decorator
 def handler(value: str) -> Masked:  # Function Signature
-    return Masked(getSecret(value)) # Tag Logic
+    return Masked(getSecret(value))  # Tag Logic
 ```
 
 <br>
@@ -120,16 +118,20 @@ def handler(value: str) -> Masked:  # Function Signature
 from credstash import getSecret
 from granular_configuration_language.yaml.classes import Masked
 from granular_configuration_language.yaml.decorators import (
-    Tag, as_lazy, interpolate_value_without_ref, string_tag, with_tag
+    Tag,
+    as_lazy,
+    interpolate_value_without_ref,
+    string_tag,
+    with_tag,
 )
 
 
-@string_tag(Tag("!Credstash"))      # Tag Type Decorator
-@as_lazy                            # Laziness Decorator
-@interpolate_value_without_ref      # (Optional) Interpolate Decorator
+@string_tag(Tag("!Credstash"))  # Tag Type Decorator
+@as_lazy  # Laziness Decorator
+@interpolate_value_without_ref  # (Optional) Interpolate Decorator
 @with_tag
 def handler(tag: Tag, value: str) -> Masked:  # Function Signature
-    return Masked(getSecret(value)) # Tag Logic
+    return Masked(getSecret(value))  # Tag Logic
 ```
 
 ---
@@ -147,6 +149,7 @@ import typing
 from granular_configuration_language.yaml.decorators import (
     TagDecoratorBase,
 )
+
 
 class float_tag(TagDecoratorBase[float]):
     Type: typing.TypeAlias = float
@@ -175,7 +178,6 @@ The guaranteed to never break and handling all possible cases solution is the au
 
 ```python
 class float_tag(TagDecoratorBase[float]):
-
     # ...
 
     @typing.override  # Python 3.12+

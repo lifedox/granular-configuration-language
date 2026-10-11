@@ -9,7 +9,7 @@ from decimal import Decimal
 from functools import partial, update_wrapper
 from uuid import UUID
 
-from granular_configuration_language import Configuration, LazyLoadConfiguration
+from granular_configuration_language import LazyLoadConfiguration, TypedConfiguration
 
 
 def get_name(value: tabc.Callable) -> str:
@@ -49,7 +49,7 @@ def json_default(value: typ.Any) -> typ.Any:  # noqa: C901
 
     """
     match value:
-        case Configuration():
+        case TypedConfiguration():
             return value.as_dict()
         case LazyLoadConfiguration():
             return value.config.as_dict()

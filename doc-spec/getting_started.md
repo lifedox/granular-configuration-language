@@ -156,18 +156,18 @@ If you want code completion and typing checking, you can use {py:class}`.Configu
 ```python
 from granular_configuration_language import Configuration, LazyLoadConfiguration
 
+
 class Setting2Config(Configuration):
     sub_setting1: str
+
 
 class Config(Configuration):
     setting1: str
     setting2: Setting2Config
     example_of_codes: Configuration[int, str]
 
-CONFIG = LazyLoadConfiguration(
-  Path(__file___).parent / "config.yaml",
-  base_path="example_config"
-).as_typed(Config)
+
+CONFIG = LazyLoadConfiguration(Path(__file___).parent / "config.yaml", base_path="example_config").as_typed(Config)
 ```
 
 ```{note}

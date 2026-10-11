@@ -63,15 +63,21 @@ Some use cases:
       class CommonSettings(Configuration):
           use_decimal: bool
           encryption_type: str
+
+
       #
       class DatabaseSettings:
           location: str
           user: str
           password: str
+
+
       #
       class Settings(Configuration):
           common_settings: CommonSettings
           databases: Configuration[str, DatabaseSettings]
+
+
       #
       CONFIG = LazyLoadConfiguration(
           Path(__file___).parent / "config.yaml",

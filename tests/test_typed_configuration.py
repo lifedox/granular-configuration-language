@@ -5,7 +5,7 @@ from pathlib import Path
 
 import pytest
 
-from granular_configuration_language import Configuration, LazyLoadConfiguration
+from granular_configuration_language import Configuration, LazyLoadConfiguration, TypedConfiguration
 from granular_configuration_language.exceptions import ErrorWhileLoadingFileOccurred
 from granular_configuration_language.proxy import SafeConfigurationProxy
 from granular_configuration_language.yaml import loads
@@ -14,18 +14,18 @@ ASSET_DIR = (Path(__file__).parent / "assets" / "test_typed_configuration").reso
 LAZY_DIR = (Path(__file__).parent / "assets" / "test_lazy_config").resolve()
 
 
-class SubConfig(Configuration):
+class SubConfig(TypedConfiguration):
     c: str
 
 
-class Config(Configuration):
+class Config(TypedConfiguration):
     a: int
     b: SubConfig
     config: str
 
 
 def test_with_Configuration() -> None:
-    config: Configuration = loads(
+    config: TypedConfiguration = loads(
         """
 a: 101
 b:

@@ -51,11 +51,11 @@ class LazyLoadConfiguration(Mapping):
 
         .. code-block:: python
 
-            class SubConfig(Configuration):
+            class SubConfig(TypedConfiguration):
                 c: str
 
 
-            class Config(Configuration):
+            class Config(TypedConfiguration):
                 a: int
                 b: SubConfig
 
@@ -179,18 +179,10 @@ class LazyLoadConfiguration(Mapping):
             disable_cache=disable_caching,
         )
 
-    if sys.version_info >= (3, 11):
-
-        @override
-        def __getstate__(self) -> typ.Any:
-            self.config  # noqa: B018  # Run to get rid of the RLock and before ruining this instance with pickling_error_occur
-            return super().__getstate__()
-
-    else:
-
-        def __getstate__(self) -> typ.Any:
-            self.config  # noqa: B018  # Run to get rid of the RLock and before ruining this instance with pickling_error_occur
-            return self.__dict__
+    @override
+    def __getstate__(self) -> typ.Any:
+        self.config  # noqa: B018  # Run to get rid of the RLock and before ruining this instance with pickling_error_occur
+        return super().__getstate__()
 
     def __setstate__(self, state: dict[str, typ.Any]) -> None:
         # custom __getattr__ requires custom __setstate__
@@ -253,7 +245,7 @@ class LazyLoadConfiguration(Mapping):
 
     def as_typed(self, typed_base: type[C]) -> C:
         """
-        Create a proxy that is cast to provide :py:class:`Configuration`
+        Create a proxy that is cast to provide :py:class:`TypedConfiguration`
         subclass with typed annotated attributes.
 
         This proxy ensures laziness is preserved and is fully compatible with
@@ -265,11 +257,11 @@ class LazyLoadConfiguration(Mapping):
 
             .. code-block:: python
 
-                class SubConfig(Configuration):
+                class SubConfig(TypedConfiguration):
                     c: str
 
 
-                class Config(Configuration):
+                class Config(TypedConfiguration):
                     a: int
                     b: SubConfig
 
@@ -286,7 +278,7 @@ class LazyLoadConfiguration(Mapping):
 
             This method uses :py:func:`typing.cast` to return a
             :py:class:`.SafeConfigurationProxy` of this instance
-            as the requested :py:class:`Configuration` subclass.
+            as the requested :py:class:`TypedConfiguration` subclass.
 
             This enables typing checking and typed attributes with minimal
             runtime cost, but it is limited to just improving developer
@@ -296,7 +288,7 @@ class LazyLoadConfiguration(Mapping):
             checking.
 
         :param type[C] typed_base:
-            Subclass of :py:class:`Configuration` to assume
+            Subclass of :py:class:`TypedConfiguration` to assume
         :return:
             :py:class:`.SafeConfigurationProxy` instance that has been cast to
             the provided type.
@@ -325,7 +317,7 @@ class LazyLoadConfiguration(Mapping):
         Behaves like :py:meth:`.as_typed` otherwise.
 
         :param type[C] typed_base:
-            Subclass of :py:class:`Configuration` to assume
+            Subclass of :py:class:`TypedConfiguration` or :py:class:`Configuration` to assume
         :return:
             :py:class:`.EagerIOConfigurationProxy` instance that has been cast
             to the provided type.

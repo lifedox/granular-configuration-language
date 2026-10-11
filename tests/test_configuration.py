@@ -221,10 +221,10 @@ e: !Ref $.a
           """
     )
 
-    assert str(test.a._Configuration__attribute_name) == "$.a"
-    assert str(test.e._Configuration__attribute_name) == "$.e"
-    assert str(test.a.b.c._Configuration__attribute_name) == "$.a.b.c"
-    assert str(test.e.b.c._Configuration__attribute_name) == "$.e.b.c"
+    assert str(test.a._TypedConfiguration__attribute_name) == "$.a"
+    assert str(test.e._TypedConfiguration__attribute_name) == "$.e"
+    assert str(test.a.b.c._TypedConfiguration__attribute_name) == "$.a.b.c"
+    assert str(test.e.b.c._TypedConfiguration__attribute_name) == "$.e.b.c"
 
 
 def test_attribute_name_is_weakly_referenced() -> None:
@@ -243,7 +243,7 @@ e: !Ref $.a
     del test
     gc.collect()
 
-    assert str(new_root._Configuration__attribute_name) == "c"
+    assert str(new_root._TypedConfiguration__attribute_name) == "c"
 
 
 def test_evalute_all_run_all_LazyEval() -> None:

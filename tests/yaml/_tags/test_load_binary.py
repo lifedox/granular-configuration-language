@@ -4,13 +4,13 @@ from pathlib import Path
 
 import pytest
 
-from granular_configuration_language import Configuration, LazyLoadConfiguration
+from granular_configuration_language import LazyLoadConfiguration, TypedConfiguration
 from granular_configuration_language.yaml import loads
 
 ASSET_DIR = (Path(__file__).parent / "../../assets/" / "test_load_bindary").resolve()
 
 
-class Config(Configuration):
+class Config(TypedConfiguration):
     data: bytes
 
 
