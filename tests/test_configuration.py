@@ -22,6 +22,26 @@ def test_private_set_is_protected() -> None:
     assert config["a"] == 1
 
 
+def test_private_get_is_protected() -> None:
+    config = Configuration(a=1)
+
+    with pytest.raises(TypeError):
+        config._private_get("a", "hello")
+
+    assert config._private_get("a", setter_secret) == 1
+
+
+def test_private_del_is_protected() -> None:
+    config = Configuration(a=1)
+
+    with pytest.raises(TypeError):
+        config._private_del("a", "hello")
+
+    config._private_del("a", setter_secret)
+
+    assert config.exists("a") is False
+
+
 def test_using_like_mapping() -> None:
     config = Configuration(name="me")
 

@@ -37,7 +37,7 @@ class MutableProxy(tabc.MutableMapping):
         return iter(self.__config)
 
     @override
-    def __len__(self) -> int:
+    def __len__(self) -> int:  # pragma: no cover
         return len(self.__config)
 
     @override
