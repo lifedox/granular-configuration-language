@@ -151,17 +151,17 @@ example_config: # Example Base Path
 
 ### Type annotating your configuration
 
-If you want code completion and typing checking, you can use {py:class}`.Configuration` like a {py:func}`dataclass <dataclasses.dataclass>` and {py:meth}`.LazyLoadConfiguration.as_typed` to apply your subclass.
+If you want code completion and typing checking, you can use {py:class}`.TypedConfiguration` like a {py:func}`dataclass <dataclasses.dataclass>` and {py:meth}`.LazyLoadConfiguration.as_typed` to apply your subclass.
 
 ```python
 from granular_configuration_language import Configuration, LazyLoadConfiguration
 
 
-class Setting2Config(Configuration):
+class Setting2Config(TypedConfiguration):
     sub_setting1: str
 
 
-class Config(Configuration):
+class Config(TypedConfiguration):
     setting1: str
     setting2: Setting2Config
     example_of_codes: Configuration[int, str]

@@ -60,20 +60,20 @@ Some use cases:
       ```
     - Library Code with type annotations:
       ```python
-      class CommonSettings(Configuration):
+      class CommonSettings(TypedConfiguration):
           use_decimal: bool
           encryption_type: str
 
 
       #
-      class DatabaseSettings:
+      class DatabaseSettings(TypedConfiguration):
           location: str
           user: str
           password: str
 
 
       #
-      class Settings(Configuration):
+      class Settings(TypedConfiguration):
           common_settings: CommonSettings
           databases: Configuration[str, DatabaseSettings]
 
