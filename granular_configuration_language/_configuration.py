@@ -71,7 +71,7 @@ class AttributeName(tabc.Iterable[str]):
 @typ.dataclass_transform(frozen_default=True, eq_default=True, kw_only_default=True)
 class TypedConfiguration(typ.Generic[KT, VT], tabc.Mapping[KT, VT]):
     r"""
-    .. versionadded:: 2.5.0
+    .. versionadded:: 2.6.0
 
     Use this class to create type annotated subclasses to
     enable type checking and code completion, as if your subclass was a

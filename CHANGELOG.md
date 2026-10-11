@@ -2,7 +2,7 @@
 
 <!-- markdownlint-disable-file MD024 -->
 
-## 2.5.0
+## 2.6.0
 
 ### Added
 
