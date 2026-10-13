@@ -11,7 +11,7 @@
 
 ### Fixed
 
-- `granular_configuration.mock.patch_config` now allows `TypedConfiguration`.
+- `granular_configuration_language.mock.patch_config` now allows `TypedConfiguration`.
 
 ## 2.6.0
 
@@ -19,7 +19,7 @@
 
 - Added `TypedConfiguration`, as a way to not expose the `__getattr__` that returned `typing.Any` to typing system.
   - It is identical to `Configuration`. `Configuration` is a subclass of `TypedConfiguration` and continues to expose the `__getattr__`
-- Added `granular_configuration.mock.patch_config`
+- Added `granular_configuration_language.mock.patch_config`
 
 ### Removed
 
@@ -236,7 +236,7 @@
   - Note: `jsonpath-rw` is very dead
   - Important: Both `jsonpath-rw` and `python-jsonpath` cannot be installed. `jsonpath-rw` controls `jsonpath_rw` and `jsonpath` modules (despite not explicitly needing the latter). `python-jsonpath` also controls `jsonpath`, but loses to `jsonpath-rw`.
     - `ImportError` occur on the `jsonpath` modules when both are installed.
-- Renamed `granular_configuration.yaml_handler` module to `granular_configuration.yaml`
+- Renamed `granular_configuration_language.yaml_handler` module to `granular_configuration_language.yaml`
 - Configuration no longer fakes being a subclass of `dict`.
   - It remains a `MutableMapping`.
   - `dict` inheritance was done for compatible with `json.dumps` and other library that only support the primitive `dict`, instead of `Mapping`. However, faking the inheritance has always been sketchy and `json.dumps` has failed in rare occurrences.
