@@ -22,6 +22,7 @@ def _load_file(
     *,
     filename: Path | EagerIOTextFile,
     mutable: bool,
+    intern_keys: bool,
     lazy_root: LazyRoot | None,
     previous_options: LoadOptions | None,
 ) -> typ.Any:
@@ -31,6 +32,7 @@ def _load_file(
             lazy_root=lazy_root,
             file_path=filename.path if isinstance(filename, EagerIOTextFile) else filename,
             mutable=mutable,
+            intern_keys=intern_keys,
             previous_options=previous_options,
         )
     except ParsingTriedToCreateALoop:
@@ -45,6 +47,7 @@ def load_file(
     filename: Path | EagerIOTextFile,
     *,
     mutable: bool,
+    intern_keys: bool,
     lazy_root: LazyRoot | None = None,
     previous_options: LoadOptions | None = None,
 ) -> typ.Any:
@@ -57,6 +60,7 @@ def load_file(
         return _load_file(
             filename=filename,
             mutable=mutable,
+            intern_keys=intern_keys,
             lazy_root=lazy_root,
             previous_options=previous_options,
         )

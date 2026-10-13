@@ -35,7 +35,7 @@ def _merge(configuration_type: type[C], base_config: C, configs: tabc.Iterable[C
 
 
 def _load_configs_from_locations(
-    configuration_type: type[C], locations: tabc.Iterable[Path], lazy_root: LazyRoot, mutable: bool
+    configuration_type: type[C], locations: tabc.Iterable[Path], lazy_root: LazyRoot, mutable: bool, intern_keys: bool
 ) -> tabc.Iterator[C]:
     def configuration_only(
         configs: tabc.Iterable[C | typ.Any],
@@ -44,7 +44,7 @@ def _load_configs_from_locations(
             if isinstance(config, configuration_type):
                 yield config
 
-    _load_file = partial(load_file, lazy_root=lazy_root, mutable=mutable)
+    _load_file = partial(load_file, lazy_root=lazy_root, mutable=mutable, intern_keys=intern_keys)
     return configuration_only(map(_load_file, map(load_text_file, locations)))
 
 
@@ -66,6 +66,7 @@ def _inject_configs(
 def build_configuration(
     locations: tabc.Iterable[Path],
     mutable: bool,
+    intern_keys: bool,
     *,
     inject_before: Configuration | None,
     inject_after: Configuration | None,
@@ -75,7 +76,7 @@ def build_configuration(
     lazy_root = LazyRoot.with_root(base_config)
 
     valid_configs = _inject_configs(
-        _load_configs_from_locations(configuration_type, locations, lazy_root, mutable),
+        _load_configs_from_locations(configuration_type, locations, lazy_root, mutable, intern_keys),
         before=inject_before,
         after=inject_after,
     )

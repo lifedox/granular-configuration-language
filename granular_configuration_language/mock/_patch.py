@@ -6,7 +6,7 @@ import typing as typ
 from contextlib import contextmanager
 from unittest.mock import patch
 
-from granular_configuration_language import Configuration, LazyLoadConfiguration
+from granular_configuration_language import LazyLoadConfiguration, TypedConfiguration
 from granular_configuration_language._s import setter_secret
 from granular_configuration_language.yaml.classes import RT, P
 
@@ -21,7 +21,7 @@ else:
 
 
 class MutableProxy(tabc.MutableMapping):
-    def __init__(self, config: Configuration) -> None:
+    def __init__(self, config: TypedConfiguration) -> None:
         self.__config = config
 
     @override
@@ -47,7 +47,7 @@ class MutableProxy(tabc.MutableMapping):
 
 @contextmanager
 def patch_config(
-    in_config: Configuration | LazyLoadConfiguration, values: tabc.Mapping[typ.Any, typ.Any], clear: bool = False
+    in_config: TypedConfiguration | LazyLoadConfiguration, values: tabc.Mapping[typ.Any, typ.Any], clear: bool = False
 ) -> tabc.Generator[None]:
     """
     Works like :py:func:`patch.dict <unittest.mock.patch.dict>` except for
@@ -61,7 +61,7 @@ def patch_config(
         This is only meant to be used to mutate your configuration during your
         tests!
 
-    :param Configuration | LazyLoadConfiguration in_config:
+    :param TypedConfiguration | LazyLoadConfiguration in_config:
         :py:class:`.Configuration` being patched.
     :param ~collections.abc.Mapping[~typing.Any, ~typing.Any] values:
         dictionary of values to set in the configuration.
@@ -71,7 +71,7 @@ def patch_config(
         A context manager
     :rtype: contextlib.AbstractContextManager[None]
     """
-    proxy = MutableProxy(in_config if isinstance(in_config, Configuration) else in_config.config)
+    proxy = MutableProxy(in_config.config if isinstance(in_config, LazyLoadConfiguration) else in_config)
 
     with patch.dict(proxy, values, clear):
         yield

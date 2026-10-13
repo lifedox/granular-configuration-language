@@ -2,6 +2,17 @@
 
 <!-- markdownlint-disable-file MD024 -->
 
+## 2.7.0
+
+### Added
+
+- Added `intern_keys` parameter to `LazyLoadConfiguration`
+- Added `!Intern`
+
+### Fixed
+
+- `granular_configuration.mock.patch_config` now allows `TypedConfiguration`.
+
 ## 2.6.0
 
 ### Added

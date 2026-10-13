@@ -135,6 +135,8 @@ class LazyLoadConfiguration(Mapping):
         Inject a runtime :py:class:`.Configuration` instance, as if it were the first loaded file.
     :param Configuration, optional inject_after:
         Inject a runtime :py:class:`.Configuration` instance, as if it were the last loaded file.
+    :param bool, optional intern_keys:
+        When :py:data:`True`, strings used as keys will be :py:func:`~sys.intern`-ed.
     :param bool, optional disable_caching:
         When :py:data:`True`, this instance will not participate in the caching of "identical immutable configurations".
     :param ~typing.Any \*\*kwargs: There are no public-facing supported extra parameters.
@@ -157,6 +159,9 @@ class LazyLoadConfiguration(Mapping):
 
             # With a typed `Configuration`
             LazyLoadConfiguration(...).as_typed(TypedConfig)
+
+    .. versionadded:: 2.7.0
+        The *intern_keys* parameter
     """
 
     def __init__(
@@ -167,6 +172,7 @@ class LazyLoadConfiguration(Mapping):
         env_location_var_name: str = "G_CONFIG_LOCATION",
         inject_before: Configuration | None = None,
         inject_after: Configuration | None = None,
+        intern_keys: bool = False,
         disable_caching: bool = False,
         **kwargs: typ.Any,
     ) -> None:
@@ -176,6 +182,7 @@ class LazyLoadConfiguration(Mapping):
             mutable_configuration=kwargs.get("_mutable_configuration", False),
             inject_before=inject_before,
             inject_after=inject_after,
+            intern_keys=intern_keys,
             disable_cache=disable_caching,
         )
 

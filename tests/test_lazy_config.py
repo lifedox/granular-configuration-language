@@ -5,6 +5,7 @@ import operator as op
 import os
 from contextlib import AbstractContextManager
 from pathlib import Path
+from sys import intern
 from unittest.mock import AsyncMock, MagicMock, patch
 
 import pytest
@@ -43,8 +44,7 @@ def build_configuration_pach() -> AbstractContextManager[AsyncMock | MagicMock]:
     ids=("class", "proxy", "mutable_class"),
 )
 def test_laziness(
-    creator: tabc.Callable[[tabc.Iterable[Path]], LazyLoadConfiguration | Configuration],
-    mutable: bool,
+    creator: tabc.Callable[[tabc.Iterable[Path]], LazyLoadConfiguration | Configuration], mutable: bool
 ) -> None:
     with build_configuration_pach() as bc_mock:
         files = [ASSET_DIR / "test_env_config.yaml"]
@@ -56,7 +56,7 @@ def test_laziness(
         assert config.A.key1 == "value2"
         assert config.A.key2 == "MyTestValue"
 
-        bc_mock.assert_called_once_with(Locations(files), mutable, inject_before=None, inject_after=None)
+        bc_mock.assert_called_once_with(Locations(files), mutable, False, inject_before=None, inject_after=None)
 
 
 def test_with_base_path() -> None:
@@ -176,3 +176,14 @@ def test_missing_environment_variable_in_base_path() -> None:
 def test_loading_environment_variable_file_extension_fails() -> None:
     with pytest.raises(ReservedFileExtension):
         LazyLoadConfiguration(ASSET_DIR / ("bad" + ENV_VAR_FILE_EXTENSION)).config
+
+
+def test_intern_keys_returns_interned_keys() -> None:
+    config = LazyLoadConfiguration(ASSET_DIR / "intern.yaml", intern_keys=True)
+
+    for key in config:
+        if isinstance(key, str):
+            assert intern(key) is key
+
+    for key in config[2]:
+        assert intern(key) is key

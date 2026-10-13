@@ -23,7 +23,9 @@ def load_from_file(file: EagerIOTextFile | Path, /, options: LoadOptions, root: 
     from granular_configuration_language.yaml.load import load_file
 
     lazy_root = LazyRoot.with_root(root)
-    return load_file(file, lazy_root=lazy_root, mutable=options.mutable, previous_options=options)
+    return load_file(
+        file, lazy_root=lazy_root, mutable=options.mutable, intern_keys=options.intern_keys, previous_options=options
+    )
 
 
 def safe_load_from_file(file: EagerIOTextFile | Path, /) -> typ.Any:

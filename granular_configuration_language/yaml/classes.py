@@ -5,10 +5,13 @@ import collections.abc as tabc
 import sys
 import typing as typ
 from dataclasses import dataclass
-from functools import cached_property
+from functools import cached_property, partial
 from pathlib import Path
+from sys import intern
 from threading import RLock
 from typing import Final  # autodoc didn't like typ.Final on a class attribute, so import Final
+
+from ruamel.yaml import MappingNode, SafeConstructor, SequenceNode
 
 if sys.version_info >= (3, 12):
     from typing import override
@@ -204,6 +207,14 @@ class LazyEval(abc.ABC, typ.Generic[RT]):
         return super().__getstate__()
 
 
+class ConstructMapping(typ.Protocol):
+    def __call__(self, constructor: SafeConstructor, node: MappingNode) -> tabc.Mapping[typ.Any, typ.Any]: ...
+
+
+class ConstructSequence(typ.Protocol):
+    def __call__(self, constructor: SafeConstructor, node: SequenceNode) -> tabc.Sequence[typ.Any]: ...
+
+
 @dataclass(frozen=True, kw_only=True, slots=True)
 class LoadOptions:
     """
@@ -217,6 +228,10 @@ class LoadOptions:
     Type being used for YAML mappings
     """
     sequence_func: type[tuple[typ.Any] | list[typ.Any]]
+    """
+    Type being used for YAML mappings
+    """
+    intern_keys: bool
     """
     Type being used for YAML sequences
     """
@@ -237,6 +252,17 @@ class LoadOptions:
     Pointer to previous options, if this file was loaded by another
     """
 
+    @property
+    def construct_mapping(self) -> ConstructMapping:
+        if self.intern_keys:
+            return partial(_construct_mapping, self.obj_pairs_func, _intern_any)
+        else:
+            return partial(_construct_mapping, self.obj_pairs_func, _no_op)
+
+    @property
+    def construct_sequence(self) -> ConstructSequence:
+        return partial(_construct_sequence, self.sequence_func)
+
 
 @dataclass(frozen=True, kw_only=True, slots=True)
 class StateHolder:
@@ -254,3 +280,43 @@ class StateHolder:
     """
     Shared reference to the final root configuration
     """
+
+
+_KeyOp = tabc.Callable[[typ.Any], typ.Any]
+
+
+def _intern_any(value: typ.Any, /) -> typ.Any:
+    match value:
+        case str():
+            return intern(value)
+        case _:
+            return value
+
+
+def _no_op(value: typ.Any, /) -> typ.Any:
+    return value
+
+
+def _construct_mapping(
+    cls: type, key_op: _KeyOp, constructor: SafeConstructor, node: MappingNode
+) -> tabc.Mapping[typ.Any, typ.Any]:
+    node.value = [pair for pair in node.value if pair[0].tag != "!Del"]
+
+    value: tabc.Mapping = cls(constructor.construct_mapping(node, deep=False))
+
+    for key in value:
+        if isinstance(key, LazyEval):
+            raise TypeError("Lazy Tags are not allowed as keys to mappings.")
+
+    return cls((key_op(k), v) for k, v in constructor.construct_mapping(node, deep=False).items())
+
+
+def _construct_sequence(
+    cls: type[list | tuple], constructor: SafeConstructor, node: SequenceNode
+) -> tabc.Sequence[typ.Any]:
+    value = constructor.construct_sequence(node, deep=False)
+
+    if isinstance(value, cls):
+        return value
+    else:
+        return cls(value)

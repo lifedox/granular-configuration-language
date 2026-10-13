@@ -11,7 +11,6 @@ from ruamel.yaml import MappingNode, Node, SafeConstructor, ScalarNode, Sequence
 from granular_configuration_language.exceptions import ErrorWhileLoadingTags, TagHadUnsupportArgument
 from granular_configuration_language.yaml.classes import RT, StateHolder, T, Tag
 from granular_configuration_language.yaml.decorators._tag_tracker import HandlerAttributes, tracker
-from granular_configuration_language.yaml.load._constructors import construct_mapping, construct_sequence
 
 if sys.version_info >= (3, 12):
     from typing import override
@@ -257,11 +256,11 @@ class TagDecoratorBase(typ.Generic[T], abc.ABC):
                         if isinstance(value, str) and scalar_node_type_check(value):
                             return handler(tag, scalar_node_transformer(value), state)
                     elif isinstance(node, SequenceNode):
-                        value = construct_sequence(state.options.sequence_func, constructor, node)
+                        value = state.options.construct_sequence(constructor, node)
                         if isinstance(value, tabc.Sequence) and sequence_node_type_check(value):
                             return handler(tag, sequence_node_transformers(value), state)
                     elif isinstance(node, MappingNode):
-                        value = construct_mapping(state.options.obj_pairs_func, constructor, node)
+                        value = state.options.construct_mapping(constructor, node)
                         if isinstance(value, tabc.Mapping) and mapping_node_type_check(value):
                             return handler(tag, mapping_node_transformer(value), state)
                     else:

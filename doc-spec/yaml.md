@@ -109,6 +109,10 @@
   - `str`
   - `!Func functools.reduce`
 * -
+  - [`!Intern`](#mask) [{sup}`i-`](#interpolates-reduced){.abbr title="Supports reduced interpolation syntax (without JSON Path or JSON Pointer syntax)"}
+  - `str`
+  - `!Intern Some not auto-interned string.`
+* -
   - [`!Mask`](#mask) [{sup}`i-`](#interpolates-reduced){.abbr title="Supports reduced interpolation syntax (without JSON Path or JSON Pointer syntax)"}
   - `str`
   - `!Mask ${SECRET}`
@@ -558,12 +562,28 @@ function: !Func functools.reduce
 
 ---
 
+(tag-intern)=
+
+### `!Intern`
+
+```yaml
+string: !Intern Some not auto-interned string.
+```
+
+- **Argument:** _str_
+  - _Supports Reduced Interpolation [Syntax](#interpolations)_
+- **Returns:** {py:class}`str` ‒ Returns the output of calling {py:func}`~sys.intern` on this string.
+- Notes:
+  - You can use the `intern_keys=True` parameter of {py:class}`.LazyLoadConfiguration` to have all keys be interned.
+
+---
+
 (tag-mask)=
 
 ### `!Mask`
 
 ```yaml
-function: !Mask ${SECRET}
+string: !Mask ${SECRET}
 ```
 
 - **Argument:** _str_

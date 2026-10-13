@@ -15,6 +15,7 @@ def loads(
     file_path: Path | None = None,
     previous_options: LoadOptions | None = None,
     mutable: bool = False,
+    intern_keys: bool = False,
 ) -> typ.Any:
     state = StateHolder(
         lazy_root_obj=lazy_root or LazyRoot(),
@@ -23,6 +24,7 @@ def loads(
             relative_to_directory=file_path.parent if file_path is not None else Path(),
             obj_pairs_func=obj_pairs_func(mutable),
             sequence_func=sequence_func(mutable),
+            intern_keys=intern_keys,
             mutable=mutable,
             previous=previous_options,
         ),
