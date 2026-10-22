@@ -43,7 +43,7 @@ python-jsonpath = ">=2.0.2"
 optional = true
 
 [tool.poetry.group.pyright.dependencies]
-python-dateutil = ">=2.9.0.post0"
+python-dateutil = ">=3.0.0"
 pyright = { version = ">=1.1.414", extras = ["nodejs"] }
 
 [tool.poetry.group.docs]
