@@ -52,7 +52,7 @@ optional = true
 [tool.poetry.group.docs.dependencies]
 sphinx = { version = ">=9.2.0", python = ">=3.14" }
 sphinx_rtd_theme = { version = ">=3.1.0", python = ">=3.14" }
-myst-parser = { version = ">=5.1.0", python = ">=3.14" }
+myst-parser = { version = ">=5.2.0", python = ">=3.14" }
 sphinx-copybutton = { version = ">=0.5.2", python = ">=3.14" }
 
 [tool.poetry.group.dev.dependencies]
