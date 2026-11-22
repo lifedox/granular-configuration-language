@@ -1195,18 +1195,18 @@ tzdata = "*"
 
 [[package]]
 name = "python-jsonpath"
-version = "2.2.2"
+version = "2.3.0"
 description = "JSONPath, JSON Pointer and JSON Patch for Python."
 optional = false
 python-versions = ">=3.8"
 groups = ["main", "renovate-main"]
 files = [
-    {file = "python_jsonpath-2.2.2-py3-none-any.whl", hash = "sha256:b088251c7b63ee8c8ac14e54cf2eefbfe0cf5f59f0d26609a96bacb444ec40ac"},
-    {file = "python_jsonpath-2.2.2.tar.gz", hash = "sha256:bb1a66e82b8c586fcdd53a1df46df92e1cd5e4164aa57f315b03afa76dd14947"},
+    {file = "python_jsonpath-2.3.0-py3-none-any.whl", hash = "sha256:df4dad45cda24635d4a3e683bd29dc6396dea1b3b82fc8ae5cf1ceedc02652ce"},
+    {file = "python_jsonpath-2.3.0.tar.gz", hash = "sha256:d141741899950da3183415e66d4d5037d5423e307845cbd0a814605d324749f7"},
 ]
 
 [package.extras]
-strict = ["iregexp-check (>=0.1.4)", "regex"]
+strict = ["regex"]
 
 [[package]]
 name = "pyyaml"
